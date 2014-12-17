@@ -1,6 +1,6 @@
 import {History} from 'aurelia-history';
 import {Container} from 'aurelia-dependency-injection';
-import {AppRouter, PipelineProvider} from '../lib/index';
+import {AppRouter, PipelineProvider} from '../src/index';
 
 describe('observer locator', () => {
   it('should have some tests', () => {

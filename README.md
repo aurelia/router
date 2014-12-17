@@ -14,6 +14,11 @@ This library is part of the [Aurelia](http://www.aurelia.io/) platform and conta
 * [aurelia-history](https://github.com/aurelia/history)
 * [aurelia-route-recognizer](https://github.com/aurelia/route-recognizer)
 
+## Used By
+
+* [aurelia-bootstrapper](https://github.com/aurelia/bootstrapper)
+* [aurelia-templating-router](https://github.com/aurelia/templating-router)
+
 ## Platform Support
 
 This library can be used in the **browser** only.

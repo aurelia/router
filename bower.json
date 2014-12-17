@@ -1,0 +1,22 @@
+{
+  "name": "aurelia-router",
+  "version": "0.1.0",
+  "description": "A powerful client-side router.",
+  "keywords": [
+    "aurelia",
+    "router"
+  ],
+  "homepage": "http://aurelia.io",
+  "license": "MIT",
+  "authors": ["Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)"],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/aurelia/router"
+  },
+  "dependencies": {
+    "aurelia-dependency-injection": "0.1.0",
+    "aurelia-history": "0.1.0",
+    "aurelia-route-recognizer": "0.1.0",
+    "es6-shim": "0.21.1"
+  }
+}
