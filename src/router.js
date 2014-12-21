@@ -18,9 +18,26 @@ export class Router {
     if (typeof this.viewPorts[name] == 'function') {
       var callback = this.viewPorts[name];
       this.viewPorts[name] = viewPort;
-      callback(viewPort);
+      this.configureRouterForViewPort(viewPort, callback);
     } else {
-      this.viewPorts[name] = viewPort;
+      this.configureRouterForViewPort(viewPort, () =>{
+        if (typeof this.viewPorts[name] == 'function') {
+          var callback = this.viewPorts[name];
+          this.viewPorts[name] = viewPort;
+          callback(viewPort);
+        }else{
+          this.viewPorts[name] = viewPort;
+        }
+      });
+    }
+  }
+
+  configureRouterForViewPort(viewPort, callback){
+    if('configureRouter' in viewPort.executionContext){
+      var result = viewPort.executionContext.configureRouter() || Promise.resolve();
+      result.then(() => callback(viewPort));
+    }else{
+      callback(viewPort);
     }
   }
 

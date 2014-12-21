@@ -72,12 +72,13 @@ export class AppRouter extends Router {
   }
 
   registerViewPort(viewPort, name) {
-    super.registerViewPort(viewPort, name);
+    name = name || 'default';
+    this.viewPorts[name] = viewPort;
 
     if (!this.isActive) {
-      this.activate();
+      this.configureRouterForViewPort(viewPort, () => this.activate());
     } else {
-      this.dequeueInstruction();
+      this.configureRouterForViewPort(viewPort, () => this.dequeueInstruction());
     }
   }
 
