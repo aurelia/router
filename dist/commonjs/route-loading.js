@@ -107,7 +107,7 @@ function resolveComponent(routeLoader, router, viewPortPlan) {
       }
 
       function getComponent(routerViewPort) {
-        routerViewPort.getComponent(type, createChildRouter, viewPortPlan.config).then(resolve)["catch"](error);
+        routerViewPort.getComponent(type, createChildRouter, viewPortPlan.config).then(resolve)["catch"](reject);
       }
 
       if (possibleRouterViewPort) {

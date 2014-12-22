@@ -1,3 +1,11 @@
+### 0.2.1 (2014-12-22)
+
+
+#### Bug Fixes
+
+* **route-loading:** use correct rejection callback ([74799a2e](http://github.com/aurelia/router/commit/74799a2e991d114070ad06c7320fe6dc8088635a))
+
+
 ## 0.2.0 (2014-12-22)
 
 

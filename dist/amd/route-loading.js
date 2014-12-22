@@ -108,7 +108,7 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
         }
 
         function getComponent(routerViewPort) {
-          routerViewPort.getComponent(type, createChildRouter, viewPortPlan.config).then(resolve)["catch"](error);
+          routerViewPort.getComponent(type, createChildRouter, viewPortPlan.config).then(resolve)["catch"](reject);
         }
 
         if (possibleRouterViewPort) {
