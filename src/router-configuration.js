@@ -1,5 +1,3 @@
-import {extend} from './util';
-
 export class RouterConfiguration{
   constructor() {
     this.instructions = [];
@@ -35,12 +33,12 @@ export class RouterConfiguration{
         var navModel = {}, i, ii, current;
 
         for (i = 0, ii = config.route.length; i < ii; ++i) {
-          current = extend({}, config);
+          current = Object.assign({}, config);
           current.route = config.route[i];
           this.configureRoute(router, current, navModel);
         }
       } else {
-        this.configureRoute(router, extend({}, config));
+        this.configureRoute(router, Object.assign({}, config));
       }
     });
 

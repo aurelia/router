@@ -1,5 +1,4 @@
 import {History} from 'aurelia-history';
-import {extend} from './util';
 import {Router} from './router';
 import {PipelineProvider} from './pipeline-provider';
 import {isNavigationCommand} from './navigation-commands';
@@ -88,7 +87,7 @@ export class AppRouter extends Router {
     }
 
     this.isActive = true;
-    this.options = extend({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
+    this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
     this.history.activate(this.options);
     this.dequeueInstruction();
   }
