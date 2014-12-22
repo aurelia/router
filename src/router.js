@@ -1,8 +1,9 @@
 import {RouteRecognizer} from 'aurelia-route-recognizer';
+import {join} from 'aurelia-path';
 import {NavigationContext} from './navigation-context';
 import {NavigationInstruction} from './navigation-instruction';
 import {RouterConfiguration} from './router-configuration';
-import {processPotential, combinePath} from './util';
+import {processPotential} from './util';
 
 export class Router {
   constructor(history) {
@@ -81,7 +82,7 @@ export class Router {
   }
 
   navigate(fragment, options) {
-    fragment = combinePath(fragment, this.baseUrl);
+    fragment = join(this.baseUrl, fragment);
     return this.history.navigate(fragment, options);
   }
 

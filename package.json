@@ -25,6 +25,7 @@
     "dependencies": {
       "aurelia-dependency-injection": "^0.1.1",
       "aurelia-history": "^0.1.1",
+      "aurelia-path": "^0.3.0",
       "aurelia-route-recognizer": "^0.1.1",
       "es6-shim": "github:paulmillr/es6-shim@^0.21.1"
     }

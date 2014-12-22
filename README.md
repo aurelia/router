@@ -13,6 +13,7 @@ This library is part of the [Aurelia](http://www.aurelia.io/) platform and conta
 * [aurelia-dependency-injection](https://github.com/aurelia/dependency-injection)
 * [aurelia-history](https://github.com/aurelia/history)
 * [aurelia-route-recognizer](https://github.com/aurelia/route-recognizer)
+* [aurelia-path](https://github.com/aurelia/path)
 
 ## Used By
 
