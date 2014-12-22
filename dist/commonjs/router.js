@@ -1,11 +1,11 @@
 "use strict";
 
 var RouteRecognizer = require('aurelia-route-recognizer').RouteRecognizer;
+var join = require('aurelia-path').join;
 var NavigationContext = require('./navigation-context').NavigationContext;
 var NavigationInstruction = require('./navigation-instruction').NavigationInstruction;
 var RouterConfiguration = require('./router-configuration').RouterConfiguration;
 var processPotential = require('./util').processPotential;
-var combinePath = require('./util').combinePath;
 var Router = (function () {
   var Router = function Router(history) {
     this.history = history;
@@ -15,14 +15,34 @@ var Router = (function () {
   };
 
   Router.prototype.registerViewPort = function (viewPort, name) {
+    var _this = this;
     name = name || "default";
 
     if (typeof this.viewPorts[name] == "function") {
       var callback = this.viewPorts[name];
       this.viewPorts[name] = viewPort;
-      callback(viewPort);
+      this.configureRouterForViewPort(viewPort, callback);
     } else {
-      this.viewPorts[name] = viewPort;
+      this.configureRouterForViewPort(viewPort, function () {
+        if (typeof _this.viewPorts[name] == "function") {
+          var callback = _this.viewPorts[name];
+          _this.viewPorts[name] = viewPort;
+          callback(viewPort);
+        } else {
+          _this.viewPorts[name] = viewPort;
+        }
+      });
+    }
+  };
+
+  Router.prototype.configureRouterForViewPort = function (viewPort, callback) {
+    if ("configureRouter" in viewPort.executionContext) {
+      var result = viewPort.executionContext.configureRouter() || Promise.resolve();
+      result.then(function () {
+        return callback(viewPort);
+      });
+    } else {
+      callback(viewPort);
     }
   };
 
@@ -66,7 +86,7 @@ var Router = (function () {
   };
 
   Router.prototype.navigate = function (fragment, options) {
-    fragment = combinePath(fragment, this.baseUrl);
+    fragment = join(this.baseUrl, fragment);
     return this.history.navigate(fragment, options);
   };
 

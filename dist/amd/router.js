@@ -1,12 +1,12 @@
-define(["exports", "aurelia-route-recognizer", "./navigation-context", "./navigation-instruction", "./router-configuration", "./util"], function (exports, _aureliaRouteRecognizer, _navigationContext, _navigationInstruction, _routerConfiguration, _util) {
+define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-context", "./navigation-instruction", "./router-configuration", "./util"], function (exports, _aureliaRouteRecognizer, _aureliaPath, _navigationContext, _navigationInstruction, _routerConfiguration, _util) {
   "use strict";
 
   var RouteRecognizer = _aureliaRouteRecognizer.RouteRecognizer;
+  var join = _aureliaPath.join;
   var NavigationContext = _navigationContext.NavigationContext;
   var NavigationInstruction = _navigationInstruction.NavigationInstruction;
   var RouterConfiguration = _routerConfiguration.RouterConfiguration;
   var processPotential = _util.processPotential;
-  var combinePath = _util.combinePath;
   var Router = (function () {
     var Router = function Router(history) {
       this.history = history;
@@ -16,14 +16,34 @@ define(["exports", "aurelia-route-recognizer", "./navigation-context", "./naviga
     };
 
     Router.prototype.registerViewPort = function (viewPort, name) {
+      var _this = this;
       name = name || "default";
 
       if (typeof this.viewPorts[name] == "function") {
         var callback = this.viewPorts[name];
         this.viewPorts[name] = viewPort;
-        callback(viewPort);
+        this.configureRouterForViewPort(viewPort, callback);
       } else {
-        this.viewPorts[name] = viewPort;
+        this.configureRouterForViewPort(viewPort, function () {
+          if (typeof _this.viewPorts[name] == "function") {
+            var callback = _this.viewPorts[name];
+            _this.viewPorts[name] = viewPort;
+            callback(viewPort);
+          } else {
+            _this.viewPorts[name] = viewPort;
+          }
+        });
+      }
+    };
+
+    Router.prototype.configureRouterForViewPort = function (viewPort, callback) {
+      if ("configureRouter" in viewPort.executionContext) {
+        var result = viewPort.executionContext.configureRouter() || Promise.resolve();
+        result.then(function () {
+          return callback(viewPort);
+        });
+      } else {
+        callback(viewPort);
       }
     };
 
@@ -67,7 +87,7 @@ define(["exports", "aurelia-route-recognizer", "./navigation-context", "./naviga
     };
 
     Router.prototype.navigate = function (fragment, options) {
-      fragment = combinePath(fragment, this.baseUrl);
+      fragment = join(this.baseUrl, fragment);
       return this.history.navigate(fragment, options);
     };
 

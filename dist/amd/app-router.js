@@ -1,4 +1,4 @@
-define(["exports", "aurelia-history", "./util", "./router", "./pipeline-provider", "./navigation-commands"], function (exports, _aureliaHistory, _util, _router, _pipelineProvider, _navigationCommands) {
+define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navigation-commands"], function (exports, _aureliaHistory, _router, _pipelineProvider, _navigationCommands) {
   "use strict";
 
   var _extends = function (child, parent) {
@@ -14,7 +14,6 @@ define(["exports", "aurelia-history", "./util", "./router", "./pipeline-provider
   };
 
   var History = _aureliaHistory.History;
-  var extend = _util.extend;
   var Router = _router.Router;
   var PipelineProvider = _pipelineProvider.PipelineProvider;
   var isNavigationCommand = _navigationCommands.isNavigationCommand;
@@ -94,12 +93,18 @@ define(["exports", "aurelia-history", "./util", "./router", "./pipeline-provider
     };
 
     AppRouter.prototype.registerViewPort = function (viewPort, name) {
-      Router.prototype.registerViewPort.call(this, viewPort, name);
+      var _this4 = this;
+      name = name || "default";
+      this.viewPorts[name] = viewPort;
 
       if (!this.isActive) {
-        this.activate();
+        this.configureRouterForViewPort(viewPort, function () {
+          return _this4.activate();
+        });
       } else {
-        this.dequeueInstruction();
+        this.configureRouterForViewPort(viewPort, function () {
+          return _this4.dequeueInstruction();
+        });
       }
     };
 
@@ -109,7 +114,7 @@ define(["exports", "aurelia-history", "./util", "./router", "./pipeline-provider
       }
 
       this.isActive = true;
-      this.options = extend({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
+      this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
       this.history.activate(this.options);
       this.dequeueInstruction();
     };

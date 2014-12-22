@@ -1,6 +1,5 @@
 "use strict";
 
-var extend = require('./util').extend;
 var RouterConfiguration = (function () {
   var RouterConfiguration = function RouterConfiguration() {
     this.instructions = [];
@@ -37,12 +36,12 @@ var RouterConfiguration = (function () {
         var navModel = {}, i, ii, current;
 
         for (i = 0, ii = config.route.length; i < ii; ++i) {
-          current = extend({}, config);
+          current = Object.assign({}, config);
           current.route = config.route[i];
           _this.configureRoute(router, current, navModel);
         }
       } else {
-        _this.configureRoute(router, extend({}, config));
+        _this.configureRoute(router, Object.assign({}, config));
       }
     });
 

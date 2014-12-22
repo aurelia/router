@@ -13,7 +13,6 @@ var _extends = function (child, parent) {
 };
 
 var History = require('aurelia-history').History;
-var extend = require('./util').extend;
 var Router = require('./router').Router;
 var PipelineProvider = require('./pipeline-provider').PipelineProvider;
 var isNavigationCommand = require('./navigation-commands').isNavigationCommand;
@@ -93,12 +92,18 @@ var AppRouter = (function (Router) {
   };
 
   AppRouter.prototype.registerViewPort = function (viewPort, name) {
-    Router.prototype.registerViewPort.call(this, viewPort, name);
+    var _this4 = this;
+    name = name || "default";
+    this.viewPorts[name] = viewPort;
 
     if (!this.isActive) {
-      this.activate();
+      this.configureRouterForViewPort(viewPort, function () {
+        return _this4.activate();
+      });
     } else {
-      this.dequeueInstruction();
+      this.configureRouterForViewPort(viewPort, function () {
+        return _this4.dequeueInstruction();
+      });
     }
   };
 
@@ -108,7 +113,7 @@ var AppRouter = (function (Router) {
     }
 
     this.isActive = true;
-    this.options = extend({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
+    this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
     this.history.activate(this.options);
     this.dequeueInstruction();
   };

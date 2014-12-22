@@ -116,11 +116,9 @@ function resolveComponent(routeLoader, router, viewPortPlan) {
       }
 
       function getComponent(routerViewPort) {
-        try {
-          resolve(routerViewPort.getComponent(type, createChildRouter));
-        } catch(error){
-          reject(error);
-        }
+        routerViewPort.getComponent(type, createChildRouter, viewPortPlan.config)
+                      .then(resolve)
+                      .catch(error);
       }
 
       if (possibleRouterViewPort) {
