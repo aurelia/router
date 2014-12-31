@@ -114,7 +114,9 @@ export class Router {
 
     if((!results || !results.length) && this.catchAllHandler){
       results = [{
-        config:{},
+        config:{
+          navModel:{}
+        },
         handler:this.catchAllHandler,
         params:{
           path:fragment
@@ -142,8 +144,18 @@ export class Router {
         parentInstruction
         );
 
-      if (typeof first.handler == 'function') {
-        return first.handler(instruction);
+      if (typeof first.handler == "function") {
+        return first.handler(instruction).then(instruction => {
+          if (!("viewPorts" in instruction.config)) {
+            instruction.config.viewPorts = {
+              "default": {
+                moduleId: instruction.config.moduleId
+              }
+            };
+          }
+
+          return instruction;
+        });
       }
 
       return Promise.resolve(instruction);
