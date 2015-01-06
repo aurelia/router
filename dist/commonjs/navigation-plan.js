@@ -31,7 +31,8 @@ function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
       if (prevViewPortInstruction.moduleId != nextViewPortConfig.moduleId) {
         viewPortPlan.strategy = REPLACE;
       } else if ("determineActivationStrategy" in prevViewPortInstruction.component.executionContext) {
-        viewPortPlan.strategy = prevViewPortInstruction.component.executionContext.determineActivationStrategy.apply(prevViewPortInstruction.component.executionContext, _toArray(next.lifecycleArgs));
+        var _prevViewPortInstruction$component$executionContext;
+        viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, _toArray(next.lifecycleArgs));
       } else if (newParams || forceLifecycleMinimum) {
         viewPortPlan.strategy = INVOKE_LIFECYCLE;
       } else {
@@ -68,18 +69,14 @@ function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
   }
 }
 
-var BuildNavigationPlanStep = (function () {
-  var BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
+var BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
 
-  BuildNavigationPlanStep.prototype.run = function (navigationContext, next) {
-    return buildNavigationPlan(navigationContext).then(function (plan) {
-      navigationContext.plan = plan;
-      return next();
-    })["catch"](next.cancel);
-  };
-
-  return BuildNavigationPlanStep;
-})();
+BuildNavigationPlanStep.prototype.run = function (navigationContext, next) {
+  return buildNavigationPlan(navigationContext).then(function (plan) {
+    navigationContext.plan = plan;
+    return next();
+  })["catch"](next.cancel);
+};
 
 exports.BuildNavigationPlanStep = BuildNavigationPlanStep;
 

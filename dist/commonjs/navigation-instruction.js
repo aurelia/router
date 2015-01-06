@@ -1,61 +1,57 @@
 "use strict";
 
-var NavigationInstruction = (function () {
-  var NavigationInstruction = function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
-    this.fragment = fragment;
-    this.queryString = queryString;
-    this.params = params || {};
-    this.queryParams = queryParams;
-    this.config = config;
-    this.lifecycleArgs = [params, queryParams, config];
-    this.viewPortInstructions = {};
+var NavigationInstruction = function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
+  this.fragment = fragment;
+  this.queryString = queryString;
+  this.params = params || {};
+  this.queryParams = queryParams;
+  this.config = config;
+  this.lifecycleArgs = [params, queryParams, config];
+  this.viewPortInstructions = {};
 
-    if (parentInstruction) {
-      this.params.$parent = parentInstruction.params;
-    }
+  if (parentInstruction) {
+    this.params.$parent = parentInstruction.params;
+  }
+};
+
+NavigationInstruction.prototype.addViewPortInstruction = function (viewPortName, strategy, moduleId, component) {
+  return this.viewPortInstructions[viewPortName] = {
+    name: viewPortName,
+    strategy: strategy,
+    moduleId: moduleId,
+    component: component,
+    childRouter: component.executionContext.router,
+    lifecycleArgs: this.lifecycleArgs.slice()
   };
+};
 
-  NavigationInstruction.prototype.addViewPortInstruction = function (viewPortName, strategy, moduleId, component) {
-    return this.viewPortInstructions[viewPortName] = {
-      name: viewPortName,
-      strategy: strategy,
-      moduleId: moduleId,
-      component: component,
-      childRouter: component.executionContext.router,
-      lifecycleArgs: this.lifecycleArgs.slice()
-    };
-  };
+NavigationInstruction.prototype.getWildCardName = function () {
+  var wildcardIndex = this.config.route.lastIndexOf("*");
+  return this.config.route.substr(wildcardIndex + 1);
+};
 
-  NavigationInstruction.prototype.getWildCardName = function () {
-    var wildcardIndex = this.config.route.lastIndexOf("*");
-    return this.config.route.substr(wildcardIndex + 1);
-  };
+NavigationInstruction.prototype.getWildcardPath = function () {
+  var wildcardName = this.getWildCardName(), path = this.params[wildcardName];
 
-  NavigationInstruction.prototype.getWildcardPath = function () {
-    var wildcardName = this.getWildCardName(), path = this.params[wildcardName];
+  if (this.queryString) {
+    path += "?" + this.queryString;
+  }
 
-    if (this.queryString) {
-      path += "?" + this.queryString;
-    }
+  return path;
+};
 
-    return path;
-  };
+NavigationInstruction.prototype.getBaseUrl = function () {
+  if (!this.params) {
+    return this.fragment;
+  }
 
-  NavigationInstruction.prototype.getBaseUrl = function () {
-    if (!this.params) {
-      return this.fragment;
-    }
+  var wildcardName = this.getWildCardName(), path = this.params[wildcardName];
 
-    var wildcardName = this.getWildCardName(), path = this.params[wildcardName];
+  if (!path) {
+    return this.fragment;
+  }
 
-    if (!path) {
-      return this.fragment;
-    }
-
-    return this.fragment.substr(0, this.fragment.lastIndexOf(path));
-  };
-
-  return NavigationInstruction;
-})();
+  return this.fragment.substr(0, this.fragment.lastIndexOf(path));
+};
 
 exports.NavigationInstruction = NavigationInstruction;

@@ -1,8 +1,11 @@
 define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navigation-commands"], function (exports, _aureliaHistory, _router, _pipelineProvider, _navigationCommands) {
   "use strict";
 
-  var _extends = function (child, parent) {
-    child.prototype = Object.create(parent.prototype, {
+  var _inherits = function (child, parent) {
+    if (typeof parent !== "function" && parent !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof parent);
+    }
+    child.prototype = Object.create(parent && parent.prototype, {
       constructor: {
         value: child,
         enumerable: false,
@@ -10,21 +13,22 @@ define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navi
         configurable: true
       }
     });
-    child.__proto__ = parent;
+    if (parent) child.__proto__ = parent;
   };
 
   var History = _aureliaHistory.History;
   var Router = _router.Router;
   var PipelineProvider = _pipelineProvider.PipelineProvider;
   var isNavigationCommand = _navigationCommands.isNavigationCommand;
-  var AppRouter = (function (Router) {
+  var AppRouter = (function () {
+    var _Router = Router;
     var AppRouter = function AppRouter(history, pipelineProvider) {
-      Router.call(this, history);
+      _Router.call(this, history);
       this.pipelineProvider = pipelineProvider;
       document.addEventListener("click", handleLinkClick.bind(this), true);
     };
 
-    _extends(AppRouter, Router);
+    _inherits(AppRouter, _Router);
 
     AppRouter.inject = function () {
       return [History, PipelineProvider];
@@ -125,13 +129,13 @@ define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navi
     };
 
     AppRouter.prototype.reset = function () {
-      Router.prototype.reset.call(this);
+      _Router.prototype.reset.call(this);
       this.queue = [];
       delete this.options;
     };
 
     return AppRouter;
-  })(Router);
+  })();
 
   exports.AppRouter = AppRouter;
 
@@ -150,7 +154,7 @@ define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navi
       if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
         var href = target.getAttribute("href");
 
-        if (href !== null && !(href.charAt(0) === "#" || (/^[a-z]+:/i).test(href))) {
+        if (href !== null && !(href.charAt(0) === "#" || /^[a-z]+:/i.test(href))) {
           evt.preventDefault();
           this.history.navigate(href);
         }
@@ -161,6 +165,6 @@ define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navi
   function targetIsThisWindow(target) {
     var targetWindow = target.getAttribute("target");
 
-    return !targetWindow || targetWindow === window.name || targetWindow === "_self" || (targetWindow === "top" && window === window.top);
+    return !targetWindow || targetWindow === window.name || targetWindow === "_self" || targetWindow === "top" && window === window.top;
   }
 });

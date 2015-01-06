@@ -1,13 +1,9 @@
 "use strict";
 
-var ApplyModelBindersStep = (function () {
-  var ApplyModelBindersStep = function ApplyModelBindersStep() {};
+var ApplyModelBindersStep = function ApplyModelBindersStep() {};
 
-  ApplyModelBindersStep.prototype.run = function (navigationContext, next) {
-    return next();
-  };
-
-  return ApplyModelBindersStep;
-})();
+ApplyModelBindersStep.prototype.run = function (navigationContext, next) {
+  return next();
+};
 
 exports.ApplyModelBindersStep = ApplyModelBindersStep;

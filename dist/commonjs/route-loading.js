@@ -1,34 +1,26 @@
 "use strict";
 
 exports.loadNewRoute = loadNewRoute;
-var REPLACE = require('./navigation-plan').REPLACE;
-var buildNavigationPlan = require('./navigation-plan').buildNavigationPlan;
-var RouteLoader = (function () {
-  var RouteLoader = function RouteLoader() {};
+var REPLACE = require("./navigation-plan").REPLACE;
+var buildNavigationPlan = require("./navigation-plan").buildNavigationPlan;
+var RouteLoader = function RouteLoader() {};
 
-  RouteLoader.prototype.loadRoute = function (config) {
-    throw Error("Route loaders must implment \"loadRoute(config)\".");
-  };
-
-  return RouteLoader;
-})();
+RouteLoader.prototype.loadRoute = function (config) {
+  throw Error("Route loaders must implment \"loadRoute(config)\".");
+};
 
 exports.RouteLoader = RouteLoader;
-var LoadRouteStep = (function () {
-  var LoadRouteStep = function LoadRouteStep(routeLoader) {
-    this.routeLoader = routeLoader;
-  };
+var LoadRouteStep = function LoadRouteStep(routeLoader) {
+  this.routeLoader = routeLoader;
+};
 
-  LoadRouteStep.inject = function () {
-    return [RouteLoader];
-  };
+LoadRouteStep.inject = function () {
+  return [RouteLoader];
+};
 
-  LoadRouteStep.prototype.run = function (navigationContext, next) {
-    return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
-  };
-
-  return LoadRouteStep;
-})();
+LoadRouteStep.prototype.run = function (navigationContext, next) {
+  return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
+};
 
 exports.LoadRouteStep = LoadRouteStep;
 function loadNewRoute(routeLoader, navigationContext) {

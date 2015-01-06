@@ -1,44 +1,7 @@
-define(["exports", "./navigation-plan", "./navigation-commands", "./util"], function (exports, _navigationPlan, _navigationCommands, _util) {
+System.register(["./navigation-plan", "./navigation-commands", "./util"], function (_export) {
   "use strict";
 
-  var _toArray = function (arr) {
-    return Array.isArray(arr) ? arr : Array.from(arr);
-  };
-
-  var INVOKE_LIFECYCLE = _navigationPlan.INVOKE_LIFECYCLE;
-  var REPLACE = _navigationPlan.REPLACE;
-  var isNavigationCommand = _navigationCommands.isNavigationCommand;
-  var processPotential = _util.processPotential;
-  var affirmations = exports.affirmations = ["yes", "ok", "true"];
-
-  var CanDeactivatePreviousStep = function CanDeactivatePreviousStep() {};
-
-  CanDeactivatePreviousStep.prototype.run = function (navigationContext, next) {
-    return processDeactivatable(navigationContext.plan, "canDeactivate", next);
-  };
-
-  exports.CanDeactivatePreviousStep = CanDeactivatePreviousStep;
-  var CanActivateNextStep = function CanActivateNextStep() {};
-
-  CanActivateNextStep.prototype.run = function (navigationContext, next) {
-    return processActivatable(navigationContext, "canActivate", next);
-  };
-
-  exports.CanActivateNextStep = CanActivateNextStep;
-  var DeactivatePreviousStep = function DeactivatePreviousStep() {};
-
-  DeactivatePreviousStep.prototype.run = function (navigationContext, next) {
-    return processDeactivatable(navigationContext.plan, "deactivate", next, true);
-  };
-
-  exports.DeactivatePreviousStep = DeactivatePreviousStep;
-  var ActivateNextStep = function ActivateNextStep() {};
-
-  ActivateNextStep.prototype.run = function (navigationContext, next) {
-    return processActivatable(navigationContext, "activate", next, true);
-  };
-
-  exports.ActivateNextStep = ActivateNextStep;
+  var INVOKE_LIFECYCLE, REPLACE, isNavigationCommand, processPotential, _toArray, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
 
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
@@ -194,4 +157,52 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
     return output;
   }
+  return {
+    setters: [function (_navigationPlan) {
+      INVOKE_LIFECYCLE = _navigationPlan.INVOKE_LIFECYCLE;
+      REPLACE = _navigationPlan.REPLACE;
+    }, function (_navigationCommands) {
+      isNavigationCommand = _navigationCommands.isNavigationCommand;
+    }, function (_util) {
+      processPotential = _util.processPotential;
+    }],
+    execute: function () {
+      _toArray = function (arr) {
+        return Array.isArray(arr) ? arr : Array.from(arr);
+      };
+
+      affirmations = _export("affirmations", ["yes", "ok", "true"]);
+      CanDeactivatePreviousStep = function CanDeactivatePreviousStep() {};
+
+      CanDeactivatePreviousStep.prototype.run = function (navigationContext, next) {
+        return processDeactivatable(navigationContext.plan, "canDeactivate", next);
+      };
+
+      _export("CanDeactivatePreviousStep", CanDeactivatePreviousStep);
+
+      CanActivateNextStep = function CanActivateNextStep() {};
+
+      CanActivateNextStep.prototype.run = function (navigationContext, next) {
+        return processActivatable(navigationContext, "canActivate", next);
+      };
+
+      _export("CanActivateNextStep", CanActivateNextStep);
+
+      DeactivatePreviousStep = function DeactivatePreviousStep() {};
+
+      DeactivatePreviousStep.prototype.run = function (navigationContext, next) {
+        return processDeactivatable(navigationContext.plan, "deactivate", next, true);
+      };
+
+      _export("DeactivatePreviousStep", DeactivatePreviousStep);
+
+      ActivateNextStep = function ActivateNextStep() {};
+
+      ActivateNextStep.prototype.run = function (navigationContext, next) {
+        return processActivatable(navigationContext, "activate", next, true);
+      };
+
+      _export("ActivateNextStep", ActivateNextStep);
+    }
+  };
 });

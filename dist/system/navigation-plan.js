@@ -1,14 +1,8 @@
-define(["exports"], function (exports) {
+System.register([], function (_export) {
   "use strict";
 
-  var _toArray = function (arr) {
-    return Array.isArray(arr) ? arr : Array.from(arr);
-  };
-
-  exports.buildNavigationPlan = buildNavigationPlan;
-  var NO_CHANGE = exports.NO_CHANGE = "no-change";
-  var INVOKE_LIFECYCLE = exports.INVOKE_LIFECYCLE = "invoke-lifecycle";
-  var REPLACE = exports.REPLACE = "replace";
+  var _toArray, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
+  _export("buildNavigationPlan", buildNavigationPlan);
 
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
     var prev = navigationContext.prevInstruction;
@@ -70,18 +64,6 @@ define(["exports"], function (exports) {
     }
   }
 
-  var BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
-
-  BuildNavigationPlanStep.prototype.run = function (navigationContext, next) {
-    return buildNavigationPlan(navigationContext).then(function (plan) {
-      navigationContext.plan = plan;
-      return next();
-    })["catch"](next.cancel);
-  };
-
-  exports.BuildNavigationPlanStep = BuildNavigationPlanStep;
-
-
   function hasDifferentParameterValues(prev, next) {
     var prevParams = prev.params, nextParams = next.params, nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
@@ -97,4 +79,26 @@ define(["exports"], function (exports) {
 
     return false;
   }
+  return {
+    setters: [],
+    execute: function () {
+      _toArray = function (arr) {
+        return Array.isArray(arr) ? arr : Array.from(arr);
+      };
+
+      NO_CHANGE = _export("NO_CHANGE", "no-change");
+      INVOKE_LIFECYCLE = _export("INVOKE_LIFECYCLE", "invoke-lifecycle");
+      REPLACE = _export("REPLACE", "replace");
+      BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
+
+      BuildNavigationPlanStep.prototype.run = function (navigationContext, next) {
+        return buildNavigationPlan(navigationContext).then(function (plan) {
+          navigationContext.plan = plan;
+          return next();
+        })["catch"](next.cancel);
+      };
+
+      _export("BuildNavigationPlanStep", BuildNavigationPlanStep);
+    }
+  };
 });

@@ -1,3 +1,18 @@
+## 0.3.0 (2015-01-06)
+
+
+#### Bug Fixes
+
+* **router:**
+  * add missing config data for dynamic routing scenarios ([fca4ad57](http://github.com/aurelia/router/commit/fca4ad57a88c24a70277918db6b89d06e58104da))
+  * empty paths for unknown routes now match ([fda55889](http://github.com/aurelia/router/commit/fda55889c56e82c6622a8846072244469330e4db))
+
+
+#### Features
+
+* **build:** update compile, switch to register modules, switch to core-js ([ce6abe32](http://github.com/aurelia/router/commit/ce6abe3261eb01c1604d746aec256a80536bfb57))
+
+
 ### 0.2.1 (2014-12-22)
 
 

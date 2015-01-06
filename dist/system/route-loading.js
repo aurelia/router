@@ -1,29 +1,9 @@
-define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
+System.register(["./navigation-plan"], function (_export) {
   "use strict";
 
-  exports.loadNewRoute = loadNewRoute;
-  var REPLACE = _navigationPlan.REPLACE;
-  var buildNavigationPlan = _navigationPlan.buildNavigationPlan;
-  var RouteLoader = function RouteLoader() {};
+  var REPLACE, buildNavigationPlan, RouteLoader, LoadRouteStep;
+  _export("loadNewRoute", loadNewRoute);
 
-  RouteLoader.prototype.loadRoute = function (config) {
-    throw Error("Route loaders must implment \"loadRoute(config)\".");
-  };
-
-  exports.RouteLoader = RouteLoader;
-  var LoadRouteStep = function LoadRouteStep(routeLoader) {
-    this.routeLoader = routeLoader;
-  };
-
-  LoadRouteStep.inject = function () {
-    return [RouteLoader];
-  };
-
-  LoadRouteStep.prototype.run = function (navigationContext, next) {
-    return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
-  };
-
-  exports.LoadRouteStep = LoadRouteStep;
   function loadNewRoute(routeLoader, navigationContext) {
     var toLoad = determineWhatToLoad(navigationContext);
     var loadPromises = toLoad.map(function (current) {
@@ -111,4 +91,33 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
       });
     });
   }
+  return {
+    setters: [function (_navigationPlan) {
+      REPLACE = _navigationPlan.REPLACE;
+      buildNavigationPlan = _navigationPlan.buildNavigationPlan;
+    }],
+    execute: function () {
+      RouteLoader = function RouteLoader() {};
+
+      RouteLoader.prototype.loadRoute = function (config) {
+        throw Error("Route loaders must implment \"loadRoute(config)\".");
+      };
+
+      _export("RouteLoader", RouteLoader);
+
+      LoadRouteStep = function LoadRouteStep(routeLoader) {
+        this.routeLoader = routeLoader;
+      };
+
+      LoadRouteStep.inject = function () {
+        return [RouteLoader];
+      };
+
+      LoadRouteStep.prototype.run = function (navigationContext, next) {
+        return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
+      };
+
+      _export("LoadRouteStep", LoadRouteStep);
+    }
+  };
 });

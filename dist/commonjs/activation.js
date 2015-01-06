@@ -4,54 +4,38 @@ var _toArray = function (arr) {
   return Array.isArray(arr) ? arr : Array.from(arr);
 };
 
-var INVOKE_LIFECYCLE = require('./navigation-plan').INVOKE_LIFECYCLE;
-var REPLACE = require('./navigation-plan').REPLACE;
-var isNavigationCommand = require('./navigation-commands').isNavigationCommand;
-var processPotential = require('./util').processPotential;
+var INVOKE_LIFECYCLE = require("./navigation-plan").INVOKE_LIFECYCLE;
+var REPLACE = require("./navigation-plan").REPLACE;
+var isNavigationCommand = require("./navigation-commands").isNavigationCommand;
+var processPotential = require("./util").processPotential;
 var affirmations = exports.affirmations = ["yes", "ok", "true"];
 
-var CanDeactivatePreviousStep = (function () {
-  var CanDeactivatePreviousStep = function CanDeactivatePreviousStep() {};
+var CanDeactivatePreviousStep = function CanDeactivatePreviousStep() {};
 
-  CanDeactivatePreviousStep.prototype.run = function (navigationContext, next) {
-    return processDeactivatable(navigationContext.plan, "canDeactivate", next);
-  };
-
-  return CanDeactivatePreviousStep;
-})();
+CanDeactivatePreviousStep.prototype.run = function (navigationContext, next) {
+  return processDeactivatable(navigationContext.plan, "canDeactivate", next);
+};
 
 exports.CanDeactivatePreviousStep = CanDeactivatePreviousStep;
-var CanActivateNextStep = (function () {
-  var CanActivateNextStep = function CanActivateNextStep() {};
+var CanActivateNextStep = function CanActivateNextStep() {};
 
-  CanActivateNextStep.prototype.run = function (navigationContext, next) {
-    return processActivatable(navigationContext, "canActivate", next);
-  };
-
-  return CanActivateNextStep;
-})();
+CanActivateNextStep.prototype.run = function (navigationContext, next) {
+  return processActivatable(navigationContext, "canActivate", next);
+};
 
 exports.CanActivateNextStep = CanActivateNextStep;
-var DeactivatePreviousStep = (function () {
-  var DeactivatePreviousStep = function DeactivatePreviousStep() {};
+var DeactivatePreviousStep = function DeactivatePreviousStep() {};
 
-  DeactivatePreviousStep.prototype.run = function (navigationContext, next) {
-    return processDeactivatable(navigationContext.plan, "deactivate", next, true);
-  };
-
-  return DeactivatePreviousStep;
-})();
+DeactivatePreviousStep.prototype.run = function (navigationContext, next) {
+  return processDeactivatable(navigationContext.plan, "deactivate", next, true);
+};
 
 exports.DeactivatePreviousStep = DeactivatePreviousStep;
-var ActivateNextStep = (function () {
-  var ActivateNextStep = function ActivateNextStep() {};
+var ActivateNextStep = function ActivateNextStep() {};
 
-  ActivateNextStep.prototype.run = function (navigationContext, next) {
-    return processActivatable(navigationContext, "activate", next, true);
-  };
-
-  return ActivateNextStep;
-})();
+ActivateNextStep.prototype.run = function (navigationContext, next) {
+  return processActivatable(navigationContext, "activate", next, true);
+};
 
 exports.ActivateNextStep = ActivateNextStep;
 
@@ -145,8 +129,9 @@ function processActivatable(navigationContext, callbackName, next, ignoreResult)
 
     if (i < length) {
       try {
+        var _current$controller;
         var current = infos[i];
-        var result = current.controller[callbackName].apply(current.controller, _toArray(current.lifecycleArgs));
+        var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toArray(current.lifecycleArgs));
         return processPotential(result, function (val) {
           return inspect(val, current.router);
         }, next.cancel);

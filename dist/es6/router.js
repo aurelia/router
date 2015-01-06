@@ -98,9 +98,30 @@ export class Router {
 
   createNavigationInstruction(url='', parentInstruction=null) {
     var results = this.recognizer.recognize(url);
+    var fragment, queryIndex, queryString;
 
     if (!results || !results.length) {
       results = this.childRecognizer.recognize(url);
+    }
+
+    fragment = url
+    queryIndex = fragment.indexOf("?");
+
+    if (queryIndex != -1) {
+      fragment = url.substr(0, queryIndex);
+      queryString = url.substr(queryIndex + 1);
+    }
+
+    if((!results || !results.length) && this.catchAllHandler){
+      results = [{
+        config:{
+          navModel:{}
+        },
+        handler:this.catchAllHandler,
+        params:{
+          path:fragment
+        }
+      }];
     }
 
     if (results && results.length) {
@@ -119,13 +140,22 @@ export class Router {
         queryString,
         first.params,
         first.queryParams,
-        first.handler,
+        first.config || first.handler,
         parentInstruction
         );
 
-      if (typeof first.handler == 'function') {
-        instruction.config = {};
-        return first.handler(instruction);
+      if (typeof first.handler == "function") {
+        return first.handler(instruction).then(instruction => {
+          if (!("viewPorts" in instruction.config)) {
+            instruction.config.viewPorts = {
+              "default": {
+                moduleId: instruction.config.moduleId
+              }
+            };
+          }
+
+          return instruction;
+        });
       }
 
       return Promise.resolve(instruction);
@@ -191,12 +221,10 @@ export class Router {
   }
 
   handleUnknownRoutes(config) {
-    var catchAllPattern = "*path";
-
     var callback = instruction => new Promise((resolve, reject) => {
       function done(inst){
         inst = inst || instruction;
-        inst.config.route = catchAllPattern;
+        inst.config.route = inst.params.path;
         resolve(inst);
       }
 
@@ -214,10 +242,7 @@ export class Router {
       }
     });
 
-    this.childRecognizer.add([{
-      path: catchAllPattern,
-      handler: callback
-    }]);
+    this.catchAllHandler = callback;
   }
 
   reset() {
