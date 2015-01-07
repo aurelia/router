@@ -1,12 +1,13 @@
+import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
 import {Router} from './router';
 import {PipelineProvider} from './pipeline-provider';
 import {isNavigationCommand} from './navigation-commands';
 
 export class AppRouter extends Router {
-  static inject(){ return [History, PipelineProvider]; }
-  constructor(history, pipelineProvider) {
-    super(history);
+  static inject(){ return [Container, History, PipelineProvider]; }
+  constructor(container, history, pipelineProvider) {
+    super(container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener('click', handleLinkClick.bind(this), true);
   }
@@ -71,13 +72,12 @@ export class AppRouter extends Router {
   }
 
   registerViewPort(viewPort, name) {
-    name = name || 'default';
-    this.viewPorts[name] = viewPort;
+    super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
-      this.configureRouterForViewPort(viewPort, () => this.activate());
+      this.activate();
     } else {
-      this.configureRouterForViewPort(viewPort, () => this.dequeueInstruction());
+      this.dequeueInstruction();
     }
   }
 

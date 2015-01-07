@@ -6,7 +6,8 @@ import {RouterConfiguration} from './router-configuration';
 import {processPotential} from './util';
 
 export class Router {
-  constructor(history) {
+  constructor(container, history) {
+    this.container = container;
     this.history = history;
     this.viewPorts = {};
     this.reset();
@@ -15,31 +16,7 @@ export class Router {
 
   registerViewPort(viewPort, name) {
     name = name || 'default';
-
-    if (typeof this.viewPorts[name] == 'function') {
-      var callback = this.viewPorts[name];
-      this.viewPorts[name] = viewPort;
-      this.configureRouterForViewPort(viewPort, callback);
-    } else {
-      this.configureRouterForViewPort(viewPort, () =>{
-        if (typeof this.viewPorts[name] == 'function') {
-          var callback = this.viewPorts[name];
-          this.viewPorts[name] = viewPort;
-          callback(viewPort);
-        }else{
-          this.viewPorts[name] = viewPort;
-        }
-      });
-    }
-  }
-
-  configureRouterForViewPort(viewPort, callback){
-    if('configureRouter' in viewPort.executionContext){
-      var result = viewPort.executionContext.configureRouter() || Promise.resolve();
-      result.then(() => callback(viewPort));
-    }else{
-      callback(viewPort);
-    }
+    this.viewPorts[name] = viewPort;
   }
 
   refreshBaseUrl() {
@@ -90,8 +67,8 @@ export class Router {
     this.history.navigateBack();
   }
 
-  createChild() {
-    var childRouter = new Router(this.history);
+  createChild(container) {
+    var childRouter = new Router(container || this.container.createChild(), this.history);
     childRouter.parent = this;
     return childRouter;
   }

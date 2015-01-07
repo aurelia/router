@@ -1,8 +1,8 @@
 import {REPLACE, buildNavigationPlan} from './navigation-plan';
 
 export class RouteLoader {
-  loadRoute(config){
-    throw Error('Route loaders must implment "loadRoute(config)".');
+  loadRoute(router, config){
+    throw Error('Route loaders must implment "loadRoute(router, config)".');
   }
 }
 
@@ -71,12 +71,7 @@ function loadRoute(routeLoader, navigationContext, viewPortPlan) {
   var moduleId = viewPortPlan.config.moduleId;
   var next = navigationContext.nextInstruction;
 
-  return resolveComponent(
-    routeLoader,
-    navigationContext.router,
-    viewPortPlan
-    ).then(component => {
-
+  return loadComponent(routeLoader, navigationContext.router, viewPortPlan.config).then(component => {
     var viewPortInstruction = next.addViewPortInstruction(
       viewPortPlan.name,
       viewPortPlan.strategy,
@@ -106,26 +101,15 @@ function loadRoute(routeLoader, navigationContext, viewPortPlan) {
   });
 }
 
-function resolveComponent(routeLoader, router, viewPortPlan) {
-  var possibleRouterViewPort = router.viewPorts[viewPortPlan.name];
+function loadComponent(routeLoader, router, config){
+  return routeLoader.loadRoute(router, config).then(component => {
+    if('configureRouter' in component.executionContext){
+      var result = component.executionContext.configureRouter() || Promise.resolve();
+      return result.then(() => component);
+    }
 
-  return routeLoader.loadRoute(viewPortPlan.config).then(type => {
-    return new Promise((resolve, reject) => {
-      function createChildRouter() {
-        return router.createChild();
-      }
-
-      function getComponent(routerViewPort) {
-        routerViewPort.getComponent(type, createChildRouter, viewPortPlan.config)
-                      .then(resolve)
-                      .catch(reject);
-      }
-
-      if (possibleRouterViewPort) {
-        getComponent(possibleRouterViewPort);
-      } else {
-        router.viewPorts[viewPortPlan.name] = getComponent;
-      }
-    });
+    component.router = router;
+    component.config = config;
+    return component;
   });
 }
