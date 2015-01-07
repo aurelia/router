@@ -8,11 +8,13 @@ export class NavigationContext {
     this.prevInstruction = router.currentInstruction;
   }
 
-  commitChanges() {
+  commitChanges(waitToSwap) {
     var next = this.nextInstruction,
         prev = this.prevInstruction,
         viewPortInstructions = next.viewPortInstructions,
-        router = this.router;
+        router = this.router,
+        loads = [],
+        delaySwaps = [];
 
     router.currentInstruction = next;
 
@@ -30,13 +32,25 @@ export class NavigationContext {
       var viewPort = router.viewPorts[viewPortName];
 
       if (viewPortInstruction.strategy === REPLACE) {
-        viewPort.process(viewPortInstruction);
-      }
+        if(waitToSwap){
+          delaySwaps.push({viewPort, viewPortInstruction});
+        }
 
-      if ('childNavigationContext' in viewPortInstruction) {
-        viewPortInstruction.childNavigationContext.commitChanges();
+        loads.push(viewPort.process(viewPortInstruction, waitToSwap).then(x => {
+          if ('childNavigationContext' in viewPortInstruction) {
+            return viewPortInstruction.childNavigationContext.commitChanges();
+          }
+        }));
+      }else{
+        if ('childNavigationContext' in viewPortInstruction) {
+          loads.push(viewPortInstruction.childNavigationContext.commitChanges(waitToSwap));
+        }
       }
     }
+
+    return Promise.all(loads).then(() => {
+      delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
+    });
   }
 
   buildTitle(separator=' | ') {
@@ -70,7 +84,7 @@ export class NavigationContext {
 
 export class CommitChangesStep {
   run(navigationContext, next) {
-    navigationContext.commitChanges();
+    navigationContext.commitChanges(true);
 
     var title = navigationContext.buildTitle();
     if (title) {

@@ -1,3 +1,16 @@
+## 0.4.0 (2015-01-07)
+
+
+#### Bug Fixes
+
+* **router:** correct push state href generation ([9116d50e](http://github.com/aurelia/router/commit/9116d50ec1143b4c185ad5a03ba06a525ea1e5a3))
+
+
+#### Features
+
+* **router:** delayed view loading and post-activate view strategies ([e0e991b0](http://github.com/aurelia/router/commit/e0e991b0cc96cfee9aeb5d18d06bf54ba46f8982))
+
+
 ## 0.3.0 (2015-01-06)
 
 

@@ -15,14 +15,15 @@ var _inherits = function (child, parent) {
   if (parent) child.__proto__ = parent;
 };
 
+var Container = require("aurelia-dependency-injection").Container;
 var History = require("aurelia-history").History;
 var Router = require("./router").Router;
 var PipelineProvider = require("./pipeline-provider").PipelineProvider;
 var isNavigationCommand = require("./navigation-commands").isNavigationCommand;
 var AppRouter = (function () {
   var _Router = Router;
-  var AppRouter = function AppRouter(history, pipelineProvider) {
-    _Router.call(this, history);
+  var AppRouter = function AppRouter(container, history, pipelineProvider) {
+    _Router.call(this, container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener("click", handleLinkClick.bind(this), true);
   };
@@ -30,7 +31,7 @@ var AppRouter = (function () {
   _inherits(AppRouter, _Router);
 
   AppRouter.inject = function () {
-    return [History, PipelineProvider];
+    return [Container, History, PipelineProvider];
   };
 
   AppRouter.prototype.loadUrl = function (url) {
@@ -96,18 +97,12 @@ var AppRouter = (function () {
   };
 
   AppRouter.prototype.registerViewPort = function (viewPort, name) {
-    var _this4 = this;
-    name = name || "default";
-    this.viewPorts[name] = viewPort;
+    _Router.prototype.registerViewPort.call(this, viewPort, name);
 
     if (!this.isActive) {
-      this.configureRouterForViewPort(viewPort, function () {
-        return _this4.activate();
-      });
+      this.activate();
     } else {
-      this.configureRouterForViewPort(viewPort, function () {
-        return _this4.dequeueInstruction();
-      });
+      this.dequeueInstruction();
     }
   };
 

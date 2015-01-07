@@ -6,8 +6,8 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
   var buildNavigationPlan = _navigationPlan.buildNavigationPlan;
   var RouteLoader = function RouteLoader() {};
 
-  RouteLoader.prototype.loadRoute = function (config) {
-    throw Error("Route loaders must implment \"loadRoute(config)\".");
+  RouteLoader.prototype.loadRoute = function (router, config) {
+    throw Error("Route loaders must implment \"loadRoute(router, config)\".");
   };
 
   exports.RouteLoader = RouteLoader;
@@ -68,7 +68,7 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
     var moduleId = viewPortPlan.config.moduleId;
     var next = navigationContext.nextInstruction;
 
-    return resolveComponent(routeLoader, navigationContext.router, viewPortPlan).then(function (component) {
+    return loadComponent(routeLoader, navigationContext.router, viewPortPlan.config).then(function (component) {
       var viewPortInstruction = next.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
 
       var controller = component.executionContext;
@@ -90,25 +90,18 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
     });
   }
 
-  function resolveComponent(routeLoader, router, viewPortPlan) {
-    var possibleRouterViewPort = router.viewPorts[viewPortPlan.name];
+  function loadComponent(routeLoader, router, config) {
+    return routeLoader.loadRoute(router, config).then(function (component) {
+      if ("configureRouter" in component.executionContext) {
+        var result = component.executionContext.configureRouter() || Promise.resolve();
+        return result.then(function () {
+          return component;
+        });
+      }
 
-    return routeLoader.loadRoute(viewPortPlan.config).then(function (type) {
-      return new Promise(function (resolve, reject) {
-        function createChildRouter() {
-          return router.createChild();
-        }
-
-        function getComponent(routerViewPort) {
-          routerViewPort.getComponent(type, createChildRouter, viewPortPlan.config).then(resolve)["catch"](reject);
-        }
-
-        if (possibleRouterViewPort) {
-          getComponent(possibleRouterViewPort);
-        } else {
-          router.viewPorts[viewPortPlan.name] = getComponent;
-        }
-      });
+      component.router = router;
+      component.config = config;
+      return component;
     });
   }
 });

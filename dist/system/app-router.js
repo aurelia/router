@@ -1,7 +1,7 @@
-System.register(["aurelia-history", "./router", "./pipeline-provider", "./navigation-commands"], function (_export) {
+System.register(["aurelia-dependency-injection", "aurelia-history", "./router", "./pipeline-provider", "./navigation-commands"], function (_export) {
   "use strict";
 
-  var History, Router, PipelineProvider, isNavigationCommand, _inherits, AppRouter;
+  var Container, History, Router, PipelineProvider, isNavigationCommand, _inherits, AppRouter;
 
 
   function handleLinkClick(evt) {
@@ -32,7 +32,9 @@ System.register(["aurelia-history", "./router", "./pipeline-provider", "./naviga
     return !targetWindow || targetWindow === window.name || targetWindow === "_self" || targetWindow === "top" && window === window.top;
   }
   return {
-    setters: [function (_aureliaHistory) {
+    setters: [function (_aureliaDependencyInjection) {
+      Container = _aureliaDependencyInjection.Container;
+    }, function (_aureliaHistory) {
       History = _aureliaHistory.History;
     }, function (_router) {
       Router = _router.Router;
@@ -59,8 +61,8 @@ System.register(["aurelia-history", "./router", "./pipeline-provider", "./naviga
 
       AppRouter = (function () {
         var _Router = Router;
-        var AppRouter = function AppRouter(history, pipelineProvider) {
-          _Router.call(this, history);
+        var AppRouter = function AppRouter(container, history, pipelineProvider) {
+          _Router.call(this, container, history);
           this.pipelineProvider = pipelineProvider;
           document.addEventListener("click", handleLinkClick.bind(this), true);
         };
@@ -68,7 +70,7 @@ System.register(["aurelia-history", "./router", "./pipeline-provider", "./naviga
         _inherits(AppRouter, _Router);
 
         AppRouter.inject = function () {
-          return [History, PipelineProvider];
+          return [Container, History, PipelineProvider];
         };
 
         AppRouter.prototype.loadUrl = function (url) {
@@ -134,18 +136,12 @@ System.register(["aurelia-history", "./router", "./pipeline-provider", "./naviga
         };
 
         AppRouter.prototype.registerViewPort = function (viewPort, name) {
-          var _this4 = this;
-          name = name || "default";
-          this.viewPorts[name] = viewPort;
+          _Router.prototype.registerViewPort.call(this, viewPort, name);
 
           if (!this.isActive) {
-            this.configureRouterForViewPort(viewPort, function () {
-              return _this4.activate();
-            });
+            this.activate();
           } else {
-            this.configureRouterForViewPort(viewPort, function () {
-              return _this4.dequeueInstruction();
-            });
+            this.dequeueInstruction();
           }
         };
 

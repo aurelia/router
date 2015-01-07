@@ -1,4 +1,4 @@
-define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navigation-commands"], function (exports, _aureliaHistory, _router, _pipelineProvider, _navigationCommands) {
+define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router", "./pipeline-provider", "./navigation-commands"], function (exports, _aureliaDependencyInjection, _aureliaHistory, _router, _pipelineProvider, _navigationCommands) {
   "use strict";
 
   var _inherits = function (child, parent) {
@@ -16,14 +16,15 @@ define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navi
     if (parent) child.__proto__ = parent;
   };
 
+  var Container = _aureliaDependencyInjection.Container;
   var History = _aureliaHistory.History;
   var Router = _router.Router;
   var PipelineProvider = _pipelineProvider.PipelineProvider;
   var isNavigationCommand = _navigationCommands.isNavigationCommand;
   var AppRouter = (function () {
     var _Router = Router;
-    var AppRouter = function AppRouter(history, pipelineProvider) {
-      _Router.call(this, history);
+    var AppRouter = function AppRouter(container, history, pipelineProvider) {
+      _Router.call(this, container, history);
       this.pipelineProvider = pipelineProvider;
       document.addEventListener("click", handleLinkClick.bind(this), true);
     };
@@ -31,7 +32,7 @@ define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navi
     _inherits(AppRouter, _Router);
 
     AppRouter.inject = function () {
-      return [History, PipelineProvider];
+      return [Container, History, PipelineProvider];
     };
 
     AppRouter.prototype.loadUrl = function (url) {
@@ -97,18 +98,12 @@ define(["exports", "aurelia-history", "./router", "./pipeline-provider", "./navi
     };
 
     AppRouter.prototype.registerViewPort = function (viewPort, name) {
-      var _this4 = this;
-      name = name || "default";
-      this.viewPorts[name] = viewPort;
+      _Router.prototype.registerViewPort.call(this, viewPort, name);
 
       if (!this.isActive) {
-        this.configureRouterForViewPort(viewPort, function () {
-          return _this4.activate();
-        });
+        this.activate();
       } else {
-        this.configureRouterForViewPort(viewPort, function () {
-          return _this4.dequeueInstruction();
-        });
+        this.dequeueInstruction();
       }
     };
 

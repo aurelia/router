@@ -8,8 +8,8 @@ var NavigationContext = function NavigationContext(router, nextInstruction) {
   this.prevInstruction = router.currentInstruction;
 };
 
-NavigationContext.prototype.commitChanges = function () {
-  var next = this.nextInstruction, prev = this.prevInstruction, viewPortInstructions = next.viewPortInstructions, router = this.router;
+NavigationContext.prototype.commitChanges = function (waitToSwap) {
+  var next = this.nextInstruction, prev = this.prevInstruction, viewPortInstructions = next.viewPortInstructions, router = this.router, loads = [], delaySwaps = [];
 
   router.currentInstruction = next;
 
@@ -27,13 +27,27 @@ NavigationContext.prototype.commitChanges = function () {
     var viewPort = router.viewPorts[viewPortName];
 
     if (viewPortInstruction.strategy === REPLACE) {
-      viewPort.process(viewPortInstruction);
-    }
+      if (waitToSwap) {
+        delaySwaps.push({ viewPort: viewPort, viewPortInstruction: viewPortInstruction });
+      }
 
-    if ("childNavigationContext" in viewPortInstruction) {
-      viewPortInstruction.childNavigationContext.commitChanges();
+      loads.push(viewPort.process(viewPortInstruction, waitToSwap).then(function (x) {
+        if ("childNavigationContext" in viewPortInstruction) {
+          return viewPortInstruction.childNavigationContext.commitChanges();
+        }
+      }));
+    } else {
+      if ("childNavigationContext" in viewPortInstruction) {
+        loads.push(viewPortInstruction.childNavigationContext.commitChanges(waitToSwap));
+      }
     }
   }
+
+  return Promise.all(loads).then(function () {
+    delaySwaps.forEach(function (x) {
+      return x.viewPort.swap(x.viewPortInstruction);
+    });
+  });
 };
 
 NavigationContext.prototype.buildTitle = function () {
@@ -66,7 +80,7 @@ exports.NavigationContext = NavigationContext;
 var CommitChangesStep = function CommitChangesStep() {};
 
 CommitChangesStep.prototype.run = function (navigationContext, next) {
-  navigationContext.commitChanges();
+  navigationContext.commitChanges(true);
 
   var title = navigationContext.buildTitle();
   if (title) {

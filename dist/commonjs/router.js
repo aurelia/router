@@ -6,7 +6,8 @@ var NavigationContext = require("./navigation-context").NavigationContext;
 var NavigationInstruction = require("./navigation-instruction").NavigationInstruction;
 var RouterConfiguration = require("./router-configuration").RouterConfiguration;
 var processPotential = require("./util").processPotential;
-var Router = function Router(history) {
+var Router = function Router(container, history) {
+  this.container = container;
   this.history = history;
   this.viewPorts = {};
   this.reset();
@@ -14,35 +15,8 @@ var Router = function Router(history) {
 };
 
 Router.prototype.registerViewPort = function (viewPort, name) {
-  var _this = this;
   name = name || "default";
-
-  if (typeof this.viewPorts[name] == "function") {
-    var callback = this.viewPorts[name];
-    this.viewPorts[name] = viewPort;
-    this.configureRouterForViewPort(viewPort, callback);
-  } else {
-    this.configureRouterForViewPort(viewPort, function () {
-      if (typeof _this.viewPorts[name] == "function") {
-        var callback = _this.viewPorts[name];
-        _this.viewPorts[name] = viewPort;
-        callback(viewPort);
-      } else {
-        _this.viewPorts[name] = viewPort;
-      }
-    });
-  }
-};
-
-Router.prototype.configureRouterForViewPort = function (viewPort, callback) {
-  if ("configureRouter" in viewPort.executionContext) {
-    var result = viewPort.executionContext.configureRouter() || Promise.resolve();
-    result.then(function () {
-      return callback(viewPort);
-    });
-  } else {
-    callback(viewPort);
-  }
+  this.viewPorts[name] = viewPort;
 };
 
 Router.prototype.refreshBaseUrl = function () {
@@ -58,10 +32,12 @@ Router.prototype.refreshNavigation = function () {
   for (var i = 0, length = nav.length; i < length; i++) {
     var current = nav[i];
 
-    if (this.baseUrl[0] == "/") {
-      current.href = "#" + this.baseUrl;
-    } else {
-      current.href = "#/" + this.baseUrl;
+    if (!this.history._hasPushState) {
+      if (this.baseUrl[0] == "/") {
+        current.href = "#" + this.baseUrl;
+      } else {
+        current.href = "#/" + this.baseUrl;
+      }
     }
 
     if (current.href[current.href.length - 1] != "/") {
@@ -93,8 +69,8 @@ Router.prototype.navigateBack = function () {
   this.history.navigateBack();
 };
 
-Router.prototype.createChild = function () {
-  var childRouter = new Router(this.history);
+Router.prototype.createChild = function (container) {
+  var childRouter = new Router(container || this.container.createChild(), this.history);
   childRouter.parent = this;
   return childRouter;
 };
