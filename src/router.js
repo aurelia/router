@@ -32,10 +32,12 @@ export class Router {
     for(var i = 0, length = nav.length; i < length; i++) {
       var current = nav[i];
 
-      if (this.baseUrl[0] == '/') {
-        current.href = '#' + this.baseUrl;
-      } else {
-        current.href = '#/' + this.baseUrl;
+      if(!this.history._hasPushState){
+        if (this.baseUrl[0] == '/') {
+          current.href = '#' + this.baseUrl;
+        } else {
+          current.href = '#/' + this.baseUrl;
+        }
       }
 
       if (current.href[current.href.length - 1] != '/') {
