@@ -98,10 +98,18 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
     };
 
     AppRouter.prototype.registerViewPort = function (viewPort, name) {
+      var _this4 = this;
       _Router.prototype.registerViewPort.call(this, viewPort, name);
 
       if (!this.isActive) {
-        this.activate();
+        if ("configureRouter" in this.container.viewModel) {
+          var result = this.container.viewModel.configureRouter() || Promise.resolve();
+          return result.then(function () {
+            return _this4.activate();
+          });
+        } else {
+          this.activate();
+        }
       } else {
         this.dequeueInstruction();
       }

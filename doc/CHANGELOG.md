@@ -1,3 +1,11 @@
+### 0.4.1 (2015-01-07)
+
+
+#### Bug Fixes
+
+* **router:** enable async configureRouter for app-level router ([576b869f](http://github.com/aurelia/router/commit/576b869fdad14549847adc15c3c4c2d27e6cf0ad))
+
+
 ## 0.4.0 (2015-01-07)
 
 

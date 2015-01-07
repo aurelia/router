@@ -75,7 +75,12 @@ export class AppRouter extends Router {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
-      this.activate();
+      if('configureRouter' in this.container.viewModel){
+        var result = this.container.viewModel.configureRouter() || Promise.resolve();
+        return result.then(() => this.activate());
+      }else{
+        this.activate();
+      }
     } else {
       this.dequeueInstruction();
     }
