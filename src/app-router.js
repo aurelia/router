@@ -68,6 +68,8 @@ export class AppRouter extends Router {
 
       instruction.resolve(result);
       this.dequeueInstruction();
+    }).catch(error => {
+      console.error(error);
     });
   }
 
