@@ -155,7 +155,8 @@ export class Router {
     if (!('viewPorts' in config)) {
       config.viewPorts = {
         'default': {
-          moduleId: config.moduleId
+          moduleId: config.moduleId,
+          view: config.view
         }
       };
     }
