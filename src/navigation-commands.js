@@ -1,8 +1,7 @@
 /**
- * A function returns true if passed parameter is of class NavigationCommand and
- * false otherwise. To define if passed parameter is NavigationCommand function
- * will check if parameter has a navigate method.
- * @param {object} obj - the item to check.
+ * Determines if the provided object is a navigation command.
+ * A navigation command is anything with a navigate method.
+ * @param {object} obj The item to check.
  * @return {boolean}
  */
 export function isNavigationCommand(obj){
@@ -10,21 +9,24 @@ export function isNavigationCommand(obj){
 }
 
 /**
- * This class represents a redirection command.
- */
+* Used during the activation lifecycle to cause a redirect.
+*
+* @class Redirect
+* @constructor
+* @param {String} url The url to redirect to.
+*/
 export class Redirect{
-  /**
-   * @param {String} url - the url to redirect to.
-   */
   constructor(url) {
     this.url = url;
     this.shouldContinueProcessing = false;
   }
 
   /**
-   * Runs a navigation proccess.
-   * @param {Router} appRouter - a router which should execute redirection.
-   */
+  * Called by the navigation pipeline to navigate.
+  *
+  * @method navigate
+  * @param {Router} appRouter - a router which should redirect
+  */
   navigate(appRouter){
     (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
   }
