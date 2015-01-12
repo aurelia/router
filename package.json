@@ -24,10 +24,10 @@
       "lib": "dist"
     },
     "dependencies": {
-      "aurelia-dependency-injection": "^0.2.1",
-      "aurelia-history": "^0.2.0",
+      "aurelia-dependency-injection": "^0.3.1",
+      "aurelia-history": "^0.2.1",
       "aurelia-path": "^0.4.0",
-      "aurelia-route-recognizer": "^0.2.0",
+      "aurelia-route-recognizer": "^0.2.1",
       "core-js": "npm:core-js@^0.4.1"
     }
   },
