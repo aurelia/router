@@ -31,6 +31,10 @@ export class NavigationContext {
       var viewPortInstruction = viewPortInstructions[viewPortName];
       var viewPort = router.viewPorts[viewPortName];
 
+      if(!viewPort){
+        throw new Error(`There was no router-view found in the view for ${viewPortInstruction.moduleId}.`);
+      }
+
       if (viewPortInstruction.strategy === REPLACE) {
         if(waitToSwap){
           delaySwaps.push({viewPort, viewPortInstruction});

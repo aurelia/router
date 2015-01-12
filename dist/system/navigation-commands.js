@@ -1,7 +1,7 @@
 System.register([], function (_export) {
   "use strict";
 
-  var Redirect;
+  var _prototypeProperties, Redirect;
   _export("isNavigationCommand", isNavigationCommand);
 
   function isNavigationCommand(obj) {
@@ -11,15 +11,30 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      Redirect = function Redirect(url) {
-        this.url = url;
-        this.shouldContinueProcessing = false;
+      _prototypeProperties = function (child, staticProps, instanceProps) {
+        if (staticProps) Object.defineProperties(child, staticProps);
+        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
       };
 
-      Redirect.prototype.navigate = function (appRouter) {
-        (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
-      };
+      Redirect = (function () {
+        var Redirect = function Redirect(url) {
+          this.url = url;
+          this.shouldContinueProcessing = false;
+        };
 
+        _prototypeProperties(Redirect, null, {
+          navigate: {
+            value: function (appRouter) {
+              (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
+
+        return Redirect;
+      })();
       _export("Redirect", Redirect);
     }
   };

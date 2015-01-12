@@ -1,5 +1,10 @@
 "use strict";
 
+var _prototypeProperties = function (child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);
+  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
 var Container = require("aurelia-dependency-injection").Container;
 var Pipeline = require("./pipeline").Pipeline;
 var BuildNavigationPlanStep = require("./navigation-plan").BuildNavigationPlanStep;
@@ -10,22 +15,38 @@ var CanDeactivatePreviousStep = require("./activation").CanDeactivatePreviousSte
 var CanActivateNextStep = require("./activation").CanActivateNextStep;
 var DeactivatePreviousStep = require("./activation").DeactivatePreviousStep;
 var ActivateNextStep = require("./activation").ActivateNextStep;
-var PipelineProvider = function PipelineProvider(container) {
-  this.container = container;
-  this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, ApplyModelBindersStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
-};
+var PipelineProvider = (function () {
+  var PipelineProvider = function PipelineProvider(container) {
+    this.container = container;
+    this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, ApplyModelBindersStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
+  };
 
-PipelineProvider.inject = function () {
-  return [Container];
-};
-
-PipelineProvider.prototype.createPipeline = function (navigationContext) {
-  var _this = this;
-  var pipeline = new Pipeline();
-  this.steps.forEach(function (step) {
-    return pipeline.withStep(_this.container.get(step));
+  _prototypeProperties(PipelineProvider, {
+    inject: {
+      value: function () {
+        return [Container];
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    }
+  }, {
+    createPipeline: {
+      value: function (navigationContext) {
+        var _this = this;
+        var pipeline = new Pipeline();
+        this.steps.forEach(function (step) {
+          return pipeline.withStep(_this.container.get(step));
+        });
+        return pipeline;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    }
   });
-  return pipeline;
-};
+
+  return PipelineProvider;
+})();
 
 exports.PipelineProvider = PipelineProvider;

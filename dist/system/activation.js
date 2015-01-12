@@ -1,11 +1,12 @@
 System.register(["./navigation-plan", "./navigation-commands", "./util"], function (_export) {
   "use strict";
 
-  var INVOKE_LIFECYCLE, REPLACE, isNavigationCommand, processPotential, _toArray, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
+  var INVOKE_LIFECYCLE, REPLACE, isNavigationCommand, processPotential, _toArray, _prototypeProperties, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
 
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
-    var infos = findDeactivatable(plan, callbackName), i = infos.length;
+    var infos = findDeactivatable(plan, callbackName),
+        i = infos.length;
 
     function inspect(val) {
       if (ignoreResult || shouldContinue(val)) {
@@ -78,7 +79,9 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
   }
 
   function processActivatable(navigationContext, callbackName, next, ignoreResult) {
-    var infos = findActivatable(navigationContext, callbackName), length = infos.length, i = -1;
+    var infos = findActivatable(navigationContext, callbackName),
+        length = infos.length,
+        i = -1;
 
     function inspect(val, router) {
       if (ignoreResult || shouldContinue(val, router)) {
@@ -171,37 +174,82 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
         return Array.isArray(arr) ? arr : Array.from(arr);
       };
 
-      affirmations = _export("affirmations", ["yes", "ok", "true"]);
-      CanDeactivatePreviousStep = function CanDeactivatePreviousStep() {};
-
-      CanDeactivatePreviousStep.prototype.run = function (navigationContext, next) {
-        return processDeactivatable(navigationContext.plan, "canDeactivate", next);
+      _prototypeProperties = function (child, staticProps, instanceProps) {
+        if (staticProps) Object.defineProperties(child, staticProps);
+        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
       };
 
+      affirmations = _export("affirmations", ["yes", "ok", "true"]);
+      CanDeactivatePreviousStep = (function () {
+        var CanDeactivatePreviousStep = function CanDeactivatePreviousStep() {};
+
+        _prototypeProperties(CanDeactivatePreviousStep, null, {
+          run: {
+            value: function (navigationContext, next) {
+              return processDeactivatable(navigationContext.plan, "canDeactivate", next);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
+
+        return CanDeactivatePreviousStep;
+      })();
       _export("CanDeactivatePreviousStep", CanDeactivatePreviousStep);
 
-      CanActivateNextStep = function CanActivateNextStep() {};
+      CanActivateNextStep = (function () {
+        var CanActivateNextStep = function CanActivateNextStep() {};
 
-      CanActivateNextStep.prototype.run = function (navigationContext, next) {
-        return processActivatable(navigationContext, "canActivate", next);
-      };
+        _prototypeProperties(CanActivateNextStep, null, {
+          run: {
+            value: function (navigationContext, next) {
+              return processActivatable(navigationContext, "canActivate", next);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
+        return CanActivateNextStep;
+      })();
       _export("CanActivateNextStep", CanActivateNextStep);
 
-      DeactivatePreviousStep = function DeactivatePreviousStep() {};
+      DeactivatePreviousStep = (function () {
+        var DeactivatePreviousStep = function DeactivatePreviousStep() {};
 
-      DeactivatePreviousStep.prototype.run = function (navigationContext, next) {
-        return processDeactivatable(navigationContext.plan, "deactivate", next, true);
-      };
+        _prototypeProperties(DeactivatePreviousStep, null, {
+          run: {
+            value: function (navigationContext, next) {
+              return processDeactivatable(navigationContext.plan, "deactivate", next, true);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
+        return DeactivatePreviousStep;
+      })();
       _export("DeactivatePreviousStep", DeactivatePreviousStep);
 
-      ActivateNextStep = function ActivateNextStep() {};
+      ActivateNextStep = (function () {
+        var ActivateNextStep = function ActivateNextStep() {};
 
-      ActivateNextStep.prototype.run = function (navigationContext, next) {
-        return processActivatable(navigationContext, "activate", next, true);
-      };
+        _prototypeProperties(ActivateNextStep, null, {
+          run: {
+            value: function (navigationContext, next) {
+              return processActivatable(navigationContext, "activate", next, true);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
+        return ActivateNextStep;
+      })();
       _export("ActivateNextStep", ActivateNextStep);
     }
   };

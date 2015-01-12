@@ -4,6 +4,11 @@ var _toArray = function (arr) {
   return Array.isArray(arr) ? arr : Array.from(arr);
 };
 
+var _prototypeProperties = function (child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);
+  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
 exports.buildNavigationPlan = buildNavigationPlan;
 var NO_CHANGE = exports.NO_CHANGE = "no-change";
 var INVOKE_LIFECYCLE = exports.INVOKE_LIFECYCLE = "invoke-lifecycle";
@@ -69,20 +74,33 @@ function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
   }
 }
 
-var BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
+var BuildNavigationPlanStep = (function () {
+  var BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
 
-BuildNavigationPlanStep.prototype.run = function (navigationContext, next) {
-  return buildNavigationPlan(navigationContext).then(function (plan) {
-    navigationContext.plan = plan;
-    return next();
-  })["catch"](next.cancel);
-};
+  _prototypeProperties(BuildNavigationPlanStep, null, {
+    run: {
+      value: function (navigationContext, next) {
+        return buildNavigationPlan(navigationContext).then(function (plan) {
+          navigationContext.plan = plan;
+          return next();
+        })["catch"](next.cancel);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    }
+  });
+
+  return BuildNavigationPlanStep;
+})();
 
 exports.BuildNavigationPlanStep = BuildNavigationPlanStep;
 
 
 function hasDifferentParameterValues(prev, next) {
-  var prevParams = prev.params, nextParams = next.params, nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
+  var prevParams = prev.params,
+      nextParams = next.params,
+      nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
   for (var key in nextParams) {
     if (key == nextWildCardName) {

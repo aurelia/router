@@ -1,19 +1,35 @@
 define(["exports"], function (exports) {
   "use strict";
 
+  var _prototypeProperties = function (child, staticProps, instanceProps) {
+    if (staticProps) Object.defineProperties(child, staticProps);
+    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+  };
+
   exports.isNavigationCommand = isNavigationCommand;
   function isNavigationCommand(obj) {
     return obj && typeof obj.navigate === "function";
   }
 
-  var Redirect = function Redirect(url) {
-    this.url = url;
-    this.shouldContinueProcessing = false;
-  };
+  var Redirect = (function () {
+    var Redirect = function Redirect(url) {
+      this.url = url;
+      this.shouldContinueProcessing = false;
+    };
 
-  Redirect.prototype.navigate = function (appRouter) {
-    (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
-  };
+    _prototypeProperties(Redirect, null, {
+      navigate: {
+        value: function (appRouter) {
+          (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
+        },
+        writable: true,
+        enumerable: true,
+        configurable: true
+      }
+    });
+
+    return Redirect;
+  })();
 
   exports.Redirect = Redirect;
 });

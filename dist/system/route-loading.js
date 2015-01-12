@@ -1,7 +1,7 @@
 System.register(["./navigation-plan"], function (_export) {
   "use strict";
 
-  var REPLACE, buildNavigationPlan, RouteLoader, LoadRouteStep;
+  var REPLACE, buildNavigationPlan, _prototypeProperties, RouteLoader, LoadRouteStep;
   _export("loadNewRoute", loadNewRoute);
 
   function loadNewRoute(routeLoader, navigationContext) {
@@ -90,26 +90,56 @@ System.register(["./navigation-plan"], function (_export) {
       buildNavigationPlan = _navigationPlan.buildNavigationPlan;
     }],
     execute: function () {
-      RouteLoader = function RouteLoader() {};
-
-      RouteLoader.prototype.loadRoute = function (router, config) {
-        throw Error("Route loaders must implment \"loadRoute(router, config)\".");
+      _prototypeProperties = function (child, staticProps, instanceProps) {
+        if (staticProps) Object.defineProperties(child, staticProps);
+        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
       };
 
+      RouteLoader = (function () {
+        var RouteLoader = function RouteLoader() {};
+
+        _prototypeProperties(RouteLoader, null, {
+          loadRoute: {
+            value: function (router, config) {
+              throw Error("Route loaders must implment \"loadRoute(router, config)\".");
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
+
+        return RouteLoader;
+      })();
       _export("RouteLoader", RouteLoader);
 
-      LoadRouteStep = function LoadRouteStep(routeLoader) {
-        this.routeLoader = routeLoader;
-      };
+      LoadRouteStep = (function () {
+        var LoadRouteStep = function LoadRouteStep(routeLoader) {
+          this.routeLoader = routeLoader;
+        };
 
-      LoadRouteStep.inject = function () {
-        return [RouteLoader];
-      };
+        _prototypeProperties(LoadRouteStep, {
+          inject: {
+            value: function () {
+              return [RouteLoader];
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        }, {
+          run: {
+            value: function (navigationContext, next) {
+              return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
-      LoadRouteStep.prototype.run = function (navigationContext, next) {
-        return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
-      };
-
+        return LoadRouteStep;
+      })();
       _export("LoadRouteStep", LoadRouteStep);
     }
   };

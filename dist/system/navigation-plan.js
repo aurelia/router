@@ -1,7 +1,7 @@
 System.register([], function (_export) {
   "use strict";
 
-  var _toArray, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
+  var _toArray, _prototypeProperties, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
   _export("buildNavigationPlan", buildNavigationPlan);
 
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
@@ -65,7 +65,9 @@ System.register([], function (_export) {
   }
 
   function hasDifferentParameterValues(prev, next) {
-    var prevParams = prev.params, nextParams = next.params, nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
+    var prevParams = prev.params,
+        nextParams = next.params,
+        nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
     for (var key in nextParams) {
       if (key == nextWildCardName) {
@@ -86,18 +88,33 @@ System.register([], function (_export) {
         return Array.isArray(arr) ? arr : Array.from(arr);
       };
 
+      _prototypeProperties = function (child, staticProps, instanceProps) {
+        if (staticProps) Object.defineProperties(child, staticProps);
+        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+      };
+
       NO_CHANGE = _export("NO_CHANGE", "no-change");
       INVOKE_LIFECYCLE = _export("INVOKE_LIFECYCLE", "invoke-lifecycle");
       REPLACE = _export("REPLACE", "replace");
-      BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
+      BuildNavigationPlanStep = (function () {
+        var BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
 
-      BuildNavigationPlanStep.prototype.run = function (navigationContext, next) {
-        return buildNavigationPlan(navigationContext).then(function (plan) {
-          navigationContext.plan = plan;
-          return next();
-        })["catch"](next.cancel);
-      };
+        _prototypeProperties(BuildNavigationPlanStep, null, {
+          run: {
+            value: function (navigationContext, next) {
+              return buildNavigationPlan(navigationContext).then(function (plan) {
+                navigationContext.plan = plan;
+                return next();
+              })["catch"](next.cancel);
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+          }
+        });
 
+        return BuildNavigationPlanStep;
+      })();
       _export("BuildNavigationPlanStep", BuildNavigationPlanStep);
     }
   };

@@ -1,5 +1,32 @@
 "use strict";
 
+var _prototypeProperties = function (child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);
+  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _get = function get(object, property, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+    if (getter === undefined) {
+      return undefined;
+    }
+    return getter.call(receiver);
+  }
+};
+
 var _inherits = function (child, parent) {
   if (typeof parent !== "function" && parent !== null) {
     throw new TypeError("Super expression must either be null or a function, not " + typeof parent);
@@ -20,124 +47,161 @@ var History = require("aurelia-history").History;
 var Router = require("./router").Router;
 var PipelineProvider = require("./pipeline-provider").PipelineProvider;
 var isNavigationCommand = require("./navigation-commands").isNavigationCommand;
-var AppRouter = (function () {
-  var _Router = Router;
+var AppRouter = (function (Router) {
   var AppRouter = function AppRouter(container, history, pipelineProvider) {
-    _Router.call(this, container, history);
+    _get(Object.getPrototypeOf(AppRouter.prototype), "constructor", this).call(this, container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener("click", handleLinkClick.bind(this), true);
   };
 
-  _inherits(AppRouter, _Router);
+  _inherits(AppRouter, Router);
 
-  AppRouter.inject = function () {
-    return [Container, History, PipelineProvider];
-  };
-
-  AppRouter.prototype.loadUrl = function (url) {
-    var _this = this;
-    return this.createNavigationInstruction(url).then(function (instruction) {
-      return _this.queueInstruction(instruction);
-    })["catch"](function (error) {
-      console.error(error);
-
-      if (_this.history.previousFragment) {
-        _this.navigate(_this.history.previousFragment, false);
-      }
-    });
-  };
-
-  AppRouter.prototype.queueInstruction = function (instruction) {
-    var _this2 = this;
-    return new Promise(function (resolve) {
-      instruction.resolve = resolve;
-      _this2.queue.unshift(instruction);
-      _this2.dequeueInstruction();
-    });
-  };
-
-  AppRouter.prototype.dequeueInstruction = function () {
-    var _this3 = this;
-    if (this.isNavigating) {
-      return;
+  _prototypeProperties(AppRouter, {
+    inject: {
+      value: function () {
+        return [Container, History, PipelineProvider];
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
     }
+  }, {
+    loadUrl: {
+      value: function (url) {
+        var _this = this;
+        return this.createNavigationInstruction(url).then(function (instruction) {
+          return _this.queueInstruction(instruction);
+        })["catch"](function (error) {
+          console.error(error);
 
-    var instruction = this.queue.shift();
-    this.queue = [];
-
-    if (!instruction) {
-      return;
-    }
-
-    this.isNavigating = true;
-
-    var context = this.createNavigationContext(instruction);
-    var pipeline = this.pipelineProvider.createPipeline(context);
-
-    pipeline.run(context).then(function (result) {
-      _this3.isNavigating = false;
-
-      if (result.completed) {
-        _this3.history.previousFragment = instruction.fragment;
-      }
-
-      if (result.output instanceof Error) {
-        console.error(result.output);
-      }
-
-      if (isNavigationCommand(result.output)) {
-        result.output.navigate(_this3);
-      } else if (!result.completed && _this3.history.previousFragment) {
-        _this3.navigate(_this3.history.previousFragment, false);
-      }
-
-      instruction.resolve(result);
-      _this3.dequeueInstruction();
-    });
-  };
-
-  AppRouter.prototype.registerViewPort = function (viewPort, name) {
-    var _this4 = this;
-    _Router.prototype.registerViewPort.call(this, viewPort, name);
-
-    if (!this.isActive) {
-      if ("configureRouter" in this.container.viewModel) {
-        var result = this.container.viewModel.configureRouter() || Promise.resolve();
-        return result.then(function () {
-          return _this4.activate();
+          if (_this.history.previousFragment) {
+            _this.navigate(_this.history.previousFragment, false);
+          }
         });
-      } else {
-        this.activate();
-      }
-    } else {
-      this.dequeueInstruction();
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    queueInstruction: {
+      value: function (instruction) {
+        var _this2 = this;
+        return new Promise(function (resolve) {
+          instruction.resolve = resolve;
+          _this2.queue.unshift(instruction);
+          _this2.dequeueInstruction();
+        });
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    dequeueInstruction: {
+      value: function () {
+        var _this3 = this;
+        if (this.isNavigating) {
+          return;
+        }
+
+        var instruction = this.queue.shift();
+        this.queue = [];
+
+        if (!instruction) {
+          return;
+        }
+
+        this.isNavigating = true;
+
+        var context = this.createNavigationContext(instruction);
+        var pipeline = this.pipelineProvider.createPipeline(context);
+
+        pipeline.run(context).then(function (result) {
+          _this3.isNavigating = false;
+
+          if (result.completed) {
+            _this3.history.previousFragment = instruction.fragment;
+          }
+
+          if (result.output instanceof Error) {
+            console.error(result.output);
+          }
+
+          if (isNavigationCommand(result.output)) {
+            result.output.navigate(_this3);
+          } else if (!result.completed && _this3.history.previousFragment) {
+            _this3.navigate(_this3.history.previousFragment, false);
+          }
+
+          instruction.resolve(result);
+          _this3.dequeueInstruction();
+        })["catch"](function (error) {
+          console.error(error);
+        });
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    registerViewPort: {
+      value: function (viewPort, name) {
+        var _this4 = this;
+        _get(Object.getPrototypeOf(AppRouter.prototype), "registerViewPort", this).call(this, viewPort, name);
+
+        if (!this.isActive) {
+          if ("configureRouter" in this.container.viewModel) {
+            var result = this.container.viewModel.configureRouter() || Promise.resolve();
+            return result.then(function () {
+              return _this4.activate();
+            });
+          } else {
+            this.activate();
+          }
+        } else {
+          this.dequeueInstruction();
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    activate: {
+      value: function (options) {
+        if (this.isActive) {
+          return;
+        }
+
+        this.isActive = true;
+        this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
+        this.history.activate(this.options);
+        this.dequeueInstruction();
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    deactivate: {
+      value: function () {
+        this.isActive = false;
+        this.history.deactivate();
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    reset: {
+      value: function () {
+        _get(Object.getPrototypeOf(AppRouter.prototype), "reset", this).call(this);
+        this.queue = [];
+        delete this.options;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
     }
-  };
-
-  AppRouter.prototype.activate = function (options) {
-    if (this.isActive) {
-      return;
-    }
-
-    this.isActive = true;
-    this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
-    this.history.activate(this.options);
-    this.dequeueInstruction();
-  };
-
-  AppRouter.prototype.deactivate = function () {
-    this.isActive = false;
-    this.history.deactivate();
-  };
-
-  AppRouter.prototype.reset = function () {
-    _Router.prototype.reset.call(this);
-    this.queue = [];
-    delete this.options;
-  };
+  });
 
   return AppRouter;
-})();
+})(Router);
 
 exports.AppRouter = AppRouter;
 

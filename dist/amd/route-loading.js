@@ -1,27 +1,59 @@
 define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
   "use strict";
 
+  var _prototypeProperties = function (child, staticProps, instanceProps) {
+    if (staticProps) Object.defineProperties(child, staticProps);
+    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+  };
+
   exports.loadNewRoute = loadNewRoute;
   var REPLACE = _navigationPlan.REPLACE;
   var buildNavigationPlan = _navigationPlan.buildNavigationPlan;
-  var RouteLoader = function RouteLoader() {};
+  var RouteLoader = (function () {
+    var RouteLoader = function RouteLoader() {};
 
-  RouteLoader.prototype.loadRoute = function (router, config) {
-    throw Error("Route loaders must implment \"loadRoute(router, config)\".");
-  };
+    _prototypeProperties(RouteLoader, null, {
+      loadRoute: {
+        value: function (router, config) {
+          throw Error("Route loaders must implment \"loadRoute(router, config)\".");
+        },
+        writable: true,
+        enumerable: true,
+        configurable: true
+      }
+    });
+
+    return RouteLoader;
+  })();
 
   exports.RouteLoader = RouteLoader;
-  var LoadRouteStep = function LoadRouteStep(routeLoader) {
-    this.routeLoader = routeLoader;
-  };
+  var LoadRouteStep = (function () {
+    var LoadRouteStep = function LoadRouteStep(routeLoader) {
+      this.routeLoader = routeLoader;
+    };
 
-  LoadRouteStep.inject = function () {
-    return [RouteLoader];
-  };
+    _prototypeProperties(LoadRouteStep, {
+      inject: {
+        value: function () {
+          return [RouteLoader];
+        },
+        writable: true,
+        enumerable: true,
+        configurable: true
+      }
+    }, {
+      run: {
+        value: function (navigationContext, next) {
+          return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
+        },
+        writable: true,
+        enumerable: true,
+        configurable: true
+      }
+    });
 
-  LoadRouteStep.prototype.run = function (navigationContext, next) {
-    return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
-  };
+    return LoadRouteStep;
+  })();
 
   exports.LoadRouteStep = LoadRouteStep;
   function loadNewRoute(routeLoader, navigationContext) {

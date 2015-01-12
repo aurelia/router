@@ -1,101 +1,153 @@
 "use strict";
 
-var RouterConfiguration = function RouterConfiguration() {
-  this.instructions = [];
+var _prototypeProperties = function (child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);
+  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
 };
 
-RouterConfiguration.prototype.map = function (route, config) {
-  if (Array.isArray(route)) {
-    for (var i = 0; i < route.length; i++) {
-      this.map(route[i]);
-    }
+var RouterConfiguration = (function () {
+  var RouterConfiguration = function RouterConfiguration() {
+    this.instructions = [];
+  };
 
-    return this;
-  }
+  _prototypeProperties(RouterConfiguration, null, {
+    map: {
+      value: function (route, config) {
+        if (Array.isArray(route)) {
+          for (var i = 0; i < route.length; i++) {
+            this.map(route[i]);
+          }
 
-  if (typeof route == "string") {
-    if (!config) {
-      config = {};
-    } else if (typeof config == "string") {
-      config = { moduleId: config };
-    }
+          return this;
+        }
 
-    config.route = route;
-  } else {
-    config = route;
-  }
+        if (typeof route == "string") {
+          if (!config) {
+            config = {};
+          } else if (typeof config == "string") {
+            config = { moduleId: config };
+          }
 
-  return this.mapRoute(config);
-};
+          config.route = route;
+        } else {
+          config = route;
+        }
 
-RouterConfiguration.prototype.mapRoute = function (config) {
-  var _this = this;
-  this.instructions.push(function (router) {
-    if (Array.isArray(config.route)) {
-      var navModel = {}, i, ii, current;
+        return this.mapRoute(config);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    mapRoute: {
+      value: function (config) {
+        var _this = this;
+        this.instructions.push(function (router) {
+          if (Array.isArray(config.route)) {
+            var navModel = {}, i, ii, current;
 
-      for (i = 0, ii = config.route.length; i < ii; ++i) {
-        current = Object.assign({}, config);
-        current.route = config.route[i];
-        _this.configureRoute(router, current, navModel);
-      }
-    } else {
-      _this.configureRoute(router, Object.assign({}, config));
+            for (i = 0, ii = config.route.length; i < ii; ++i) {
+              current = Object.assign({}, config);
+              current.route = config.route[i];
+              _this.configureRoute(router, current, navModel);
+            }
+          } else {
+            _this.configureRoute(router, Object.assign({}, config));
+          }
+        });
+
+        return this;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    mapUnknownRoutes: {
+      value: function (config) {
+        this.unknownRouteConfig = config;
+        return this;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    exportToRouter: {
+      value: function (router) {
+        var instructions = this.instructions, i, ii;
+
+        for (i = 0, ii = instructions.length; i < ii; ++i) {
+          instructions[i](router);
+        }
+
+        if (this.title) {
+          router.title = this.title;
+        }
+
+        if (this.unknownRouteConfig) {
+          router.handleUnknownRoutes(this.unknownRouteConfig);
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    configureRoute: {
+      value: function (router, config, navModel) {
+        this.ensureDefaultsForRouteConfig(config);
+        router.addRoute(config, navModel);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    ensureDefaultsForRouteConfig: {
+      value: function (config) {
+        config.name = ensureConfigValue(config, "name", this.deriveName);
+        config.route = ensureConfigValue(config, "route", this.deriveRoute);
+        config.title = ensureConfigValue(config, "title", this.deriveTitle);
+        config.moduleId = ensureConfigValue(config, "moduleId", this.deriveModuleId);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    deriveName: {
+      value: function (config) {
+        return config.title || (config.route ? stripParametersFromRoute(config.route) : config.moduleId);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    deriveRoute: {
+      value: function (config) {
+        return config.moduleId || config.name;
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    deriveTitle: {
+      value: function (config) {
+        var value = config.name;
+        return value.substr(0, 1).toUpperCase() + value.substr(1);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
+    deriveModuleId: {
+      value: function (config) {
+        return stripParametersFromRoute(config.route);
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
     }
   });
 
-  return this;
-};
-
-RouterConfiguration.prototype.mapUnknownRoutes = function (config) {
-  this.unknownRouteConfig = config;
-  return this;
-};
-
-RouterConfiguration.prototype.exportToRouter = function (router) {
-  var instructions = this.instructions, i, ii;
-
-  for (i = 0, ii = instructions.length; i < ii; ++i) {
-    instructions[i](router);
-  }
-
-  if (this.title) {
-    router.title = this.title;
-  }
-
-  if (this.unknownRouteConfig) {
-    router.handleUnknownRoutes(this.unknownRouteConfig);
-  }
-};
-
-RouterConfiguration.prototype.configureRoute = function (router, config, navModel) {
-  this.ensureDefaultsForRouteConfig(config);
-  router.addRoute(config, navModel);
-};
-
-RouterConfiguration.prototype.ensureDefaultsForRouteConfig = function (config) {
-  config.name = ensureConfigValue(config, "name", this.deriveName);
-  config.route = ensureConfigValue(config, "route", this.deriveRoute);
-  config.title = ensureConfigValue(config, "title", this.deriveTitle);
-  config.moduleId = ensureConfigValue(config, "moduleId", this.deriveModuleId);
-};
-
-RouterConfiguration.prototype.deriveName = function (config) {
-  return config.title || (config.route ? stripParametersFromRoute(config.route) : config.moduleId);
-};
-
-RouterConfiguration.prototype.deriveRoute = function (config) {
-  return config.moduleId || config.name;
-};
-
-RouterConfiguration.prototype.deriveTitle = function (config) {
-  var value = config.name;
-  return value.substr(0, 1).toUpperCase() + value.substr(1);
-};
-
-RouterConfiguration.prototype.deriveModuleId = function (config) {
-  return stripParametersFromRoute(config.route);
-};
+  return RouterConfiguration;
+})();
 
 exports.RouterConfiguration = RouterConfiguration;
 
