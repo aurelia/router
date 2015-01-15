@@ -180,7 +180,7 @@ export class Router {
 
     config.navModel = navModel;
 
-    if (('nav' in config || 'order' in navModel) && this.navigation.indexOf(navModel) === -1) {
+    if ((config.nav || 'order' in navModel) && this.navigation.indexOf(navModel) === -1) {
       navModel.order = navModel.order || config.nav;
       navModel.href = navModel.href || config.href;
       navModel.isActive = false;
