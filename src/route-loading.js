@@ -13,15 +13,16 @@ export class LoadRouteStep {
   }
 
   run(navigationContext, next) {
-    return loadNewRoute(this.routeLoader, navigationContext)
+    return loadNewRoute([], this.routeLoader, navigationContext)
       .then(next)
       .catch(next.cancel);
   }
 }
 
-export function loadNewRoute(routeLoader, navigationContext) {
+export function loadNewRoute(routers, routeLoader, navigationContext) {
   var toLoad = determineWhatToLoad(navigationContext);
   var loadPromises = toLoad.map(current => loadRoute(
+    routers,
     routeLoader,
     current.navigationContext,
     current.viewPortPlan
@@ -67,9 +68,11 @@ function determineWhatToLoad(navigationContext, toLoad) {
   return toLoad;
 }
 
-function loadRoute(routeLoader, navigationContext, viewPortPlan) {
+function loadRoute(routers, routeLoader, navigationContext, viewPortPlan) {
   var moduleId = viewPortPlan.config.moduleId;
   var next = navigationContext.nextInstruction;
+
+  routers.push(navigationContext.router);
 
   return loadComponent(routeLoader, navigationContext.router, viewPortPlan.config).then(component => {
     var viewPortInstruction = next.addViewPortInstruction(
@@ -81,7 +84,7 @@ function loadRoute(routeLoader, navigationContext, viewPortPlan) {
 
     var controller = component.executionContext;
 
-    if (controller.router) {
+    if (controller.router && routers.indexOf(controller.router) === -1) {
       var path = next.getWildcardPath();
 
       return controller.router.createNavigationInstruction(path, next)
@@ -94,7 +97,7 @@ function loadRoute(routeLoader, navigationContext, viewPortPlan) {
               viewPortPlan.childNavigationContext.plan = childPlan;
               viewPortInstruction.childNavigationContext = viewPortPlan.childNavigationContext;
 
-              return loadNewRoute(routeLoader, viewPortPlan.childNavigationContext);
+              return loadNewRoute(routers, routeLoader, viewPortPlan.childNavigationContext);
             });
         });
     }
