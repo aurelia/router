@@ -7,7 +7,7 @@ define(["exports"], function (exports) {
   };
 
   var NavigationInstruction = (function () {
-    var NavigationInstruction = function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
+    function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
       this.fragment = fragment;
       this.queryString = queryString;
       this.params = params || {};
@@ -19,11 +19,11 @@ define(["exports"], function (exports) {
       if (parentInstruction) {
         this.params.$parent = parentInstruction.params;
       }
-    };
+    }
 
     _prototypeProperties(NavigationInstruction, null, {
       addViewPortInstruction: {
-        value: function (viewPortName, strategy, moduleId, component) {
+        value: function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
           return this.viewPortInstructions[viewPortName] = {
             name: viewPortName,
             strategy: strategy,
@@ -38,7 +38,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       getWildCardName: {
-        value: function () {
+        value: function getWildCardName() {
           var wildcardIndex = this.config.route.lastIndexOf("*");
           return this.config.route.substr(wildcardIndex + 1);
         },
@@ -47,7 +47,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       getWildcardPath: {
-        value: function () {
+        value: function getWildcardPath() {
           var wildcardName = this.getWildCardName(),
               path = this.params[wildcardName];
 
@@ -62,7 +62,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       getBaseUrl: {
-        value: function () {
+        value: function getBaseUrl() {
           if (!this.params) {
             return this.fragment;
           }

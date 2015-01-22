@@ -17,14 +17,14 @@ System.register([], function (_export) {
       };
 
       Redirect = (function () {
-        var Redirect = function Redirect(url) {
+        function Redirect(url) {
           this.url = url;
           this.shouldContinueProcessing = false;
-        };
+        }
 
         _prototypeProperties(Redirect, null, {
           navigate: {
-            value: function (appRouter) {
+            value: function navigate(appRouter) {
               (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
             },
             writable: true,

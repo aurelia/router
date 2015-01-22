@@ -16,11 +16,11 @@ var processPotential = require("./util").processPotential;
 var affirmations = exports.affirmations = ["yes", "ok", "true"];
 
 var CanDeactivatePreviousStep = (function () {
-  var CanDeactivatePreviousStep = function CanDeactivatePreviousStep() {};
+  function CanDeactivatePreviousStep() {}
 
   _prototypeProperties(CanDeactivatePreviousStep, null, {
     run: {
-      value: function (navigationContext, next) {
+      value: function run(navigationContext, next) {
         return processDeactivatable(navigationContext.plan, "canDeactivate", next);
       },
       writable: true,
@@ -34,11 +34,11 @@ var CanDeactivatePreviousStep = (function () {
 
 exports.CanDeactivatePreviousStep = CanDeactivatePreviousStep;
 var CanActivateNextStep = (function () {
-  var CanActivateNextStep = function CanActivateNextStep() {};
+  function CanActivateNextStep() {}
 
   _prototypeProperties(CanActivateNextStep, null, {
     run: {
-      value: function (navigationContext, next) {
+      value: function run(navigationContext, next) {
         return processActivatable(navigationContext, "canActivate", next);
       },
       writable: true,
@@ -52,11 +52,11 @@ var CanActivateNextStep = (function () {
 
 exports.CanActivateNextStep = CanActivateNextStep;
 var DeactivatePreviousStep = (function () {
-  var DeactivatePreviousStep = function DeactivatePreviousStep() {};
+  function DeactivatePreviousStep() {}
 
   _prototypeProperties(DeactivatePreviousStep, null, {
     run: {
-      value: function (navigationContext, next) {
+      value: function run(navigationContext, next) {
         return processDeactivatable(navigationContext.plan, "deactivate", next, true);
       },
       writable: true,
@@ -70,11 +70,11 @@ var DeactivatePreviousStep = (function () {
 
 exports.DeactivatePreviousStep = DeactivatePreviousStep;
 var ActivateNextStep = (function () {
-  var ActivateNextStep = function ActivateNextStep() {};
+  function ActivateNextStep() {}
 
   _prototypeProperties(ActivateNextStep, null, {
     run: {
-      value: function (navigationContext, next) {
+      value: function run(navigationContext, next) {
         return processActivatable(navigationContext, "activate", next, true);
       },
       writable: true,
@@ -90,18 +90,15 @@ exports.ActivateNextStep = ActivateNextStep;
 
 
 function processDeactivatable(plan, callbackName, next, ignoreResult) {
-  var infos = findDeactivatable(plan, callbackName),
-      i = infos.length;
-
-  function inspect(val) {
+  var inspect = function (val) {
     if (ignoreResult || shouldContinue(val)) {
       return iterate();
     } else {
       return next.cancel(val);
     }
-  }
+  };
 
-  function iterate() {
+  var iterate = function () {
     if (i--) {
       try {
         var controller = infos[i];
@@ -113,7 +110,10 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
     } else {
       return next();
     }
-  }
+  };
+
+  var infos = findDeactivatable(plan, callbackName),
+      i = infos.length;
 
   return iterate();
 }
@@ -164,19 +164,15 @@ function addPreviousDeactivatable(component, callbackName, list) {
 }
 
 function processActivatable(navigationContext, callbackName, next, ignoreResult) {
-  var infos = findActivatable(navigationContext, callbackName),
-      length = infos.length,
-      i = -1;
-
-  function inspect(val, router) {
+  var inspect = function (val, router) {
     if (ignoreResult || shouldContinue(val, router)) {
       return iterate();
     } else {
       return next.cancel(val);
     }
-  }
+  };
 
-  function iterate() {
+  var iterate = function () {
     i++;
 
     if (i < length) {
@@ -193,7 +189,11 @@ function processActivatable(navigationContext, callbackName, next, ignoreResult)
     } else {
       return next();
     }
-  }
+  };
+
+  var infos = findActivatable(navigationContext, callbackName),
+      length = infos.length,
+      i = -1;
 
   return iterate();
 }

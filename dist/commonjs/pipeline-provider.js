@@ -16,14 +16,14 @@ var CanActivateNextStep = require("./activation").CanActivateNextStep;
 var DeactivatePreviousStep = require("./activation").DeactivatePreviousStep;
 var ActivateNextStep = require("./activation").ActivateNextStep;
 var PipelineProvider = (function () {
-  var PipelineProvider = function PipelineProvider(container) {
+  function PipelineProvider(container) {
     this.container = container;
     this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, ApplyModelBindersStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
-  };
+  }
 
   _prototypeProperties(PipelineProvider, {
     inject: {
-      value: function () {
+      value: function inject() {
         return [Container];
       },
       writable: true,
@@ -32,7 +32,7 @@ var PipelineProvider = (function () {
     }
   }, {
     createPipeline: {
-      value: function (navigationContext) {
+      value: function createPipeline(navigationContext) {
         var _this = this;
         var pipeline = new Pipeline();
         this.steps.forEach(function (step) {

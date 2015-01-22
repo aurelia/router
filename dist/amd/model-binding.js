@@ -7,11 +7,11 @@ define(["exports"], function (exports) {
   };
 
   var ApplyModelBindersStep = (function () {
-    var ApplyModelBindersStep = function ApplyModelBindersStep() {};
+    function ApplyModelBindersStep() {}
 
     _prototypeProperties(ApplyModelBindersStep, null, {
       run: {
-        value: function (navigationContext, next) {
+        value: function run(navigationContext, next) {
           return next();
         },
         writable: true,

@@ -6,11 +6,11 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 };
 
 var ApplyModelBindersStep = (function () {
-  var ApplyModelBindersStep = function ApplyModelBindersStep() {};
+  function ApplyModelBindersStep() {}
 
   _prototypeProperties(ApplyModelBindersStep, null, {
     run: {
-      value: function (navigationContext, next) {
+      value: function run(navigationContext, next) {
         return next();
       },
       writable: true,

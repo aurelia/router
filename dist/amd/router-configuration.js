@@ -7,13 +7,13 @@ define(["exports"], function (exports) {
   };
 
   var RouterConfiguration = (function () {
-    var RouterConfiguration = function RouterConfiguration() {
+    function RouterConfiguration() {
       this.instructions = [];
-    };
+    }
 
     _prototypeProperties(RouterConfiguration, null, {
       map: {
-        value: function (route, config) {
+        value: function map(route, config) {
           if (Array.isArray(route)) {
             for (var i = 0; i < route.length; i++) {
               this.map(route[i]);
@@ -41,11 +41,14 @@ define(["exports"], function (exports) {
         configurable: true
       },
       mapRoute: {
-        value: function (config) {
+        value: function mapRoute(config) {
           var _this = this;
           this.instructions.push(function (router) {
             if (Array.isArray(config.route)) {
-              var navModel = {}, i, ii, current;
+              var navModel = {},
+                  i,
+                  ii,
+                  current;
 
               for (i = 0, ii = config.route.length; i < ii; ++i) {
                 current = Object.assign({}, config);
@@ -64,7 +67,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       mapUnknownRoutes: {
-        value: function (config) {
+        value: function mapUnknownRoutes(config) {
           this.unknownRouteConfig = config;
           return this;
         },
@@ -73,8 +76,10 @@ define(["exports"], function (exports) {
         configurable: true
       },
       exportToRouter: {
-        value: function (router) {
-          var instructions = this.instructions, i, ii;
+        value: function exportToRouter(router) {
+          var instructions = this.instructions,
+              i,
+              ii;
 
           for (i = 0, ii = instructions.length; i < ii; ++i) {
             instructions[i](router);
@@ -93,7 +98,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       configureRoute: {
-        value: function (router, config, navModel) {
+        value: function configureRoute(router, config, navModel) {
           this.ensureDefaultsForRouteConfig(config);
           router.addRoute(config, navModel);
         },
@@ -102,7 +107,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       ensureDefaultsForRouteConfig: {
-        value: function (config) {
+        value: function ensureDefaultsForRouteConfig(config) {
           config.name = ensureConfigValue(config, "name", this.deriveName);
           config.route = ensureConfigValue(config, "route", this.deriveRoute);
           config.title = ensureConfigValue(config, "title", this.deriveTitle);
@@ -113,7 +118,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       deriveName: {
-        value: function (config) {
+        value: function deriveName(config) {
           return config.title || (config.route ? stripParametersFromRoute(config.route) : config.moduleId);
         },
         writable: true,
@@ -121,7 +126,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       deriveRoute: {
-        value: function (config) {
+        value: function deriveRoute(config) {
           return config.moduleId || config.name;
         },
         writable: true,
@@ -129,7 +134,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       deriveTitle: {
-        value: function (config) {
+        value: function deriveTitle(config) {
           var value = config.name;
           return value.substr(0, 1).toUpperCase() + value.substr(1);
         },
@@ -138,7 +143,7 @@ define(["exports"], function (exports) {
         configurable: true
       },
       deriveModuleId: {
-        value: function (config) {
+        value: function deriveModuleId(config) {
           return stripParametersFromRoute(config.route);
         },
         writable: true,

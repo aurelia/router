@@ -17,11 +17,11 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
   var affirmations = exports.affirmations = ["yes", "ok", "true"];
 
   var CanDeactivatePreviousStep = (function () {
-    var CanDeactivatePreviousStep = function CanDeactivatePreviousStep() {};
+    function CanDeactivatePreviousStep() {}
 
     _prototypeProperties(CanDeactivatePreviousStep, null, {
       run: {
-        value: function (navigationContext, next) {
+        value: function run(navigationContext, next) {
           return processDeactivatable(navigationContext.plan, "canDeactivate", next);
         },
         writable: true,
@@ -35,11 +35,11 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
   exports.CanDeactivatePreviousStep = CanDeactivatePreviousStep;
   var CanActivateNextStep = (function () {
-    var CanActivateNextStep = function CanActivateNextStep() {};
+    function CanActivateNextStep() {}
 
     _prototypeProperties(CanActivateNextStep, null, {
       run: {
-        value: function (navigationContext, next) {
+        value: function run(navigationContext, next) {
           return processActivatable(navigationContext, "canActivate", next);
         },
         writable: true,
@@ -53,11 +53,11 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
   exports.CanActivateNextStep = CanActivateNextStep;
   var DeactivatePreviousStep = (function () {
-    var DeactivatePreviousStep = function DeactivatePreviousStep() {};
+    function DeactivatePreviousStep() {}
 
     _prototypeProperties(DeactivatePreviousStep, null, {
       run: {
-        value: function (navigationContext, next) {
+        value: function run(navigationContext, next) {
           return processDeactivatable(navigationContext.plan, "deactivate", next, true);
         },
         writable: true,
@@ -71,11 +71,11 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
   exports.DeactivatePreviousStep = DeactivatePreviousStep;
   var ActivateNextStep = (function () {
-    var ActivateNextStep = function ActivateNextStep() {};
+    function ActivateNextStep() {}
 
     _prototypeProperties(ActivateNextStep, null, {
       run: {
-        value: function (navigationContext, next) {
+        value: function run(navigationContext, next) {
           return processActivatable(navigationContext, "activate", next, true);
         },
         writable: true,
@@ -91,18 +91,15 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
-    var infos = findDeactivatable(plan, callbackName),
-        i = infos.length;
-
-    function inspect(val) {
+    var inspect = function (val) {
       if (ignoreResult || shouldContinue(val)) {
         return iterate();
       } else {
         return next.cancel(val);
       }
-    }
+    };
 
-    function iterate() {
+    var iterate = function () {
       if (i--) {
         try {
           var controller = infos[i];
@@ -114,7 +111,10 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
       } else {
         return next();
       }
-    }
+    };
+
+    var infos = findDeactivatable(plan, callbackName),
+        i = infos.length;
 
     return iterate();
   }
@@ -165,19 +165,15 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
   }
 
   function processActivatable(navigationContext, callbackName, next, ignoreResult) {
-    var infos = findActivatable(navigationContext, callbackName),
-        length = infos.length,
-        i = -1;
-
-    function inspect(val, router) {
+    var inspect = function (val, router) {
       if (ignoreResult || shouldContinue(val, router)) {
         return iterate();
       } else {
         return next.cancel(val);
       }
-    }
+    };
 
-    function iterate() {
+    var iterate = function () {
       i++;
 
       if (i < length) {
@@ -194,7 +190,11 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
       } else {
         return next();
       }
-    }
+    };
+
+    var infos = findActivatable(navigationContext, callbackName),
+        length = infos.length,
+        i = -1;
 
     return iterate();
   }

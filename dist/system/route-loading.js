@@ -4,10 +4,10 @@ System.register(["./navigation-plan"], function (_export) {
   var REPLACE, buildNavigationPlan, _prototypeProperties, RouteLoader, LoadRouteStep;
   _export("loadNewRoute", loadNewRoute);
 
-  function loadNewRoute(routeLoader, navigationContext) {
+  function loadNewRoute(routers, routeLoader, navigationContext) {
     var toLoad = determineWhatToLoad(navigationContext);
     var loadPromises = toLoad.map(function (current) {
-      return loadRoute(routeLoader, current.navigationContext, current.viewPortPlan);
+      return loadRoute(routers, routeLoader, current.navigationContext, current.viewPortPlan);
     });
 
     return Promise.all(loadPromises);
@@ -44,16 +44,18 @@ System.register(["./navigation-plan"], function (_export) {
     return toLoad;
   }
 
-  function loadRoute(routeLoader, navigationContext, viewPortPlan) {
+  function loadRoute(routers, routeLoader, navigationContext, viewPortPlan) {
     var moduleId = viewPortPlan.config.moduleId;
     var next = navigationContext.nextInstruction;
+
+    routers.push(navigationContext.router);
 
     return loadComponent(routeLoader, navigationContext.router, viewPortPlan.config).then(function (component) {
       var viewPortInstruction = next.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
 
       var controller = component.executionContext;
 
-      if (controller.router) {
+      if (controller.router && routers.indexOf(controller.router) === -1) {
         var path = next.getWildcardPath();
 
         return controller.router.createNavigationInstruction(path, next).then(function (childInstruction) {
@@ -63,7 +65,7 @@ System.register(["./navigation-plan"], function (_export) {
             viewPortPlan.childNavigationContext.plan = childPlan;
             viewPortInstruction.childNavigationContext = viewPortPlan.childNavigationContext;
 
-            return loadNewRoute(routeLoader, viewPortPlan.childNavigationContext);
+            return loadNewRoute(routers, routeLoader, viewPortPlan.childNavigationContext);
           });
         });
       }
@@ -96,11 +98,11 @@ System.register(["./navigation-plan"], function (_export) {
       };
 
       RouteLoader = (function () {
-        var RouteLoader = function RouteLoader() {};
+        function RouteLoader() {}
 
         _prototypeProperties(RouteLoader, null, {
           loadRoute: {
-            value: function (router, config) {
+            value: function loadRoute(router, config) {
               throw Error("Route loaders must implment \"loadRoute(router, config)\".");
             },
             writable: true,
@@ -114,13 +116,13 @@ System.register(["./navigation-plan"], function (_export) {
       _export("RouteLoader", RouteLoader);
 
       LoadRouteStep = (function () {
-        var LoadRouteStep = function LoadRouteStep(routeLoader) {
+        function LoadRouteStep(routeLoader) {
           this.routeLoader = routeLoader;
-        };
+        }
 
         _prototypeProperties(LoadRouteStep, {
           inject: {
-            value: function () {
+            value: function inject() {
               return [RouteLoader];
             },
             writable: true,
@@ -129,8 +131,8 @@ System.register(["./navigation-plan"], function (_export) {
           }
         }, {
           run: {
-            value: function (navigationContext, next) {
-              return loadNewRoute(this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
+            value: function run(navigationContext, next) {
+              return loadNewRoute([], this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
             },
             writable: true,
             enumerable: true,

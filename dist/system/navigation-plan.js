@@ -7,7 +7,8 @@ System.register([], function (_export) {
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
     var prev = navigationContext.prevInstruction;
     var next = navigationContext.nextInstruction;
-    var plan = {}, viewPortName;
+    var plan = {},
+        viewPortName;
 
     if (prev) {
       var newParams = hasDifferentParameterValues(prev, next);
@@ -97,11 +98,11 @@ System.register([], function (_export) {
       INVOKE_LIFECYCLE = _export("INVOKE_LIFECYCLE", "invoke-lifecycle");
       REPLACE = _export("REPLACE", "replace");
       BuildNavigationPlanStep = (function () {
-        var BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
+        function BuildNavigationPlanStep() {}
 
         _prototypeProperties(BuildNavigationPlanStep, null, {
           run: {
-            value: function (navigationContext, next) {
+            value: function run(navigationContext, next) {
               return buildNavigationPlan(navigationContext).then(function (plan) {
                 navigationContext.plan = plan;
                 return next();

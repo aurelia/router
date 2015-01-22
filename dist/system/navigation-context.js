@@ -13,16 +13,16 @@ System.register(["./navigation-plan"], function (_export) {
       };
 
       NavigationContext = (function () {
-        var NavigationContext = function NavigationContext(router, nextInstruction) {
+        function NavigationContext(router, nextInstruction) {
           this.router = router;
           this.nextInstruction = nextInstruction;
           this.currentInstruction = router.currentInstruction;
           this.prevInstruction = router.currentInstruction;
-        };
+        }
 
         _prototypeProperties(NavigationContext, null, {
           commitChanges: {
-            value: function (waitToSwap) {
+            value: function commitChanges(waitToSwap) {
               var next = this.nextInstruction,
                   prev = this.prevInstruction,
                   viewPortInstructions = next.viewPortInstructions,
@@ -77,7 +77,7 @@ System.register(["./navigation-plan"], function (_export) {
             configurable: true
           },
           buildTitle: {
-            value: function () {
+            value: function buildTitle() {
               var separator = arguments[0] === undefined ? " | " : arguments[0];
               var next = this.nextInstruction,
                   title = next.config.navModel.title || "",
@@ -116,11 +116,11 @@ System.register(["./navigation-plan"], function (_export) {
       _export("NavigationContext", NavigationContext);
 
       CommitChangesStep = (function () {
-        var CommitChangesStep = function CommitChangesStep() {};
+        function CommitChangesStep() {}
 
         _prototypeProperties(CommitChangesStep, null, {
           run: {
-            value: function (navigationContext, next) {
+            value: function run(navigationContext, next) {
               navigationContext.commitChanges(true);
 
               var title = navigationContext.buildTitle();

@@ -18,7 +18,8 @@ define(["exports"], function (exports) {
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
     var prev = navigationContext.prevInstruction;
     var next = navigationContext.nextInstruction;
-    var plan = {}, viewPortName;
+    var plan = {},
+        viewPortName;
 
     if (prev) {
       var newParams = hasDifferentParameterValues(prev, next);
@@ -76,11 +77,11 @@ define(["exports"], function (exports) {
   }
 
   var BuildNavigationPlanStep = (function () {
-    var BuildNavigationPlanStep = function BuildNavigationPlanStep() {};
+    function BuildNavigationPlanStep() {}
 
     _prototypeProperties(BuildNavigationPlanStep, null, {
       run: {
-        value: function (navigationContext, next) {
+        value: function run(navigationContext, next) {
           return buildNavigationPlan(navigationContext).then(function (plan) {
             navigationContext.plan = plan;
             return next();

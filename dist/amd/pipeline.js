@@ -21,13 +21,13 @@ define(["exports"], function (exports) {
   var RUNNING = exports.RUNNING = "running";
 
   var Pipeline = (function () {
-    var Pipeline = function Pipeline() {
+    function Pipeline() {
       this.steps = [];
-    };
+    }
 
     _prototypeProperties(Pipeline, null, {
       withStep: {
-        value: function (step) {
+        value: function withStep(step) {
           var run;
 
           if (typeof step == "function") {
@@ -45,8 +45,11 @@ define(["exports"], function (exports) {
         configurable: true
       },
       run: {
-        value: function (ctx) {
-          var index = -1, steps = this.steps, next, currentStep;
+        value: function run(ctx) {
+          var index = -1,
+              steps = this.steps,
+              next,
+              currentStep;
 
           next = function () {
             index++;

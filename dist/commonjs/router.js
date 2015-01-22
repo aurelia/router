@@ -12,17 +12,17 @@ var NavigationInstruction = require("./navigation-instruction").NavigationInstru
 var RouterConfiguration = require("./router-configuration").RouterConfiguration;
 var processPotential = require("./util").processPotential;
 var Router = (function () {
-  var Router = function Router(container, history) {
+  function Router(container, history) {
     this.container = container;
     this.history = history;
     this.viewPorts = {};
     this.reset();
     this.baseUrl = "";
-  };
+  }
 
   _prototypeProperties(Router, null, {
     registerViewPort: {
-      value: function (viewPort, name) {
+      value: function registerViewPort(viewPort, name) {
         name = name || "default";
         this.viewPorts[name] = viewPort;
       },
@@ -31,7 +31,7 @@ var Router = (function () {
       configurable: true
     },
     refreshBaseUrl: {
-      value: function () {
+      value: function refreshBaseUrl() {
         if (this.parent) {
           var baseUrl = this.parent.currentInstruction.getBaseUrl();
           this.baseUrl = this.parent.baseUrl + baseUrl;
@@ -42,11 +42,10 @@ var Router = (function () {
       configurable: true
     },
     refreshNavigation: {
-      value: function () {
+      value: function refreshNavigation() {
         var nav = this.navigation;
 
-        for (var i = 0,
-            length = nav.length; i < length; i++) {
+        for (var i = 0, length = nav.length; i < length; i++) {
           var current = nav[i];
 
           if (!this.history._hasPushState) {
@@ -69,7 +68,7 @@ var Router = (function () {
       configurable: true
     },
     configure: {
-      value: function (callbackOrConfig) {
+      value: function configure(callbackOrConfig) {
         if (typeof callbackOrConfig == "function") {
           var config = new RouterConfiguration();
           callbackOrConfig(config);
@@ -85,7 +84,7 @@ var Router = (function () {
       configurable: true
     },
     navigate: {
-      value: function (fragment, options) {
+      value: function navigate(fragment, options) {
         fragment = join(this.baseUrl, fragment);
         return this.history.navigate(fragment, options);
       },
@@ -94,7 +93,7 @@ var Router = (function () {
       configurable: true
     },
     navigateBack: {
-      value: function () {
+      value: function navigateBack() {
         this.history.navigateBack();
       },
       writable: true,
@@ -102,7 +101,7 @@ var Router = (function () {
       configurable: true
     },
     createChild: {
-      value: function (container) {
+      value: function createChild(container) {
         var childRouter = new Router(container || this.container.createChild(), this.history);
         childRouter.parent = this;
         return childRouter;
@@ -112,7 +111,7 @@ var Router = (function () {
       configurable: true
     },
     createNavigationInstruction: {
-      value: function () {
+      value: function createNavigationInstruction() {
         var url = arguments[0] === undefined ? "" : arguments[0];
         var parentInstruction = arguments[1] === undefined ? null : arguments[1];
         var results = this.recognizer.recognize(url);
@@ -179,7 +178,7 @@ var Router = (function () {
       configurable: true
     },
     createNavigationContext: {
-      value: function (instruction) {
+      value: function createNavigationContext(instruction) {
         return new NavigationContext(this, instruction);
       },
       writable: true,
@@ -187,7 +186,7 @@ var Router = (function () {
       configurable: true
     },
     generate: {
-      value: function (name, params) {
+      value: function generate(name, params) {
         return this.recognizer.generate(name, params);
       },
       writable: true,
@@ -195,7 +194,7 @@ var Router = (function () {
       configurable: true
     },
     addRoute: {
-      value: function (config) {
+      value: function addRoute(config) {
         var navModel = arguments[1] === undefined ? {} : arguments[1];
         if (!("viewPorts" in config)) {
           config.viewPorts = {
@@ -225,7 +224,7 @@ var Router = (function () {
 
         config.navModel = navModel;
 
-        if (("nav" in config || "order" in navModel) && this.navigation.indexOf(navModel) === -1) {
+        if ((config.nav || "order" in navModel) && this.navigation.indexOf(navModel) === -1) {
           navModel.order = navModel.order || config.nav;
           navModel.href = navModel.href || config.href;
           navModel.isActive = false;
@@ -251,14 +250,14 @@ var Router = (function () {
       configurable: true
     },
     handleUnknownRoutes: {
-      value: function (config) {
+      value: function handleUnknownRoutes(config) {
         var callback = function (instruction) {
           return new Promise(function (resolve, reject) {
-            function done(inst) {
+            var done = function (inst) {
               inst = inst || instruction;
               inst.config.route = inst.params.path;
               resolve(inst);
-            }
+            };
 
             if (!config) {
               instruction.config.moduleId = instruction.fragment;
@@ -282,7 +281,7 @@ var Router = (function () {
       configurable: true
     },
     reset: {
-      value: function () {
+      value: function reset() {
         this.fallbackOrder = 100;
         this.recognizer = new RouteRecognizer();
         this.childRecognizer = new RouteRecognizer();

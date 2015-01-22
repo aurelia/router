@@ -11,7 +11,7 @@ System.register([], function (_export) {
       };
 
       NavigationInstruction = (function () {
-        var NavigationInstruction = function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
+        function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
           this.fragment = fragment;
           this.queryString = queryString;
           this.params = params || {};
@@ -23,11 +23,11 @@ System.register([], function (_export) {
           if (parentInstruction) {
             this.params.$parent = parentInstruction.params;
           }
-        };
+        }
 
         _prototypeProperties(NavigationInstruction, null, {
           addViewPortInstruction: {
-            value: function (viewPortName, strategy, moduleId, component) {
+            value: function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
               return this.viewPortInstructions[viewPortName] = {
                 name: viewPortName,
                 strategy: strategy,
@@ -42,7 +42,7 @@ System.register([], function (_export) {
             configurable: true
           },
           getWildCardName: {
-            value: function () {
+            value: function getWildCardName() {
               var wildcardIndex = this.config.route.lastIndexOf("*");
               return this.config.route.substr(wildcardIndex + 1);
             },
@@ -51,7 +51,7 @@ System.register([], function (_export) {
             configurable: true
           },
           getWildcardPath: {
-            value: function () {
+            value: function getWildcardPath() {
               var wildcardName = this.getWildCardName(),
                   path = this.params[wildcardName];
 
@@ -66,7 +66,7 @@ System.register([], function (_export) {
             configurable: true
           },
           getBaseUrl: {
-            value: function () {
+            value: function getBaseUrl() {
               if (!this.params) {
                 return this.fragment;
               }

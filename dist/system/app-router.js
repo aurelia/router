@@ -71,33 +71,33 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
         }
       };
 
-      _inherits = function (child, parent) {
-        if (typeof parent !== "function" && parent !== null) {
-          throw new TypeError("Super expression must either be null or a function, not " + typeof parent);
+      _inherits = function (subClass, superClass) {
+        if (typeof superClass !== "function" && superClass !== null) {
+          throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
         }
-        child.prototype = Object.create(parent && parent.prototype, {
+        subClass.prototype = Object.create(superClass && superClass.prototype, {
           constructor: {
-            value: child,
+            value: subClass,
             enumerable: false,
             writable: true,
             configurable: true
           }
         });
-        if (parent) child.__proto__ = parent;
+        if (superClass) subClass.__proto__ = superClass;
       };
 
       AppRouter = (function (Router) {
-        var AppRouter = function AppRouter(container, history, pipelineProvider) {
+        function AppRouter(container, history, pipelineProvider) {
           _get(Object.getPrototypeOf(AppRouter.prototype), "constructor", this).call(this, container, history);
           this.pipelineProvider = pipelineProvider;
           document.addEventListener("click", handleLinkClick.bind(this), true);
-        };
+        }
 
         _inherits(AppRouter, Router);
 
         _prototypeProperties(AppRouter, {
           inject: {
-            value: function () {
+            value: function inject() {
               return [Container, History, PipelineProvider];
             },
             writable: true,
@@ -106,7 +106,7 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
           }
         }, {
           loadUrl: {
-            value: function (url) {
+            value: function loadUrl(url) {
               var _this = this;
               return this.createNavigationInstruction(url).then(function (instruction) {
                 return _this.queueInstruction(instruction);
@@ -123,7 +123,7 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
             configurable: true
           },
           queueInstruction: {
-            value: function (instruction) {
+            value: function queueInstruction(instruction) {
               var _this2 = this;
               return new Promise(function (resolve) {
                 instruction.resolve = resolve;
@@ -136,7 +136,7 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
             configurable: true
           },
           dequeueInstruction: {
-            value: function () {
+            value: function dequeueInstruction() {
               var _this3 = this;
               if (this.isNavigating) {
                 return;
@@ -182,7 +182,7 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
             configurable: true
           },
           registerViewPort: {
-            value: function (viewPort, name) {
+            value: function registerViewPort(viewPort, name) {
               var _this4 = this;
               _get(Object.getPrototypeOf(AppRouter.prototype), "registerViewPort", this).call(this, viewPort, name);
 
@@ -204,7 +204,7 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
             configurable: true
           },
           activate: {
-            value: function (options) {
+            value: function activate(options) {
               if (this.isActive) {
                 return;
               }
@@ -219,7 +219,7 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
             configurable: true
           },
           deactivate: {
-            value: function () {
+            value: function deactivate() {
               this.isActive = false;
               this.history.deactivate();
             },
@@ -228,7 +228,7 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
             configurable: true
           },
           reset: {
-            value: function () {
+            value: function reset() {
               _get(Object.getPrototypeOf(AppRouter.prototype), "reset", this).call(this);
               this.queue = [];
               delete this.options;
