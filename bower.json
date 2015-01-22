@@ -16,10 +16,10 @@
     "url": "http://github.com/aurelia/router"
   },
   "dependencies": {
-    "aurelia-dependency-injection": "0.3.1",
-    "aurelia-history": "0.2.1",
-    "aurelia-path": "0.4.0",
-    "aurelia-route-recognizer": "0.2.1",
+    "aurelia-dependency-injection": "0.4.0",
+    "aurelia-history": "0.2.2",
+    "aurelia-path": "0.4.1",
+    "aurelia-route-recognizer": "0.2.2",
     "core-js": "zloirock/core-js"
   }
 }
