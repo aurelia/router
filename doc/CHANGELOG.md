@@ -1,3 +1,11 @@
+### 0.5.1 (2015-01-24)
+
+
+#### Bug Fixes
+
+* **package:** update deps and fix bower semver ranges ([35b65594](http://github.com/aurelia/router/commit/35b65594b39f02c41214f1d81a45d7ae92101b36))
+
+
 ## 0.5.0 (2015-01-22)
 
 
