@@ -24,7 +24,7 @@
       "lib": "dist"
     },
     "dependencies": {
-      "aurelia-dependency-injection": "^0.4.0",
+      "aurelia-dependency-injection": "^0.4.1",
       "aurelia-history": "^0.2.2",
       "aurelia-path": "^0.4.1",
       "aurelia-route-recognizer": "^0.2.2",

@@ -9,12 +9,12 @@ System.config({
 
 System.config({
   "map": {
-    "aurelia-dependency-injection": "github:aurelia/dependency-injection@0.4.0",
+    "aurelia-dependency-injection": "github:aurelia/dependency-injection@0.4.1",
     "aurelia-history": "github:aurelia/history@0.2.2",
     "aurelia-path": "github:aurelia/path@0.4.1",
     "aurelia-route-recognizer": "github:aurelia/route-recognizer@0.2.2",
     "core-js": "npm:core-js@0.4.6",
-    "github:aurelia/dependency-injection@0.4.0": {
+    "github:aurelia/dependency-injection@0.4.1": {
       "aurelia-metadata": "github:aurelia/metadata@0.3.0",
       "core-js": "npm:core-js@0.4.6"
     },
