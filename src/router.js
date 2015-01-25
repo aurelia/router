@@ -118,7 +118,7 @@ export class Router {
         fragment,
         queryString,
         first.params,
-        first.queryParams,
+        first.queryParams || results.queryParams,
         first.config || first.handler,
         parentInstruction
         );
