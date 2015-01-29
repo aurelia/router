@@ -1,6 +1,7 @@
 export class RouterConfiguration{
   constructor() {
     this.instructions = [];
+    this.options = {};
   }
 
   map(route, config) {
@@ -65,6 +66,8 @@ export class RouterConfiguration{
     if (this.unknownRouteConfig) {
       router.handleUnknownRoutes(this.unknownRouteConfig);
     }
+
+    router.options = this.options;
   }
 
   configureRoute(router, config, navModel) {
