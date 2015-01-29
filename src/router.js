@@ -38,6 +38,8 @@ export class Router {
         } else {
           current.href = '#/' + this.baseUrl;
         }
+      } else {
+        current.href = '/' + this.baseUrl;
       }
 
       if (current.href[current.href.length - 1] != '/') {
