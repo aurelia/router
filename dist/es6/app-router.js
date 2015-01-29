@@ -107,7 +107,7 @@ export class AppRouter extends Router {
   reset() {
     super.reset();
     this.queue = [];
-    delete this.options;
+    this.options = null;
   }
 }
 

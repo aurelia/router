@@ -152,7 +152,7 @@ var Router = (function () {
             queryString = url.substr(queryIndex + 1);
           }
 
-          var instruction = new NavigationInstruction(fragment, queryString, first.params, first.queryParams, first.config || first.handler, parentInstruction);
+          var instruction = new NavigationInstruction(fragment, queryString, first.params, first.queryParams || results.queryParams, first.config || first.handler, parentInstruction);
 
           if (typeof first.handler == "function") {
             return first.handler(instruction).then(function (instruction) {

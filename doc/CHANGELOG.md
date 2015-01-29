@@ -1,3 +1,16 @@
+### 0.5.2 (2015-01-29)
+
+
+#### Bug Fixes
+
+* **router:** get queryParams route-recognizer results ([37308a6d](http://github.com/aurelia/router/commit/37308a6d768f648cb6fba405fe958ad2a17c1ad2))
+
+
+#### Features
+
+* **router-configuration:** enable pushState and other history options ([79db2e45](http://github.com/aurelia/router/commit/79db2e45acab6dc76cad0a68ba929ce21ebdf0c2))
+
+
 ### 0.5.1 (2015-01-24)
 
 

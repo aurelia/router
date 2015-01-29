@@ -231,7 +231,7 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
             value: function reset() {
               _get(Object.getPrototypeOf(AppRouter.prototype), "reset", this).call(this);
               this.queue = [];
-              delete this.options;
+              this.options = null;
             },
             writable: true,
             enumerable: true,

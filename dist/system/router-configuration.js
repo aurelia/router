@@ -30,6 +30,7 @@ System.register([], function (_export) {
       RouterConfiguration = (function () {
         function RouterConfiguration() {
           this.instructions = [];
+          this.options = {};
         }
 
         _prototypeProperties(RouterConfiguration, null, {
@@ -113,6 +114,8 @@ System.register([], function (_export) {
               if (this.unknownRouteConfig) {
                 router.handleUnknownRoutes(this.unknownRouteConfig);
               }
+
+              router.options = this.options;
             },
             writable: true,
             enumerable: true,
