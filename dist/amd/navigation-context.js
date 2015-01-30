@@ -1,13 +1,10 @@
 define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   var REPLACE = _navigationPlan.REPLACE;
-  var NavigationContext = (function () {
+  var NavigationContext = exports.NavigationContext = (function () {
     function NavigationContext(router, nextInstruction) {
       this.router = router;
       this.nextInstruction = nextInstruction;
@@ -68,7 +65,6 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
           });
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       buildTitle: {
@@ -101,16 +97,13 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
           return title;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return NavigationContext;
   })();
-
-  exports.NavigationContext = NavigationContext;
-  var CommitChangesStep = (function () {
+  var CommitChangesStep = exports.CommitChangesStep = (function () {
     function CommitChangesStep() {}
 
     _prototypeProperties(CommitChangesStep, null, {
@@ -126,13 +119,11 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
           return next();
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return CommitChangesStep;
   })();
-
-  exports.CommitChangesStep = CommitChangesStep;
+  exports.__esModule = true;
 });

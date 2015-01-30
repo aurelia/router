@@ -1,9 +1,6 @@
 "use strict";
 
-var _prototypeProperties = function (child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);
-  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var Container = require("aurelia-dependency-injection").Container;
 var Pipeline = require("./pipeline").Pipeline;
@@ -11,11 +8,13 @@ var BuildNavigationPlanStep = require("./navigation-plan").BuildNavigationPlanSt
 var ApplyModelBindersStep = require("./model-binding").ApplyModelBindersStep;
 var LoadRouteStep = require("./route-loading").LoadRouteStep;
 var CommitChangesStep = require("./navigation-context").CommitChangesStep;
-var CanDeactivatePreviousStep = require("./activation").CanDeactivatePreviousStep;
-var CanActivateNextStep = require("./activation").CanActivateNextStep;
-var DeactivatePreviousStep = require("./activation").DeactivatePreviousStep;
-var ActivateNextStep = require("./activation").ActivateNextStep;
-var PipelineProvider = (function () {
+var _activation = require("./activation");
+
+var CanDeactivatePreviousStep = _activation.CanDeactivatePreviousStep;
+var CanActivateNextStep = _activation.CanActivateNextStep;
+var DeactivatePreviousStep = _activation.DeactivatePreviousStep;
+var ActivateNextStep = _activation.ActivateNextStep;
+var PipelineProvider = exports.PipelineProvider = (function () {
   function PipelineProvider(container) {
     this.container = container;
     this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, ApplyModelBindersStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
@@ -27,7 +26,6 @@ var PipelineProvider = (function () {
         return [Container];
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   }, {
@@ -41,12 +39,10 @@ var PipelineProvider = (function () {
         return pipeline;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   });
 
   return PipelineProvider;
 })();
-
-exports.PipelineProvider = PipelineProvider;
+exports.__esModule = true;

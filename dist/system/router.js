@@ -17,12 +17,9 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
       processPotential = _util.processPotential;
     }],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      Router = (function () {
+      Router = _export("Router", (function () {
         function Router(container, history) {
           this.container = container;
           this.history = history;
@@ -38,7 +35,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               this.viewPorts[name] = viewPort;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           refreshBaseUrl: {
@@ -49,7 +45,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           refreshNavigation: {
@@ -65,6 +60,8 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
                   } else {
                     current.href = "#/" + this.baseUrl;
                   }
+                } else {
+                  current.href = "/" + this.baseUrl;
                 }
 
                 if (current.href[current.href.length - 1] != "/") {
@@ -75,7 +72,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           configure: {
@@ -91,7 +87,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               return this;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           navigate: {
@@ -100,7 +95,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               return this.history.navigate(fragment, options);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           navigateBack: {
@@ -108,7 +102,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               this.history.navigateBack();
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           createChild: {
@@ -118,7 +111,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               return childRouter;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           createNavigationInstruction: {
@@ -185,7 +177,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           createNavigationContext: {
@@ -193,7 +184,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               return new NavigationContext(this, instruction);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           generate: {
@@ -201,7 +191,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               return this.recognizer.generate(name, params);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           addRoute: {
@@ -257,18 +246,17 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           handleUnknownRoutes: {
             value: function handleUnknownRoutes(config) {
               var callback = function (instruction) {
                 return new Promise(function (resolve, reject) {
-                  var done = function (inst) {
+                  function done(inst) {
                     inst = inst || instruction;
                     inst.config.route = inst.params.path;
                     resolve(inst);
-                  };
+                  }
 
                   if (!config) {
                     instruction.config.moduleId = instruction.fragment;
@@ -288,7 +276,6 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               this.catchAllHandler = callback;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           reset: {
@@ -301,14 +288,12 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
               this.navigation = [];
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return Router;
-      })();
-      _export("Router", Router);
+      })());
     }
   };
 });

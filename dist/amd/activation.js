@@ -1,14 +1,9 @@
 define(["exports", "./navigation-plan", "./navigation-commands", "./util"], function (exports, _navigationPlan, _navigationCommands, _util) {
   "use strict";
 
-  var _toArray = function (arr) {
-    return Array.isArray(arr) ? arr : Array.from(arr);
-  };
+  var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   var INVOKE_LIFECYCLE = _navigationPlan.INVOKE_LIFECYCLE;
   var REPLACE = _navigationPlan.REPLACE;
@@ -16,7 +11,7 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
   var processPotential = _util.processPotential;
   var affirmations = exports.affirmations = ["yes", "ok", "true"];
 
-  var CanDeactivatePreviousStep = (function () {
+  var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = (function () {
     function CanDeactivatePreviousStep() {}
 
     _prototypeProperties(CanDeactivatePreviousStep, null, {
@@ -25,16 +20,13 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
           return processDeactivatable(navigationContext.plan, "canDeactivate", next);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return CanDeactivatePreviousStep;
   })();
-
-  exports.CanDeactivatePreviousStep = CanDeactivatePreviousStep;
-  var CanActivateNextStep = (function () {
+  var CanActivateNextStep = exports.CanActivateNextStep = (function () {
     function CanActivateNextStep() {}
 
     _prototypeProperties(CanActivateNextStep, null, {
@@ -43,16 +35,13 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
           return processActivatable(navigationContext, "canActivate", next);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return CanActivateNextStep;
   })();
-
-  exports.CanActivateNextStep = CanActivateNextStep;
-  var DeactivatePreviousStep = (function () {
+  var DeactivatePreviousStep = exports.DeactivatePreviousStep = (function () {
     function DeactivatePreviousStep() {}
 
     _prototypeProperties(DeactivatePreviousStep, null, {
@@ -61,16 +50,13 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
           return processDeactivatable(navigationContext.plan, "deactivate", next, true);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return DeactivatePreviousStep;
   })();
-
-  exports.DeactivatePreviousStep = DeactivatePreviousStep;
-  var ActivateNextStep = (function () {
+  var ActivateNextStep = exports.ActivateNextStep = (function () {
     function ActivateNextStep() {}
 
     _prototypeProperties(ActivateNextStep, null, {
@@ -79,7 +65,6 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
           return processActivatable(navigationContext, "activate", next, true);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
@@ -87,19 +72,20 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
     return ActivateNextStep;
   })();
 
-  exports.ActivateNextStep = ActivateNextStep;
-
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
-    var inspect = function (val) {
+    var infos = findDeactivatable(plan, callbackName),
+        i = infos.length;
+
+    function inspect(val) {
       if (ignoreResult || shouldContinue(val)) {
         return iterate();
       } else {
         return next.cancel(val);
       }
-    };
+    }
 
-    var iterate = function () {
+    function iterate() {
       if (i--) {
         try {
           var controller = infos[i];
@@ -111,10 +97,7 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
       } else {
         return next();
       }
-    };
-
-    var infos = findDeactivatable(plan, callbackName),
-        i = infos.length;
+    }
 
     return iterate();
   }
@@ -165,15 +148,19 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
   }
 
   function processActivatable(navigationContext, callbackName, next, ignoreResult) {
-    var inspect = function (val, router) {
+    var infos = findActivatable(navigationContext, callbackName),
+        length = infos.length,
+        i = -1;
+
+    function inspect(val, router) {
       if (ignoreResult || shouldContinue(val, router)) {
         return iterate();
       } else {
         return next.cancel(val);
       }
-    };
+    }
 
-    var iterate = function () {
+    function iterate() {
       i++;
 
       if (i < length) {
@@ -190,11 +177,7 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
       } else {
         return next();
       }
-    };
-
-    var infos = findActivatable(navigationContext, callbackName),
-        length = infos.length,
-        i = -1;
+    }
 
     return iterate();
   }
@@ -246,4 +229,5 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
     return output;
   }
+  exports.__esModule = true;
 });

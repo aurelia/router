@@ -1,10 +1,7 @@
 define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-context", "./navigation-instruction", "./router-configuration", "./util"], function (exports, _aureliaRouteRecognizer, _aureliaPath, _navigationContext, _navigationInstruction, _routerConfiguration, _util) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   var RouteRecognizer = _aureliaRouteRecognizer.RouteRecognizer;
   var join = _aureliaPath.join;
@@ -12,7 +9,7 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
   var NavigationInstruction = _navigationInstruction.NavigationInstruction;
   var RouterConfiguration = _routerConfiguration.RouterConfiguration;
   var processPotential = _util.processPotential;
-  var Router = (function () {
+  var Router = exports.Router = (function () {
     function Router(container, history) {
       this.container = container;
       this.history = history;
@@ -28,7 +25,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           this.viewPorts[name] = viewPort;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       refreshBaseUrl: {
@@ -39,7 +35,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           }
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       refreshNavigation: {
@@ -55,6 +50,8 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
               } else {
                 current.href = "#/" + this.baseUrl;
               }
+            } else {
+              current.href = "/" + this.baseUrl;
             }
 
             if (current.href[current.href.length - 1] != "/") {
@@ -65,7 +62,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           }
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       configure: {
@@ -81,7 +77,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           return this;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       navigate: {
@@ -90,7 +85,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           return this.history.navigate(fragment, options);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       navigateBack: {
@@ -98,7 +92,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           this.history.navigateBack();
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       createChild: {
@@ -108,7 +101,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           return childRouter;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       createNavigationInstruction: {
@@ -175,7 +167,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           }
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       createNavigationContext: {
@@ -183,7 +174,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           return new NavigationContext(this, instruction);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       generate: {
@@ -191,7 +181,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           return this.recognizer.generate(name, params);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       addRoute: {
@@ -247,18 +236,17 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           }
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       handleUnknownRoutes: {
         value: function handleUnknownRoutes(config) {
           var callback = function (instruction) {
             return new Promise(function (resolve, reject) {
-              var done = function (inst) {
+              function done(inst) {
                 inst = inst || instruction;
                 inst.config.route = inst.params.path;
                 resolve(inst);
-              };
+              }
 
               if (!config) {
                 instruction.config.moduleId = instruction.fragment;
@@ -278,7 +266,6 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           this.catchAllHandler = callback;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       reset: {
@@ -291,13 +278,11 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           this.navigation = [];
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return Router;
   })();
-
-  exports.Router = Router;
+  exports.__esModule = true;
 });

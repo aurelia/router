@@ -1,14 +1,9 @@
 define(["exports"], function (exports) {
   "use strict";
 
-  var _toArray = function (arr) {
-    return Array.isArray(arr) ? arr : Array.from(arr);
-  };
+  var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   exports.buildNavigationPlan = buildNavigationPlan;
   var NO_CHANGE = exports.NO_CHANGE = "no-change";
@@ -76,7 +71,7 @@ define(["exports"], function (exports) {
     }
   }
 
-  var BuildNavigationPlanStep = (function () {
+  var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = (function () {
     function BuildNavigationPlanStep() {}
 
     _prototypeProperties(BuildNavigationPlanStep, null, {
@@ -88,15 +83,12 @@ define(["exports"], function (exports) {
           })["catch"](next.cancel);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return BuildNavigationPlanStep;
   })();
-
-  exports.BuildNavigationPlanStep = BuildNavigationPlanStep;
 
 
   function hasDifferentParameterValues(prev, next) {
@@ -116,4 +108,5 @@ define(["exports"], function (exports) {
 
     return false;
   }
+  exports.__esModule = true;
 });

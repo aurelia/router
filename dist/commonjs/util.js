@@ -20,3 +20,4 @@ function processPotential(obj, resolve, reject) {
     }
   }
 }
+exports.__esModule = true;

@@ -1,12 +1,9 @@
 define(["exports"], function (exports) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-  var NavigationInstruction = (function () {
+  var NavigationInstruction = exports.NavigationInstruction = (function () {
     function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
       this.fragment = fragment;
       this.queryString = queryString;
@@ -34,7 +31,6 @@ define(["exports"], function (exports) {
           };
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       getWildCardName: {
@@ -43,7 +39,6 @@ define(["exports"], function (exports) {
           return this.config.route.substr(wildcardIndex + 1);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       getWildcardPath: {
@@ -58,7 +53,6 @@ define(["exports"], function (exports) {
           return path;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       getBaseUrl: {
@@ -77,13 +71,11 @@ define(["exports"], function (exports) {
           return this.fragment.substr(0, this.fragment.lastIndexOf(path));
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return NavigationInstruction;
   })();
-
-  exports.NavigationInstruction = NavigationInstruction;
+  exports.__esModule = true;
 });

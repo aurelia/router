@@ -10,4 +10,5 @@ define(["exports", "./router", "./app-router", "./pipeline-provider", "./navigat
   exports.NO_CHANGE = _navigationPlan.NO_CHANGE;
   exports.INVOKE_LIFECYCLE = _navigationPlan.INVOKE_LIFECYCLE;
   exports.REPLACE = _navigationPlan.REPLACE;
+  exports.__esModule = true;
 });

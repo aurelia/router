@@ -1,12 +1,9 @@
 "use strict";
 
-var _prototypeProperties = function (child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);
-  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var REPLACE = require("./navigation-plan").REPLACE;
-var NavigationContext = (function () {
+var NavigationContext = exports.NavigationContext = (function () {
   function NavigationContext(router, nextInstruction) {
     this.router = router;
     this.nextInstruction = nextInstruction;
@@ -67,7 +64,6 @@ var NavigationContext = (function () {
         });
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     buildTitle: {
@@ -100,16 +96,13 @@ var NavigationContext = (function () {
         return title;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   });
 
   return NavigationContext;
 })();
-
-exports.NavigationContext = NavigationContext;
-var CommitChangesStep = (function () {
+var CommitChangesStep = exports.CommitChangesStep = (function () {
   function CommitChangesStep() {}
 
   _prototypeProperties(CommitChangesStep, null, {
@@ -125,12 +118,10 @@ var CommitChangesStep = (function () {
         return next();
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   });
 
   return CommitChangesStep;
 })();
-
-exports.CommitChangesStep = CommitChangesStep;
+exports.__esModule = true;

@@ -1,9 +1,6 @@
 "use strict";
 
-var _prototypeProperties = function (child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);
-  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 function createResult(ctx, next) {
   return {
@@ -19,7 +16,7 @@ var CANCELLED = exports.CANCELLED = "cancelled";
 var REJECTED = exports.REJECTED = "rejected";
 var RUNNING = exports.RUNNING = "running";
 
-var Pipeline = (function () {
+var Pipeline = exports.Pipeline = (function () {
   function Pipeline() {
     this.steps = [];
   }
@@ -40,7 +37,6 @@ var Pipeline = (function () {
         return this;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     run: {
@@ -89,12 +85,10 @@ var Pipeline = (function () {
         return next();
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   });
 
   return Pipeline;
 })();
-
-exports.Pipeline = Pipeline;
+exports.__esModule = true;

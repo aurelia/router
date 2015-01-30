@@ -14,16 +14,13 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
       COMPLETED = _export("COMPLETED", "completed");
       CANCELLED = _export("CANCELLED", "cancelled");
       REJECTED = _export("REJECTED", "rejected");
       RUNNING = _export("RUNNING", "running");
-      Pipeline = (function () {
+      Pipeline = _export("Pipeline", (function () {
         function Pipeline() {
           this.steps = [];
         }
@@ -44,7 +41,6 @@ System.register([], function (_export) {
               return this;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           run: {
@@ -93,14 +89,12 @@ System.register([], function (_export) {
               return next();
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return Pipeline;
-      })();
-      _export("Pipeline", Pipeline);
+      })());
     }
   };
 });

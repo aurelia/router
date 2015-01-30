@@ -22,12 +22,9 @@ System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-pla
       ActivateNextStep = _activation.ActivateNextStep;
     }],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      PipelineProvider = (function () {
+      PipelineProvider = _export("PipelineProvider", (function () {
         function PipelineProvider(container) {
           this.container = container;
           this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, ApplyModelBindersStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
@@ -39,7 +36,6 @@ System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-pla
               return [Container];
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         }, {
@@ -53,14 +49,12 @@ System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-pla
               return pipeline;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return PipelineProvider;
-      })();
-      _export("PipelineProvider", PipelineProvider);
+      })());
     }
   };
 });

@@ -1,9 +1,6 @@
 "use strict";
 
-var _prototypeProperties = function (child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);
-  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var RouteRecognizer = require("aurelia-route-recognizer").RouteRecognizer;
 var join = require("aurelia-path").join;
@@ -11,7 +8,7 @@ var NavigationContext = require("./navigation-context").NavigationContext;
 var NavigationInstruction = require("./navigation-instruction").NavigationInstruction;
 var RouterConfiguration = require("./router-configuration").RouterConfiguration;
 var processPotential = require("./util").processPotential;
-var Router = (function () {
+var Router = exports.Router = (function () {
   function Router(container, history) {
     this.container = container;
     this.history = history;
@@ -27,7 +24,6 @@ var Router = (function () {
         this.viewPorts[name] = viewPort;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     refreshBaseUrl: {
@@ -38,7 +34,6 @@ var Router = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     refreshNavigation: {
@@ -54,6 +49,8 @@ var Router = (function () {
             } else {
               current.href = "#/" + this.baseUrl;
             }
+          } else {
+            current.href = "/" + this.baseUrl;
           }
 
           if (current.href[current.href.length - 1] != "/") {
@@ -64,7 +61,6 @@ var Router = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     configure: {
@@ -80,7 +76,6 @@ var Router = (function () {
         return this;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     navigate: {
@@ -89,7 +84,6 @@ var Router = (function () {
         return this.history.navigate(fragment, options);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     navigateBack: {
@@ -97,7 +91,6 @@ var Router = (function () {
         this.history.navigateBack();
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     createChild: {
@@ -107,7 +100,6 @@ var Router = (function () {
         return childRouter;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     createNavigationInstruction: {
@@ -174,7 +166,6 @@ var Router = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     createNavigationContext: {
@@ -182,7 +173,6 @@ var Router = (function () {
         return new NavigationContext(this, instruction);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     generate: {
@@ -190,7 +180,6 @@ var Router = (function () {
         return this.recognizer.generate(name, params);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     addRoute: {
@@ -246,18 +235,17 @@ var Router = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     handleUnknownRoutes: {
       value: function handleUnknownRoutes(config) {
         var callback = function (instruction) {
           return new Promise(function (resolve, reject) {
-            var done = function (inst) {
+            function done(inst) {
               inst = inst || instruction;
               inst.config.route = inst.params.path;
               resolve(inst);
-            };
+            }
 
             if (!config) {
               instruction.config.moduleId = instruction.fragment;
@@ -277,7 +265,6 @@ var Router = (function () {
         this.catchAllHandler = callback;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     reset: {
@@ -290,12 +277,10 @@ var Router = (function () {
         this.navigation = [];
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   });
 
   return Router;
 })();
-
-exports.Router = Router;
+exports.__esModule = true;

@@ -1,3 +1,11 @@
+### 0.5.3 (2015-01-30)
+
+
+#### Bug Fixes
+
+* **router:** url fragments duplicated on subsequent navigations between routes when using pus ([021e7410](http://github.com/aurelia/router/commit/021e741009830df963ffa465f0b2ebc0b2b43c30))
+
+
 ### 0.5.2 (2015-01-29)
 
 

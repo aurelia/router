@@ -1,12 +1,9 @@
 define(["exports"], function (exports) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-  var RouterConfiguration = (function () {
+  var RouterConfiguration = exports.RouterConfiguration = (function () {
     function RouterConfiguration() {
       this.instructions = [];
       this.options = {};
@@ -38,7 +35,6 @@ define(["exports"], function (exports) {
           return this.mapRoute(config);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       mapRoute: {
@@ -64,7 +60,6 @@ define(["exports"], function (exports) {
           return this;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       mapUnknownRoutes: {
@@ -73,7 +68,6 @@ define(["exports"], function (exports) {
           return this;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       exportToRouter: {
@@ -97,7 +91,6 @@ define(["exports"], function (exports) {
           router.options = this.options;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       configureRoute: {
@@ -106,7 +99,6 @@ define(["exports"], function (exports) {
           router.addRoute(config, navModel);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       ensureDefaultsForRouteConfig: {
@@ -117,7 +109,6 @@ define(["exports"], function (exports) {
           config.moduleId = ensureConfigValue(config, "moduleId", this.deriveModuleId);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       deriveName: {
@@ -125,7 +116,6 @@ define(["exports"], function (exports) {
           return config.title || (config.route ? stripParametersFromRoute(config.route) : config.moduleId);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       deriveRoute: {
@@ -133,7 +123,6 @@ define(["exports"], function (exports) {
           return config.moduleId || config.name;
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       deriveTitle: {
@@ -142,7 +131,6 @@ define(["exports"], function (exports) {
           return value.substr(0, 1).toUpperCase() + value.substr(1);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       },
       deriveModuleId: {
@@ -150,15 +138,12 @@ define(["exports"], function (exports) {
           return stripParametersFromRoute(config.route);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return RouterConfiguration;
   })();
-
-  exports.RouterConfiguration = RouterConfiguration;
 
 
   function ensureConfigValue(config, property, getter) {
@@ -176,4 +161,5 @@ define(["exports"], function (exports) {
     var length = colonIndex > 0 ? colonIndex - 1 : route.length;
     return route.substr(0, length);
   }
+  exports.__esModule = true;
 });

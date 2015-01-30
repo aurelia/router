@@ -85,19 +85,14 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      _toArray = function (arr) {
-        return Array.isArray(arr) ? arr : Array.from(arr);
-      };
+      _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
 
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
       NO_CHANGE = _export("NO_CHANGE", "no-change");
       INVOKE_LIFECYCLE = _export("INVOKE_LIFECYCLE", "invoke-lifecycle");
       REPLACE = _export("REPLACE", "replace");
-      BuildNavigationPlanStep = (function () {
+      BuildNavigationPlanStep = _export("BuildNavigationPlanStep", (function () {
         function BuildNavigationPlanStep() {}
 
         _prototypeProperties(BuildNavigationPlanStep, null, {
@@ -109,14 +104,12 @@ System.register([], function (_export) {
               })["catch"](next.cancel);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return BuildNavigationPlanStep;
-      })();
-      _export("BuildNavigationPlanStep", BuildNavigationPlanStep);
+      })());
     }
   };
 });

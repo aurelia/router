@@ -7,12 +7,9 @@ System.register(["./navigation-plan"], function (_export) {
       REPLACE = _navigationPlan.REPLACE;
     }],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      NavigationContext = (function () {
+      NavigationContext = _export("NavigationContext", (function () {
         function NavigationContext(router, nextInstruction) {
           this.router = router;
           this.nextInstruction = nextInstruction;
@@ -73,7 +70,6 @@ System.register(["./navigation-plan"], function (_export) {
               });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           buildTitle: {
@@ -106,16 +102,13 @@ System.register(["./navigation-plan"], function (_export) {
               return title;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return NavigationContext;
-      })();
-      _export("NavigationContext", NavigationContext);
-
-      CommitChangesStep = (function () {
+      })());
+      CommitChangesStep = _export("CommitChangesStep", (function () {
         function CommitChangesStep() {}
 
         _prototypeProperties(CommitChangesStep, null, {
@@ -131,14 +124,12 @@ System.register(["./navigation-plan"], function (_export) {
               return next();
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return CommitChangesStep;
-      })();
-      _export("CommitChangesStep", CommitChangesStep);
+      })());
     }
   };
 });

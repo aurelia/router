@@ -44,49 +44,13 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
       isNavigationCommand = _navigationCommands.isNavigationCommand;
     }],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      _get = function get(object, property, receiver) {
-        var desc = Object.getOwnPropertyDescriptor(object, property);
+      _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-        if (desc === undefined) {
-          var parent = Object.getPrototypeOf(object);
+      _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
-          if (parent === null) {
-            return undefined;
-          } else {
-            return get(parent, property, receiver);
-          }
-        } else if ("value" in desc && desc.writable) {
-          return desc.value;
-        } else {
-          var getter = desc.get;
-          if (getter === undefined) {
-            return undefined;
-          }
-          return getter.call(receiver);
-        }
-      };
-
-      _inherits = function (subClass, superClass) {
-        if (typeof superClass !== "function" && superClass !== null) {
-          throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-        }
-        subClass.prototype = Object.create(superClass && superClass.prototype, {
-          constructor: {
-            value: subClass,
-            enumerable: false,
-            writable: true,
-            configurable: true
-          }
-        });
-        if (superClass) subClass.__proto__ = superClass;
-      };
-
-      AppRouter = (function (Router) {
+      AppRouter = _export("AppRouter", (function (Router) {
         function AppRouter(container, history, pipelineProvider) {
           _get(Object.getPrototypeOf(AppRouter.prototype), "constructor", this).call(this, container, history);
           this.pipelineProvider = pipelineProvider;
@@ -101,7 +65,6 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
               return [Container, History, PipelineProvider];
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         }, {
@@ -119,25 +82,23 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
               });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           queueInstruction: {
             value: function queueInstruction(instruction) {
-              var _this2 = this;
+              var _this = this;
               return new Promise(function (resolve) {
                 instruction.resolve = resolve;
-                _this2.queue.unshift(instruction);
-                _this2.dequeueInstruction();
+                _this.queue.unshift(instruction);
+                _this.dequeueInstruction();
               });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           dequeueInstruction: {
             value: function dequeueInstruction() {
-              var _this3 = this;
+              var _this = this;
               if (this.isNavigating) {
                 return;
               }
@@ -155,10 +116,10 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
               var pipeline = this.pipelineProvider.createPipeline(context);
 
               pipeline.run(context).then(function (result) {
-                _this3.isNavigating = false;
+                _this.isNavigating = false;
 
                 if (result.completed) {
-                  _this3.history.previousFragment = instruction.fragment;
+                  _this.history.previousFragment = instruction.fragment;
                 }
 
                 if (result.output instanceof Error) {
@@ -166,31 +127,30 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
                 }
 
                 if (isNavigationCommand(result.output)) {
-                  result.output.navigate(_this3);
-                } else if (!result.completed && _this3.history.previousFragment) {
-                  _this3.navigate(_this3.history.previousFragment, false);
+                  result.output.navigate(_this);
+                } else if (!result.completed && _this.history.previousFragment) {
+                  _this.navigate(_this.history.previousFragment, false);
                 }
 
                 instruction.resolve(result);
-                _this3.dequeueInstruction();
+                _this.dequeueInstruction();
               })["catch"](function (error) {
                 console.error(error);
               });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           registerViewPort: {
             value: function registerViewPort(viewPort, name) {
-              var _this4 = this;
+              var _this = this;
               _get(Object.getPrototypeOf(AppRouter.prototype), "registerViewPort", this).call(this, viewPort, name);
 
               if (!this.isActive) {
                 if ("configureRouter" in this.container.viewModel) {
                   var result = this.container.viewModel.configureRouter() || Promise.resolve();
                   return result.then(function () {
-                    return _this4.activate();
+                    return _this.activate();
                   });
                 } else {
                   this.activate();
@@ -200,7 +160,6 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           activate: {
@@ -215,7 +174,6 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
               this.dequeueInstruction();
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           deactivate: {
@@ -224,7 +182,6 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
               this.history.deactivate();
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           reset: {
@@ -234,14 +191,12 @@ System.register(["aurelia-dependency-injection", "aurelia-history", "./router", 
               this.options = null;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return AppRouter;
-      })(Router);
-      _export("AppRouter", AppRouter);
+      })(Router));
     }
   };
 });

@@ -92,12 +92,9 @@ System.register(["./navigation-plan"], function (_export) {
       buildNavigationPlan = _navigationPlan.buildNavigationPlan;
     }],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      RouteLoader = (function () {
+      RouteLoader = _export("RouteLoader", (function () {
         function RouteLoader() {}
 
         _prototypeProperties(RouteLoader, null, {
@@ -106,16 +103,13 @@ System.register(["./navigation-plan"], function (_export) {
               throw Error("Route loaders must implment \"loadRoute(router, config)\".");
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return RouteLoader;
-      })();
-      _export("RouteLoader", RouteLoader);
-
-      LoadRouteStep = (function () {
+      })());
+      LoadRouteStep = _export("LoadRouteStep", (function () {
         function LoadRouteStep(routeLoader) {
           this.routeLoader = routeLoader;
         }
@@ -126,7 +120,6 @@ System.register(["./navigation-plan"], function (_export) {
               return [RouteLoader];
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         }, {
@@ -135,14 +128,12 @@ System.register(["./navigation-plan"], function (_export) {
               return loadNewRoute([], this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return LoadRouteStep;
-      })();
-      _export("LoadRouteStep", LoadRouteStep);
+      })());
     }
   };
 });

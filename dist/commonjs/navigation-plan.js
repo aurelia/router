@@ -1,13 +1,8 @@
 "use strict";
 
-var _toArray = function (arr) {
-  return Array.isArray(arr) ? arr : Array.from(arr);
-};
+var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
 
-var _prototypeProperties = function (child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);
-  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 exports.buildNavigationPlan = buildNavigationPlan;
 var NO_CHANGE = exports.NO_CHANGE = "no-change";
@@ -75,7 +70,7 @@ function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
   }
 }
 
-var BuildNavigationPlanStep = (function () {
+var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = (function () {
   function BuildNavigationPlanStep() {}
 
   _prototypeProperties(BuildNavigationPlanStep, null, {
@@ -87,15 +82,12 @@ var BuildNavigationPlanStep = (function () {
         })["catch"](next.cancel);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   });
 
   return BuildNavigationPlanStep;
 })();
-
-exports.BuildNavigationPlanStep = BuildNavigationPlanStep;
 
 
 function hasDifferentParameterValues(prev, next) {
@@ -115,3 +107,4 @@ function hasDifferentParameterValues(prev, next) {
 
   return false;
 }
+exports.__esModule = true;

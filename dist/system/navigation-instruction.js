@@ -5,12 +5,9 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      NavigationInstruction = (function () {
+      NavigationInstruction = _export("NavigationInstruction", (function () {
         function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
           this.fragment = fragment;
           this.queryString = queryString;
@@ -38,7 +35,6 @@ System.register([], function (_export) {
               };
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           getWildCardName: {
@@ -47,7 +43,6 @@ System.register([], function (_export) {
               return this.config.route.substr(wildcardIndex + 1);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           getWildcardPath: {
@@ -62,7 +57,6 @@ System.register([], function (_export) {
               return path;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           getBaseUrl: {
@@ -81,14 +75,12 @@ System.register([], function (_export) {
               return this.fragment.substr(0, this.fragment.lastIndexOf(path));
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return NavigationInstruction;
-      })();
-      _export("NavigationInstruction", NavigationInstruction);
+      })());
     }
   };
 });

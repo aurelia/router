@@ -1,15 +1,12 @@
 define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) {
-    if (staticProps) Object.defineProperties(child, staticProps);
-    if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-  };
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   exports.loadNewRoute = loadNewRoute;
   var REPLACE = _navigationPlan.REPLACE;
   var buildNavigationPlan = _navigationPlan.buildNavigationPlan;
-  var RouteLoader = (function () {
+  var RouteLoader = exports.RouteLoader = (function () {
     function RouteLoader() {}
 
     _prototypeProperties(RouteLoader, null, {
@@ -18,16 +15,13 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
           throw Error("Route loaders must implment \"loadRoute(router, config)\".");
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return RouteLoader;
   })();
-
-  exports.RouteLoader = RouteLoader;
-  var LoadRouteStep = (function () {
+  var LoadRouteStep = exports.LoadRouteStep = (function () {
     function LoadRouteStep(routeLoader) {
       this.routeLoader = routeLoader;
     }
@@ -38,7 +32,6 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
           return [RouteLoader];
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     }, {
@@ -47,15 +40,12 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
           return loadNewRoute([], this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
         },
         writable: true,
-        enumerable: true,
         configurable: true
       }
     });
 
     return LoadRouteStep;
   })();
-
-  exports.LoadRouteStep = LoadRouteStep;
   function loadNewRoute(routers, routeLoader, navigationContext) {
     var toLoad = determineWhatToLoad(navigationContext);
     var loadPromises = toLoad.map(function (current) {
@@ -138,4 +128,5 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
       return component;
     });
   }
+  exports.__esModule = true;
 });

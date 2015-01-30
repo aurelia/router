@@ -5,12 +5,9 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      ApplyModelBindersStep = (function () {
+      ApplyModelBindersStep = _export("ApplyModelBindersStep", (function () {
         function ApplyModelBindersStep() {}
 
         _prototypeProperties(ApplyModelBindersStep, null, {
@@ -19,14 +16,12 @@ System.register([], function (_export) {
               return next();
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return ApplyModelBindersStep;
-      })();
-      _export("ApplyModelBindersStep", ApplyModelBindersStep);
+      })());
     }
   };
 });

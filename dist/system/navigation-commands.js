@@ -11,12 +11,9 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      Redirect = (function () {
+      Redirect = _export("Redirect", (function () {
         function Redirect(url) {
           this.url = url;
           this.shouldContinueProcessing = false;
@@ -28,14 +25,12 @@ System.register([], function (_export) {
               (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return Redirect;
-      })();
-      _export("Redirect", Redirect);
+      })());
     }
   };
 });

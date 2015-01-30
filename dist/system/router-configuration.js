@@ -22,12 +22,9 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-      RouterConfiguration = (function () {
+      RouterConfiguration = _export("RouterConfiguration", (function () {
         function RouterConfiguration() {
           this.instructions = [];
           this.options = {};
@@ -59,7 +56,6 @@ System.register([], function (_export) {
               return this.mapRoute(config);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           mapRoute: {
@@ -85,7 +81,6 @@ System.register([], function (_export) {
               return this;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           mapUnknownRoutes: {
@@ -94,7 +89,6 @@ System.register([], function (_export) {
               return this;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           exportToRouter: {
@@ -118,7 +112,6 @@ System.register([], function (_export) {
               router.options = this.options;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           configureRoute: {
@@ -127,7 +120,6 @@ System.register([], function (_export) {
               router.addRoute(config, navModel);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           ensureDefaultsForRouteConfig: {
@@ -138,7 +130,6 @@ System.register([], function (_export) {
               config.moduleId = ensureConfigValue(config, "moduleId", this.deriveModuleId);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           deriveName: {
@@ -146,7 +137,6 @@ System.register([], function (_export) {
               return config.title || (config.route ? stripParametersFromRoute(config.route) : config.moduleId);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           deriveRoute: {
@@ -154,7 +144,6 @@ System.register([], function (_export) {
               return config.moduleId || config.name;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           deriveTitle: {
@@ -163,7 +152,6 @@ System.register([], function (_export) {
               return value.substr(0, 1).toUpperCase() + value.substr(1);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           deriveModuleId: {
@@ -171,14 +159,12 @@ System.register([], function (_export) {
               return stripParametersFromRoute(config.route);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return RouterConfiguration;
-      })();
-      _export("RouterConfiguration", RouterConfiguration);
+      })());
     }
   };
 });

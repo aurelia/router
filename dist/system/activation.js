@@ -5,15 +5,18 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
 
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
-    var inspect = function (val) {
+    var infos = findDeactivatable(plan, callbackName),
+        i = infos.length;
+
+    function inspect(val) {
       if (ignoreResult || shouldContinue(val)) {
         return iterate();
       } else {
         return next.cancel(val);
       }
-    };
+    }
 
-    var iterate = function () {
+    function iterate() {
       if (i--) {
         try {
           var controller = infos[i];
@@ -25,10 +28,7 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
       } else {
         return next();
       }
-    };
-
-    var infos = findDeactivatable(plan, callbackName),
-        i = infos.length;
+    }
 
     return iterate();
   }
@@ -79,15 +79,19 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
   }
 
   function processActivatable(navigationContext, callbackName, next, ignoreResult) {
-    var inspect = function (val, router) {
+    var infos = findActivatable(navigationContext, callbackName),
+        length = infos.length,
+        i = -1;
+
+    function inspect(val, router) {
       if (ignoreResult || shouldContinue(val, router)) {
         return iterate();
       } else {
         return next.cancel(val);
       }
-    };
+    }
 
-    var iterate = function () {
+    function iterate() {
       i++;
 
       if (i < length) {
@@ -104,11 +108,7 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
       } else {
         return next();
       }
-    };
-
-    var infos = findActivatable(navigationContext, callbackName),
-        length = infos.length,
-        i = -1;
+    }
 
     return iterate();
   }
@@ -170,17 +170,12 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
       processPotential = _util.processPotential;
     }],
     execute: function () {
-      _toArray = function (arr) {
-        return Array.isArray(arr) ? arr : Array.from(arr);
-      };
+      _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
 
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
       affirmations = _export("affirmations", ["yes", "ok", "true"]);
-      CanDeactivatePreviousStep = (function () {
+      CanDeactivatePreviousStep = _export("CanDeactivatePreviousStep", (function () {
         function CanDeactivatePreviousStep() {}
 
         _prototypeProperties(CanDeactivatePreviousStep, null, {
@@ -189,16 +184,13 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
               return processDeactivatable(navigationContext.plan, "canDeactivate", next);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return CanDeactivatePreviousStep;
-      })();
-      _export("CanDeactivatePreviousStep", CanDeactivatePreviousStep);
-
-      CanActivateNextStep = (function () {
+      })());
+      CanActivateNextStep = _export("CanActivateNextStep", (function () {
         function CanActivateNextStep() {}
 
         _prototypeProperties(CanActivateNextStep, null, {
@@ -207,16 +199,13 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
               return processActivatable(navigationContext, "canActivate", next);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return CanActivateNextStep;
-      })();
-      _export("CanActivateNextStep", CanActivateNextStep);
-
-      DeactivatePreviousStep = (function () {
+      })());
+      DeactivatePreviousStep = _export("DeactivatePreviousStep", (function () {
         function DeactivatePreviousStep() {}
 
         _prototypeProperties(DeactivatePreviousStep, null, {
@@ -225,16 +214,13 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
               return processDeactivatable(navigationContext.plan, "deactivate", next, true);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return DeactivatePreviousStep;
-      })();
-      _export("DeactivatePreviousStep", DeactivatePreviousStep);
-
-      ActivateNextStep = (function () {
+      })());
+      ActivateNextStep = _export("ActivateNextStep", (function () {
         function ActivateNextStep() {}
 
         _prototypeProperties(ActivateNextStep, null, {
@@ -243,14 +229,12 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
               return processActivatable(navigationContext, "activate", next, true);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return ActivateNextStep;
-      })();
-      _export("ActivateNextStep", ActivateNextStep);
+      })());
     }
   };
 });

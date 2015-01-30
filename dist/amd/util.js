@@ -21,4 +21,5 @@ define(["exports"], function (exports) {
       }
     }
   }
+  exports.__esModule = true;
 });
