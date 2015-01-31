@@ -111,13 +111,20 @@ export class AppRouter extends Router {
   }
 }
 
+function findAnchor(el) {
+  while (el) {
+    if (el.tagName === "A") return el;
+    el = el.parentNode;
+  }
+}
+
 function handleLinkClick(evt) {
   if (!this.isActive) {
     return;
   }
 
-  var target = evt.target;
-  if (target.tagName != 'A') {
+  var target = findAnchor(evt.target);
+  if (!target) {
     return;
   }
 
