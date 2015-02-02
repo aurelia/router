@@ -62,8 +62,8 @@ export class AppRouter extends Router {
 
       if (isNavigationCommand(result.output)) {
         result.output.navigate(this);
-      } else if (!result.completed && this.history.previousFragment) {
-        this.navigate(this.history.previousFragment, false);
+      } else if (!result.completed) {
+        this.navigate(this.history.previousFragment || '', false);
       }
 
       instruction.resolve(result);

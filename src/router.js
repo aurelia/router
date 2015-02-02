@@ -64,6 +64,7 @@ export class Router {
 
   navigate(fragment, options) {
     fragment = join(this.baseUrl, fragment);
+    if(fragment === '') fragment = '/';
     return this.history.navigate(fragment, options);
   }
 
