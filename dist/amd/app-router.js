@@ -90,8 +90,8 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
 
             if (isNavigationCommand(result.output)) {
               result.output.navigate(_this);
-            } else if (!result.completed && _this.history.previousFragment) {
-              _this.navigate(_this.history.previousFragment, false);
+            } else if (!result.completed) {
+              _this.navigate(_this.history.previousFragment || "", false);
             }
 
             instruction.resolve(result);
@@ -161,13 +161,20 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
   })(Router);
 
 
+  function findAnchor(el) {
+    while (el) {
+      if (el.tagName === "A") return el;
+      el = el.parentNode;
+    }
+  }
+
   function handleLinkClick(evt) {
     if (!this.isActive) {
       return;
     }
 
-    var target = evt.target;
-    if (target.tagName != "A") {
+    var target = findAnchor(evt.target);
+    if (!target) {
       return;
     }
 

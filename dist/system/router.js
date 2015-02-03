@@ -92,6 +92,7 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
           navigate: {
             value: function navigate(fragment, options) {
               fragment = join(this.baseUrl, fragment);
+              if (fragment === "") fragment = "/";
               return this.history.navigate(fragment, options);
             },
             writable: true,

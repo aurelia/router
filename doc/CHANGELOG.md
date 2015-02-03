@@ -1,3 +1,13 @@
+### 0.5.4 (2015-02-03)
+
+
+#### Bug Fixes
+
+* **router:**
+  * canActivate = false doesn't change back route ([80b219cc](http://github.com/aurelia/router/commit/80b219cc81c5e3d0c82dc35745aafcd2910f9214))
+  * link click handler not triggering when clicking on a nested element inside an an ([a08ee477](http://github.com/aurelia/router/commit/a08ee477177773fee0e6845b0eeb183cd238793c))
+
+
 ### 0.5.3 (2015-01-30)
 
 

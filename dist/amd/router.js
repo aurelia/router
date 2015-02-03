@@ -82,6 +82,7 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
       navigate: {
         value: function navigate(fragment, options) {
           fragment = join(this.baseUrl, fragment);
+          if (fragment === "") fragment = "/";
           return this.history.navigate(fragment, options);
         },
         writable: true,

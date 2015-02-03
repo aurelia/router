@@ -89,8 +89,8 @@ var AppRouter = exports.AppRouter = (function (Router) {
 
           if (isNavigationCommand(result.output)) {
             result.output.navigate(_this);
-          } else if (!result.completed && _this.history.previousFragment) {
-            _this.navigate(_this.history.previousFragment, false);
+          } else if (!result.completed) {
+            _this.navigate(_this.history.previousFragment || "", false);
           }
 
           instruction.resolve(result);
@@ -160,13 +160,20 @@ var AppRouter = exports.AppRouter = (function (Router) {
 })(Router);
 
 
+function findAnchor(el) {
+  while (el) {
+    if (el.tagName === "A") return el;
+    el = el.parentNode;
+  }
+}
+
 function handleLinkClick(evt) {
   if (!this.isActive) {
     return;
   }
 
-  var target = evt.target;
-  if (target.tagName != "A") {
+  var target = findAnchor(evt.target);
+  if (!target) {
     return;
   }
 
