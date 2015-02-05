@@ -165,6 +165,7 @@ export class Router {
     }
 
     navModel.title = navModel.title || config.title;
+    navModel.settings = config.settings || (config.settings = {});
 
     this.routes.push(config);
     this.recognizer.add([{path:config.route, handler: config}]);
@@ -179,6 +180,7 @@ export class Router {
       }]);
 
       withChild.navModel = navModel;
+      withChild.settings = config.settings;
     }
 
     config.navModel = navModel;
