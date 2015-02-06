@@ -1,3 +1,11 @@
+### 0.5.5 (2015-02-06)
+
+
+#### Features
+
+* **router:** enable dedicated user setting for route config ([9cc337d0](http://github.com/aurelia/router/commit/9cc337d0be4125c3c500c3bf95f446981dc41511), closes [#23](http://github.com/aurelia/router/issues/23))
+
+
 ### 0.5.4 (2015-02-03)
 
 
