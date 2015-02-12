@@ -92,7 +92,7 @@ export class RouterConfiguration{
 
   deriveTitle(config) {
     var value = config.name;
-    return value.substr(0, 1).toUpperCase() + value.substr(1);
+    return value ? value.substr(0, 1).toUpperCase() + value.substr(1) : null;
   }
 
   deriveModuleId(config) {

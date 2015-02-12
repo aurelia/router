@@ -1,3 +1,5 @@
+import {Redirect} from './navigation-commands';
+
 export var NO_CHANGE = 'no-change';
 export var INVOKE_LIFECYCLE = 'invoke-lifecycle';
 export var REPLACE = 'replace';
@@ -68,6 +70,10 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
 
 export class BuildNavigationPlanStep {
 	run(navigationContext, next) {
+    if (navigationContext.nextInstruction.config.redirect) {
+      return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
+    }
+
     return buildNavigationPlan(navigationContext)
       .then(plan => {
         navigationContext.plan = plan;
