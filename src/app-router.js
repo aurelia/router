@@ -12,6 +12,10 @@ export class AppRouter extends Router {
     document.addEventListener('click', handleLinkClick.bind(this), true);
   }
 
+  get isRoot() {
+    return true;
+  }
+
   loadUrl(url) {
     return this.createNavigationInstruction(url).
       then(instruction => this.queueInstruction(instruction)).
