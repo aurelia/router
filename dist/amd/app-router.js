@@ -30,6 +30,12 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
         configurable: true
       }
     }, {
+      isRoot: {
+        get: function () {
+          return true;
+        },
+        configurable: true
+      },
       loadUrl: {
         value: function loadUrl(url) {
           var _this = this;

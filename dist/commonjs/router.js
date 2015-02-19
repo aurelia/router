@@ -18,6 +18,12 @@ var Router = exports.Router = (function () {
   }
 
   _prototypeProperties(Router, null, {
+    isRoot: {
+      get: function () {
+        return false;
+      },
+      configurable: true
+    },
     registerViewPort: {
       value: function registerViewPort(viewPort, name) {
         name = name || "default";

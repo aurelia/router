@@ -5,6 +5,7 @@ var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 exports.buildNavigationPlan = buildNavigationPlan;
+var Redirect = require("./navigation-commands").Redirect;
 var NO_CHANGE = exports.NO_CHANGE = "no-change";
 var INVOKE_LIFECYCLE = exports.INVOKE_LIFECYCLE = "invoke-lifecycle";
 var REPLACE = exports.REPLACE = "replace";
@@ -76,6 +77,10 @@ var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = (function () {
   _prototypeProperties(BuildNavigationPlanStep, null, {
     run: {
       value: function run(navigationContext, next) {
+        if (navigationContext.nextInstruction.config.redirect) {
+          return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
+        }
+
         return buildNavigationPlan(navigationContext).then(function (plan) {
           navigationContext.plan = plan;
           return next();

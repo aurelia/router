@@ -1,3 +1,17 @@
+### 0.5.6 (2015-02-18)
+
+
+#### Bug Fixes
+
+* **build:** add missing bower bump ([8fab77de](http://github.com/aurelia/router/commit/8fab77ded0f490aee8bc3689313b462edb97206b))
+
+
+#### Features
+
+* **navigation-plan:** allow route redirects ([61cda341](http://github.com/aurelia/router/commit/61cda341fd4bc2dbbf620ccb478497ea97e016e8))
+* **router:** add support for named pipelines ([7e9f1c71](http://github.com/aurelia/router/commit/7e9f1c71cff57398ebd10419cb970883904e097d), closes [#26](http://github.com/aurelia/router/issues/26))
+
+
 ### 0.5.5 (2015-02-06)
 
 

@@ -1,7 +1,7 @@
-System.register([], function (_export) {
+System.register(["./route-filters"], function (_export) {
   "use strict";
 
-  var _prototypeProperties, RouterConfiguration;
+  var RouteFilterContainer, _prototypeProperties, RouterConfiguration;
 
 
   function ensureConfigValue(config, property, getter) {
@@ -20,7 +20,9 @@ System.register([], function (_export) {
     return route.substr(0, length);
   }
   return {
-    setters: [],
+    setters: [function (_routeFilters) {
+      RouteFilterContainer = _routeFilters.RouteFilterContainer;
+    }],
     execute: function () {
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
@@ -28,9 +30,17 @@ System.register([], function (_export) {
         function RouterConfiguration() {
           this.instructions = [];
           this.options = {};
+          this.pipelineSteps = [];
         }
 
         _prototypeProperties(RouterConfiguration, null, {
+          addPipelineStep: {
+            value: function addPipelineStep(name, step) {
+              this.pipelineSteps.push({ name: name, step: step });
+            },
+            writable: true,
+            configurable: true
+          },
           map: {
             value: function map(route, config) {
               if (Array.isArray(route)) {
@@ -94,8 +104,10 @@ System.register([], function (_export) {
           exportToRouter: {
             value: function exportToRouter(router) {
               var instructions = this.instructions,
+                  pipelineSteps = this.pipelineSteps,
                   i,
-                  ii;
+                  ii,
+                  filterContainer;
 
               for (i = 0, ii = instructions.length; i < ii; ++i) {
                 instructions[i](router);
@@ -110,6 +122,19 @@ System.register([], function (_export) {
               }
 
               router.options = this.options;
+
+              if (pipelineSteps.length) {
+                if (!router.isRoot) {
+                  throw new Error("Pipeline steps can only be added to the root router");
+                }
+
+                filterContainer = router.container.get(RouteFilterContainer);
+                for (i = 0, ii = pipelineSteps.length; i < ii; ++i) {
+                  var name = pipelineSteps[i].name;
+                  var step = pipelineSteps[i].step;
+                  filterContainer.addStep(name, step);
+                }
+              }
             },
             writable: true,
             configurable: true
@@ -149,7 +174,7 @@ System.register([], function (_export) {
           deriveTitle: {
             value: function deriveTitle(config) {
               var value = config.name;
-              return value.substr(0, 1).toUpperCase() + value.substr(1);
+              return value ? value.substr(0, 1).toUpperCase() + value.substr(1) : null;
             },
             writable: true,
             configurable: true

@@ -10,6 +10,7 @@ import {
   DeactivatePreviousStep,
   ActivateNextStep
 } from './activation';
+import {createRouteFilterStep} from './route-filters';
 
 export class PipelineProvider {
   static inject(){ return [Container]; }
@@ -19,7 +20,8 @@ export class PipelineProvider {
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, //optional
       LoadRouteStep,
-      ApplyModelBindersStep, //optional
+      createRouteFilterStep('authorize'),
+      createRouteFilterStep('modelbind'),
       CanActivateNextStep, //optional
       //NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, //optional

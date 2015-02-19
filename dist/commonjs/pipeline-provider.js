@@ -14,10 +14,11 @@ var CanDeactivatePreviousStep = _activation.CanDeactivatePreviousStep;
 var CanActivateNextStep = _activation.CanActivateNextStep;
 var DeactivatePreviousStep = _activation.DeactivatePreviousStep;
 var ActivateNextStep = _activation.ActivateNextStep;
+var createRouteFilterStep = require("./route-filters").createRouteFilterStep;
 var PipelineProvider = exports.PipelineProvider = (function () {
   function PipelineProvider(container) {
     this.container = container;
-    this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, ApplyModelBindersStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
+    this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, createRouteFilterStep("authorize"), createRouteFilterStep("modelbind"), CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
   }
 
   _prototypeProperties(PipelineProvider, {

@@ -1,4 +1,4 @@
-define(["exports"], function (exports) {
+define(["exports", "./navigation-commands"], function (exports, _navigationCommands) {
   "use strict";
 
   var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
@@ -6,6 +6,7 @@ define(["exports"], function (exports) {
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   exports.buildNavigationPlan = buildNavigationPlan;
+  var Redirect = _navigationCommands.Redirect;
   var NO_CHANGE = exports.NO_CHANGE = "no-change";
   var INVOKE_LIFECYCLE = exports.INVOKE_LIFECYCLE = "invoke-lifecycle";
   var REPLACE = exports.REPLACE = "replace";
@@ -77,6 +78,10 @@ define(["exports"], function (exports) {
     _prototypeProperties(BuildNavigationPlanStep, null, {
       run: {
         value: function run(navigationContext, next) {
+          if (navigationContext.nextInstruction.config.redirect) {
+            return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
+          }
+
           return buildNavigationPlan(navigationContext).then(function (plan) {
             navigationContext.plan = plan;
             return next();

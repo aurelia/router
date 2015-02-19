@@ -18,6 +18,50 @@ System.register(["./navigation-plan"], function (_export) {
         }
 
         _prototypeProperties(NavigationContext, null, {
+          getAllContexts: {
+            value: function getAllContexts() {
+              var acc = arguments[0] === undefined ? [] : arguments[0];
+              acc.push(this);
+              if (this.plan) {
+                for (var key in this.plan) {
+                  this.plan[key].childNavigationContext && this.plan[key].childNavigationContext.getAllContexts(acc);
+                }
+              }
+              return acc;
+            },
+            writable: true,
+            configurable: true
+          },
+          nextInstructions: {
+            get: function () {
+              return this.getAllContexts().map(function (c) {
+                return c.nextInstruction;
+              }).filter(function (c) {
+                return c;
+              });
+            },
+            configurable: true
+          },
+          currentInstructions: {
+            get: function () {
+              return this.getAllContexts().map(function (c) {
+                return c.currentInstruction;
+              }).filter(function (c) {
+                return c;
+              });
+            },
+            configurable: true
+          },
+          prevInstructions: {
+            get: function () {
+              return this.getAllContexts().map(function (c) {
+                return c.prevInstruction;
+              }).filter(function (c) {
+                return c;
+              });
+            },
+            configurable: true
+          },
           commitChanges: {
             value: function commitChanges(waitToSwap) {
               var next = this.nextInstruction,

@@ -2,13 +2,22 @@
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+var RouteFilterContainer = require("./route-filters").RouteFilterContainer;
 var RouterConfiguration = exports.RouterConfiguration = (function () {
   function RouterConfiguration() {
     this.instructions = [];
     this.options = {};
+    this.pipelineSteps = [];
   }
 
   _prototypeProperties(RouterConfiguration, null, {
+    addPipelineStep: {
+      value: function addPipelineStep(name, step) {
+        this.pipelineSteps.push({ name: name, step: step });
+      },
+      writable: true,
+      configurable: true
+    },
     map: {
       value: function map(route, config) {
         if (Array.isArray(route)) {
@@ -72,8 +81,10 @@ var RouterConfiguration = exports.RouterConfiguration = (function () {
     exportToRouter: {
       value: function exportToRouter(router) {
         var instructions = this.instructions,
+            pipelineSteps = this.pipelineSteps,
             i,
-            ii;
+            ii,
+            filterContainer;
 
         for (i = 0, ii = instructions.length; i < ii; ++i) {
           instructions[i](router);
@@ -88,6 +99,19 @@ var RouterConfiguration = exports.RouterConfiguration = (function () {
         }
 
         router.options = this.options;
+
+        if (pipelineSteps.length) {
+          if (!router.isRoot) {
+            throw new Error("Pipeline steps can only be added to the root router");
+          }
+
+          filterContainer = router.container.get(RouteFilterContainer);
+          for (i = 0, ii = pipelineSteps.length; i < ii; ++i) {
+            var name = pipelineSteps[i].name;
+            var step = pipelineSteps[i].step;
+            filterContainer.addStep(name, step);
+          }
+        }
       },
       writable: true,
       configurable: true
@@ -127,7 +151,7 @@ var RouterConfiguration = exports.RouterConfiguration = (function () {
     deriveTitle: {
       value: function deriveTitle(config) {
         var value = config.name;
-        return value.substr(0, 1).toUpperCase() + value.substr(1);
+        return value ? value.substr(0, 1).toUpperCase() + value.substr(1) : null;
       },
       writable: true,
       configurable: true

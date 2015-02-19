@@ -1,4 +1,4 @@
-System.register(["./router", "./app-router", "./pipeline-provider", "./navigation-commands", "./route-loading", "./router-configuration", "./navigation-plan"], function (_export) {
+System.register(["./router", "./app-router", "./pipeline-provider", "./navigation-commands", "./route-loading", "./router-configuration", "./navigation-plan", "./route-filters"], function (_export) {
   "use strict";
 
   return {
@@ -20,6 +20,10 @@ System.register(["./router", "./app-router", "./pipeline-provider", "./navigatio
       _export("INVOKE_LIFECYCLE", _navigationPlan.INVOKE_LIFECYCLE);
 
       _export("REPLACE", _navigationPlan.REPLACE);
+    }, function (_routeFilters) {
+      _export("RouteFilterContainer", _routeFilters.RouteFilterContainer);
+
+      _export("createRouteFilterStep", _routeFilters.createRouteFilterStep);
     }],
     execute: function () {}
   };

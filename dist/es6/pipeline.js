@@ -18,10 +18,17 @@ export class Pipeline {
   }
 
   withStep(step) {
-    var run;
+    var run, steps, i, l;
 
     if (typeof step == 'function') {
       run = step;
+    } else if (step.isMultiStep) {
+      steps = step.getSteps();
+      for (i = 0, l = steps.length; i < l; i++) {
+        this.withStep(steps[i]);
+      }
+
+      return this;
     } else {
       run = step.run.bind(step);
     }

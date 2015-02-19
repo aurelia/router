@@ -8,6 +8,28 @@ export class NavigationContext {
     this.prevInstruction = router.currentInstruction;
   }
 
+  getAllContexts(acc = []) {
+    acc.push(this);
+    if(this.plan) {
+      for (var key in this.plan) {
+        this.plan[key].childNavigationContext && this.plan[key].childNavigationContext.getAllContexts(acc);
+      }
+    }
+    return acc;
+  }
+
+  get nextInstructions() {
+    return this.getAllContexts().map(c => c.nextInstruction).filter(c => c);
+  }
+
+  get currentInstructions() {
+    return this.getAllContexts().map(c => c.currentInstruction).filter(c => c);
+  }
+
+  get prevInstructions() {
+    return this.getAllContexts().map(c => c.prevInstruction).filter(c => c);
+  }
+
   commitChanges(waitToSwap) {
     var next = this.nextInstruction,
         prev = this.prevInstruction,

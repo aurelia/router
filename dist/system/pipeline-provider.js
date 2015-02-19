@@ -1,7 +1,7 @@
-System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-plan", "./model-binding", "./route-loading", "./navigation-context", "./activation"], function (_export) {
+System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-plan", "./model-binding", "./route-loading", "./navigation-context", "./activation", "./route-filters"], function (_export) {
   "use strict";
 
-  var Container, Pipeline, BuildNavigationPlanStep, ApplyModelBindersStep, LoadRouteStep, CommitChangesStep, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, _prototypeProperties, PipelineProvider;
+  var Container, Pipeline, BuildNavigationPlanStep, ApplyModelBindersStep, LoadRouteStep, CommitChangesStep, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep, _prototypeProperties, PipelineProvider;
   return {
     setters: [function (_aureliaDependencyInjection) {
       Container = _aureliaDependencyInjection.Container;
@@ -20,6 +20,8 @@ System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-pla
       CanActivateNextStep = _activation.CanActivateNextStep;
       DeactivatePreviousStep = _activation.DeactivatePreviousStep;
       ActivateNextStep = _activation.ActivateNextStep;
+    }, function (_routeFilters) {
+      createRouteFilterStep = _routeFilters.createRouteFilterStep;
     }],
     execute: function () {
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
@@ -27,7 +29,7 @@ System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-pla
       PipelineProvider = _export("PipelineProvider", (function () {
         function PipelineProvider(container) {
           this.container = container;
-          this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, ApplyModelBindersStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
+          this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, createRouteFilterStep("authorize"), createRouteFilterStep("modelbind"), CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
         }
 
         _prototypeProperties(PipelineProvider, {

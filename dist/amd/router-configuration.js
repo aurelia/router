@@ -1,15 +1,24 @@
-define(["exports"], function (exports) {
+define(["exports", "./route-filters"], function (exports, _routeFilters) {
   "use strict";
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+  var RouteFilterContainer = _routeFilters.RouteFilterContainer;
   var RouterConfiguration = exports.RouterConfiguration = (function () {
     function RouterConfiguration() {
       this.instructions = [];
       this.options = {};
+      this.pipelineSteps = [];
     }
 
     _prototypeProperties(RouterConfiguration, null, {
+      addPipelineStep: {
+        value: function addPipelineStep(name, step) {
+          this.pipelineSteps.push({ name: name, step: step });
+        },
+        writable: true,
+        configurable: true
+      },
       map: {
         value: function map(route, config) {
           if (Array.isArray(route)) {
@@ -73,8 +82,10 @@ define(["exports"], function (exports) {
       exportToRouter: {
         value: function exportToRouter(router) {
           var instructions = this.instructions,
+              pipelineSteps = this.pipelineSteps,
               i,
-              ii;
+              ii,
+              filterContainer;
 
           for (i = 0, ii = instructions.length; i < ii; ++i) {
             instructions[i](router);
@@ -89,6 +100,19 @@ define(["exports"], function (exports) {
           }
 
           router.options = this.options;
+
+          if (pipelineSteps.length) {
+            if (!router.isRoot) {
+              throw new Error("Pipeline steps can only be added to the root router");
+            }
+
+            filterContainer = router.container.get(RouteFilterContainer);
+            for (i = 0, ii = pipelineSteps.length; i < ii; ++i) {
+              var name = pipelineSteps[i].name;
+              var step = pipelineSteps[i].step;
+              filterContainer.addStep(name, step);
+            }
+          }
         },
         writable: true,
         configurable: true
@@ -128,7 +152,7 @@ define(["exports"], function (exports) {
       deriveTitle: {
         value: function deriveTitle(config) {
           var value = config.name;
-          return value.substr(0, 1).toUpperCase() + value.substr(1);
+          return value ? value.substr(0, 1).toUpperCase() + value.substr(1) : null;
         },
         writable: true,
         configurable: true

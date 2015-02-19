@@ -19,6 +19,12 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
     }
 
     _prototypeProperties(Router, null, {
+      isRoot: {
+        get: function () {
+          return false;
+        },
+        configurable: true
+      },
       registerViewPort: {
         value: function registerViewPort(viewPort, name) {
           name = name || "default";

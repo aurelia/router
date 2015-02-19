@@ -1,7 +1,7 @@
-System.register([], function (_export) {
+System.register(["./navigation-commands"], function (_export) {
   "use strict";
 
-  var _toArray, _prototypeProperties, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
+  var Redirect, _toArray, _prototypeProperties, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
   _export("buildNavigationPlan", buildNavigationPlan);
 
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
@@ -83,7 +83,9 @@ System.register([], function (_export) {
     return false;
   }
   return {
-    setters: [],
+    setters: [function (_navigationCommands) {
+      Redirect = _navigationCommands.Redirect;
+    }],
     execute: function () {
       _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
 
@@ -98,6 +100,10 @@ System.register([], function (_export) {
         _prototypeProperties(BuildNavigationPlanStep, null, {
           run: {
             value: function run(navigationContext, next) {
+              if (navigationContext.nextInstruction.config.redirect) {
+                return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
+              }
+
               return buildNavigationPlan(navigationContext).then(function (plan) {
                 navigationContext.plan = plan;
                 return next();

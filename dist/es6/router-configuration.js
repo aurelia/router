@@ -1,7 +1,14 @@
+import {RouteFilterContainer} from './route-filters';
+
 export class RouterConfiguration{
   constructor() {
     this.instructions = [];
     this.options = {};
+    this.pipelineSteps = [];
+  }
+
+  addPipelineStep(name, step) {
+    this.pipelineSteps.push({name, step});
   }
 
   map(route, config) {
@@ -53,7 +60,8 @@ export class RouterConfiguration{
 
   exportToRouter(router) {
     var instructions = this.instructions,
-        i, ii;
+        pipelineSteps = this.pipelineSteps,
+        i, ii, filterContainer;
 
     for (i = 0, ii = instructions.length; i < ii; ++i) {
       instructions[i](router);
@@ -68,6 +76,19 @@ export class RouterConfiguration{
     }
 
     router.options = this.options;
+
+    if (pipelineSteps.length) {
+      // Pipeline steps should only be added at the app router
+      if (!router.isRoot) {
+        throw new Error('Pipeline steps can only be added to the root router');
+      }
+
+      filterContainer = router.container.get(RouteFilterContainer);
+      for (i = 0, ii = pipelineSteps.length; i < ii; ++i) {
+        var {name, step} = pipelineSteps[i];
+        filterContainer.addStep(name, step);
+      }
+    }
   }
 
   configureRoute(router, config, navModel) {
@@ -92,7 +113,7 @@ export class RouterConfiguration{
 
   deriveTitle(config) {
     var value = config.name;
-    return value.substr(0, 1).toUpperCase() + value.substr(1);
+    return value ? value.substr(0, 1).toUpperCase() + value.substr(1) : null;
   }
 
   deriveModuleId(config) {

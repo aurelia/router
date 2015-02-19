@@ -14,6 +14,10 @@ export class Router {
     this.baseUrl = '';
   }
 
+  get isRoot() {
+    return false;
+  }
+
   registerViewPort(viewPort, name) {
     name = name || 'default';
     this.viewPorts[name] = viewPort;
