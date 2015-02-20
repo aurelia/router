@@ -26,6 +26,7 @@ export class PipelineProvider {
       //NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, //optional
       ActivateNextStep, //optional
+      createRouteFilterStep('precommit'),
       CommitChangesStep
     ];
   }
