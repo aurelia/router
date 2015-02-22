@@ -3,13 +3,15 @@ import {History} from 'aurelia-history';
 import {Router} from './router';
 import {PipelineProvider} from './pipeline-provider';
 import {isNavigationCommand} from './navigation-commands';
+import {EventAggregator} from 'aurelia-event-aggregator';
 
 export class AppRouter extends Router {
-  static inject(){ return [Container, History, PipelineProvider]; }
-  constructor(container, history, pipelineProvider) {
+  static inject(){ return [Container, History, PipelineProvider, EventAggregator]; }
+  constructor(container, history, pipelineProvider, events) {
     super(container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener('click', handleLinkClick.bind(this), true);
+    this.events = events;
   }
 
   get isRoot() {
@@ -62,6 +64,7 @@ export class AppRouter extends Router {
 
       if (result.output instanceof Error) {
         console.error(result.output);
+        this.events.publish('Router:Navigating:Error', { instruction, result });
       }
 
       if (isNavigationCommand(result.output)) {
