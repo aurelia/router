@@ -3,13 +3,15 @@ import {History} from 'aurelia-history';
 import {Router} from './router';
 import {PipelineProvider} from './pipeline-provider';
 import {isNavigationCommand} from './navigation-commands';
+import {EventAggregator} from 'aurelia-event-aggregator';
 
 export class AppRouter extends Router {
-  static inject(){ return [Container, History, PipelineProvider]; }
-  constructor(container, history, pipelineProvider) {
+  static inject(){ return [Container, History, PipelineProvider, EventAggregator]; }
+  constructor(container, history, pipelineProvider, events) {
     super(container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener('click', handleLinkClick.bind(this), true);
+    this.events = events;
   }
 
   get isRoot() {
@@ -49,6 +51,7 @@ export class AppRouter extends Router {
     }
 
     this.isNavigating = true;
+    this.events.publish('router:navigation:processing', instruction);
 
     var context = this.createNavigationContext(instruction);
     var pipeline = this.pipelineProvider.createPipeline(context);
@@ -62,17 +65,21 @@ export class AppRouter extends Router {
 
       if (result.output instanceof Error) {
         console.error(result.output);
+        this.events.publish('router:navigation:error', { instruction, result });
       }
 
       if (isNavigationCommand(result.output)) {
         result.output.navigate(this);
       } else if (!result.completed) {
         this.navigate(this.history.previousFragment || '', false);
+        this.events.publish('router:navigation:cancelled', instruction)
       }
 
       instruction.resolve(result);
       this.dequeueInstruction();
-    }).catch(error => {
+    })
+    .then(result => this.events.publish('router:navigation:complete', instruction))
+    .catch(error => {
       console.error(error);
     });
   }

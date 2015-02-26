@@ -110,13 +110,13 @@ export class NavigationContext {
 
 export class CommitChangesStep {
   run(navigationContext, next) {
-    navigationContext.commitChanges(true);
+    navigationContext.commitChanges(true).then(() => {
+      var title = navigationContext.buildTitle();
+        if (title) {
+          document.title = title;
+        }
 
-    var title = navigationContext.buildTitle();
-    if (title) {
-      document.title = title;
-    }
-
-    return next();
+        return next();
+    });
   }
 }

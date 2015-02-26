@@ -10,6 +10,7 @@ System.config({
 System.config({
   "map": {
     "aurelia-dependency-injection": "github:aurelia/dependency-injection@0.4.1",
+    "aurelia-event-aggregator": "github:aurelia/event-aggregator@0.2.2",
     "aurelia-history": "github:aurelia/history@0.2.2",
     "aurelia-path": "github:aurelia/path@0.4.1",
     "aurelia-route-recognizer": "github:aurelia/route-recognizer@0.2.2",
