@@ -14,6 +14,7 @@ This library is part of the [Aurelia](http://www.aurelia.io/) platform and conta
 * [aurelia-history](https://github.com/aurelia/history)
 * [aurelia-route-recognizer](https://github.com/aurelia/route-recognizer)
 * [aurelia-path](https://github.com/aurelia/path)
+* [aurelia-event-aggregator](https://github.com/aurelia/event-aggregator)
 
 ## Used By
 

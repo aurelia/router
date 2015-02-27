@@ -25,7 +25,7 @@
     },
     "dependencies": {
       "aurelia-dependency-injection": "^0.4.1",
-      "aurelia-event-aggregator": "^0.2.2",
+      "aurelia-event-aggregator": "github:aurelia/event-aggregator@^0.2.2",
       "aurelia-history": "^0.2.2",
       "aurelia-path": "^0.4.1",
       "aurelia-route-recognizer": "^0.2.2",
