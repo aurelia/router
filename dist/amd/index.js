@@ -12,5 +12,7 @@ define(["exports", "./router", "./app-router", "./pipeline-provider", "./navigat
   exports.REPLACE = _navigationPlan.REPLACE;
   exports.RouteFilterContainer = _routeFilters.RouteFilterContainer;
   exports.createRouteFilterStep = _routeFilters.createRouteFilterStep;
-  exports.__esModule = true;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

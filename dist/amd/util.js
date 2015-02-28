@@ -2,6 +2,7 @@ define(["exports"], function (exports) {
   "use strict";
 
   exports.processPotential = processPotential;
+
   function processPotential(obj, resolve, reject) {
     if (obj && typeof obj.then === "function") {
       var dfd = obj.then(resolve);
@@ -21,5 +22,8 @@ define(["exports"], function (exports) {
       }
     }
   }
-  exports.__esModule = true;
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

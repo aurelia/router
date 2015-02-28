@@ -2,14 +2,24 @@
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 var RouteRecognizer = require("aurelia-route-recognizer").RouteRecognizer;
+
 var join = require("aurelia-path").join;
+
 var NavigationContext = require("./navigation-context").NavigationContext;
+
 var NavigationInstruction = require("./navigation-instruction").NavigationInstruction;
+
 var RouterConfiguration = require("./router-configuration").RouterConfiguration;
+
 var processPotential = require("./util").processPotential;
+
 var Router = exports.Router = (function () {
   function Router(container, history) {
+    _classCallCheck(this, Router);
+
     this.container = container;
     this.history = history;
     this.viewPorts = {};
@@ -113,6 +123,7 @@ var Router = exports.Router = (function () {
       value: function createNavigationInstruction() {
         var url = arguments[0] === undefined ? "" : arguments[0];
         var parentInstruction = arguments[1] === undefined ? null : arguments[1];
+
         var results = this.recognizer.recognize(url);
         var fragment, queryIndex, queryString;
 
@@ -192,6 +203,7 @@ var Router = exports.Router = (function () {
     addRoute: {
       value: function addRoute(config) {
         var navModel = arguments[1] === undefined ? {} : arguments[1];
+
         if (!("viewPorts" in config)) {
           config.viewPorts = {
             "default": {
@@ -292,4 +304,7 @@ var Router = exports.Router = (function () {
 
   return Router;
 })();
-exports.__esModule = true;
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});

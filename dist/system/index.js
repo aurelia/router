@@ -1,6 +1,4 @@
 System.register(["./router", "./app-router", "./pipeline-provider", "./navigation-commands", "./route-loading", "./router-configuration", "./navigation-plan", "./route-filters"], function (_export) {
-  "use strict";
-
   return {
     setters: [function (_router) {
       _export("Router", _router.Router);
@@ -25,6 +23,8 @@ System.register(["./router", "./app-router", "./pipeline-provider", "./navigatio
 
       _export("createRouteFilterStep", _routeFilters.createRouteFilterStep);
     }],
-    execute: function () {}
+    execute: function () {
+      "use strict";
+    }
   };
 });

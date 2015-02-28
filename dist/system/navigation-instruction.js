@@ -1,20 +1,25 @@
 System.register([], function (_export) {
-  "use strict";
+  var _prototypeProperties, _classCallCheck, NavigationInstruction;
 
-  var _prototypeProperties, NavigationInstruction;
   return {
     setters: [],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
       NavigationInstruction = _export("NavigationInstruction", (function () {
         function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
+          _classCallCheck(this, NavigationInstruction);
+
           this.fragment = fragment;
           this.queryString = queryString;
           this.params = params || {};
           this.queryParams = queryParams;
           this.config = config;
-          this.lifecycleArgs = [params, queryParams, config];
+          this.lifecycleArgs = [params, queryParams, config, this];
           this.viewPortInstructions = {};
 
           if (parentInstruction) {

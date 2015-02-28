@@ -3,14 +3,18 @@ define(["exports"], function (exports) {
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
   var NavigationInstruction = exports.NavigationInstruction = (function () {
     function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
+      _classCallCheck(this, NavigationInstruction);
+
       this.fragment = fragment;
       this.queryString = queryString;
       this.params = params || {};
       this.queryParams = queryParams;
       this.config = config;
-      this.lifecycleArgs = [params, queryParams, config];
+      this.lifecycleArgs = [params, queryParams, config, this];
       this.viewPortInstructions = {};
 
       if (parentInstruction) {
@@ -77,5 +81,8 @@ define(["exports"], function (exports) {
 
     return NavigationInstruction;
   })();
-  exports.__esModule = true;
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

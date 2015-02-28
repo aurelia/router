@@ -1,16 +1,21 @@
 System.register(["./navigation-plan"], function (_export) {
-  "use strict";
+  var REPLACE, _prototypeProperties, _classCallCheck, NavigationContext, CommitChangesStep;
 
-  var REPLACE, _prototypeProperties, NavigationContext, CommitChangesStep;
   return {
     setters: [function (_navigationPlan) {
       REPLACE = _navigationPlan.REPLACE;
     }],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
       NavigationContext = _export("NavigationContext", (function () {
         function NavigationContext(router, nextInstruction) {
+          _classCallCheck(this, NavigationContext);
+
           this.router = router;
           this.nextInstruction = nextInstruction;
           this.currentInstruction = router.currentInstruction;
@@ -21,6 +26,7 @@ System.register(["./navigation-plan"], function (_export) {
           getAllContexts: {
             value: function getAllContexts() {
               var acc = arguments[0] === undefined ? [] : arguments[0];
+
               acc.push(this);
               if (this.plan) {
                 for (var key in this.plan) {
@@ -119,6 +125,7 @@ System.register(["./navigation-plan"], function (_export) {
           buildTitle: {
             value: function buildTitle() {
               var separator = arguments[0] === undefined ? " | " : arguments[0];
+
               var next = this.nextInstruction,
                   title = next.config.navModel.title || "",
                   viewPortInstructions = next.viewPortInstructions,
@@ -153,19 +160,21 @@ System.register(["./navigation-plan"], function (_export) {
         return NavigationContext;
       })());
       CommitChangesStep = _export("CommitChangesStep", (function () {
-        function CommitChangesStep() {}
+        function CommitChangesStep() {
+          _classCallCheck(this, CommitChangesStep);
+        }
 
         _prototypeProperties(CommitChangesStep, null, {
           run: {
             value: function run(navigationContext, next) {
-              navigationContext.commitChanges(true);
+              return navigationContext.commitChanges(true).then(function () {
+                var title = navigationContext.buildTitle();
+                if (title) {
+                  document.title = title;
+                }
 
-              var title = navigationContext.buildTitle();
-              if (title) {
-                document.title = title;
-              }
-
-              return next();
+                return next();
+              });
             },
             writable: true,
             configurable: true

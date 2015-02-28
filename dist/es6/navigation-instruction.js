@@ -5,7 +5,7 @@ export class NavigationInstruction {
     this.params = params || {};
     this.queryParams = queryParams;
     this.config = config;
-    this.lifecycleArgs = [params, queryParams, config];
+    this.lifecycleArgs = [params, queryParams, config, this];
     this.viewPortInstructions = {};
 
     if (parentInstruction) {

@@ -1,7 +1,6 @@
 System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-plan", "./model-binding", "./route-loading", "./navigation-context", "./activation", "./route-filters"], function (_export) {
-  "use strict";
+  var Container, Pipeline, BuildNavigationPlanStep, ApplyModelBindersStep, LoadRouteStep, CommitChangesStep, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep, _prototypeProperties, _classCallCheck, PipelineProvider;
 
-  var Container, Pipeline, BuildNavigationPlanStep, ApplyModelBindersStep, LoadRouteStep, CommitChangesStep, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep, _prototypeProperties, PipelineProvider;
   return {
     setters: [function (_aureliaDependencyInjection) {
       Container = _aureliaDependencyInjection.Container;
@@ -24,12 +23,23 @@ System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-pla
       createRouteFilterStep = _routeFilters.createRouteFilterStep;
     }],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
       PipelineProvider = _export("PipelineProvider", (function () {
         function PipelineProvider(container) {
+          _classCallCheck(this, PipelineProvider);
+
           this.container = container;
-          this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, createRouteFilterStep("authorize"), createRouteFilterStep("modelbind"), CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, CommitChangesStep];
+          this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, //optional
+          LoadRouteStep, createRouteFilterStep("authorize"), createRouteFilterStep("modelbind"), CanActivateNextStep, //optional
+          //NOTE: app state changes start below - point of no return
+          DeactivatePreviousStep, //optional
+          ActivateNextStep, //optional
+          createRouteFilterStep("precommit"), CommitChangesStep];
         }
 
         _prototypeProperties(PipelineProvider, {
@@ -44,6 +54,7 @@ System.register(["aurelia-dependency-injection", "./pipeline", "./navigation-pla
           createPipeline: {
             value: function createPipeline(navigationContext) {
               var _this = this;
+
               var pipeline = new Pipeline();
               this.steps.forEach(function (step) {
                 return pipeline.withStep(_this.container.get(step));

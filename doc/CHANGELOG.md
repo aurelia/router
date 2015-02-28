@@ -1,3 +1,20 @@
+### 0.5.7 (2015-02-28)
+
+
+#### Bug Fixes
+
+* **navigation-context:** navigation result not returned ([2890bfde](http://github.com/aurelia/router/commit/2890bfdeec182f4ff274e84f0429f58af37b61bb))
+* **package:** update dependencies ([01e5adac](http://github.com/aurelia/router/commit/01e5adac3839646e797289512c6fe97299b51f59))
+
+
+#### Features
+
+* **navigation-instruction:** add instruction to lifecycle args ([26b890c2](http://github.com/aurelia/router/commit/26b890c237443fa644caa400da6b79a1945ae88a))
+* **router:**
+  * add lifecycle events ([4c2839d1](http://github.com/aurelia/router/commit/4c2839d123850404dc0a5256402e2c1b66aa2675))
+  * Add a precommit extension point to the pipeline ([8f11bfd9](http://github.com/aurelia/router/commit/8f11bfd932d9cfb6c8466ad9299f02c73066034f))
+
+
 ### 0.5.6 (2015-02-18)
 
 

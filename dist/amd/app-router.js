@@ -1,4 +1,4 @@
-define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router", "./pipeline-provider", "./navigation-commands"], function (exports, _aureliaDependencyInjection, _aureliaHistory, _router, _pipelineProvider, _navigationCommands) {
+define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router", "./pipeline-provider", "./navigation-commands", "aurelia-event-aggregator"], function (exports, _aureliaDependencyInjection, _aureliaHistory, _router, _pipelineProvider, _navigationCommands, _aureliaEventAggregator) {
   "use strict";
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
@@ -7,16 +7,23 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
 
   var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
   var Container = _aureliaDependencyInjection.Container;
   var History = _aureliaHistory.History;
   var Router = _router.Router;
   var PipelineProvider = _pipelineProvider.PipelineProvider;
   var isNavigationCommand = _navigationCommands.isNavigationCommand;
+  var EventAggregator = _aureliaEventAggregator.EventAggregator;
+
   var AppRouter = exports.AppRouter = (function (Router) {
-    function AppRouter(container, history, pipelineProvider) {
+    function AppRouter(container, history, pipelineProvider, events) {
+      _classCallCheck(this, AppRouter);
+
       _get(Object.getPrototypeOf(AppRouter.prototype), "constructor", this).call(this, container, history);
       this.pipelineProvider = pipelineProvider;
       document.addEventListener("click", handleLinkClick.bind(this), true);
+      this.events = events;
     }
 
     _inherits(AppRouter, Router);
@@ -24,7 +31,7 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
     _prototypeProperties(AppRouter, {
       inject: {
         value: function inject() {
-          return [Container, History, PipelineProvider];
+          return [Container, History, PipelineProvider, EventAggregator];
         },
         writable: true,
         configurable: true
@@ -39,6 +46,7 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
       loadUrl: {
         value: function loadUrl(url) {
           var _this = this;
+
           return this.createNavigationInstruction(url).then(function (instruction) {
             return _this.queueInstruction(instruction);
           })["catch"](function (error) {
@@ -55,6 +63,7 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
       queueInstruction: {
         value: function queueInstruction(instruction) {
           var _this = this;
+
           return new Promise(function (resolve) {
             instruction.resolve = resolve;
             _this.queue.unshift(instruction);
@@ -67,6 +76,7 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
       dequeueInstruction: {
         value: function dequeueInstruction() {
           var _this = this;
+
           if (this.isNavigating) {
             return;
           }
@@ -79,6 +89,7 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
           }
 
           this.isNavigating = true;
+          this.events.publish("router:navigation:processing", instruction);
 
           var context = this.createNavigationContext(instruction);
           var pipeline = this.pipelineProvider.createPipeline(context);
@@ -92,16 +103,20 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
 
             if (result.output instanceof Error) {
               console.error(result.output);
+              _this.events.publish("router:navigation:error", { instruction: instruction, result: result });
             }
 
             if (isNavigationCommand(result.output)) {
               result.output.navigate(_this);
             } else if (!result.completed) {
               _this.navigate(_this.history.previousFragment || "", false);
+              _this.events.publish("router:navigation:cancelled", instruction);
             }
 
             instruction.resolve(result);
             _this.dequeueInstruction();
+          }).then(function (result) {
+            return _this.events.publish("router:navigation:complete", instruction);
           })["catch"](function (error) {
             console.error(error);
           });
@@ -112,6 +127,7 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
       registerViewPort: {
         value: function registerViewPort(viewPort, name) {
           var _this = this;
+
           _get(Object.getPrototypeOf(AppRouter.prototype), "registerViewPort", this).call(this, viewPort, name);
 
           if (!this.isActive) {
@@ -166,11 +182,11 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
     return AppRouter;
   })(Router);
 
-
   function findAnchor(el) {
     while (el) {
-      if (el.tagName === "A") return el;
-      el = el.parentNode;
+      if (el.tagName === "A") {
+        return el;
+      }el = el.parentNode;
     }
   }
 
@@ -188,6 +204,8 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
       if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
         var href = target.getAttribute("href");
 
+        // Ensure the protocol is not part of URL, meaning its relative.
+        // Stop the event bubbling to ensure the link will not cause a page refresh.
         if (href !== null && !(href.charAt(0) === "#" || /^[a-z]+:/i.test(href))) {
           evt.preventDefault();
           this.history.navigate(href);
@@ -201,5 +219,7 @@ define(["exports", "aurelia-dependency-injection", "aurelia-history", "./router"
 
     return !targetWindow || targetWindow === window.name || targetWindow === "_self" || targetWindow === "top" && window === window.top;
   }
-  exports.__esModule = true;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

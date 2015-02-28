@@ -1,6 +1,7 @@
 "use strict";
 
 exports.processPotential = processPotential;
+
 function processPotential(obj, resolve, reject) {
   if (obj && typeof obj.then === "function") {
     var dfd = obj.then(resolve);
@@ -20,4 +21,7 @@ function processPotential(obj, resolve, reject) {
     }
   }
 }
-exports.__esModule = true;
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});

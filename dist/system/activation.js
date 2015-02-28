@@ -1,12 +1,9 @@
 System.register(["./navigation-plan", "./navigation-commands", "./util"], function (_export) {
-  "use strict";
-
-  var INVOKE_LIFECYCLE, REPLACE, isNavigationCommand, processPotential, _toArray, _prototypeProperties, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
-
+  var INVOKE_LIFECYCLE, REPLACE, isNavigationCommand, processPotential, _toConsumableArray, _prototypeProperties, _classCallCheck, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
     var infos = findDeactivatable(plan, callbackName),
-        i = infos.length;
+        i = infos.length; //query from inside out
 
     function inspect(val) {
       if (ignoreResult || shouldContinue(val)) {
@@ -41,6 +38,7 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
       var prevComponent = viewPortPlan.prevComponent;
 
       if ((viewPortPlan.strategy == INVOKE_LIFECYCLE || viewPortPlan.strategy == REPLACE) && prevComponent) {
+
         var controller = prevComponent.executionContext;
 
         if (callbackName in controller) {
@@ -81,7 +79,7 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
   function processActivatable(navigationContext, callbackName, next, ignoreResult) {
     var infos = findActivatable(navigationContext, callbackName),
         length = infos.length,
-        i = -1;
+        i = -1; //query from top down
 
     function inspect(val, router) {
       if (ignoreResult || shouldContinue(val, router)) {
@@ -97,8 +95,9 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
       if (i < length) {
         try {
           var _current$controller;
+
           var current = infos[i];
-          var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toArray(current.lifecycleArgs));
+          var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toConsumableArray(current.lifecycleArgs));
           return processPotential(result, function (val) {
             return inspect(val, current.router);
           }, next.cancel);
@@ -170,13 +169,19 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
       processPotential = _util.processPotential;
     }],
     execute: function () {
-      _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
+      "use strict";
+
+      _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
       affirmations = _export("affirmations", ["yes", "ok", "true"]);
       CanDeactivatePreviousStep = _export("CanDeactivatePreviousStep", (function () {
-        function CanDeactivatePreviousStep() {}
+        function CanDeactivatePreviousStep() {
+          _classCallCheck(this, CanDeactivatePreviousStep);
+        }
 
         _prototypeProperties(CanDeactivatePreviousStep, null, {
           run: {
@@ -191,7 +196,9 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
         return CanDeactivatePreviousStep;
       })());
       CanActivateNextStep = _export("CanActivateNextStep", (function () {
-        function CanActivateNextStep() {}
+        function CanActivateNextStep() {
+          _classCallCheck(this, CanActivateNextStep);
+        }
 
         _prototypeProperties(CanActivateNextStep, null, {
           run: {
@@ -206,7 +213,9 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
         return CanActivateNextStep;
       })());
       DeactivatePreviousStep = _export("DeactivatePreviousStep", (function () {
-        function DeactivatePreviousStep() {}
+        function DeactivatePreviousStep() {
+          _classCallCheck(this, DeactivatePreviousStep);
+        }
 
         _prototypeProperties(DeactivatePreviousStep, null, {
           run: {
@@ -221,7 +230,9 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
         return DeactivatePreviousStep;
       })());
       ActivateNextStep = _export("ActivateNextStep", (function () {
-        function ActivateNextStep() {}
+        function ActivateNextStep() {
+          _classCallCheck(this, ActivateNextStep);
+        }
 
         _prototypeProperties(ActivateNextStep, null, {
           run: {

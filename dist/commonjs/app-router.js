@@ -6,16 +6,28 @@ var _get = function get(object, property, receiver) { var desc = Object.getOwnPr
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 var Container = require("aurelia-dependency-injection").Container;
+
 var History = require("aurelia-history").History;
+
 var Router = require("./router").Router;
+
 var PipelineProvider = require("./pipeline-provider").PipelineProvider;
+
 var isNavigationCommand = require("./navigation-commands").isNavigationCommand;
+
+var EventAggregator = require("aurelia-event-aggregator").EventAggregator;
+
 var AppRouter = exports.AppRouter = (function (Router) {
-  function AppRouter(container, history, pipelineProvider) {
+  function AppRouter(container, history, pipelineProvider, events) {
+    _classCallCheck(this, AppRouter);
+
     _get(Object.getPrototypeOf(AppRouter.prototype), "constructor", this).call(this, container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener("click", handleLinkClick.bind(this), true);
+    this.events = events;
   }
 
   _inherits(AppRouter, Router);
@@ -23,7 +35,7 @@ var AppRouter = exports.AppRouter = (function (Router) {
   _prototypeProperties(AppRouter, {
     inject: {
       value: function inject() {
-        return [Container, History, PipelineProvider];
+        return [Container, History, PipelineProvider, EventAggregator];
       },
       writable: true,
       configurable: true
@@ -38,6 +50,7 @@ var AppRouter = exports.AppRouter = (function (Router) {
     loadUrl: {
       value: function loadUrl(url) {
         var _this = this;
+
         return this.createNavigationInstruction(url).then(function (instruction) {
           return _this.queueInstruction(instruction);
         })["catch"](function (error) {
@@ -54,6 +67,7 @@ var AppRouter = exports.AppRouter = (function (Router) {
     queueInstruction: {
       value: function queueInstruction(instruction) {
         var _this = this;
+
         return new Promise(function (resolve) {
           instruction.resolve = resolve;
           _this.queue.unshift(instruction);
@@ -66,6 +80,7 @@ var AppRouter = exports.AppRouter = (function (Router) {
     dequeueInstruction: {
       value: function dequeueInstruction() {
         var _this = this;
+
         if (this.isNavigating) {
           return;
         }
@@ -78,6 +93,7 @@ var AppRouter = exports.AppRouter = (function (Router) {
         }
 
         this.isNavigating = true;
+        this.events.publish("router:navigation:processing", instruction);
 
         var context = this.createNavigationContext(instruction);
         var pipeline = this.pipelineProvider.createPipeline(context);
@@ -91,16 +107,20 @@ var AppRouter = exports.AppRouter = (function (Router) {
 
           if (result.output instanceof Error) {
             console.error(result.output);
+            _this.events.publish("router:navigation:error", { instruction: instruction, result: result });
           }
 
           if (isNavigationCommand(result.output)) {
             result.output.navigate(_this);
           } else if (!result.completed) {
             _this.navigate(_this.history.previousFragment || "", false);
+            _this.events.publish("router:navigation:cancelled", instruction);
           }
 
           instruction.resolve(result);
           _this.dequeueInstruction();
+        }).then(function (result) {
+          return _this.events.publish("router:navigation:complete", instruction);
         })["catch"](function (error) {
           console.error(error);
         });
@@ -111,6 +131,7 @@ var AppRouter = exports.AppRouter = (function (Router) {
     registerViewPort: {
       value: function registerViewPort(viewPort, name) {
         var _this = this;
+
         _get(Object.getPrototypeOf(AppRouter.prototype), "registerViewPort", this).call(this, viewPort, name);
 
         if (!this.isActive) {
@@ -165,11 +186,11 @@ var AppRouter = exports.AppRouter = (function (Router) {
   return AppRouter;
 })(Router);
 
-
 function findAnchor(el) {
   while (el) {
-    if (el.tagName === "A") return el;
-    el = el.parentNode;
+    if (el.tagName === "A") {
+      return el;
+    }el = el.parentNode;
   }
 }
 
@@ -187,6 +208,8 @@ function handleLinkClick(evt) {
     if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
       var href = target.getAttribute("href");
 
+      // Ensure the protocol is not part of URL, meaning its relative.
+      // Stop the event bubbling to ensure the link will not cause a page refresh.
       if (href !== null && !(href.charAt(0) === "#" || /^[a-z]+:/i.test(href))) {
         evt.preventDefault();
         this.history.navigate(href);
@@ -200,4 +223,6 @@ function targetIsThisWindow(target) {
 
   return !targetWindow || targetWindow === window.name || targetWindow === "_self" || targetWindow === "top" && window === window.top;
 }
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});

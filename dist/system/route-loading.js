@@ -1,7 +1,6 @@
 System.register(["./navigation-plan"], function (_export) {
-  "use strict";
+  var REPLACE, buildNavigationPlan, _prototypeProperties, _classCallCheck, RouteLoader, LoadRouteStep;
 
-  var REPLACE, buildNavigationPlan, _prototypeProperties, RouteLoader, LoadRouteStep;
   _export("loadNewRoute", loadNewRoute);
 
   function loadNewRoute(routers, routeLoader, navigationContext) {
@@ -92,10 +91,16 @@ System.register(["./navigation-plan"], function (_export) {
       buildNavigationPlan = _navigationPlan.buildNavigationPlan;
     }],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
       RouteLoader = _export("RouteLoader", (function () {
-        function RouteLoader() {}
+        function RouteLoader() {
+          _classCallCheck(this, RouteLoader);
+        }
 
         _prototypeProperties(RouteLoader, null, {
           loadRoute: {
@@ -111,6 +116,8 @@ System.register(["./navigation-plan"], function (_export) {
       })());
       LoadRouteStep = _export("LoadRouteStep", (function () {
         function LoadRouteStep(routeLoader) {
+          _classCallCheck(this, LoadRouteStep);
+
           this.routeLoader = routeLoader;
         }
 

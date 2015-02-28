@@ -1,7 +1,6 @@
 System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-context", "./navigation-instruction", "./router-configuration", "./util"], function (_export) {
-  "use strict";
+  var RouteRecognizer, join, NavigationContext, NavigationInstruction, RouterConfiguration, processPotential, _prototypeProperties, _classCallCheck, Router;
 
-  var RouteRecognizer, join, NavigationContext, NavigationInstruction, RouterConfiguration, processPotential, _prototypeProperties, Router;
   return {
     setters: [function (_aureliaRouteRecognizer) {
       RouteRecognizer = _aureliaRouteRecognizer.RouteRecognizer;
@@ -17,10 +16,16 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
       processPotential = _util.processPotential;
     }],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
       Router = _export("Router", (function () {
         function Router(container, history) {
+          _classCallCheck(this, Router);
+
           this.container = container;
           this.history = history;
           this.viewPorts = {};
@@ -124,6 +129,7 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
             value: function createNavigationInstruction() {
               var url = arguments[0] === undefined ? "" : arguments[0];
               var parentInstruction = arguments[1] === undefined ? null : arguments[1];
+
               var results = this.recognizer.recognize(url);
               var fragment, queryIndex, queryString;
 
@@ -203,6 +209,7 @@ System.register(["aurelia-route-recognizer", "aurelia-path", "./navigation-conte
           addRoute: {
             value: function addRoute(config) {
               var navModel = arguments[1] === undefined ? {} : arguments[1];
+
               if (!("viewPorts" in config)) {
                 config.viewPorts = {
                   "default": {

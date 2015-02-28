@@ -1,9 +1,11 @@
 define(["exports", "./navigation-plan", "./navigation-commands", "./util"], function (exports, _navigationPlan, _navigationCommands, _util) {
   "use strict";
 
-  var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
+  var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
   var INVOKE_LIFECYCLE = _navigationPlan.INVOKE_LIFECYCLE;
   var REPLACE = _navigationPlan.REPLACE;
@@ -12,7 +14,9 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
   var affirmations = exports.affirmations = ["yes", "ok", "true"];
 
   var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = (function () {
-    function CanDeactivatePreviousStep() {}
+    function CanDeactivatePreviousStep() {
+      _classCallCheck(this, CanDeactivatePreviousStep);
+    }
 
     _prototypeProperties(CanDeactivatePreviousStep, null, {
       run: {
@@ -26,8 +30,11 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
     return CanDeactivatePreviousStep;
   })();
+
   var CanActivateNextStep = exports.CanActivateNextStep = (function () {
-    function CanActivateNextStep() {}
+    function CanActivateNextStep() {
+      _classCallCheck(this, CanActivateNextStep);
+    }
 
     _prototypeProperties(CanActivateNextStep, null, {
       run: {
@@ -41,8 +48,11 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
     return CanActivateNextStep;
   })();
+
   var DeactivatePreviousStep = exports.DeactivatePreviousStep = (function () {
-    function DeactivatePreviousStep() {}
+    function DeactivatePreviousStep() {
+      _classCallCheck(this, DeactivatePreviousStep);
+    }
 
     _prototypeProperties(DeactivatePreviousStep, null, {
       run: {
@@ -56,8 +66,11 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
     return DeactivatePreviousStep;
   })();
+
   var ActivateNextStep = exports.ActivateNextStep = (function () {
-    function ActivateNextStep() {}
+    function ActivateNextStep() {
+      _classCallCheck(this, ActivateNextStep);
+    }
 
     _prototypeProperties(ActivateNextStep, null, {
       run: {
@@ -72,10 +85,9 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
     return ActivateNextStep;
   })();
 
-
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
     var infos = findDeactivatable(plan, callbackName),
-        i = infos.length;
+        i = infos.length; //query from inside out
 
     function inspect(val) {
       if (ignoreResult || shouldContinue(val)) {
@@ -110,6 +122,7 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
       var prevComponent = viewPortPlan.prevComponent;
 
       if ((viewPortPlan.strategy == INVOKE_LIFECYCLE || viewPortPlan.strategy == REPLACE) && prevComponent) {
+
         var controller = prevComponent.executionContext;
 
         if (callbackName in controller) {
@@ -150,7 +163,7 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
   function processActivatable(navigationContext, callbackName, next, ignoreResult) {
     var infos = findActivatable(navigationContext, callbackName),
         length = infos.length,
-        i = -1;
+        i = -1; //query from top down
 
     function inspect(val, router) {
       if (ignoreResult || shouldContinue(val, router)) {
@@ -166,8 +179,9 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
       if (i < length) {
         try {
           var _current$controller;
+
           var current = infos[i];
-          var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toArray(current.lifecycleArgs));
+          var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toConsumableArray(current.lifecycleArgs));
           return processPotential(result, function (val) {
             return inspect(val, current.router);
           }, next.cancel);
@@ -229,5 +243,7 @@ define(["exports", "./navigation-plan", "./navigation-commands", "./util"], func
 
     return output;
   }
-  exports.__esModule = true;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

@@ -1,19 +1,26 @@
 "use strict";
 
-var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
+var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var _navigationPlan = require("./navigation-plan");
 
 var INVOKE_LIFECYCLE = _navigationPlan.INVOKE_LIFECYCLE;
 var REPLACE = _navigationPlan.REPLACE;
+
 var isNavigationCommand = require("./navigation-commands").isNavigationCommand;
+
 var processPotential = require("./util").processPotential;
+
 var affirmations = exports.affirmations = ["yes", "ok", "true"];
 
 var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = (function () {
-  function CanDeactivatePreviousStep() {}
+  function CanDeactivatePreviousStep() {
+    _classCallCheck(this, CanDeactivatePreviousStep);
+  }
 
   _prototypeProperties(CanDeactivatePreviousStep, null, {
     run: {
@@ -27,8 +34,11 @@ var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = (function ()
 
   return CanDeactivatePreviousStep;
 })();
+
 var CanActivateNextStep = exports.CanActivateNextStep = (function () {
-  function CanActivateNextStep() {}
+  function CanActivateNextStep() {
+    _classCallCheck(this, CanActivateNextStep);
+  }
 
   _prototypeProperties(CanActivateNextStep, null, {
     run: {
@@ -42,8 +52,11 @@ var CanActivateNextStep = exports.CanActivateNextStep = (function () {
 
   return CanActivateNextStep;
 })();
+
 var DeactivatePreviousStep = exports.DeactivatePreviousStep = (function () {
-  function DeactivatePreviousStep() {}
+  function DeactivatePreviousStep() {
+    _classCallCheck(this, DeactivatePreviousStep);
+  }
 
   _prototypeProperties(DeactivatePreviousStep, null, {
     run: {
@@ -57,8 +70,11 @@ var DeactivatePreviousStep = exports.DeactivatePreviousStep = (function () {
 
   return DeactivatePreviousStep;
 })();
+
 var ActivateNextStep = exports.ActivateNextStep = (function () {
-  function ActivateNextStep() {}
+  function ActivateNextStep() {
+    _classCallCheck(this, ActivateNextStep);
+  }
 
   _prototypeProperties(ActivateNextStep, null, {
     run: {
@@ -73,10 +89,9 @@ var ActivateNextStep = exports.ActivateNextStep = (function () {
   return ActivateNextStep;
 })();
 
-
 function processDeactivatable(plan, callbackName, next, ignoreResult) {
   var infos = findDeactivatable(plan, callbackName),
-      i = infos.length;
+      i = infos.length; //query from inside out
 
   function inspect(val) {
     if (ignoreResult || shouldContinue(val)) {
@@ -111,6 +126,7 @@ function findDeactivatable(plan, callbackName, list) {
     var prevComponent = viewPortPlan.prevComponent;
 
     if ((viewPortPlan.strategy == INVOKE_LIFECYCLE || viewPortPlan.strategy == REPLACE) && prevComponent) {
+
       var controller = prevComponent.executionContext;
 
       if (callbackName in controller) {
@@ -151,7 +167,7 @@ function addPreviousDeactivatable(component, callbackName, list) {
 function processActivatable(navigationContext, callbackName, next, ignoreResult) {
   var infos = findActivatable(navigationContext, callbackName),
       length = infos.length,
-      i = -1;
+      i = -1; //query from top down
 
   function inspect(val, router) {
     if (ignoreResult || shouldContinue(val, router)) {
@@ -167,8 +183,9 @@ function processActivatable(navigationContext, callbackName, next, ignoreResult)
     if (i < length) {
       try {
         var _current$controller;
+
         var current = infos[i];
-        var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toArray(current.lifecycleArgs));
+        var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toConsumableArray(current.lifecycleArgs));
         return processPotential(result, function (val) {
           return inspect(val, current.router);
         }, next.cancel);
@@ -230,4 +247,6 @@ function shouldContinue(output, router) {
 
   return output;
 }
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});

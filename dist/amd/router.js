@@ -3,14 +3,19 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
   var RouteRecognizer = _aureliaRouteRecognizer.RouteRecognizer;
   var join = _aureliaPath.join;
   var NavigationContext = _navigationContext.NavigationContext;
   var NavigationInstruction = _navigationInstruction.NavigationInstruction;
   var RouterConfiguration = _routerConfiguration.RouterConfiguration;
   var processPotential = _util.processPotential;
+
   var Router = exports.Router = (function () {
     function Router(container, history) {
+      _classCallCheck(this, Router);
+
       this.container = container;
       this.history = history;
       this.viewPorts = {};
@@ -114,6 +119,7 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
         value: function createNavigationInstruction() {
           var url = arguments[0] === undefined ? "" : arguments[0];
           var parentInstruction = arguments[1] === undefined ? null : arguments[1];
+
           var results = this.recognizer.recognize(url);
           var fragment, queryIndex, queryString;
 
@@ -193,6 +199,7 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
       addRoute: {
         value: function addRoute(config) {
           var navModel = arguments[1] === undefined ? {} : arguments[1];
+
           if (!("viewPorts" in config)) {
             config.viewPorts = {
               "default": {
@@ -293,5 +300,8 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
 
     return Router;
   })();
-  exports.__esModule = true;
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

@@ -2,9 +2,14 @@
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 var RouteFilterContainer = require("./route-filters").RouteFilterContainer;
+
 var RouterConfiguration = exports.RouterConfiguration = (function () {
   function RouterConfiguration() {
+    _classCallCheck(this, RouterConfiguration);
+
     this.instructions = [];
     this.options = {};
     this.pipelineSteps = [];
@@ -48,6 +53,7 @@ var RouterConfiguration = exports.RouterConfiguration = (function () {
     mapRoute: {
       value: function mapRoute(config) {
         var _this = this;
+
         this.instructions.push(function (router) {
           if (Array.isArray(config.route)) {
             var navModel = {},
@@ -101,14 +107,17 @@ var RouterConfiguration = exports.RouterConfiguration = (function () {
         router.options = this.options;
 
         if (pipelineSteps.length) {
+          // Pipeline steps should only be added at the app router
           if (!router.isRoot) {
             throw new Error("Pipeline steps can only be added to the root router");
           }
 
           filterContainer = router.container.get(RouteFilterContainer);
           for (i = 0, ii = pipelineSteps.length; i < ii; ++i) {
-            var name = pipelineSteps[i].name;
-            var step = pipelineSteps[i].step;
+            var _pipelineSteps$i = pipelineSteps[i];
+            var name = _pipelineSteps$i.name;
+            var step = _pipelineSteps$i.step;
+
             filterContainer.addStep(name, step);
           }
         }
@@ -168,7 +177,6 @@ var RouterConfiguration = exports.RouterConfiguration = (function () {
   return RouterConfiguration;
 })();
 
-
 function ensureConfigValue(config, property, getter) {
   var value = config[property];
 
@@ -184,4 +192,6 @@ function stripParametersFromRoute(route) {
   var length = colonIndex > 0 ? colonIndex - 1 : route.length;
   return route.substr(0, length);
 }
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});

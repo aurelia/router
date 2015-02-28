@@ -1,7 +1,6 @@
 System.register(["./navigation-commands"], function (_export) {
-  "use strict";
+  var Redirect, _toConsumableArray, _prototypeProperties, _classCallCheck, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
 
-  var Redirect, _toArray, _prototypeProperties, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
   _export("buildNavigationPlan", buildNavigationPlan);
 
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
@@ -28,7 +27,9 @@ System.register(["./navigation-commands"], function (_export) {
           viewPortPlan.strategy = REPLACE;
         } else if ("determineActivationStrategy" in prevViewPortInstruction.component.executionContext) {
           var _prevViewPortInstruction$component$executionContext;
-          viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, _toArray(next.lifecycleArgs));
+
+          //TODO: should we tell them if the parent had a lifecycle min change?
+          viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, _toConsumableArray(next.lifecycleArgs));
         } else if (newParams || forceLifecycleMinimum) {
           viewPortPlan.strategy = INVOKE_LIFECYCLE;
         } else {
@@ -87,15 +88,21 @@ System.register(["./navigation-commands"], function (_export) {
       Redirect = _navigationCommands.Redirect;
     }],
     execute: function () {
-      _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
+      "use strict";
+
+      _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
       NO_CHANGE = _export("NO_CHANGE", "no-change");
       INVOKE_LIFECYCLE = _export("INVOKE_LIFECYCLE", "invoke-lifecycle");
       REPLACE = _export("REPLACE", "replace");
       BuildNavigationPlanStep = _export("BuildNavigationPlanStep", (function () {
-        function BuildNavigationPlanStep() {}
+        function BuildNavigationPlanStep() {
+          _classCallCheck(this, BuildNavigationPlanStep);
+        }
 
         _prototypeProperties(BuildNavigationPlanStep, null, {
           run: {

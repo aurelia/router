@@ -1,8 +1,5 @@
 System.register(["./route-filters"], function (_export) {
-  "use strict";
-
-  var RouteFilterContainer, _prototypeProperties, RouterConfiguration;
-
+  var RouteFilterContainer, _prototypeProperties, _classCallCheck, RouterConfiguration;
 
   function ensureConfigValue(config, property, getter) {
     var value = config[property];
@@ -24,10 +21,16 @@ System.register(["./route-filters"], function (_export) {
       RouteFilterContainer = _routeFilters.RouteFilterContainer;
     }],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
       RouterConfiguration = _export("RouterConfiguration", (function () {
         function RouterConfiguration() {
+          _classCallCheck(this, RouterConfiguration);
+
           this.instructions = [];
           this.options = {};
           this.pipelineSteps = [];
@@ -71,6 +74,7 @@ System.register(["./route-filters"], function (_export) {
           mapRoute: {
             value: function mapRoute(config) {
               var _this = this;
+
               this.instructions.push(function (router) {
                 if (Array.isArray(config.route)) {
                   var navModel = {},
@@ -124,14 +128,17 @@ System.register(["./route-filters"], function (_export) {
               router.options = this.options;
 
               if (pipelineSteps.length) {
+                // Pipeline steps should only be added at the app router
                 if (!router.isRoot) {
                   throw new Error("Pipeline steps can only be added to the root router");
                 }
 
                 filterContainer = router.container.get(RouteFilterContainer);
                 for (i = 0, ii = pipelineSteps.length; i < ii; ++i) {
-                  var name = pipelineSteps[i].name;
-                  var step = pipelineSteps[i].step;
+                  var _pipelineSteps$i = pipelineSteps[i];
+                  var name = _pipelineSteps$i.name;
+                  var step = _pipelineSteps$i.step;
+
                   filterContainer.addStep(name, step);
                 }
               }

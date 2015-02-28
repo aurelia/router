@@ -1,14 +1,19 @@
 define(["exports", "aurelia-dependency-injection"], function (exports, _aureliaDependencyInjection) {
   "use strict";
 
-  var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
+  var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
   exports.createRouteFilterStep = createRouteFilterStep;
   var Container = _aureliaDependencyInjection.Container;
+
   var RouteFilterContainer = exports.RouteFilterContainer = (function () {
     function RouteFilterContainer(container) {
+      _classCallCheck(this, RouteFilterContainer);
+
       this.container = container;
       this.filters = {};
       this.filterCache = {};
@@ -26,6 +31,7 @@ define(["exports", "aurelia-dependency-injection"], function (exports, _aureliaD
       addStep: {
         value: function addStep(name, step) {
           var index = arguments[2] === undefined ? -1 : arguments[2];
+
           var filter = this.filters[name];
           if (!filter) {
             filter = this.filters[name] = [];
@@ -55,7 +61,7 @@ define(["exports", "aurelia-dependency-injection"], function (exports, _aureliaD
 
           for (var i = 0, l = filter.length; i < l; i++) {
             if (typeof filter[i] === "string") {
-              steps.push.apply(steps, _toArray(this.getFilterSteps(filter[i])));
+              steps.push.apply(steps, _toConsumableArray(this.getFilterSteps(filter[i])));
             } else {
               steps.push(this.container.get(filter[i]));
             }
@@ -70,6 +76,7 @@ define(["exports", "aurelia-dependency-injection"], function (exports, _aureliaD
 
     return RouteFilterContainer;
   })();
+
   function createRouteFilterStep(name) {
     function create(routeFilterContainer) {
       return new RouteFilterStep(name, routeFilterContainer);
@@ -82,6 +89,8 @@ define(["exports", "aurelia-dependency-injection"], function (exports, _aureliaD
 
   var RouteFilterStep = (function () {
     function RouteFilterStep(name, routeFilterContainer) {
+      _classCallCheck(this, RouteFilterStep);
+
       this.name = name;
       this.routeFilterContainer = routeFilterContainer;
       this.isMultiStep = true;
@@ -100,5 +109,7 @@ define(["exports", "aurelia-dependency-injection"], function (exports, _aureliaD
     return RouteFilterStep;
   })();
 
-  exports.__esModule = true;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

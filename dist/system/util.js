@@ -1,6 +1,4 @@
 System.register([], function (_export) {
-  "use strict";
-
   _export("processPotential", processPotential);
 
   function processPotential(obj, resolve, reject) {
@@ -22,8 +20,11 @@ System.register([], function (_export) {
       }
     }
   }
+
   return {
     setters: [],
-    execute: function () {}
+    execute: function () {
+      "use strict";
+    }
   };
 });

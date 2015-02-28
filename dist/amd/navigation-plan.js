@@ -1,9 +1,11 @@
 define(["exports", "./navigation-commands"], function (exports, _navigationCommands) {
   "use strict";
 
-  var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
+  var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
   exports.buildNavigationPlan = buildNavigationPlan;
   var Redirect = _navigationCommands.Redirect;
@@ -35,7 +37,9 @@ define(["exports", "./navigation-commands"], function (exports, _navigationComma
           viewPortPlan.strategy = REPLACE;
         } else if ("determineActivationStrategy" in prevViewPortInstruction.component.executionContext) {
           var _prevViewPortInstruction$component$executionContext;
-          viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, _toArray(next.lifecycleArgs));
+
+          //TODO: should we tell them if the parent had a lifecycle min change?
+          viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, _toConsumableArray(next.lifecycleArgs));
         } else if (newParams || forceLifecycleMinimum) {
           viewPortPlan.strategy = INVOKE_LIFECYCLE;
         } else {
@@ -73,7 +77,9 @@ define(["exports", "./navigation-commands"], function (exports, _navigationComma
   }
 
   var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = (function () {
-    function BuildNavigationPlanStep() {}
+    function BuildNavigationPlanStep() {
+      _classCallCheck(this, BuildNavigationPlanStep);
+    }
 
     _prototypeProperties(BuildNavigationPlanStep, null, {
       run: {
@@ -95,7 +101,6 @@ define(["exports", "./navigation-commands"], function (exports, _navigationComma
     return BuildNavigationPlanStep;
   })();
 
-
   function hasDifferentParameterValues(prev, next) {
     var prevParams = prev.params,
         nextParams = next.params,
@@ -113,5 +118,7 @@ define(["exports", "./navigation-commands"], function (exports, _navigationComma
 
     return false;
   }
-  exports.__esModule = true;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });

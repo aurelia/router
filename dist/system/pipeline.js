@@ -1,7 +1,6 @@
 System.register([], function (_export) {
-  "use strict";
+  var _prototypeProperties, _classCallCheck, COMPLETED, CANCELLED, REJECTED, RUNNING, Pipeline;
 
-  var _prototypeProperties, COMPLETED, CANCELLED, REJECTED, RUNNING, Pipeline;
   function createResult(ctx, next) {
     return {
       status: next.status,
@@ -14,7 +13,11 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
       COMPLETED = _export("COMPLETED", "completed");
       CANCELLED = _export("CANCELLED", "cancelled");
@@ -22,6 +25,8 @@ System.register([], function (_export) {
       RUNNING = _export("RUNNING", "running");
       Pipeline = _export("Pipeline", (function () {
         function Pipeline() {
+          _classCallCheck(this, Pipeline);
+
           this.steps = [];
         }
 

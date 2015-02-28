@@ -2,13 +2,19 @@
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 exports.loadNewRoute = loadNewRoute;
+
 var _navigationPlan = require("./navigation-plan");
 
 var REPLACE = _navigationPlan.REPLACE;
 var buildNavigationPlan = _navigationPlan.buildNavigationPlan;
+
 var RouteLoader = exports.RouteLoader = (function () {
-  function RouteLoader() {}
+  function RouteLoader() {
+    _classCallCheck(this, RouteLoader);
+  }
 
   _prototypeProperties(RouteLoader, null, {
     loadRoute: {
@@ -22,8 +28,11 @@ var RouteLoader = exports.RouteLoader = (function () {
 
   return RouteLoader;
 })();
+
 var LoadRouteStep = exports.LoadRouteStep = (function () {
   function LoadRouteStep(routeLoader) {
+    _classCallCheck(this, LoadRouteStep);
+
     this.routeLoader = routeLoader;
   }
 
@@ -47,6 +56,7 @@ var LoadRouteStep = exports.LoadRouteStep = (function () {
 
   return LoadRouteStep;
 })();
+
 function loadNewRoute(routers, routeLoader, navigationContext) {
   var toLoad = determineWhatToLoad(navigationContext);
   var loadPromises = toLoad.map(function (current) {
@@ -129,4 +139,6 @@ function loadComponent(routeLoader, router, config) {
     return component;
   });
 }
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});

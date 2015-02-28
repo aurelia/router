@@ -2,6 +2,8 @@
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 function createResult(ctx, next) {
   return {
     status: next.status,
@@ -18,6 +20,8 @@ var RUNNING = exports.RUNNING = "running";
 
 var Pipeline = exports.Pipeline = (function () {
   function Pipeline() {
+    _classCallCheck(this, Pipeline);
+
     this.steps = [];
   }
 
@@ -98,4 +102,7 @@ var Pipeline = exports.Pipeline = (function () {
 
   return Pipeline;
 })();
-exports.__esModule = true;
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});

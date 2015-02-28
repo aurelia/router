@@ -3,9 +3,14 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
   var REPLACE = _navigationPlan.REPLACE;
+
   var NavigationContext = exports.NavigationContext = (function () {
     function NavigationContext(router, nextInstruction) {
+      _classCallCheck(this, NavigationContext);
+
       this.router = router;
       this.nextInstruction = nextInstruction;
       this.currentInstruction = router.currentInstruction;
@@ -16,6 +21,7 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
       getAllContexts: {
         value: function getAllContexts() {
           var acc = arguments[0] === undefined ? [] : arguments[0];
+
           acc.push(this);
           if (this.plan) {
             for (var key in this.plan) {
@@ -114,6 +120,7 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
       buildTitle: {
         value: function buildTitle() {
           var separator = arguments[0] === undefined ? " | " : arguments[0];
+
           var next = this.nextInstruction,
               title = next.config.navModel.title || "",
               viewPortInstructions = next.viewPortInstructions,
@@ -147,20 +154,23 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
 
     return NavigationContext;
   })();
+
   var CommitChangesStep = exports.CommitChangesStep = (function () {
-    function CommitChangesStep() {}
+    function CommitChangesStep() {
+      _classCallCheck(this, CommitChangesStep);
+    }
 
     _prototypeProperties(CommitChangesStep, null, {
       run: {
         value: function run(navigationContext, next) {
-          navigationContext.commitChanges(true);
+          return navigationContext.commitChanges(true).then(function () {
+            var title = navigationContext.buildTitle();
+            if (title) {
+              document.title = title;
+            }
 
-          var title = navigationContext.buildTitle();
-          if (title) {
-            document.title = title;
-          }
-
-          return next();
+            return next();
+          });
         },
         writable: true,
         configurable: true
@@ -169,5 +179,8 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
 
     return CommitChangesStep;
   })();
-  exports.__esModule = true;
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 });
