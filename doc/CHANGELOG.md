@@ -1,3 +1,11 @@
+### 0.5.8 (2015-02-28)
+
+
+#### Bug Fixes
+
+* **package:** change jspm directories ([bb51cacb](http://github.com/aurelia/router/commit/bb51cacbf7ec66323d97e6982abed9de1563fcf5))
+
+
 ### 0.5.7 (2015-02-28)
 
 
