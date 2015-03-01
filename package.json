@@ -18,17 +18,17 @@
     "url": "http://github.com/aurelia/router"
   },
   "jspm": {
-    "main": "system/index",
+    "main": "index",
     "format": "register",
     "directories": {
-      "lib": "dist"
+      "lib": "dist/system"
     },
     "dependencies": {
-      "aurelia-dependency-injection": "github:aurelia/dependency-injection@^0.4.4",
-      "aurelia-event-aggregator": "github:aurelia/event-aggregator@^0.2.3",
-      "aurelia-history": "github:aurelia/history@^0.2.3",
-      "aurelia-path": "github:aurelia/path@^0.4.4",
-      "aurelia-route-recognizer": "github:aurelia/route-recognizer@^0.2.3",
+      "aurelia-dependency-injection": "github:aurelia/dependency-injection@^0.4.5",
+      "aurelia-event-aggregator": "github:aurelia/event-aggregator@^0.2.4",
+      "aurelia-history": "github:aurelia/history@^0.2.4",
+      "aurelia-path": "github:aurelia/path@^0.4.5",
+      "aurelia-route-recognizer": "github:aurelia/route-recognizer@^0.2.4",
       "core-js": "npm:core-js@^0.4.1"
     }
   },
