@@ -74,7 +74,7 @@ function loadRoute(routers, routeLoader, navigationContext, viewPortPlan) {
 
   routers.push(navigationContext.router);
 
-  return loadComponent(routeLoader, navigationContext.router, viewPortPlan.config).then(component => {
+  return loadComponent(routeLoader, navigationContext, viewPortPlan.config).then(component => {
     var viewPortInstruction = next.addViewPortInstruction(
       viewPortPlan.name,
       viewPortPlan.strategy,
@@ -104,10 +104,12 @@ function loadRoute(routers, routeLoader, navigationContext, viewPortPlan) {
   });
 }
 
-function loadComponent(routeLoader, router, config){
+function loadComponent(routeLoader, navigationContext, config){
+  var router = navigationContext.router,
+      lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
   return routeLoader.loadRoute(router, config).then(component => {
     if('configureRouter' in component.executionContext){
-      var result = component.executionContext.configureRouter() || Promise.resolve();
+      var result = component.executionContext.configureRouter(...lifecycleArgs) || Promise.resolve();
       return result.then(() => component);
     }
 
