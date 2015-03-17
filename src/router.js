@@ -175,7 +175,10 @@ export class Router {
     this.recognizer.add([{path:config.route, handler: config}]);
 
     if (config.route) {
-      var withChild = JSON.parse(JSON.stringify(config));
+      var withChild, settings = config.settings;
+      delete config.settings;
+      withChild = JSON.parse(JSON.stringify(config));
+      config.settings = settings;
       withChild.route += "/*childRoute";
       withChild.hasChildRouter = true;
       this.childRecognizer.add([{
