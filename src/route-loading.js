@@ -84,7 +84,7 @@ function loadRoute(routers, routeLoader, navigationContext, viewPortPlan) {
 
     var controller = component.executionContext;
 
-    if (controller.router && routers.indexOf(controller.router) === -1) {
+    if (controller.router && controller.router.isConfigured && routers.indexOf(controller.router) === -1) {
       var path = next.getWildcardPath();
 
       return controller.router.createNavigationInstruction(path, next)

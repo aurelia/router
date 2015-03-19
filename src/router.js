@@ -12,6 +12,7 @@ export class Router {
     this.viewPorts = {};
     this.reset();
     this.baseUrl = '';
+    this.isConfigured = false;
   }
 
   get isRoot() {
@@ -55,6 +56,8 @@ export class Router {
   }
 
   configure(callbackOrConfig) {
+    this.isConfigured = true;
+
     if (typeof callbackOrConfig == 'function') {
       var config = new RouterConfiguration();
       callbackOrConfig(config);
@@ -67,6 +70,10 @@ export class Router {
   }
 
   navigate(fragment, options) {
+    if(!this.isConfigured && this.parent){
+      return this.parent.navigate(fragment, options);
+    }
+
     fragment = join(this.baseUrl, fragment);
     if(fragment === '') fragment = '/';
     return this.history.navigate(fragment, options);
@@ -155,6 +162,10 @@ export class Router {
   }
 
   generate(name, params) {
+    if(!this.isConfigured && this.parent){
+      return this.parent.generate(name, params);
+    }
+
     return this.recognizer.generate(name, params);
   }
 
@@ -244,5 +255,6 @@ export class Router {
     this.routes = [];
     this.isNavigating = false;
     this.navigation = [];
+    this.isConfigured = false;
   }
 }
