@@ -22,6 +22,16 @@ export class Redirect{
   }
 
   /**
+  * Called by the activation system to set the child router.
+  *
+  * @method setRouter
+  * @param {Router} router
+  */
+  setRouter(router){
+    this.router = router;
+  }
+
+  /**
   * Called by the navigation pipeline to navigate.
   *
   * @method navigate
