@@ -1,4 +1,5 @@
 import {Redirect, isNavigationCommand} from '../src/navigation-commands';
+import core from 'core-js';
 
 describe('isNavigaionCommand', () => {
   it('should return true for object which has a navigate method', () => {
@@ -27,10 +28,37 @@ describe('Redirect', () => {
           }
         };
 
+    redirect.setRouter(mockrouter);
+
     expect(mockrouter.url).toBe('');
 
     redirect.navigate(mockrouter);
 
     expect(mockrouter.url).toBe(testurl);
+  });
+
+  it('should accept options in constructor to use the app router', () => {
+    var testurl = 'http://aurelia.io/',
+        redirect = new Redirect(testurl, {useAppRouter:true}),
+        mockrouter = {
+          url: '',
+          navigate(url) {
+        	 this.url = url;
+          }
+        },
+        mockapprouter = {
+          url: '',
+          navigate(url) {
+        	 this.url = url;
+          }
+        };
+
+    redirect.setRouter(mockrouter);
+
+    expect(mockapprouter.url).toBe('');
+
+    redirect.navigate(mockapprouter);
+
+    expect(mockapprouter.url).toBe(testurl);
   });
 });

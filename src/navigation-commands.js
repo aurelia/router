@@ -16,8 +16,9 @@ export function isNavigationCommand(obj){
 * @param {String} url The url to redirect to.
 */
 export class Redirect{
-  constructor(url) {
+  constructor(url, options) {
     this.url = url;
+    this.options = Object.assign({ trigger: true, replace: true }, options || {});
     this.shouldContinueProcessing = false;
   }
 
@@ -38,6 +39,7 @@ export class Redirect{
   * @param {Router} appRouter - a router which should redirect
   */
   navigate(appRouter){
-    (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
+    var navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
+    navigatingRouter.navigate(this.url, this.options);
   }
 }
