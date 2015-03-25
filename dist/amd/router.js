@@ -21,6 +21,7 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
       this.viewPorts = {};
       this.reset();
       this.baseUrl = "";
+      this.isConfigured = false;
     }
 
     _prototypeProperties(Router, null, {
@@ -77,6 +78,8 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
       },
       configure: {
         value: function configure(callbackOrConfig) {
+          this.isConfigured = true;
+
           if (typeof callbackOrConfig == "function") {
             var config = new RouterConfiguration();
             callbackOrConfig(config);
@@ -92,6 +95,10 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
       },
       navigate: {
         value: function navigate(fragment, options) {
+          if (!this.isConfigured && this.parent) {
+            return this.parent.navigate(fragment, options);
+          }
+
           fragment = join(this.baseUrl, fragment);
           if (fragment === "") fragment = "/";
           return this.history.navigate(fragment, options);
@@ -191,6 +198,10 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
       },
       generate: {
         value: function generate(name, params) {
+          if (!this.isConfigured && this.parent) {
+            return this.parent.generate(name, params);
+          }
+
           return this.recognizer.generate(name, params);
         },
         writable: true,
@@ -216,7 +227,11 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           this.recognizer.add([{ path: config.route, handler: config }]);
 
           if (config.route) {
-            var withChild = JSON.parse(JSON.stringify(config));
+            var withChild,
+                settings = config.settings;
+            delete config.settings;
+            withChild = JSON.parse(JSON.stringify(config));
+            config.settings = settings;
             withChild.route += "/*childRoute";
             withChild.hasChildRouter = true;
             this.childRecognizer.add([{
@@ -292,6 +307,7 @@ define(["exports", "aurelia-route-recognizer", "aurelia-path", "./navigation-con
           this.routes = [];
           this.isNavigating = false;
           this.navigation = [];
+          this.isConfigured = false;
         },
         writable: true,
         configurable: true

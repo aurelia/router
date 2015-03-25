@@ -1,6 +1,8 @@
 define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
   "use strict";
 
+  var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
+
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
@@ -101,12 +103,12 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
 
     routers.push(navigationContext.router);
 
-    return loadComponent(routeLoader, navigationContext.router, viewPortPlan.config).then(function (component) {
+    return loadComponent(routeLoader, navigationContext, viewPortPlan.config).then(function (component) {
       var viewPortInstruction = next.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
 
       var controller = component.executionContext;
 
-      if (controller.router && routers.indexOf(controller.router) === -1) {
+      if (controller.router && controller.router.isConfigured && routers.indexOf(controller.router) === -1) {
         var path = next.getWildcardPath();
 
         return controller.router.createNavigationInstruction(path, next).then(function (childInstruction) {
@@ -123,10 +125,14 @@ define(["exports", "./navigation-plan"], function (exports, _navigationPlan) {
     });
   }
 
-  function loadComponent(routeLoader, router, config) {
+  function loadComponent(routeLoader, navigationContext, config) {
+    var router = navigationContext.router,
+        lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
     return routeLoader.loadRoute(router, config).then(function (component) {
       if ("configureRouter" in component.executionContext) {
-        var result = component.executionContext.configureRouter() || Promise.resolve();
+        var _component$executionContext;
+
+        var result = (_component$executionContext = component.executionContext).configureRouter.apply(_component$executionContext, _toConsumableArray(lifecycleArgs)) || Promise.resolve();
         return result.then(function () {
           return component;
         });

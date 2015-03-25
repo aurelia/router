@@ -158,9 +158,9 @@ function findActivatable(navigationContext, callbackName, list, router) {
 
     if (viewPortPlan.childNavigationContext) {
       findActivatable(
-        viewPortPlan.childNavigationContext, 
-        callbackName, 
-        list, 
+        viewPortPlan.childNavigationContext,
+        callbackName,
+        list,
         controller.router || router
       );
     }
@@ -170,20 +170,23 @@ function findActivatable(navigationContext, callbackName, list, router) {
 }
 
 function shouldContinue(output, router) {
-  if (output instanceof Error) {
+  if(output instanceof Error) {
     return false;
   }
 
   if(isNavigationCommand(output)){
-    output.router = router;
+    if(typeof output.setRouter === 'function') {
+      output.setRouter(router);
+    }
+
     return !!output.shouldContinueProcessing;
   }
 
-  if (typeof output == 'string') {
+  if(typeof output === 'string') {
     return affirmations.indexOf(value.toLowerCase()) !== -1;
   }
 
-  if (typeof output == 'undefined') {
+  if(typeof output === 'undefined') {
     return true;
   }
 

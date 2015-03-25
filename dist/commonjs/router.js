@@ -25,6 +25,7 @@ var Router = exports.Router = (function () {
     this.viewPorts = {};
     this.reset();
     this.baseUrl = "";
+    this.isConfigured = false;
   }
 
   _prototypeProperties(Router, null, {
@@ -81,6 +82,8 @@ var Router = exports.Router = (function () {
     },
     configure: {
       value: function configure(callbackOrConfig) {
+        this.isConfigured = true;
+
         if (typeof callbackOrConfig == "function") {
           var config = new RouterConfiguration();
           callbackOrConfig(config);
@@ -96,6 +99,10 @@ var Router = exports.Router = (function () {
     },
     navigate: {
       value: function navigate(fragment, options) {
+        if (!this.isConfigured && this.parent) {
+          return this.parent.navigate(fragment, options);
+        }
+
         fragment = join(this.baseUrl, fragment);
         if (fragment === "") fragment = "/";
         return this.history.navigate(fragment, options);
@@ -195,6 +202,10 @@ var Router = exports.Router = (function () {
     },
     generate: {
       value: function generate(name, params) {
+        if (!this.isConfigured && this.parent) {
+          return this.parent.generate(name, params);
+        }
+
         return this.recognizer.generate(name, params);
       },
       writable: true,
@@ -220,7 +231,11 @@ var Router = exports.Router = (function () {
         this.recognizer.add([{ path: config.route, handler: config }]);
 
         if (config.route) {
-          var withChild = JSON.parse(JSON.stringify(config));
+          var withChild,
+              settings = config.settings;
+          delete config.settings;
+          withChild = JSON.parse(JSON.stringify(config));
+          config.settings = settings;
           withChild.route += "/*childRoute";
           withChild.hasChildRouter = true;
           this.childRecognizer.add([{
@@ -296,6 +311,7 @@ var Router = exports.Router = (function () {
         this.routes = [];
         this.isNavigating = false;
         this.navigation = [];
+        this.isConfigured = false;
       },
       writable: true,
       configurable: true

@@ -233,15 +233,18 @@ function shouldContinue(output, router) {
   }
 
   if (isNavigationCommand(output)) {
-    output.router = router;
+    if (typeof output.setRouter === "function") {
+      output.setRouter(router);
+    }
+
     return !!output.shouldContinueProcessing;
   }
 
-  if (typeof output == "string") {
+  if (typeof output === "string") {
     return affirmations.indexOf(value.toLowerCase()) !== -1;
   }
 
-  if (typeof output == "undefined") {
+  if (typeof output === "undefined") {
     return true;
   }
 

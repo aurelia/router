@@ -1,3 +1,17 @@
+## 0.6.0 (2015-03-25)
+
+
+#### Bug Fixes
+
+* **navigation-command:** add explicit interface for commands interested in child routers ([1e1c4d3b](http://github.com/aurelia/router/commit/1e1c4d3b0389ad3725051a4c04c2482ea595eac1))
+* **router:** do not interpret as child router if not configured ([18e52d85](http://github.com/aurelia/router/commit/18e52d85821ac04946f7fbf99bad8167219929f8), closes [#34](http://github.com/aurelia/router/issues/34))
+
+
+#### Features
+
+* **redirect:** enable redirect from the app router by option ([4d1a7ea8](http://github.com/aurelia/router/commit/4d1a7ea8b20ae07cc35c5add9afc8116a9fc791f), closes [#51](http://github.com/aurelia/router/issues/51))
+
+
 ### 0.5.8 (2015-02-28)
 
 

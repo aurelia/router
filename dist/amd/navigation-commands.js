@@ -26,14 +26,30 @@ define(["exports"], function (exports) {
   */
 
   var Redirect = exports.Redirect = (function () {
-    function Redirect(url) {
+    function Redirect(url, options) {
       _classCallCheck(this, Redirect);
 
       this.url = url;
+      this.options = Object.assign({ trigger: true, replace: true }, options || {});
       this.shouldContinueProcessing = false;
     }
 
     _prototypeProperties(Redirect, null, {
+      setRouter: {
+
+        /**
+        * Called by the activation system to set the child router.
+        *
+        * @method setRouter
+        * @param {Router} router
+        */
+
+        value: function setRouter(router) {
+          this.router = router;
+        },
+        writable: true,
+        configurable: true
+      },
       navigate: {
 
         /**
@@ -44,7 +60,8 @@ define(["exports"], function (exports) {
         */
 
         value: function navigate(appRouter) {
-          (this.router || appRouter).navigate(this.url, { trigger: true, replace: true });
+          var navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
+          navigatingRouter.navigate(this.url, this.options);
         },
         writable: true,
         configurable: true
