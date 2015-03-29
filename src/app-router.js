@@ -59,6 +59,10 @@ export class AppRouter extends Router {
     pipeline.run(context).then(result => {
       this.isNavigating = false;
 
+      if (!(result && 'completed' in result && 'output' in result)) {
+        throw new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
+      }
+
       if (result.completed) {
         this.history.previousFragment = instruction.fragment;
       }
