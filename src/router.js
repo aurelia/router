@@ -162,7 +162,7 @@ export class Router {
   }
 
   generate(name, params) {
-    if(!this.isConfigured && this.parent){
+    if((!this.isConfigured || !this.recognizer.hasRoute(name)) && this.parent){
       return this.parent.generate(name, params);
     }
 
