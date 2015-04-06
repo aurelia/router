@@ -38,6 +38,17 @@ describe('the router', () => {
       expect(router.generate('test', { id: 1 })).toBe('/test/1');
     });
 
+    it('should generate absolute paths', () => {
+      router.configure(config => {
+        config.map({ name: 'test', route: 'test', moduleId: './test' });
+      });
+
+      router.baseUrl = 'root';
+      router.history.root = '/';
+
+      expect(router.generate('test', null, { absolute: true })).toBe('/root/test');
+    })
+
     it('should delegate to parent when not configured', () => {
       const child = router.createChild(new Container()); 
 

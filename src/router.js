@@ -161,12 +161,19 @@ export class Router {
     return new NavigationContext(this, instruction);
   }
 
-  generate(name, params) {
+  generate(name, params, options) {
+    options = options || {};
     if((!this.isConfigured || !this.recognizer.hasRoute(name)) && this.parent){
-      return this.parent.generate(name, params);
+      return this.parent.generate(name, params, options);
     }
 
-    return this.recognizer.generate(name, params);
+    let root = '';
+    let path = this.recognizer.generate(name, params);
+    if (options.absolute) {
+      root = (this.history.root || '') + this.baseUrl;
+    }
+
+    return root + path;
   }
 
   addRoute(config, navModel={}) {
