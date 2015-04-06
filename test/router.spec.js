@@ -13,6 +13,22 @@ describe('the router', () => {
   });
 
   describe('addRoute', () => {
+    it('should register named routes', () => {
+      const child = router.createChild(new Container()); 
+
+      router.addRoute({ name: 'parent', route: 'parent', moduleId: 'parent' });
+      child.addRoute({ name: 'child', route: 'child', moduleId: 'child' });
+
+      expect(child.hasRoute('child')).toBe(true);
+      expect(child.hasRoute('parent')).toBe(true);
+      expect(child.hasOwnRoute('child')).toBe(true);
+      expect(child.hasOwnRoute('parent')).toBe(false);
+
+      expect(router.hasRoute('child')).toBe(false);
+      expect(router.hasRoute('parent')).toBe(true);
+      expect(router.hasOwnRoute('child')).toBe(false);
+      expect(router.hasOwnRoute('parent')).toBe(true);
+    });
 
     it('should add a route to navigation if it has a nav=true', () => {
       var testRoute = {};

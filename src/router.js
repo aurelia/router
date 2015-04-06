@@ -230,6 +230,14 @@ export class Router {
     }
   }
 
+  hasRoute(name) {
+    return !!(this.recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
+  }
+
+  hasOwnRoute(name) {
+    return this.recognizer.hasRoute(name);
+  }
+
   handleUnknownRoutes(config) {
     var callback = instruction => new Promise((resolve, reject) => {
       function done(inst){
