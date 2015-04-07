@@ -43,6 +43,11 @@ describe('the router', () => {
       router.addRoute({ route: 'test', moduleId: 'test', title: 'Resume', nav: false }, testRoute);
       expect(router.navigation).not.toContain(testRoute);
     });
+
+    it('should reject dynamic routes specifying nav=true with no href', () => {
+      expect(() => router.addRoute({ route: 'test/:id', href: 'test', moduleId: 'test', nav: true })).not.toThrow();
+      expect(() => router.addRoute({ route: 'test/:id', moduleId: 'test', nav: true })).toThrow();
+    });
   });
 
   describe('generate', () => {
