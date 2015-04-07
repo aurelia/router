@@ -1,3 +1,4 @@
+import core from 'core-js';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {join} from 'aurelia-path';
 import {NavigationContext} from './navigation-context';
@@ -281,9 +282,9 @@ export class Router {
 }
 
 function validateRouteConfig(config) {
-  let isValid = typeof config == 'object'
+  let isValid = typeof config === 'object'
     && config.moduleId
-    && config.route;
+    && config.route !== null && config.route !== undefined;
 
   if (!isValid) {
     throw new Error('Invalid route config.');

@@ -1,3 +1,4 @@
+import core from 'core-js';
 import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
 import {Router} from './router';
