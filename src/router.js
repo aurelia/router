@@ -177,6 +177,8 @@ export class Router {
   }
 
   addRoute(config, navModel={}) {
+    validateRouteConfig(config);
+
     if (!('viewPorts' in config)) {
       config.viewPorts = {
         'default': {
@@ -275,5 +277,15 @@ export class Router {
     this.isNavigating = false;
     this.navigation = [];
     this.isConfigured = false;
+  }
+}
+
+function validateRouteConfig(config) {
+  let isValid = typeof config == 'object'
+    && config.moduleId
+    && config.route;
+
+  if (!isValid) {
+    throw new Error('Invalid route config.');
   }
 }
