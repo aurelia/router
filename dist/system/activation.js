@@ -1,9 +1,9 @@
-System.register(["./navigation-plan", "./navigation-commands", "./util"], function (_export) {
-  var INVOKE_LIFECYCLE, REPLACE, isNavigationCommand, processPotential, _toConsumableArray, _prototypeProperties, _classCallCheck, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
+System.register(['./navigation-plan', './navigation-commands', './util'], function (_export) {
+  var INVOKE_LIFECYCLE, REPLACE, isNavigationCommand, processPotential, _toConsumableArray, _classCallCheck, _createClass, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
     var infos = findDeactivatable(plan, callbackName),
-        i = infos.length; //query from inside out
+        i = infos.length;
 
     function inspect(val) {
       if (ignoreResult || shouldContinue(val)) {
@@ -79,7 +79,7 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
   function processActivatable(navigationContext, callbackName, next, ignoreResult) {
     var infos = findActivatable(navigationContext, callbackName),
         length = infos.length,
-        i = -1; //query from top down
+        i = -1;
 
     function inspect(val, router) {
       if (ignoreResult || shouldContinue(val, router)) {
@@ -145,18 +145,18 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
     }
 
     if (isNavigationCommand(output)) {
-      if (typeof output.setRouter === "function") {
+      if (typeof output.setRouter === 'function') {
         output.setRouter(router);
       }
 
       return !!output.shouldContinueProcessing;
     }
 
-    if (typeof output === "string") {
-      return affirmations.indexOf(value.toLowerCase()) !== -1;
+    if (typeof output === 'string') {
+      return affirmations.indexOf(output.toLowerCase()) !== -1;
     }
 
-    if (typeof output === "undefined") {
+    if (typeof output === 'undefined') {
       return true;
     }
 
@@ -172,83 +172,85 @@ System.register(["./navigation-plan", "./navigation-commands", "./util"], functi
       processPotential = _util.processPotential;
     }],
     execute: function () {
-      "use strict";
+      'use strict';
 
       _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
-      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-      affirmations = _export("affirmations", ["yes", "ok", "true"]);
-      CanDeactivatePreviousStep = _export("CanDeactivatePreviousStep", (function () {
+      affirmations = ['yes', 'ok', 'true'];
+
+      _export('affirmations', affirmations);
+
+      CanDeactivatePreviousStep = (function () {
         function CanDeactivatePreviousStep() {
           _classCallCheck(this, CanDeactivatePreviousStep);
         }
 
-        _prototypeProperties(CanDeactivatePreviousStep, null, {
-          run: {
-            value: function run(navigationContext, next) {
-              return processDeactivatable(navigationContext.plan, "canDeactivate", next);
-            },
-            writable: true,
-            configurable: true
+        _createClass(CanDeactivatePreviousStep, [{
+          key: 'run',
+          value: function run(navigationContext, next) {
+            return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
           }
-        });
+        }]);
 
         return CanDeactivatePreviousStep;
-      })());
-      CanActivateNextStep = _export("CanActivateNextStep", (function () {
+      })();
+
+      _export('CanDeactivatePreviousStep', CanDeactivatePreviousStep);
+
+      CanActivateNextStep = (function () {
         function CanActivateNextStep() {
           _classCallCheck(this, CanActivateNextStep);
         }
 
-        _prototypeProperties(CanActivateNextStep, null, {
-          run: {
-            value: function run(navigationContext, next) {
-              return processActivatable(navigationContext, "canActivate", next);
-            },
-            writable: true,
-            configurable: true
+        _createClass(CanActivateNextStep, [{
+          key: 'run',
+          value: function run(navigationContext, next) {
+            return processActivatable(navigationContext, 'canActivate', next);
           }
-        });
+        }]);
 
         return CanActivateNextStep;
-      })());
-      DeactivatePreviousStep = _export("DeactivatePreviousStep", (function () {
+      })();
+
+      _export('CanActivateNextStep', CanActivateNextStep);
+
+      DeactivatePreviousStep = (function () {
         function DeactivatePreviousStep() {
           _classCallCheck(this, DeactivatePreviousStep);
         }
 
-        _prototypeProperties(DeactivatePreviousStep, null, {
-          run: {
-            value: function run(navigationContext, next) {
-              return processDeactivatable(navigationContext.plan, "deactivate", next, true);
-            },
-            writable: true,
-            configurable: true
+        _createClass(DeactivatePreviousStep, [{
+          key: 'run',
+          value: function run(navigationContext, next) {
+            return processDeactivatable(navigationContext.plan, 'deactivate', next, true);
           }
-        });
+        }]);
 
         return DeactivatePreviousStep;
-      })());
-      ActivateNextStep = _export("ActivateNextStep", (function () {
+      })();
+
+      _export('DeactivatePreviousStep', DeactivatePreviousStep);
+
+      ActivateNextStep = (function () {
         function ActivateNextStep() {
           _classCallCheck(this, ActivateNextStep);
         }
 
-        _prototypeProperties(ActivateNextStep, null, {
-          run: {
-            value: function run(navigationContext, next) {
-              return processActivatable(navigationContext, "activate", next, true);
-            },
-            writable: true,
-            configurable: true
+        _createClass(ActivateNextStep, [{
+          key: 'run',
+          value: function run(navigationContext, next) {
+            return processActivatable(navigationContext, 'activate', next, true);
           }
-        });
+        }]);
 
         return ActivateNextStep;
-      })());
+      })();
+
+      _export('ActivateNextStep', ActivateNextStep);
     }
   };
 });

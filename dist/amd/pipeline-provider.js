@@ -1,63 +1,42 @@
-define(["exports", "aurelia-dependency-injection", "./pipeline", "./navigation-plan", "./model-binding", "./route-loading", "./navigation-context", "./activation", "./route-filters"], function (exports, _aureliaDependencyInjection, _pipeline, _navigationPlan, _modelBinding, _routeLoading, _navigationContext, _activation, _routeFilters) {
-  "use strict";
+define(['exports', 'aurelia-dependency-injection', './pipeline', './navigation-plan', './route-loading', './navigation-context', './activation', './route-filters'], function (exports, _aureliaDependencyInjection, _pipeline, _navigationPlan, _routeLoading, _navigationContext, _activation, _routeFilters) {
+  'use strict';
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-  var Container = _aureliaDependencyInjection.Container;
-  var Pipeline = _pipeline.Pipeline;
-  var BuildNavigationPlanStep = _navigationPlan.BuildNavigationPlanStep;
-  var ApplyModelBindersStep = _modelBinding.ApplyModelBindersStep;
-  var LoadRouteStep = _routeLoading.LoadRouteStep;
-  var CommitChangesStep = _navigationContext.CommitChangesStep;
-  var CanDeactivatePreviousStep = _activation.CanDeactivatePreviousStep;
-  var CanActivateNextStep = _activation.CanActivateNextStep;
-  var DeactivatePreviousStep = _activation.DeactivatePreviousStep;
-  var ActivateNextStep = _activation.ActivateNextStep;
-  var createRouteFilterStep = _routeFilters.createRouteFilterStep;
+  Object.defineProperty(exports, '__esModule', {
+    value: true
+  });
 
-  var PipelineProvider = exports.PipelineProvider = (function () {
+  var PipelineProvider = (function () {
     function PipelineProvider(container) {
       _classCallCheck(this, PipelineProvider);
 
       this.container = container;
-      this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, //optional
-      LoadRouteStep, createRouteFilterStep("authorize"), createRouteFilterStep("modelbind"), CanActivateNextStep, //optional
-      //NOTE: app state changes start below - point of no return
-      DeactivatePreviousStep, //optional
-      ActivateNextStep, //optional
-      createRouteFilterStep("precommit"), CommitChangesStep];
+      this.steps = [_navigationPlan.BuildNavigationPlanStep, _activation.CanDeactivatePreviousStep, _routeLoading.LoadRouteStep, _routeFilters.createRouteFilterStep('authorize'), _routeFilters.createRouteFilterStep('modelbind'), _activation.CanActivateNextStep, _activation.DeactivatePreviousStep, _activation.ActivateNextStep, _routeFilters.createRouteFilterStep('precommit'), _navigationContext.CommitChangesStep];
     }
 
-    _prototypeProperties(PipelineProvider, {
-      inject: {
-        value: function inject() {
-          return [Container];
-        },
-        writable: true,
-        configurable: true
-      }
-    }, {
-      createPipeline: {
-        value: function createPipeline(navigationContext) {
-          var _this = this;
+    _createClass(PipelineProvider, [{
+      key: 'createPipeline',
+      value: function createPipeline(navigationContext) {
+        var _this = this;
 
-          var pipeline = new Pipeline();
-          this.steps.forEach(function (step) {
-            return pipeline.withStep(_this.container.get(step));
-          });
-          return pipeline;
-        },
-        writable: true,
-        configurable: true
+        var pipeline = new _pipeline.Pipeline();
+        this.steps.forEach(function (step) {
+          return pipeline.withStep(_this.container.get(step));
+        });
+        return pipeline;
       }
-    });
+    }], [{
+      key: 'inject',
+      value: function inject() {
+        return [_aureliaDependencyInjection.Container];
+      }
+    }]);
 
     return PipelineProvider;
   })();
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+  exports.PipelineProvider = PipelineProvider;
 });

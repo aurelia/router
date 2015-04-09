@@ -1,13 +1,13 @@
 System.register([], function (_export) {
-  _export("processPotential", processPotential);
+  _export('processPotential', processPotential);
 
   function processPotential(obj, resolve, reject) {
-    if (obj && typeof obj.then === "function") {
+    if (obj && typeof obj.then === 'function') {
       var dfd = obj.then(resolve);
 
-      if (typeof dfd["catch"] === "function") {
-        return dfd["catch"](reject);
-      } else if (typeof dfd.fail === "function") {
+      if (typeof dfd['catch'] === 'function') {
+        return dfd['catch'](reject);
+      } else if (typeof dfd.fail === 'function') {
         return dfd.fail(reject);
       }
 
@@ -24,7 +24,7 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      "use strict";
+      'use strict';
     }
   };
 });

@@ -1,7 +1,6 @@
 import {Container} from 'aurelia-dependency-injection';
 import {Pipeline} from './pipeline';
 import {BuildNavigationPlanStep} from './navigation-plan';
-import {ApplyModelBindersStep} from './model-binding';
 import {LoadRouteStep} from './route-loading';
 import {CommitChangesStep} from './navigation-context';
 import {

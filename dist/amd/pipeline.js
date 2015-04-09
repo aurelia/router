@@ -1,9 +1,17 @@
-define(["exports"], function (exports) {
-  "use strict";
+define(['exports', 'core-js'], function (exports, _coreJs) {
+  'use strict';
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+  Object.defineProperty(exports, '__esModule', {
+    value: true
+  });
+
+  var _core = _interopRequire(_coreJs);
 
   function createResult(ctx, next) {
     return {
@@ -14,97 +22,95 @@ define(["exports"], function (exports) {
     };
   }
 
-  var COMPLETED = exports.COMPLETED = "completed";
-  var CANCELLED = exports.CANCELLED = "cancelled";
-  var REJECTED = exports.REJECTED = "rejected";
-  var RUNNING = exports.RUNNING = "running";
+  var COMPLETED = 'completed';
+  exports.COMPLETED = COMPLETED;
+  var CANCELLED = 'cancelled';
+  exports.CANCELLED = CANCELLED;
+  var REJECTED = 'rejected';
+  exports.REJECTED = REJECTED;
+  var RUNNING = 'running';
 
-  var Pipeline = exports.Pipeline = (function () {
+  exports.RUNNING = RUNNING;
+
+  var Pipeline = (function () {
     function Pipeline() {
       _classCallCheck(this, Pipeline);
 
       this.steps = [];
     }
 
-    _prototypeProperties(Pipeline, null, {
-      withStep: {
-        value: function withStep(step) {
-          var run, steps, i, l;
+    _createClass(Pipeline, [{
+      key: 'withStep',
+      value: function withStep(step) {
+        var run, steps, i, l;
 
-          if (typeof step == "function") {
-            run = step;
-          } else if (step.isMultiStep) {
-            steps = step.getSteps();
-            for (i = 0, l = steps.length; i < l; i++) {
-              this.withStep(steps[i]);
-            }
-
-            return this;
-          } else {
-            run = step.run.bind(step);
+        if (typeof step == 'function') {
+          run = step;
+        } else if (step.isMultiStep) {
+          steps = step.getSteps();
+          for (i = 0, l = steps.length; i < l; i++) {
+            this.withStep(steps[i]);
           }
 
-          this.steps.push(run);
-
           return this;
-        },
-        writable: true,
-        configurable: true
-      },
-      run: {
-        value: function run(ctx) {
-          var index = -1,
-              steps = this.steps,
-              next,
-              currentStep;
+        } else {
+          run = step.run.bind(step);
+        }
 
-          next = function () {
-            index++;
+        this.steps.push(run);
 
-            if (index < steps.length) {
-              currentStep = steps[index];
-
-              try {
-                return currentStep(ctx, next);
-              } catch (e) {
-                return next.reject(e);
-              }
-            } else {
-              return next.complete();
-            }
-          };
-
-          next.complete = function (output) {
-            next.status = COMPLETED;
-            next.output = output;
-            return Promise.resolve(createResult(ctx, next));
-          };
-
-          next.cancel = function (reason) {
-            next.status = CANCELLED;
-            next.output = reason;
-            return Promise.resolve(createResult(ctx, next));
-          };
-
-          next.reject = function (error) {
-            next.status = REJECTED;
-            next.output = error;
-            return Promise.reject(createResult(ctx, next));
-          };
-
-          next.status = RUNNING;
-
-          return next();
-        },
-        writable: true,
-        configurable: true
+        return this;
       }
-    });
+    }, {
+      key: 'run',
+      value: function run(ctx) {
+        var index = -1,
+            steps = this.steps,
+            next,
+            currentStep;
+
+        next = function () {
+          index++;
+
+          if (index < steps.length) {
+            currentStep = steps[index];
+
+            try {
+              return currentStep(ctx, next);
+            } catch (e) {
+              return next.reject(e);
+            }
+          } else {
+            return next.complete();
+          }
+        };
+
+        next.complete = function (output) {
+          next.status = COMPLETED;
+          next.output = output;
+          return Promise.resolve(createResult(ctx, next));
+        };
+
+        next.cancel = function (reason) {
+          next.status = CANCELLED;
+          next.output = reason;
+          return Promise.resolve(createResult(ctx, next));
+        };
+
+        next.reject = function (error) {
+          next.status = REJECTED;
+          next.output = error;
+          return Promise.reject(createResult(ctx, next));
+        };
+
+        next.status = RUNNING;
+
+        return next();
+      }
+    }]);
 
     return Pipeline;
   })();
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+  exports.Pipeline = Pipeline;
 });

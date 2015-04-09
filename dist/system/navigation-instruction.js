@@ -1,16 +1,16 @@
 System.register([], function (_export) {
-  var _prototypeProperties, _classCallCheck, NavigationInstruction;
+  var _classCallCheck, _createClass, NavigationInstruction;
 
   return {
     setters: [],
     execute: function () {
       "use strict";
 
-      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
-
       _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-      NavigationInstruction = _export("NavigationInstruction", (function () {
+      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+      NavigationInstruction = (function () {
         function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
           _classCallCheck(this, NavigationInstruction);
 
@@ -27,65 +27,58 @@ System.register([], function (_export) {
           }
         }
 
-        _prototypeProperties(NavigationInstruction, null, {
-          addViewPortInstruction: {
-            value: function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
-              return this.viewPortInstructions[viewPortName] = {
-                name: viewPortName,
-                strategy: strategy,
-                moduleId: moduleId,
-                component: component,
-                childRouter: component.executionContext.router,
-                lifecycleArgs: this.lifecycleArgs.slice()
-              };
-            },
-            writable: true,
-            configurable: true
-          },
-          getWildCardName: {
-            value: function getWildCardName() {
-              var wildcardIndex = this.config.route.lastIndexOf("*");
-              return this.config.route.substr(wildcardIndex + 1);
-            },
-            writable: true,
-            configurable: true
-          },
-          getWildcardPath: {
-            value: function getWildcardPath() {
-              var wildcardName = this.getWildCardName(),
-                  path = this.params[wildcardName];
-
-              if (this.queryString) {
-                path += "?" + this.queryString;
-              }
-
-              return path;
-            },
-            writable: true,
-            configurable: true
-          },
-          getBaseUrl: {
-            value: function getBaseUrl() {
-              if (!this.params) {
-                return this.fragment;
-              }
-
-              var wildcardName = this.getWildCardName(),
-                  path = this.params[wildcardName];
-
-              if (!path) {
-                return this.fragment;
-              }
-
-              return this.fragment.substr(0, this.fragment.lastIndexOf(path));
-            },
-            writable: true,
-            configurable: true
+        _createClass(NavigationInstruction, [{
+          key: "addViewPortInstruction",
+          value: function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
+            return this.viewPortInstructions[viewPortName] = {
+              name: viewPortName,
+              strategy: strategy,
+              moduleId: moduleId,
+              component: component,
+              childRouter: component.executionContext.router,
+              lifecycleArgs: this.lifecycleArgs.slice()
+            };
           }
-        });
+        }, {
+          key: "getWildCardName",
+          value: function getWildCardName() {
+            var wildcardIndex = this.config.route.lastIndexOf("*");
+            return this.config.route.substr(wildcardIndex + 1);
+          }
+        }, {
+          key: "getWildcardPath",
+          value: function getWildcardPath() {
+            var wildcardName = this.getWildCardName(),
+                path = this.params[wildcardName];
+
+            if (this.queryString) {
+              path += "?" + this.queryString;
+            }
+
+            return path;
+          }
+        }, {
+          key: "getBaseUrl",
+          value: function getBaseUrl() {
+            if (!this.params) {
+              return this.fragment;
+            }
+
+            var wildcardName = this.getWildCardName(),
+                path = this.params[wildcardName];
+
+            if (!path) {
+              return this.fragment;
+            }
+
+            return this.fragment.substr(0, this.fragment.lastIndexOf(path));
+          }
+        }]);
 
         return NavigationInstruction;
-      })());
+      })();
+
+      _export("NavigationInstruction", NavigationInstruction);
     }
   };
 });

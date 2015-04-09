@@ -1,6 +1,6 @@
 {
   "name": "aurelia-router",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "A powerful client-side router.",
   "keywords": [
     "aurelia",
@@ -16,11 +16,11 @@
     "url": "http://github.com/aurelia/router"
   },
   "dependencies": {
-    "aurelia-dependency-injection": "^0.5.0",
-    "aurelia-event-aggregator": "^0.2.4",
-    "aurelia-history": "^0.2.4",
-    "aurelia-path": "^0.4.6",
-    "aurelia-route-recognizer": "^0.2.4",
+    "aurelia-dependency-injection": "^0.6.0",
+    "aurelia-event-aggregator": "^0.3.0",
+    "aurelia-history": "^0.3.0",
+    "aurelia-path": "github:aurelia/path@^0.5.0",
+    "aurelia-route-recognizer": "^0.3.0",
     "core-js": "zloirock/core-js"
   }
 }

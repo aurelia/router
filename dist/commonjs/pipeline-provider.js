@@ -1,70 +1,54 @@
-"use strict";
+'use strict';
 
-var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var Container = require("aurelia-dependency-injection").Container;
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-var Pipeline = require("./pipeline").Pipeline;
+var _Container = require('aurelia-dependency-injection');
 
-var BuildNavigationPlanStep = require("./navigation-plan").BuildNavigationPlanStep;
+var _Pipeline = require('./pipeline');
 
-var ApplyModelBindersStep = require("./model-binding").ApplyModelBindersStep;
+var _BuildNavigationPlanStep = require('./navigation-plan');
 
-var LoadRouteStep = require("./route-loading").LoadRouteStep;
+var _LoadRouteStep = require('./route-loading');
 
-var CommitChangesStep = require("./navigation-context").CommitChangesStep;
+var _CommitChangesStep = require('./navigation-context');
 
-var _activation = require("./activation");
+var _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep = require('./activation');
 
-var CanDeactivatePreviousStep = _activation.CanDeactivatePreviousStep;
-var CanActivateNextStep = _activation.CanActivateNextStep;
-var DeactivatePreviousStep = _activation.DeactivatePreviousStep;
-var ActivateNextStep = _activation.ActivateNextStep;
+var _createRouteFilterStep = require('./route-filters');
 
-var createRouteFilterStep = require("./route-filters").createRouteFilterStep;
-
-var PipelineProvider = exports.PipelineProvider = (function () {
+var PipelineProvider = (function () {
   function PipelineProvider(container) {
     _classCallCheck(this, PipelineProvider);
 
     this.container = container;
-    this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, //optional
-    LoadRouteStep, createRouteFilterStep("authorize"), createRouteFilterStep("modelbind"), CanActivateNextStep, //optional
-    //NOTE: app state changes start below - point of no return
-    DeactivatePreviousStep, //optional
-    ActivateNextStep, //optional
-    createRouteFilterStep("precommit"), CommitChangesStep];
+    this.steps = [_BuildNavigationPlanStep.BuildNavigationPlanStep, _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep.CanDeactivatePreviousStep, _LoadRouteStep.LoadRouteStep, _createRouteFilterStep.createRouteFilterStep('authorize'), _createRouteFilterStep.createRouteFilterStep('modelbind'), _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep.CanActivateNextStep, _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep.DeactivatePreviousStep, _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep.ActivateNextStep, _createRouteFilterStep.createRouteFilterStep('precommit'), _CommitChangesStep.CommitChangesStep];
   }
 
-  _prototypeProperties(PipelineProvider, {
-    inject: {
-      value: function inject() {
-        return [Container];
-      },
-      writable: true,
-      configurable: true
-    }
-  }, {
-    createPipeline: {
-      value: function createPipeline(navigationContext) {
-        var _this = this;
+  _createClass(PipelineProvider, [{
+    key: 'createPipeline',
+    value: function createPipeline(navigationContext) {
+      var _this = this;
 
-        var pipeline = new Pipeline();
-        this.steps.forEach(function (step) {
-          return pipeline.withStep(_this.container.get(step));
-        });
-        return pipeline;
-      },
-      writable: true,
-      configurable: true
+      var pipeline = new _Pipeline.Pipeline();
+      this.steps.forEach(function (step) {
+        return pipeline.withStep(_this.container.get(step));
+      });
+      return pipeline;
     }
-  });
+  }], [{
+    key: 'inject',
+    value: function inject() {
+      return [_Container.Container];
+    }
+  }]);
 
   return PipelineProvider;
 })();
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+exports.PipelineProvider = PipelineProvider;

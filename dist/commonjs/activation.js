@@ -1,97 +1,96 @@
-"use strict";
+'use strict';
 
 var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
-var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _navigationPlan = require("./navigation-plan");
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-var INVOKE_LIFECYCLE = _navigationPlan.INVOKE_LIFECYCLE;
-var REPLACE = _navigationPlan.REPLACE;
+var _INVOKE_LIFECYCLE$REPLACE = require('./navigation-plan');
 
-var isNavigationCommand = require("./navigation-commands").isNavigationCommand;
+var _isNavigationCommand = require('./navigation-commands');
 
-var processPotential = require("./util").processPotential;
+var _processPotential = require('./util');
 
-var affirmations = exports.affirmations = ["yes", "ok", "true"];
+var affirmations = ['yes', 'ok', 'true'];
 
-var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = (function () {
+exports.affirmations = affirmations;
+
+var CanDeactivatePreviousStep = (function () {
   function CanDeactivatePreviousStep() {
     _classCallCheck(this, CanDeactivatePreviousStep);
   }
 
-  _prototypeProperties(CanDeactivatePreviousStep, null, {
-    run: {
-      value: function run(navigationContext, next) {
-        return processDeactivatable(navigationContext.plan, "canDeactivate", next);
-      },
-      writable: true,
-      configurable: true
+  _createClass(CanDeactivatePreviousStep, [{
+    key: 'run',
+    value: function run(navigationContext, next) {
+      return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
     }
-  });
+  }]);
 
   return CanDeactivatePreviousStep;
 })();
 
-var CanActivateNextStep = exports.CanActivateNextStep = (function () {
+exports.CanDeactivatePreviousStep = CanDeactivatePreviousStep;
+
+var CanActivateNextStep = (function () {
   function CanActivateNextStep() {
     _classCallCheck(this, CanActivateNextStep);
   }
 
-  _prototypeProperties(CanActivateNextStep, null, {
-    run: {
-      value: function run(navigationContext, next) {
-        return processActivatable(navigationContext, "canActivate", next);
-      },
-      writable: true,
-      configurable: true
+  _createClass(CanActivateNextStep, [{
+    key: 'run',
+    value: function run(navigationContext, next) {
+      return processActivatable(navigationContext, 'canActivate', next);
     }
-  });
+  }]);
 
   return CanActivateNextStep;
 })();
 
-var DeactivatePreviousStep = exports.DeactivatePreviousStep = (function () {
+exports.CanActivateNextStep = CanActivateNextStep;
+
+var DeactivatePreviousStep = (function () {
   function DeactivatePreviousStep() {
     _classCallCheck(this, DeactivatePreviousStep);
   }
 
-  _prototypeProperties(DeactivatePreviousStep, null, {
-    run: {
-      value: function run(navigationContext, next) {
-        return processDeactivatable(navigationContext.plan, "deactivate", next, true);
-      },
-      writable: true,
-      configurable: true
+  _createClass(DeactivatePreviousStep, [{
+    key: 'run',
+    value: function run(navigationContext, next) {
+      return processDeactivatable(navigationContext.plan, 'deactivate', next, true);
     }
-  });
+  }]);
 
   return DeactivatePreviousStep;
 })();
 
-var ActivateNextStep = exports.ActivateNextStep = (function () {
+exports.DeactivatePreviousStep = DeactivatePreviousStep;
+
+var ActivateNextStep = (function () {
   function ActivateNextStep() {
     _classCallCheck(this, ActivateNextStep);
   }
 
-  _prototypeProperties(ActivateNextStep, null, {
-    run: {
-      value: function run(navigationContext, next) {
-        return processActivatable(navigationContext, "activate", next, true);
-      },
-      writable: true,
-      configurable: true
+  _createClass(ActivateNextStep, [{
+    key: 'run',
+    value: function run(navigationContext, next) {
+      return processActivatable(navigationContext, 'activate', next, true);
     }
-  });
+  }]);
 
   return ActivateNextStep;
 })();
 
+exports.ActivateNextStep = ActivateNextStep;
+
 function processDeactivatable(plan, callbackName, next, ignoreResult) {
   var infos = findDeactivatable(plan, callbackName),
-      i = infos.length; //query from inside out
+      i = infos.length;
 
   function inspect(val) {
     if (ignoreResult || shouldContinue(val)) {
@@ -106,7 +105,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
       try {
         var controller = infos[i];
         var result = controller[callbackName]();
-        return processPotential(result, inspect, next.cancel);
+        return _processPotential.processPotential(result, inspect, next.cancel);
       } catch (error) {
         return next.cancel(error);
       }
@@ -125,7 +124,7 @@ function findDeactivatable(plan, callbackName, list) {
     var viewPortPlan = plan[viewPortName];
     var prevComponent = viewPortPlan.prevComponent;
 
-    if ((viewPortPlan.strategy == INVOKE_LIFECYCLE || viewPortPlan.strategy == REPLACE) && prevComponent) {
+    if ((viewPortPlan.strategy == _INVOKE_LIFECYCLE$REPLACE.INVOKE_LIFECYCLE || viewPortPlan.strategy == _INVOKE_LIFECYCLE$REPLACE.REPLACE) && prevComponent) {
 
       var controller = prevComponent.executionContext;
 
@@ -167,7 +166,7 @@ function addPreviousDeactivatable(component, callbackName, list) {
 function processActivatable(navigationContext, callbackName, next, ignoreResult) {
   var infos = findActivatable(navigationContext, callbackName),
       length = infos.length,
-      i = -1; //query from top down
+      i = -1;
 
   function inspect(val, router) {
     if (ignoreResult || shouldContinue(val, router)) {
@@ -186,7 +185,7 @@ function processActivatable(navigationContext, callbackName, next, ignoreResult)
 
         var current = infos[i];
         var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toConsumableArray(current.lifecycleArgs));
-        return processPotential(result, function (val) {
+        return _processPotential.processPotential(result, function (val) {
           return inspect(val, current.router);
         }, next.cancel);
       } catch (error) {
@@ -211,7 +210,7 @@ function findActivatable(navigationContext, callbackName, list, router) {
     var viewPortInstruction = next.viewPortInstructions[viewPortName];
     var controller = viewPortInstruction.component.executionContext;
 
-    if ((viewPortPlan.strategy === INVOKE_LIFECYCLE || viewPortPlan.strategy === REPLACE) && callbackName in controller) {
+    if ((viewPortPlan.strategy === _INVOKE_LIFECYCLE$REPLACE.INVOKE_LIFECYCLE || viewPortPlan.strategy === _INVOKE_LIFECYCLE$REPLACE.REPLACE) && callbackName in controller) {
       list.push({
         controller: controller,
         lifecycleArgs: viewPortInstruction.lifecycleArgs,
@@ -232,24 +231,21 @@ function shouldContinue(output, router) {
     return false;
   }
 
-  if (isNavigationCommand(output)) {
-    if (typeof output.setRouter === "function") {
+  if (_isNavigationCommand.isNavigationCommand(output)) {
+    if (typeof output.setRouter === 'function') {
       output.setRouter(router);
     }
 
     return !!output.shouldContinueProcessing;
   }
 
-  if (typeof output === "string") {
-    return affirmations.indexOf(value.toLowerCase()) !== -1;
+  if (typeof output === 'string') {
+    return affirmations.indexOf(output.toLowerCase()) !== -1;
   }
 
-  if (typeof output === "undefined") {
+  if (typeof output === 'undefined') {
     return true;
   }
 
   return output;
 }
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});

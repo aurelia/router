@@ -1,3 +1,24 @@
+## 0.7.0 (2015-04-09)
+
+
+#### Bug Fixes
+
+* **all:** update compiler, core-js and pipeline ([f86d6dbc](http://github.com/aurelia/router/commit/f86d6dbcad8d2293f3e2c49bed0246a4963a0cf4))
+* **app-router:** throw a more helpful error when a pipeline step fails to return a result ([0f1eda20](http://github.com/aurelia/router/commit/0f1eda20d7e0df7d4472af8946b21a2d75ff3857))
+* **router:**
+  * add basic route config validation ([87741b2c](http://github.com/aurelia/router/commit/87741b2cb164ad407a23aa98db1519224b27e005))
+  * require dynamic routes to specify href when adding to navigation ([c95be190](http://github.com/aurelia/router/commit/c95be19015f9949435a770872ddc434582bff90d), closes [#59](http://github.com/aurelia/router/issues/59))
+* **shouldContinue:** typo change value to output ([1f023a16](http://github.com/aurelia/router/commit/1f023a1614b85782f1840c57005c3fd85e29dfc6))
+
+
+#### Features
+
+* **router:**
+  * add methods for checking if a router has a named route ([aa465649](http://github.com/aurelia/router/commit/aa465649b62776eb5d197049991033a6b344785a))
+  * support generating absolute paths ([aa78cc3d](http://github.com/aurelia/router/commit/aa78cc3dbfdb257854366699f3c617aca0e340aa))
+  * delegate to parent when asked to generate an unknown route ([9dd556ff](http://github.com/aurelia/router/commit/9dd556ffa2f263897e33216a67f0e7c0fec92559))
+
+
 ## 0.6.0 (2015-03-25)
 
 

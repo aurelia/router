@@ -1,3 +1,5 @@
+import core from 'core-js';
+
 function createResult(ctx, next) {
   return {
     status: next.status,

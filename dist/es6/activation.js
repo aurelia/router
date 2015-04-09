@@ -183,7 +183,7 @@ function shouldContinue(output, router) {
   }
 
   if(typeof output === 'string') {
-    return affirmations.indexOf(value.toLowerCase()) !== -1;
+    return affirmations.indexOf(output.toLowerCase()) !== -1;
   }
 
   if(typeof output === 'undefined') {

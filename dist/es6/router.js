@@ -1,3 +1,4 @@
+import core from 'core-js';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {join} from 'aurelia-path';
 import {NavigationContext} from './navigation-context';
@@ -161,15 +162,24 @@ export class Router {
     return new NavigationContext(this, instruction);
   }
 
-  generate(name, params) {
-    if(!this.isConfigured && this.parent){
-      return this.parent.generate(name, params);
+  generate(name, params, options) {
+    options = options || {};
+    if((!this.isConfigured || !this.recognizer.hasRoute(name)) && this.parent){
+      return this.parent.generate(name, params, options);
     }
 
-    return this.recognizer.generate(name, params);
+    let root = '';
+    let path = this.recognizer.generate(name, params);
+    if (options.absolute) {
+      root = (this.history.root || '') + this.baseUrl;
+    }
+
+    return root + path;
   }
 
   addRoute(config, navModel={}) {
+    validateRouteConfig(config);
+
     if (!('viewPorts' in config)) {
       config.viewPorts = {
         'default': {
@@ -183,7 +193,7 @@ export class Router {
     navModel.settings = config.settings || (config.settings = {});
 
     this.routes.push(config);
-    this.recognizer.add([{path:config.route, handler: config}]);
+    var state = this.recognizer.add({path:config.route, handler: config});
 
     if (config.route) {
       var withChild, settings = config.settings;
@@ -192,10 +202,10 @@ export class Router {
       config.settings = settings;
       withChild.route += "/*childRoute";
       withChild.hasChildRouter = true;
-      this.childRecognizer.add([{
+      this.childRecognizer.add({
         path: withChild.route,
         handler: withChild
-      }]);
+      });
 
       withChild.navModel = navModel;
       withChild.settings = config.settings;
@@ -210,6 +220,10 @@ export class Router {
       navModel.config = config;
 
       if (!config.href) {
+        if (state.types.dynamics || state.types.stars) {
+          throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
+        }
+
         navModel.relativeHref = config.route;
         navModel.href = '';
       }
@@ -221,6 +235,14 @@ export class Router {
       this.navigation.push(navModel);
       this.navigation = this.navigation.sort((a, b) => a.order - b.order);
     }
+  }
+
+  hasRoute(name) {
+    return !!(this.recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
+  }
+
+  hasOwnRoute(name) {
+    return this.recognizer.hasRoute(name);
   }
 
   handleUnknownRoutes(config) {
@@ -256,5 +278,15 @@ export class Router {
     this.isNavigating = false;
     this.navigation = [];
     this.isConfigured = false;
+  }
+}
+
+function validateRouteConfig(config) {
+  let isValid = typeof config === 'object'
+    && config.moduleId
+    && config.route !== null && config.route !== undefined;
+
+  if (!isValid) {
+    throw new Error('Invalid route config.');
   }
 }

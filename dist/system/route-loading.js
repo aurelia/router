@@ -1,7 +1,7 @@
-System.register(["./navigation-plan"], function (_export) {
-  var REPLACE, buildNavigationPlan, _toConsumableArray, _prototypeProperties, _classCallCheck, RouteLoader, LoadRouteStep;
+System.register(['./navigation-plan'], function (_export) {
+  var REPLACE, buildNavigationPlan, _toConsumableArray, _classCallCheck, _createClass, RouteLoader, LoadRouteStep;
 
-  _export("loadNewRoute", loadNewRoute);
+  _export('loadNewRoute', loadNewRoute);
 
   function loadNewRoute(routers, routeLoader, navigationContext) {
     var toLoad = determineWhatToLoad(navigationContext);
@@ -75,7 +75,7 @@ System.register(["./navigation-plan"], function (_export) {
     var router = navigationContext.router,
         lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
     return routeLoader.loadRoute(router, config).then(function (component) {
-      if ("configureRouter" in component.executionContext) {
+      if ('configureRouter' in component.executionContext) {
         var _component$executionContext;
 
         var result = (_component$executionContext = component.executionContext).configureRouter.apply(_component$executionContext, _toConsumableArray(lifecycleArgs)) || Promise.resolve();
@@ -95,58 +95,54 @@ System.register(["./navigation-plan"], function (_export) {
       buildNavigationPlan = _navigationPlan.buildNavigationPlan;
     }],
     execute: function () {
-      "use strict";
+      'use strict';
 
       _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
-      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-      RouteLoader = _export("RouteLoader", (function () {
+      RouteLoader = (function () {
         function RouteLoader() {
           _classCallCheck(this, RouteLoader);
         }
 
-        _prototypeProperties(RouteLoader, null, {
-          loadRoute: {
-            value: function loadRoute(router, config) {
-              throw Error("Route loaders must implment \"loadRoute(router, config)\".");
-            },
-            writable: true,
-            configurable: true
+        _createClass(RouteLoader, [{
+          key: 'loadRoute',
+          value: function loadRoute(router, config) {
+            throw Error('Route loaders must implment "loadRoute(router, config)".');
           }
-        });
+        }]);
 
         return RouteLoader;
-      })());
-      LoadRouteStep = _export("LoadRouteStep", (function () {
+      })();
+
+      _export('RouteLoader', RouteLoader);
+
+      LoadRouteStep = (function () {
         function LoadRouteStep(routeLoader) {
           _classCallCheck(this, LoadRouteStep);
 
           this.routeLoader = routeLoader;
         }
 
-        _prototypeProperties(LoadRouteStep, {
-          inject: {
-            value: function inject() {
-              return [RouteLoader];
-            },
-            writable: true,
-            configurable: true
+        _createClass(LoadRouteStep, [{
+          key: 'run',
+          value: function run(navigationContext, next) {
+            return loadNewRoute([], this.routeLoader, navigationContext).then(next)['catch'](next.cancel);
           }
-        }, {
-          run: {
-            value: function run(navigationContext, next) {
-              return loadNewRoute([], this.routeLoader, navigationContext).then(next)["catch"](next.cancel);
-            },
-            writable: true,
-            configurable: true
+        }], [{
+          key: 'inject',
+          value: function inject() {
+            return [RouteLoader];
           }
-        });
+        }]);
 
         return LoadRouteStep;
-      })());
+      })();
+
+      _export('LoadRouteStep', LoadRouteStep);
     }
   };
 });

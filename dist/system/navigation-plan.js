@@ -1,7 +1,7 @@
-System.register(["./navigation-commands"], function (_export) {
-  var Redirect, _toConsumableArray, _prototypeProperties, _classCallCheck, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
+System.register(['./navigation-commands'], function (_export) {
+  var Redirect, _toConsumableArray, _classCallCheck, _createClass, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
 
-  _export("buildNavigationPlan", buildNavigationPlan);
+  _export('buildNavigationPlan', buildNavigationPlan);
 
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
     var prev = navigationContext.prevInstruction;
@@ -25,10 +25,9 @@ System.register(["./navigation-commands"], function (_export) {
 
         if (prevViewPortInstruction.moduleId != nextViewPortConfig.moduleId) {
           viewPortPlan.strategy = REPLACE;
-        } else if ("determineActivationStrategy" in prevViewPortInstruction.component.executionContext) {
+        } else if ('determineActivationStrategy' in prevViewPortInstruction.component.executionContext) {
           var _prevViewPortInstruction$component$executionContext;
 
-          //TODO: should we tell them if the parent had a lifecycle min change?
           viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, _toConsumableArray(next.lifecycleArgs));
         } else if (newParams || forceLifecycleMinimum) {
           viewPortPlan.strategy = INVOKE_LIFECYCLE;
@@ -88,41 +87,49 @@ System.register(["./navigation-commands"], function (_export) {
       Redirect = _navigationCommands.Redirect;
     }],
     execute: function () {
-      "use strict";
+      'use strict';
 
       _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
-      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-      NO_CHANGE = _export("NO_CHANGE", "no-change");
-      INVOKE_LIFECYCLE = _export("INVOKE_LIFECYCLE", "invoke-lifecycle");
-      REPLACE = _export("REPLACE", "replace");
-      BuildNavigationPlanStep = _export("BuildNavigationPlanStep", (function () {
+      NO_CHANGE = 'no-change';
+
+      _export('NO_CHANGE', NO_CHANGE);
+
+      INVOKE_LIFECYCLE = 'invoke-lifecycle';
+
+      _export('INVOKE_LIFECYCLE', INVOKE_LIFECYCLE);
+
+      REPLACE = 'replace';
+
+      _export('REPLACE', REPLACE);
+
+      BuildNavigationPlanStep = (function () {
         function BuildNavigationPlanStep() {
           _classCallCheck(this, BuildNavigationPlanStep);
         }
 
-        _prototypeProperties(BuildNavigationPlanStep, null, {
-          run: {
-            value: function run(navigationContext, next) {
-              if (navigationContext.nextInstruction.config.redirect) {
-                return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
-              }
+        _createClass(BuildNavigationPlanStep, [{
+          key: 'run',
+          value: function run(navigationContext, next) {
+            if (navigationContext.nextInstruction.config.redirect) {
+              return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
+            }
 
-              return buildNavigationPlan(navigationContext).then(function (plan) {
-                navigationContext.plan = plan;
-                return next();
-              })["catch"](next.cancel);
-            },
-            writable: true,
-            configurable: true
+            return buildNavigationPlan(navigationContext).then(function (plan) {
+              navigationContext.plan = plan;
+              return next();
+            })['catch'](next.cancel);
           }
-        });
+        }]);
 
         return BuildNavigationPlanStep;
-      })());
+      })();
+
+      _export('BuildNavigationPlanStep', BuildNavigationPlanStep);
     }
   };
 });
