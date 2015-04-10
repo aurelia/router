@@ -1,3 +1,11 @@
+### 0.7.1 (2015-04-09)
+
+
+#### Bug Fixes
+
+* **bower:** bad version number ([42c065a3](http://github.com/aurelia/router/commit/42c065a34b1e1c3b39546a5a9d7d32cfd6f3df2d))
+
+
 ## 0.7.0 (2015-04-09)
 
 
