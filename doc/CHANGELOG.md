@@ -1,3 +1,11 @@
+### 0.7.2 (2015-04-11)
+
+
+#### Bug Fixes
+
+* **router:** regression in redirect due to incorrect route config validation ([f12af2e3](http://github.com/aurelia/router/commit/f12af2e357d4a8d63a2394061e6f547cb5c2beae))
+
+
 ### 0.7.1 (2015-04-09)
 
 

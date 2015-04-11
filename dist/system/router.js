@@ -2,10 +2,10 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
   var core, RouteRecognizer, join, NavigationContext, NavigationInstruction, RouterConfiguration, processPotential, _classCallCheck, _createClass, Router;
 
   function validateRouteConfig(config) {
-    var isValid = typeof config === 'object' && config.moduleId && config.route !== null && config.route !== undefined;
+    var isValid = typeof config === 'object' && (config.moduleId || config.redirect) && config.route !== null && config.route !== undefined;
 
     if (!isValid) {
-      throw new Error('Invalid route config.');
+      throw new Error('Invalid Route Config: You must have at least a route and a moduleId or redirect.');
     }
   }
   return {
