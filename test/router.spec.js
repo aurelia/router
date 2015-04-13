@@ -2,10 +2,19 @@ import {History} from 'aurelia-history';
 import {Container} from 'aurelia-dependency-injection';
 import {AppRouter, PipelineProvider} from '../src/index';
 
+class MockHistory extends History {
+  activate(){}
+  deactivate(){}
+  navigate(){}
+  navigateBack(){}
+}
+
 describe('the router', () => {
   let router;
+  let history;
   beforeEach(() => {
-    router = new AppRouter(new History(), new PipelineProvider(new Container()));
+    history = new MockHistory();
+    router = new AppRouter(new Container(), history, new PipelineProvider(new Container()));
   });
 
   it('should have some tests', () => {
@@ -52,23 +61,27 @@ describe('the router', () => {
 
   describe('generate', () => {
     it('should generate route URIs', () => {
+      const child = router.createChild(new Container());
+      child.baseUrl = 'child-router';
+      
       router.configure(config => {
-        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
+        config.map({ name: 'parent', route: 'parent', moduleId: './test' });
       });
 
-      expect(router.generate('test', { id: 1 })).toBe('/test/1');
+      child.configure(config => {
+        config.map({ name: 'child', route: 'child', moduleId: './test' });
+      });
+
+      expect(router.generate('parent')).toBe('#/parent');
+      expect(child.generate('parent')).toBe('#/parent');
+      expect(child.generate('child')).toBe('#/child-router/child');
+
+      router.history._hasPushState = true;
+
+      expect(router.generate('parent')).toBe('/parent');
+      expect(child.generate('parent')).toBe('/parent');
+      expect(child.generate('child')).toBe('/child-router/child');
     });
-
-    it('should generate absolute paths', () => {
-      router.configure(config => {
-        config.map({ name: 'test', route: 'test', moduleId: './test' });
-      });
-
-      router.baseUrl = 'root';
-      router.history.root = '/';
-
-      expect(router.generate('test', null, { absolute: true })).toBe('/root/test');
-    })
 
     it('should delegate to parent when not configured', () => {
       const child = router.createChild(new Container()); 
@@ -77,7 +90,7 @@ describe('the router', () => {
         config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
       });
 
-      expect(child.generate('test', { id: 1 })).toBe('/test/1');
+      expect(child.generate('test', { id: 1 })).toBe('#/test/1');
     });
 
     it('should delegate to parent when generating unknown route', () => {
@@ -91,8 +104,62 @@ describe('the router', () => {
         config.map({ name: 'child', route: 'child/:id', moduleId: './test' });
       });
 
-      expect(child.generate('child', { id: 1 })).toBe('/child/1');
-      expect(child.generate('parent', { id: 1 })).toBe('/parent/1');
+      expect(child.generate('child', { id: 1 })).toBe('#/child/1');
+      expect(child.generate('parent', { id: 1 })).toBe('#/parent/1');
+    });
+  });
+
+  describe('navigate', () => {
+    it('should navigate to absolute paths', () => {
+      const options = {};
+      spyOn(history, 'navigate');
+
+      const child = router.createChild(new Container());
+      child.baseUrl = 'child-router';
+
+      router.configure(config => {
+        config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' });
+      });
+
+      child.configure(config => {
+        config.map({ name: 'child', route: 'child/:id', moduleId: './test' });
+      });
+
+      router.navigate('#/test1', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/test1', options);
+      history.navigate.calls.reset();
+
+      router.navigate('/test2', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/test2', options);
+      history.navigate.calls.reset();
+      
+      router.navigate('test3', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/test3', options);
+      history.navigate.calls.reset();
+
+      child.navigate('#/test4', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/test4', options);
+      history.navigate.calls.reset();
+      
+      child.navigate('/test5', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/test5', options);
+      history.navigate.calls.reset();
+      
+      child.navigate('test6', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/child-router/test6', options);
+      history.navigate.calls.reset();
+
+      child.navigate('#/child-router/test7', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/child-router/test7', options);
+      history.navigate.calls.reset();
+
+      child.navigate('/child-router/test8', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/child-router/test8', options);
+      history.navigate.calls.reset();
+
+      child.navigate('child-router/test9', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options);
+      history.navigate.calls.reset();
     });
   });
 });

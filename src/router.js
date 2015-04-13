@@ -6,6 +6,8 @@ import {NavigationInstruction} from './navigation-instruction';
 import {RouterConfiguration} from './router-configuration';
 import {processPotential} from './util';
 
+const isRooted = /^#?\//;
+
 export class Router {
   constructor(container, history) {
     this.container = container;
@@ -37,22 +39,7 @@ export class Router {
 
     for(var i = 0, length = nav.length; i < length; i++) {
       var current = nav[i];
-
-      if(!this.history._hasPushState){
-        if (this.baseUrl[0] == '/') {
-          current.href = '#' + this.baseUrl;
-        } else {
-          current.href = '#/' + this.baseUrl;
-        }
-      } else {
-        current.href = '/' + this.baseUrl;
-      }
-
-      if (current.href[current.href.length - 1] != '/') {
-        current.href += '/';
-      }
-
-      current.href += current.relativeHref;
+      current.href = this.createRootedPath(current.relativeHref);
     }
   }
 
@@ -70,13 +57,37 @@ export class Router {
     return this;
   }
 
+  createRootedPath(fragment) {
+    let path = '';
+
+    if (this.baseUrl.length && this.baseUrl[0] !== '/') {
+      path += '/';
+    }
+
+    path += this.baseUrl;
+
+    if (path[path.length - 1] != '/' && fragment[0] != '/') {
+      path += '/';
+    }
+
+    return normalizeAbsolutePath(path + fragment, this.history._hasPushState);
+  }
+
   navigate(fragment, options) {
-    if(!this.isConfigured && this.parent){
+    if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
 
-    fragment = join(this.baseUrl, fragment);
-    if(fragment === '') fragment = '/';
+    if (fragment === '') {
+      fragment = '/';
+    }
+
+    if (isRooted.test(fragment)) {
+      fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
+    } else {
+      fragment = this.createRootedPath(fragment);
+    }
+
     return this.history.navigate(fragment, options);
   }
 
@@ -162,19 +173,13 @@ export class Router {
     return new NavigationContext(this, instruction);
   }
 
-  generate(name, params, options) {
-    options = options || {};
+  generate(name, params) {
     if((!this.isConfigured || !this.recognizer.hasRoute(name)) && this.parent){
-      return this.parent.generate(name, params, options);
+      return this.parent.generate(name, params);
     }
 
-    let root = '';
     let path = this.recognizer.generate(name, params);
-    if (options.absolute) {
-      root = (this.history.root || '') + this.baseUrl;
-    }
-
-    return root + path;
+    return this.createRootedPath(path);
   }
 
   addRoute(config, navModel={}) {
@@ -289,4 +294,12 @@ function validateRouteConfig(config) {
   if (!isValid) {
     throw new Error('Invalid Route Config: You must have at least a route and a moduleId or redirect.');
   }
+}
+
+function normalizeAbsolutePath(path, hasPushState) {
+    if (!hasPushState && path[0] !== '#') {
+      path = '#' + path;
+    }
+
+    return path;
 }
