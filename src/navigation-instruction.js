@@ -19,7 +19,7 @@ export class NavigationInstruction {
       strategy: strategy,
       moduleId: moduleId,
       component: component,
-      childRouter: component.executionContext.router,
+      childRouter: component.childRouter,
       lifecycleArgs: this.lifecycleArgs.slice()
     };
   }

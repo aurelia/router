@@ -12,8 +12,8 @@ import {
 describe('activation', () => {
 	var viewPortFactory = (resultHandler, strategy = INVOKE_LIFECYCLE) => {
 		return {
-			strategy: strategy, 
-			prevComponent: { executionContext: { canDeactivate: resultHandler } } 
+			strategy: strategy,
+			prevComponent: { executionContext: { canDeactivate: resultHandler } }
 		};
 	};
 
@@ -123,7 +123,7 @@ describe('activation', () => {
 				viewPort = viewPortFactory(() => (true)),
 				navContextWithRouter = { plan: { first: viewPort } };
 
-			viewPort.prevComponent.executionContext.router = { currentInstruction: { viewPortInstructions: { first: { component: { executionContext: executionContext }}}} };
+			viewPort.prevComponent.childRouter = { currentInstruction: { viewPortInstructions: { first: { component: { executionContext: executionContext }}}} };
 
 			it('should return true when router instruction canDeactivate', () => {
 				executionContext.canDeactivate = () => (true);
