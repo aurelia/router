@@ -91,6 +91,11 @@ export class Router {
     return this.history.navigate(fragment, options);
   }
 
+  navigateToRoute(route, params, options) {
+    let path = this.generate(route, params);
+    return this.navigate(path, options);
+  }
+
   navigateBack() {
     this.history.navigateBack();
   }

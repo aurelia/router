@@ -161,5 +161,17 @@ describe('the router', () => {
       expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options);
       history.navigate.calls.reset();
     });
+
+    it('should navigate to named routes', () => {
+      const options = {};
+      spyOn(history, 'navigate');
+
+      router.configure(config => {
+        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
+      });
+
+      router.navigateToRoute('test', { id: 123 }, options);
+      expect(history.navigate).toHaveBeenCalledWith('#/test/123', options);
+    });
   });
 });
