@@ -106,46 +106,37 @@ export class Router {
     return childRouter;
   }
 
-  createNavigationInstruction(url='', parentInstruction=null) {
-    var results = this.recognizer.recognize(url);
-    var fragment, queryIndex, queryString;
+  createNavigationInstruction(url = '', parentInstruction = null) {
+    let fragment = url;
+    let queryString = '';
 
-    if (!results || !results.length) {
-      results = this.childRecognizer.recognize(url);
-    }
-
-    fragment = url
-    queryIndex = fragment.indexOf("?");
-
+    let queryIndex = url.indexOf('?');
     if (queryIndex != -1) {
       fragment = url.substr(0, queryIndex);
       queryString = url.substr(queryIndex + 1);
     }
 
-    if((!results || !results.length) && this.catchAllHandler){
+    let results = this.recognizer.recognize(url);
+    if (!results || !results.length) {
+      results = this.childRecognizer.recognize(url);
+    }
+
+    if((!results || !results.length) && this.catchAllHandler) {
       results = [{
-        config:{
-          navModel:{}
+        config: {
+          navModel: {}
         },
-        handler:this.catchAllHandler,
-        params:{
-          path:fragment
+        handler: this.catchAllHandler,
+        params: {
+          path: fragment
         }
       }];
     }
 
     if (results && results.length) {
-      var first = results[0],
-          fragment = url,
-          queryIndex = fragment.indexOf('?'),
-          queryString;
+      let first = results[0];
 
-      if (queryIndex != -1) {
-        fragment = url.substr(0, queryIndex);
-        queryString = url.substr(queryIndex + 1);
-      }
-
-      var instruction = new NavigationInstruction(
+      let instruction = new NavigationInstruction(
         fragment,
         queryString,
         first.params,
@@ -154,11 +145,11 @@ export class Router {
         parentInstruction
         );
 
-      if (typeof first.handler == "function") {
+      if (typeof first.handler == 'function') {
         return first.handler(instruction).then(instruction => {
-          if (!("viewPorts" in instruction.config)) {
+          if (!('viewPorts' in instruction.config)) {
             instruction.config.viewPorts = {
-              "default": {
+              'default': {
                 moduleId: instruction.config.moduleId
               }
             };
@@ -169,9 +160,9 @@ export class Router {
       }
 
       return Promise.resolve(instruction);
-    } else {
-      return Promise.reject(new Error(`Route Not Found: ${url}`));
     }
+
+    return Promise.reject(new Error(`Route not found: ${url}`));
   }
 
   createNavigationContext(instruction) {
@@ -210,7 +201,7 @@ export class Router {
       delete config.settings;
       withChild = JSON.parse(JSON.stringify(config));
       config.settings = settings;
-      withChild.route += "/*childRoute";
+      withChild.route += '/*childRoute';
       withChild.hasChildRouter = true;
       this.childRecognizer.add({
         path: withChild.route,
