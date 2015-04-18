@@ -174,4 +174,48 @@ describe('the router', () => {
       expect(history.navigate).toHaveBeenCalledWith('#/test/123', options);
     });
   });
+
+  describe('createNavigationInstruction', () => {
+    it('should reject when router not configured', done => {
+      router.createNavigationInstruction()
+        .then(x => expect(true).toBeFalsy('should have rejected'))
+        .catch(reason => expect(reason).toBeTruthy())
+        .then(done);
+    });
+
+    it('should reject when route not found', done => {
+      router.configure(config => {
+        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
+      });
+
+      router.createNavigationInstruction('test')
+        .then(x => expect(true).toBeFalsy('should have rejected'))
+        .catch(reason => expect(reason).toBeTruthy())
+        .then(done);
+    });
+
+    it('should resolve matching routes', done => {
+      router.configure(config => {
+        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
+      });
+
+      router.createNavigationInstruction('test/123?foo=456')
+        .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'test/123', queryString: 'foo=456' })))
+        .catch(reason => expect(true).toBeFalsy('should have succeeded'))
+        .then(done);
+    });
+
+    it('should use catchAllHandler when route doesn\'t match', done => {
+      router.configure(config => {
+        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
+      });
+      router.handleUnknownRoutes('test');
+
+      router.createNavigationInstruction('foo/123?bar=456')
+        .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'foo/123', queryString: 'bar=456' })))
+        .catch(reason => expect(true).toBeFalsy('should have succeeded'))
+        .then(done);
+    });
+  });
 });
+
