@@ -96,7 +96,7 @@ export class AppRouter extends Router {
     if (!this.isActive) {
       if('configureRouter' in this.container.viewModel){
         var config = new RouterConfiguration();
-        var result = this.container.viewModel.configureRouter(config, this) || Promise.resolve();
+        var result = Promise.resolve(this.container.viewModel.configureRouter(config, this));
 
         return result.then(() => {
           this.configure(config);
