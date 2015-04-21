@@ -37,6 +37,12 @@ export class RouterConfiguration{
 
   mapRoute(config) {
     this.instructions.push(router => {
+      var moduleStrategy = config.moduleStrategy;
+      if(moduleStrategy !== undefined &&
+        typeof moduleStrategy === 'function') {
+        config.moduleId = moduleStrategy(router);
+      }
+
       if (Array.isArray(config.route)) {
         var navModel = {}, i, ii, current;
 

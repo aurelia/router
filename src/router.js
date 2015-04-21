@@ -176,6 +176,7 @@ export class Router {
       config.viewPorts = {
         'default': {
           moduleId: config.moduleId,
+          moduleStrategy: config.moduleStrategy,
           view: config.view
         }
       };
