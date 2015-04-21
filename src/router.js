@@ -6,6 +6,8 @@ import {NavigationInstruction} from './navigation-instruction';
 import {RouterConfiguration} from './router-configuration';
 import {processPotential} from './util';
 
+const isRooted = /^#?\//;
+
 export class Router {
   constructor(container, history) {
     this.container = container;
@@ -37,22 +39,7 @@ export class Router {
 
     for(var i = 0, length = nav.length; i < length; i++) {
       var current = nav[i];
-
-      if(!this.history._hasPushState){
-        if (this.baseUrl[0] == '/') {
-          current.href = '#' + this.baseUrl;
-        } else {
-          current.href = '#/' + this.baseUrl;
-        }
-      } else {
-        current.href = '/' + this.baseUrl;
-      }
-
-      if (current.href[current.href.length - 1] != '/') {
-        current.href += '/';
-      }
-
-      current.href += current.relativeHref;
+      current.href = this.createRootedPath(current.relativeHref);
     }
   }
 
@@ -70,14 +57,43 @@ export class Router {
     return this;
   }
 
+  createRootedPath(fragment) {
+    let path = '';
+
+    if (this.baseUrl.length && this.baseUrl[0] !== '/') {
+      path += '/';
+    }
+
+    path += this.baseUrl;
+
+    if (path[path.length - 1] != '/' && fragment[0] != '/') {
+      path += '/';
+    }
+
+    return normalizeAbsolutePath(path + fragment, this.history._hasPushState);
+  }
+
   navigate(fragment, options) {
-    if(!this.isConfigured && this.parent){
+    if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
 
-    fragment = join(this.baseUrl, fragment);
-    if(fragment === '') fragment = '/';
+    if (fragment === '') {
+      fragment = '/';
+    }
+
+    if (isRooted.test(fragment)) {
+      fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
+    } else {
+      fragment = this.createRootedPath(fragment);
+    }
+
     return this.history.navigate(fragment, options);
+  }
+
+  navigateToRoute(route, params, options) {
+    let path = this.generate(route, params);
+    return this.navigate(path, options);
   }
 
   navigateBack() {
@@ -90,46 +106,37 @@ export class Router {
     return childRouter;
   }
 
-  createNavigationInstruction(url='', parentInstruction=null) {
-    var results = this.recognizer.recognize(url);
-    var fragment, queryIndex, queryString;
+  createNavigationInstruction(url = '', parentInstruction = null) {
+    let fragment = url;
+    let queryString = '';
 
-    if (!results || !results.length) {
-      results = this.childRecognizer.recognize(url);
-    }
-
-    fragment = url
-    queryIndex = fragment.indexOf("?");
-
+    let queryIndex = url.indexOf('?');
     if (queryIndex != -1) {
       fragment = url.substr(0, queryIndex);
       queryString = url.substr(queryIndex + 1);
     }
 
-    if((!results || !results.length) && this.catchAllHandler){
+    let results = this.recognizer.recognize(url);
+    if (!results || !results.length) {
+      results = this.childRecognizer.recognize(url);
+    }
+
+    if((!results || !results.length) && this.catchAllHandler) {
       results = [{
-        config:{
-          navModel:{}
+        config: {
+          navModel: {}
         },
-        handler:this.catchAllHandler,
-        params:{
-          path:fragment
+        handler: this.catchAllHandler,
+        params: {
+          path: fragment
         }
       }];
     }
 
     if (results && results.length) {
-      var first = results[0],
-          fragment = url,
-          queryIndex = fragment.indexOf('?'),
-          queryString;
+      let first = results[0];
 
-      if (queryIndex != -1) {
-        fragment = url.substr(0, queryIndex);
-        queryString = url.substr(queryIndex + 1);
-      }
-
-      var instruction = new NavigationInstruction(
+      let instruction = new NavigationInstruction(
         fragment,
         queryString,
         first.params,
@@ -138,11 +145,11 @@ export class Router {
         parentInstruction
         );
 
-      if (typeof first.handler == "function") {
+      if (typeof first.handler == 'function') {
         return first.handler(instruction).then(instruction => {
-          if (!("viewPorts" in instruction.config)) {
+          if (!('viewPorts' in instruction.config)) {
             instruction.config.viewPorts = {
-              "default": {
+              'default': {
                 moduleId: instruction.config.moduleId
               }
             };
@@ -153,28 +160,22 @@ export class Router {
       }
 
       return Promise.resolve(instruction);
-    } else {
-      return Promise.reject(new Error(`Route Not Found: ${url}`));
     }
+
+    return Promise.reject(new Error(`Route not found: ${url}`));
   }
 
   createNavigationContext(instruction) {
     return new NavigationContext(this, instruction);
   }
 
-  generate(name, params, options) {
-    options = options || {};
+  generate(name, params) {
     if((!this.isConfigured || !this.recognizer.hasRoute(name)) && this.parent){
-      return this.parent.generate(name, params, options);
+      return this.parent.generate(name, params);
     }
 
-    let root = '';
     let path = this.recognizer.generate(name, params);
-    if (options.absolute) {
-      root = (this.history.root || '') + this.baseUrl;
-    }
-
-    return root + path;
+    return this.createRootedPath(path);
   }
 
   addRoute(config, navModel={}) {
@@ -200,7 +201,7 @@ export class Router {
       delete config.settings;
       withChild = JSON.parse(JSON.stringify(config));
       config.settings = settings;
-      withChild.route += "/*childRoute";
+      withChild.route += '/*childRoute';
       withChild.hasChildRouter = true;
       this.childRecognizer.add({
         path: withChild.route,
@@ -289,4 +290,12 @@ function validateRouteConfig(config) {
   if (!isValid) {
     throw new Error('Invalid Route Config: You must have at least a route and a moduleId or redirect.');
   }
+}
+
+function normalizeAbsolutePath(path, hasPushState) {
+    if (!hasPushState && path[0] !== '#') {
+      path = '#' + path;
+    }
+
+    return path;
 }
