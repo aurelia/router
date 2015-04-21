@@ -114,7 +114,7 @@ function loadComponent(routeLoader, navigationContext, config){
       component.childRouter = component.childContainer.getChildRouter();
 
       var config = new RouterConfiguration();
-      var result = component.executionContext.configureRouter(config, component.childRouter, ...lifecycleArgs) || Promise.resolve();
+      var result = Promise.resolve(component.executionContext.configureRouter(config, component.childRouter, ...lifecycleArgs));
 
       return result.then(() => {
         component.childRouter.configure(config);
