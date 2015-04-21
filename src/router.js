@@ -135,7 +135,6 @@ export class Router {
 
     if (results && results.length) {
       let first = results[0];
-
       let instruction = new NavigationInstruction(
         fragment,
         queryString,
@@ -145,18 +144,10 @@ export class Router {
         parentInstruction
         );
 
-      if (typeof first.handler == 'function') {
-        return first.handler(instruction).then(instruction => {
-          if (!('viewPorts' in instruction.config)) {
-            instruction.config.viewPorts = {
-              'default': {
-                moduleId: instruction.config.moduleId
-              }
-            };
-          }
-
-          return instruction;
-        });
+      if (typeof first.handler === 'function') {
+        return evaluateNavigationStrategy(instruction, first.handler, first);
+      } else if(first.config && 'navigationStrategy' in first.config){
+        return evaluateNavigationStrategy(instruction, first.config.navigationStrategy, first.config);
       }
 
       return Promise.resolve(instruction);
@@ -298,4 +289,18 @@ function normalizeAbsolutePath(path, hasPushState) {
     }
 
     return path;
+}
+
+function evaluateNavigationStrategy(instruction, evaluator, context){
+  return Promise.resolve(evaluator.call(context, instruction)).then(() => {
+    if (!('viewPorts' in instruction.config)) {
+      instruction.config.viewPorts = {
+        'default': {
+          moduleId: instruction.config.moduleId
+        }
+      };
+    }
+
+    return instruction;
+  });
 }
