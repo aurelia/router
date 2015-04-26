@@ -1,11 +1,15 @@
+import core from 'core-js';
+
 export class NavigationInstruction {
   constructor(fragment, queryString, params, queryParams, config, parentInstruction) {
+    const allParams = Object.assign({}, queryParams, params);
+
     this.fragment = fragment;
     this.queryString = queryString;
     this.params = params || {};
     this.queryParams = queryParams;
     this.config = config;
-    this.lifecycleArgs = [params, queryParams, config, this];
+    this.lifecycleArgs = [allParams, config, this];
     this.viewPortInstructions = {};
 
     if (parentInstruction) {
