@@ -1,4 +1,4 @@
-import {INVOKE_LIFECYCLE, REPLACE} from './navigation-plan';
+import {activationStrategy} from './navigation-plan';
 import {isNavigationCommand} from './navigation-commands';
 import {processPotential} from './util';
 
@@ -64,8 +64,8 @@ function findDeactivatable(plan, callbackName, list) {
     var viewPortPlan = plan[viewPortName];
     var prevComponent = viewPortPlan.prevComponent;
 
-    if ((viewPortPlan.strategy == INVOKE_LIFECYCLE ||
-        viewPortPlan.strategy == REPLACE) &&
+    if ((viewPortPlan.strategy == activationStrategy.invokeLifecycle ||
+        viewPortPlan.strategy == activationStrategy.replace) &&
         prevComponent) {
 
       var controller = prevComponent.executionContext;
@@ -149,7 +149,7 @@ function findActivatable(navigationContext, callbackName, list, router) {
     var viewPortInstruction = next.viewPortInstructions[viewPortName];
     var controller = viewPortInstruction.component.executionContext;
 
-    if ((viewPortPlan.strategy === INVOKE_LIFECYCLE || viewPortPlan.strategy === REPLACE) && callbackName in controller) {
+    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in controller) {
       list.push({
         controller:controller,
         lifecycleArgs:viewPortInstruction.lifecycleArgs,

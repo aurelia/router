@@ -1,4 +1,4 @@
-import {REPLACE, buildNavigationPlan} from './navigation-plan';
+import {activationStrategy, buildNavigationPlan} from './navigation-plan';
 import {RouterConfiguration} from './router-configuration';
 
 export class RouteLoader {
@@ -41,7 +41,7 @@ function determineWhatToLoad(navigationContext, toLoad) {
   for (var viewPortName in plan) {
     var viewPortPlan = plan[viewPortName];
 
-    if (viewPortPlan.strategy == REPLACE) {
+    if (viewPortPlan.strategy == activationStrategy.replace) {
       toLoad.push({
         viewPortPlan: viewPortPlan,
         navigationContext: navigationContext

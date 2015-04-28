@@ -1,8 +1,10 @@
 import {Redirect} from './navigation-commands';
 
-export var NO_CHANGE = 'no-change';
-export var INVOKE_LIFECYCLE = 'invoke-lifecycle';
-export var REPLACE = 'replace';
+export const activationStrategy = {
+  noChange: 'no-change',
+  invokeLifecycle: 'invoke-lifecycle',
+  replace: 'replace'
+};
 
 export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
   var prev = navigationContext.prevInstruction;
@@ -24,18 +26,18 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
       };
 
       if (prevViewPortInstruction.moduleId != nextViewPortConfig.moduleId) {
-        viewPortPlan.strategy = REPLACE;
+        viewPortPlan.strategy = activationStrategy.replace;
       } else if ('determineActivationStrategy' in prevViewPortInstruction.component.executionContext) {
          //TODO: should we tell them if the parent had a lifecycle min change?
         viewPortPlan.strategy = prevViewPortInstruction.component.executionContext
           .determineActivationStrategy(...next.lifecycleArgs);
       } else if (newParams || forceLifecycleMinimum) {
-        viewPortPlan.strategy = INVOKE_LIFECYCLE;
+        viewPortPlan.strategy = activationStrategy.invokeLifecycle;
       } else {
-        viewPortPlan.strategy = NO_CHANGE;
+        viewPortPlan.strategy = activationStrategy.noChange;
       }
 
-      if (viewPortPlan.strategy !== REPLACE && prevViewPortInstruction.childRouter) {
+      if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
         var path = next.getWildcardPath();
         var task = prevViewPortInstruction.childRouter
           .createNavigationInstruction(path, next).then(childInstruction => {
@@ -44,7 +46,7 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
 
             return buildNavigationPlan(
               viewPortPlan.childNavigationContext, 
-              viewPortPlan.strategy == INVOKE_LIFECYCLE)
+              viewPortPlan.strategy == activationStrategy.invokeLifecycle)
               .then(childPlan => {
                 viewPortPlan.childNavigationContext.plan = childPlan;
               });
@@ -59,7 +61,7 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
     for (viewPortName in next.config.viewPorts) {
       plan[viewPortName] = {
         name: viewPortName,
-        strategy: REPLACE,
+        strategy: activationStrategy.replace,
         config: next.config.viewPorts[viewPortName]
       };
     }
