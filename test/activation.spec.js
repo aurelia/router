@@ -4,13 +4,10 @@ import {
 	DeactivatePreviousStep,
 	ActivateNextStep
 } from '../src/activation';
-import {
-	INVOKE_LIFECYCLE,
-	REPLACE
-} from '../src/navigation-plan';
+import {activationStrategy} from '../src/navigation-plan';
 
 describe('activation', () => {
-	var viewPortFactory = (resultHandler, strategy = INVOKE_LIFECYCLE) => {
+	var viewPortFactory = (resultHandler, strategy = activationStrategy.invokeLifecycle) => {
 		return {
 			strategy: strategy,
 			prevComponent: { executionContext: { canDeactivate: resultHandler } }
@@ -42,8 +39,8 @@ describe('activation', () => {
 			expect(nextResult).toBe(true);
 		});
 
-		it('should return true for context that canDeactivate with REPLACE strategy', () => {
-			var singleNavContext = { plan: { first: viewPortFactory(() => (true), REPLACE) } };
+		it('should return true for context that canDeactivate with activationStrategy.replace', () => {
+			var singleNavContext = { plan: { first: viewPortFactory(() => (true), activationStrategy.replace) } };
 
 			sut.run(singleNavContext, next)
 			expect(nextResult).toBe(true);
