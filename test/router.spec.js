@@ -57,6 +57,14 @@ describe('the router', () => {
       expect(() => router.addRoute({ route: 'test/:id', href: 'test', moduleId: 'test', nav: true })).not.toThrow();
       expect(() => router.addRoute({ route: 'test/:id', moduleId: 'test', nav: true })).toThrow();
     });
+
+    it('should add a route with multiple view ports', () => {
+      expect(() => router.addRoute({ route: 'multiple/viewports', viewPorts: {
+        'default': { moduleId: 'test1' },
+        'number2': { moduleId: 'test2' }
+      }})).not.toThrow();
+    });
+
   });
 
   describe('generate', () => {
