@@ -5,14 +5,16 @@ function createResult(ctx, next) {
     status: next.status,
     context: ctx,
     output: next.output,
-    completed: next.status == COMPLETED
+    completed: next.status == pipelineStatus.completed
   };
 }
 
-export var COMPLETED = 'completed';
-export var CANCELLED = 'cancelled';
-export var REJECTED = 'rejected';
-export var RUNNING = 'running';
+export const pipelineStatus = {
+  completed: 'completed',
+  cancelled: 'cancelled',
+  rejected: 'rejected',
+  running: 'running'
+};
 
 export class Pipeline {
   constructor() {
@@ -62,24 +64,24 @@ export class Pipeline {
     };
 
     next.complete = output => {
-      next.status = COMPLETED;
+      next.status = pipelineStatus.completed;
       next.output = output;
       return Promise.resolve(createResult(ctx, next));
     };
 
     next.cancel = reason => {
-      next.status = CANCELLED;
+      next.status = pipelineStatus.cancelled;
       next.output = reason;
       return Promise.resolve(createResult(ctx, next));
     };
 
     next.reject = error => {
-      next.status = REJECTED;
+      next.status = pipelineStatus.rejected;
       next.output = error;
       return Promise.reject(createResult(ctx, next));
     };
 
-    next.status = RUNNING;
+    next.status = pipelineStatus.running;
 
     return next();
   }
