@@ -182,6 +182,9 @@ export class Router {
     }
 
     navModel.title = navModel.title || config.title;
+    navModel.setTitle = newTitle => {
+      navModel.title = newTitle;
+    };
     navModel.settings = config.settings || (config.settings = {});
 
     this.routes.push(config);
