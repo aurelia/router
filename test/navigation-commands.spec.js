@@ -1,7 +1,7 @@
 import {Redirect, isNavigationCommand} from '../src/navigation-commands';
 import core from 'core-js';
 
-describe('isNavigaionCommand', () => {
+describe('isNavigationCommand', () => {
   it('should return true for object which has a navigate method', () => {
     var nc = {
       navigate(){}
