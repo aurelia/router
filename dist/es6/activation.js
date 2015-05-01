@@ -1,4 +1,4 @@
-import {INVOKE_LIFECYCLE, REPLACE} from './navigation-plan';
+import {activationStrategy} from './navigation-plan';
 import {isNavigationCommand} from './navigation-commands';
 import {processPotential} from './util';
 
@@ -64,8 +64,8 @@ function findDeactivatable(plan, callbackName, list) {
     var viewPortPlan = plan[viewPortName];
     var prevComponent = viewPortPlan.prevComponent;
 
-    if ((viewPortPlan.strategy == INVOKE_LIFECYCLE ||
-        viewPortPlan.strategy == REPLACE) &&
+    if ((viewPortPlan.strategy == activationStrategy.invokeLifecycle ||
+        viewPortPlan.strategy == activationStrategy.replace) &&
         prevComponent) {
 
       var controller = prevComponent.executionContext;
@@ -86,10 +86,11 @@ function findDeactivatable(plan, callbackName, list) {
 }
 
 function addPreviousDeactivatable(component, callbackName, list) {
-  var controller = component.executionContext;
+  var controller = component.executionContext,
+      childRouter = component.childRouter;
 
-  if (controller.router && controller.router.currentInstruction) {
-    var viewPortInstructions = controller.router.currentInstruction.viewPortInstructions;
+  if (childRouter && childRouter.currentInstruction) {
+    var viewPortInstructions = childRouter.currentInstruction.viewPortInstructions;
 
     for (var viewPortName in viewPortInstructions) {
       var viewPortInstruction = viewPortInstructions[viewPortName];
@@ -148,7 +149,7 @@ function findActivatable(navigationContext, callbackName, list, router) {
     var viewPortInstruction = next.viewPortInstructions[viewPortName];
     var controller = viewPortInstruction.component.executionContext;
 
-    if ((viewPortPlan.strategy === INVOKE_LIFECYCLE || viewPortPlan.strategy === REPLACE) && callbackName in controller) {
+    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in controller) {
       list.push({
         controller:controller,
         lifecycleArgs:viewPortInstruction.lifecycleArgs,
@@ -161,7 +162,7 @@ function findActivatable(navigationContext, callbackName, list, router) {
         viewPortPlan.childNavigationContext,
         callbackName,
         list,
-        controller.router || router
+        viewPortInstruction.component.childRouter || router
       );
     }
   });

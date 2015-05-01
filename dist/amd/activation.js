@@ -1,15 +1,9 @@
 define(['exports', './navigation-plan', './navigation-commands', './util'], function (exports, _navigationPlan, _navigationCommands, _util) {
   'use strict';
 
-  var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
-
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-  Object.defineProperty(exports, '__esModule', {
-    value: true
-  });
+  exports.__esModule = true;
   var affirmations = ['yes', 'ok', 'true'];
 
   exports.affirmations = affirmations;
@@ -19,12 +13,9 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
       _classCallCheck(this, CanDeactivatePreviousStep);
     }
 
-    _createClass(CanDeactivatePreviousStep, [{
-      key: 'run',
-      value: function run(navigationContext, next) {
-        return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
-      }
-    }]);
+    CanDeactivatePreviousStep.prototype.run = function run(navigationContext, next) {
+      return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
+    };
 
     return CanDeactivatePreviousStep;
   })();
@@ -36,12 +27,9 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
       _classCallCheck(this, CanActivateNextStep);
     }
 
-    _createClass(CanActivateNextStep, [{
-      key: 'run',
-      value: function run(navigationContext, next) {
-        return processActivatable(navigationContext, 'canActivate', next);
-      }
-    }]);
+    CanActivateNextStep.prototype.run = function run(navigationContext, next) {
+      return processActivatable(navigationContext, 'canActivate', next);
+    };
 
     return CanActivateNextStep;
   })();
@@ -53,12 +41,9 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
       _classCallCheck(this, DeactivatePreviousStep);
     }
 
-    _createClass(DeactivatePreviousStep, [{
-      key: 'run',
-      value: function run(navigationContext, next) {
-        return processDeactivatable(navigationContext.plan, 'deactivate', next, true);
-      }
-    }]);
+    DeactivatePreviousStep.prototype.run = function run(navigationContext, next) {
+      return processDeactivatable(navigationContext.plan, 'deactivate', next, true);
+    };
 
     return DeactivatePreviousStep;
   })();
@@ -70,12 +55,9 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
       _classCallCheck(this, ActivateNextStep);
     }
 
-    _createClass(ActivateNextStep, [{
-      key: 'run',
-      value: function run(navigationContext, next) {
-        return processActivatable(navigationContext, 'activate', next, true);
-      }
-    }]);
+    ActivateNextStep.prototype.run = function run(navigationContext, next) {
+      return processActivatable(navigationContext, 'activate', next, true);
+    };
 
     return ActivateNextStep;
   })();
@@ -118,7 +100,7 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
       var viewPortPlan = plan[viewPortName];
       var prevComponent = viewPortPlan.prevComponent;
 
-      if ((viewPortPlan.strategy == _navigationPlan.INVOKE_LIFECYCLE || viewPortPlan.strategy == _navigationPlan.REPLACE) && prevComponent) {
+      if ((viewPortPlan.strategy == _navigationPlan.activationStrategy.invokeLifecycle || viewPortPlan.strategy == _navigationPlan.activationStrategy.replace) && prevComponent) {
 
         var controller = prevComponent.executionContext;
 
@@ -138,10 +120,11 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
   }
 
   function addPreviousDeactivatable(component, callbackName, list) {
-    var controller = component.executionContext;
+    var controller = component.executionContext,
+        childRouter = component.childRouter;
 
-    if (controller.router && controller.router.currentInstruction) {
-      var viewPortInstructions = controller.router.currentInstruction.viewPortInstructions;
+    if (childRouter && childRouter.currentInstruction) {
+      var viewPortInstructions = childRouter.currentInstruction.viewPortInstructions;
 
       for (var viewPortName in viewPortInstructions) {
         var viewPortInstruction = viewPortInstructions[viewPortName];
@@ -178,7 +161,7 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
           var _current$controller;
 
           var current = infos[i];
-          var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, _toConsumableArray(current.lifecycleArgs));
+          var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, current.lifecycleArgs);
           return _util.processPotential(result, function (val) {
             return inspect(val, current.router);
           }, next.cancel);
@@ -204,7 +187,7 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
       var viewPortInstruction = next.viewPortInstructions[viewPortName];
       var controller = viewPortInstruction.component.executionContext;
 
-      if ((viewPortPlan.strategy === _navigationPlan.INVOKE_LIFECYCLE || viewPortPlan.strategy === _navigationPlan.REPLACE) && callbackName in controller) {
+      if ((viewPortPlan.strategy === _navigationPlan.activationStrategy.invokeLifecycle || viewPortPlan.strategy === _navigationPlan.activationStrategy.replace) && callbackName in controller) {
         list.push({
           controller: controller,
           lifecycleArgs: viewPortInstruction.lifecycleArgs,
@@ -213,7 +196,7 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
       }
 
       if (viewPortPlan.childNavigationContext) {
-        findActivatable(viewPortPlan.childNavigationContext, callbackName, list, controller.router || router);
+        findActivatable(viewPortPlan.childNavigationContext, callbackName, list, viewPortInstruction.component.childRouter || router);
       }
     });
 

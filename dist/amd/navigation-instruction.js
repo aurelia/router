@@ -1,24 +1,26 @@
-define(["exports"], function (exports) {
-  "use strict";
+define(['exports', 'core-js'], function (exports, _coreJs) {
+  'use strict';
 
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+  exports.__esModule = true;
+
+  var _core = _interopRequire(_coreJs);
 
   var NavigationInstruction = (function () {
     function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
       _classCallCheck(this, NavigationInstruction);
+
+      var allParams = Object.assign({}, queryParams, params);
 
       this.fragment = fragment;
       this.queryString = queryString;
       this.params = params || {};
       this.queryParams = queryParams;
       this.config = config;
-      this.lifecycleArgs = [params, queryParams, config, this];
+      this.lifecycleArgs = [allParams, config, this];
       this.viewPortInstructions = {};
 
       if (parentInstruction) {
@@ -26,53 +28,47 @@ define(["exports"], function (exports) {
       }
     }
 
-    _createClass(NavigationInstruction, [{
-      key: "addViewPortInstruction",
-      value: function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
-        return this.viewPortInstructions[viewPortName] = {
-          name: viewPortName,
-          strategy: strategy,
-          moduleId: moduleId,
-          component: component,
-          childRouter: component.executionContext.router,
-          lifecycleArgs: this.lifecycleArgs.slice()
-        };
+    NavigationInstruction.prototype.addViewPortInstruction = function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
+      return this.viewPortInstructions[viewPortName] = {
+        name: viewPortName,
+        strategy: strategy,
+        moduleId: moduleId,
+        component: component,
+        childRouter: component.childRouter,
+        lifecycleArgs: this.lifecycleArgs.slice()
+      };
+    };
+
+    NavigationInstruction.prototype.getWildCardName = function getWildCardName() {
+      var wildcardIndex = this.config.route.lastIndexOf('*');
+      return this.config.route.substr(wildcardIndex + 1);
+    };
+
+    NavigationInstruction.prototype.getWildcardPath = function getWildcardPath() {
+      var wildcardName = this.getWildCardName(),
+          path = this.params[wildcardName];
+
+      if (this.queryString) {
+        path += '?' + this.queryString;
       }
-    }, {
-      key: "getWildCardName",
-      value: function getWildCardName() {
-        var wildcardIndex = this.config.route.lastIndexOf("*");
-        return this.config.route.substr(wildcardIndex + 1);
+
+      return path;
+    };
+
+    NavigationInstruction.prototype.getBaseUrl = function getBaseUrl() {
+      if (!this.params) {
+        return this.fragment;
       }
-    }, {
-      key: "getWildcardPath",
-      value: function getWildcardPath() {
-        var wildcardName = this.getWildCardName(),
-            path = this.params[wildcardName];
 
-        if (this.queryString) {
-          path += "?" + this.queryString;
-        }
+      var wildcardName = this.getWildCardName(),
+          path = this.params[wildcardName];
 
-        return path;
+      if (!path) {
+        return this.fragment;
       }
-    }, {
-      key: "getBaseUrl",
-      value: function getBaseUrl() {
-        if (!this.params) {
-          return this.fragment;
-        }
 
-        var wildcardName = this.getWildCardName(),
-            path = this.params[wildcardName];
-
-        if (!path) {
-          return this.fragment;
-        }
-
-        return this.fragment.substr(0, this.fragment.lastIndexOf(path));
-      }
-    }]);
+      return this.fragment.substr(0, this.fragment.lastIndexOf(path));
+    };
 
     return NavigationInstruction;
   })();

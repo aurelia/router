@@ -1,3 +1,35 @@
+## 0.8.0 (2015-04-30)
+
+
+#### Bug Fixes
+
+* **app-router:** handle non-promise return values from configureRouter ([f2709d60](http://github.com/aurelia/router/commit/f2709d603ac3c92487371a5bad871a53768e9f17))
+* **tests:** fix typo in test description ([f09f1c7b](http://github.com/aurelia/router/commit/f09f1c7bcd970de4eb5acdb3a6e91935e9bd4528))
+
+
+#### Features
+
+* **NavigationInstruction:** merge params and queryParams into a single argument to activate and canActivate ([8aecba85](http://github.com/aurelia/router/commit/8aecba85aca57a35cbc1836bcd558039e54f543c), closes [#74](http://github.com/aurelia/router/issues/74))
+* **all:** new router configuration strategy ([f7aff29b](http://github.com/aurelia/router/commit/f7aff29beec45966847fdedcc4de1968fe3cf7cf))
+* **router:**
+  * add navModel.setTitle method ([2cff0e10](http://github.com/aurelia/router/commit/2cff0e10cd0ff339eedc9bcc2e1a4cd859a425c9))
+  * per route config customization of the navigation instruction ([7abf47d1](http://github.com/aurelia/router/commit/7abf47d1c99a76b98d500f39d9c4c04450ee7845))
+  * add convenience method for navigating to a named route ([9053fc23](http://github.com/aurelia/router/commit/9053fc2375f4a36cd44216b4a2d4fb95c35fe784))
+  * support navigating to absolute paths ([a017edee](http://github.com/aurelia/router/commit/a017edee68d8bf4162d5f4e8eeaaf358b60c53d7))
+
+
+#### Breaking Changes
+
+* This is a breaking API change that replace router's NO_CHANGE, REPLACE, and INVOKE_LIFECYCLE constants with an activationStrategy object with noChange, replace, and invokeLifecycle properties.
+
+ ([7f10f215](http://github.com/aurelia/router/commit/7f10f215e8854a8d8f7fad4df14c79ee529ce844))
+* This is a breaking API change to the `activate` and `canActivate` view model callbacks. The first two arguments representing route params and query params have been merged into a single object. The signature is now `activate(params, config, navigationInstruction)`.
+
+fixes #74
+
+ ([8aecba85](http://github.com/aurelia/router/commit/8aecba85aca57a35cbc1836bcd558039e54f543c))
+
+
 ### 0.7.2 (2015-04-11)
 
 
@@ -235,4 +267,3 @@
 #### Bug Fixes
 
 * **package:** added missing es6-shim polyfill ([8d295197](http://github.com/aurelia/router/commit/8d295197310c6a8662b84e58fe7c011d49098d33))
-

@@ -1,5 +1,5 @@
 System.register(['./navigation-commands'], function (_export) {
-  var Redirect, _toConsumableArray, _classCallCheck, _createClass, NO_CHANGE, INVOKE_LIFECYCLE, REPLACE, BuildNavigationPlanStep;
+  var Redirect, _classCallCheck, activationStrategy, BuildNavigationPlanStep;
 
   _export('buildNavigationPlan', buildNavigationPlan);
 
@@ -24,23 +24,23 @@ System.register(['./navigation-commands'], function (_export) {
         };
 
         if (prevViewPortInstruction.moduleId != nextViewPortConfig.moduleId) {
-          viewPortPlan.strategy = REPLACE;
+          viewPortPlan.strategy = activationStrategy.replace;
         } else if ('determineActivationStrategy' in prevViewPortInstruction.component.executionContext) {
           var _prevViewPortInstruction$component$executionContext;
 
-          viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, _toConsumableArray(next.lifecycleArgs));
+          viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, next.lifecycleArgs);
         } else if (newParams || forceLifecycleMinimum) {
-          viewPortPlan.strategy = INVOKE_LIFECYCLE;
+          viewPortPlan.strategy = activationStrategy.invokeLifecycle;
         } else {
-          viewPortPlan.strategy = NO_CHANGE;
+          viewPortPlan.strategy = activationStrategy.noChange;
         }
 
-        if (viewPortPlan.strategy !== REPLACE && prevViewPortInstruction.childRouter) {
+        if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
           var path = next.getWildcardPath();
           var task = prevViewPortInstruction.childRouter.createNavigationInstruction(path, next).then(function (childInstruction) {
             viewPortPlan.childNavigationContext = prevViewPortInstruction.childRouter.createNavigationContext(childInstruction);
 
-            return buildNavigationPlan(viewPortPlan.childNavigationContext, viewPortPlan.strategy == INVOKE_LIFECYCLE).then(function (childPlan) {
+            return buildNavigationPlan(viewPortPlan.childNavigationContext, viewPortPlan.strategy == activationStrategy.invokeLifecycle).then(function (childPlan) {
               viewPortPlan.childNavigationContext.plan = childPlan;
             });
           });
@@ -56,7 +56,7 @@ System.register(['./navigation-commands'], function (_export) {
       for (viewPortName in next.config.viewPorts) {
         plan[viewPortName] = {
           name: viewPortName,
-          strategy: REPLACE,
+          strategy: activationStrategy.replace,
           config: next.config.viewPorts[viewPortName]
         };
       }
@@ -89,42 +89,31 @@ System.register(['./navigation-commands'], function (_export) {
     execute: function () {
       'use strict';
 
-      _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
-
       _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+      activationStrategy = {
+        noChange: 'no-change',
+        invokeLifecycle: 'invoke-lifecycle',
+        replace: 'replace'
+      };
 
-      NO_CHANGE = 'no-change';
-
-      _export('NO_CHANGE', NO_CHANGE);
-
-      INVOKE_LIFECYCLE = 'invoke-lifecycle';
-
-      _export('INVOKE_LIFECYCLE', INVOKE_LIFECYCLE);
-
-      REPLACE = 'replace';
-
-      _export('REPLACE', REPLACE);
+      _export('activationStrategy', activationStrategy);
 
       BuildNavigationPlanStep = (function () {
         function BuildNavigationPlanStep() {
           _classCallCheck(this, BuildNavigationPlanStep);
         }
 
-        _createClass(BuildNavigationPlanStep, [{
-          key: 'run',
-          value: function run(navigationContext, next) {
-            if (navigationContext.nextInstruction.config.redirect) {
-              return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
-            }
-
-            return buildNavigationPlan(navigationContext).then(function (plan) {
-              navigationContext.plan = plan;
-              return next();
-            })['catch'](next.cancel);
+        BuildNavigationPlanStep.prototype.run = function run(navigationContext, next) {
+          if (navigationContext.nextInstruction.config.redirect) {
+            return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
           }
-        }]);
+
+          return buildNavigationPlan(navigationContext).then(function (plan) {
+            navigationContext.plan = plan;
+            return next();
+          })['catch'](next.cancel);
+        };
 
         return BuildNavigationPlanStep;
       })();

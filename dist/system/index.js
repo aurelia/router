@@ -13,11 +13,7 @@ System.register(['./router', './app-router', './pipeline-provider', './navigatio
     }, function (_routerConfiguration) {
       _export('RouterConfiguration', _routerConfiguration.RouterConfiguration);
     }, function (_navigationPlan) {
-      _export('NO_CHANGE', _navigationPlan.NO_CHANGE);
-
-      _export('INVOKE_LIFECYCLE', _navigationPlan.INVOKE_LIFECYCLE);
-
-      _export('REPLACE', _navigationPlan.REPLACE);
+      _export('activationStrategy', _navigationPlan.activationStrategy);
     }, function (_routeFilters) {
       _export('RouteFilterContainer', _routeFilters.RouteFilterContainer);
 

@@ -3,11 +3,7 @@ define(['exports', 'aurelia-dependency-injection', './pipeline', './navigation-p
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-  Object.defineProperty(exports, '__esModule', {
-    value: true
-  });
+  exports.__esModule = true;
 
   var PipelineProvider = (function () {
     function PipelineProvider(container) {
@@ -17,23 +13,19 @@ define(['exports', 'aurelia-dependency-injection', './pipeline', './navigation-p
       this.steps = [_navigationPlan.BuildNavigationPlanStep, _activation.CanDeactivatePreviousStep, _routeLoading.LoadRouteStep, _routeFilters.createRouteFilterStep('authorize'), _routeFilters.createRouteFilterStep('modelbind'), _activation.CanActivateNextStep, _activation.DeactivatePreviousStep, _activation.ActivateNextStep, _routeFilters.createRouteFilterStep('precommit'), _navigationContext.CommitChangesStep];
     }
 
-    _createClass(PipelineProvider, [{
-      key: 'createPipeline',
-      value: function createPipeline(navigationContext) {
-        var _this = this;
+    PipelineProvider.inject = function inject() {
+      return [_aureliaDependencyInjection.Container];
+    };
 
-        var pipeline = new _pipeline.Pipeline();
-        this.steps.forEach(function (step) {
-          return pipeline.withStep(_this.container.get(step));
-        });
-        return pipeline;
-      }
-    }], [{
-      key: 'inject',
-      value: function inject() {
-        return [_aureliaDependencyInjection.Container];
-      }
-    }]);
+    PipelineProvider.prototype.createPipeline = function createPipeline(navigationContext) {
+      var _this = this;
+
+      var pipeline = new _pipeline.Pipeline();
+      this.steps.forEach(function (step) {
+        return pipeline.withStep(_this.container.get(step));
+      });
+      return pipeline;
+    };
 
     return PipelineProvider;
   })();

@@ -1,15 +1,9 @@
-define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
+define(['exports', './navigation-plan', './router-configuration'], function (exports, _navigationPlan, _routerConfiguration) {
   'use strict';
-
-  var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-  Object.defineProperty(exports, '__esModule', {
-    value: true
-  });
+  exports.__esModule = true;
   exports.loadNewRoute = loadNewRoute;
 
   var RouteLoader = (function () {
@@ -17,12 +11,9 @@ define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
       _classCallCheck(this, RouteLoader);
     }
 
-    _createClass(RouteLoader, [{
-      key: 'loadRoute',
-      value: function loadRoute(router, config) {
-        throw Error('Route loaders must implment "loadRoute(router, config)".');
-      }
-    }]);
+    RouteLoader.prototype.loadRoute = function loadRoute(router, config) {
+      throw Error('Route loaders must implment "loadRoute(router, config)".');
+    };
 
     return RouteLoader;
   })();
@@ -36,27 +27,23 @@ define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
       this.routeLoader = routeLoader;
     }
 
-    _createClass(LoadRouteStep, [{
-      key: 'run',
-      value: function run(navigationContext, next) {
-        return loadNewRoute([], this.routeLoader, navigationContext).then(next)['catch'](next.cancel);
-      }
-    }], [{
-      key: 'inject',
-      value: function inject() {
-        return [RouteLoader];
-      }
-    }]);
+    LoadRouteStep.inject = function inject() {
+      return [RouteLoader];
+    };
+
+    LoadRouteStep.prototype.run = function run(navigationContext, next) {
+      return loadNewRoute(this.routeLoader, navigationContext).then(next)['catch'](next.cancel);
+    };
 
     return LoadRouteStep;
   })();
 
   exports.LoadRouteStep = LoadRouteStep;
 
-  function loadNewRoute(routers, routeLoader, navigationContext) {
+  function loadNewRoute(routeLoader, navigationContext) {
     var toLoad = determineWhatToLoad(navigationContext);
     var loadPromises = toLoad.map(function (current) {
-      return loadRoute(routers, routeLoader, current.navigationContext, current.viewPortPlan);
+      return loadRoute(routeLoader, current.navigationContext, current.viewPortPlan);
     });
 
     return Promise.all(loadPromises);
@@ -71,7 +58,7 @@ define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
     for (var viewPortName in plan) {
       var viewPortPlan = plan[viewPortName];
 
-      if (viewPortPlan.strategy == _navigationPlan.REPLACE) {
+      if (viewPortPlan.strategy == _navigationPlan.activationStrategy.replace) {
         toLoad.push({
           viewPortPlan: viewPortPlan,
           navigationContext: navigationContext
@@ -93,28 +80,27 @@ define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
     return toLoad;
   }
 
-  function loadRoute(routers, routeLoader, navigationContext, viewPortPlan) {
+  function loadRoute(routeLoader, navigationContext, viewPortPlan) {
     var moduleId = viewPortPlan.config.moduleId;
     var next = navigationContext.nextInstruction;
-
-    routers.push(navigationContext.router);
 
     return loadComponent(routeLoader, navigationContext, viewPortPlan.config).then(function (component) {
       var viewPortInstruction = next.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
 
-      var controller = component.executionContext;
+      var controller = component.executionContext,
+          childRouter = component.childRouter;
 
-      if (controller.router && controller.router.isConfigured && routers.indexOf(controller.router) === -1) {
+      if (childRouter) {
         var path = next.getWildcardPath();
 
-        return controller.router.createNavigationInstruction(path, next).then(function (childInstruction) {
-          viewPortPlan.childNavigationContext = controller.router.createNavigationContext(childInstruction);
+        return childRouter.createNavigationInstruction(path, next).then(function (childInstruction) {
+          viewPortPlan.childNavigationContext = childRouter.createNavigationContext(childInstruction);
 
           return _navigationPlan.buildNavigationPlan(viewPortPlan.childNavigationContext).then(function (childPlan) {
             viewPortPlan.childNavigationContext.plan = childPlan;
             viewPortInstruction.childNavigationContext = viewPortPlan.childNavigationContext;
 
-            return loadNewRoute(routers, routeLoader, viewPortPlan.childNavigationContext);
+            return loadNewRoute(routeLoader, viewPortPlan.childNavigationContext);
           });
         });
       }
@@ -124,18 +110,25 @@ define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
   function loadComponent(routeLoader, navigationContext, config) {
     var router = navigationContext.router,
         lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
+
     return routeLoader.loadRoute(router, config).then(function (component) {
+      component.router = router;
+      component.config = config;
+
       if ('configureRouter' in component.executionContext) {
         var _component$executionContext;
 
-        var result = (_component$executionContext = component.executionContext).configureRouter.apply(_component$executionContext, _toConsumableArray(lifecycleArgs)) || Promise.resolve();
+        component.childRouter = component.childContainer.getChildRouter();
+
+        var config = new _routerConfiguration.RouterConfiguration();
+        var result = Promise.resolve((_component$executionContext = component.executionContext).configureRouter.apply(_component$executionContext, [config, component.childRouter].concat(lifecycleArgs)));
+
         return result.then(function () {
+          component.childRouter.configure(config);
           return component;
         });
       }
 
-      component.router = router;
-      component.config = config;
       return component;
     });
   }

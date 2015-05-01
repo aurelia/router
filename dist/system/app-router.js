@@ -1,5 +1,5 @@
-System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-history', './router', './pipeline-provider', './navigation-commands', 'aurelia-event-aggregator'], function (_export) {
-  var core, Container, History, Router, PipelineProvider, isNavigationCommand, EventAggregator, _classCallCheck, _createClass, _get, _inherits, AppRouter;
+System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-history', './router', './pipeline-provider', './navigation-commands', 'aurelia-event-aggregator', './router-configuration'], function (_export) {
+  var core, Container, History, Router, PipelineProvider, isNavigationCommand, EventAggregator, RouterConfiguration, _classCallCheck, _createClass, _inherits, AppRouter;
 
   function findAnchor(el) {
     while (el) {
@@ -51,6 +51,8 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-history', '
       isNavigationCommand = _navigationCommands.isNavigationCommand;
     }, function (_aureliaEventAggregator) {
       EventAggregator = _aureliaEventAggregator.EventAggregator;
+    }, function (_routerConfiguration) {
+      RouterConfiguration = _routerConfiguration.RouterConfiguration;
     }],
     execute: function () {
       'use strict';
@@ -59,15 +61,13 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-history', '
 
       _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-      _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
       _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
       AppRouter = (function (_Router) {
         function AppRouter(container, history, pipelineProvider, events) {
           _classCallCheck(this, AppRouter);
 
-          _get(Object.getPrototypeOf(AppRouter.prototype), 'constructor', this).call(this, container, history);
+          _Router.call(this, container, history);
           this.pipelineProvider = pipelineProvider;
           document.addEventListener('click', handleLinkClick.bind(this), true);
           this.events = events;
@@ -75,139 +75,134 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-history', '
 
         _inherits(AppRouter, _Router);
 
+        AppRouter.inject = function inject() {
+          return [Container, History, PipelineProvider, EventAggregator];
+        };
+
+        AppRouter.prototype.loadUrl = function loadUrl(url) {
+          var _this = this;
+
+          return this.createNavigationInstruction(url).then(function (instruction) {
+            return _this.queueInstruction(instruction);
+          })['catch'](function (error) {
+            console.error(error);
+
+            if (_this.history.previousFragment) {
+              _this.navigate(_this.history.previousFragment, false);
+            }
+          });
+        };
+
+        AppRouter.prototype.queueInstruction = function queueInstruction(instruction) {
+          var _this2 = this;
+
+          return new Promise(function (resolve) {
+            instruction.resolve = resolve;
+            _this2.queue.unshift(instruction);
+            _this2.dequeueInstruction();
+          });
+        };
+
+        AppRouter.prototype.dequeueInstruction = function dequeueInstruction() {
+          var _this3 = this;
+
+          if (this.isNavigating) {
+            return;
+          }
+
+          var instruction = this.queue.shift();
+          this.queue = [];
+
+          if (!instruction) {
+            return;
+          }
+
+          this.isNavigating = true;
+          this.events.publish('router:navigation:processing', instruction);
+
+          var context = this.createNavigationContext(instruction);
+          var pipeline = this.pipelineProvider.createPipeline(context);
+
+          pipeline.run(context).then(function (result) {
+            _this3.isNavigating = false;
+
+            if (!(result && 'completed' in result && 'output' in result)) {
+              throw new Error('Expected router pipeline to return a navigation result, but got [' + JSON.stringify(result) + '] instead.');
+            }
+
+            if (result.completed) {
+              _this3.history.previousFragment = instruction.fragment;
+            }
+
+            if (result.output instanceof Error) {
+              console.error(result.output);
+              _this3.events.publish('router:navigation:error', { instruction: instruction, result: result });
+            }
+
+            if (isNavigationCommand(result.output)) {
+              result.output.navigate(_this3);
+            } else if (!result.completed) {
+              _this3.navigate(_this3.history.previousFragment || '', false);
+              _this3.events.publish('router:navigation:cancelled', instruction);
+            }
+
+            instruction.resolve(result);
+            _this3.dequeueInstruction();
+          }).then(function (result) {
+            return _this3.events.publish('router:navigation:complete', instruction);
+          })['catch'](function (error) {
+            console.error(error);
+          });
+        };
+
+        AppRouter.prototype.registerViewPort = function registerViewPort(viewPort, name) {
+          var _this4 = this;
+
+          _Router.prototype.registerViewPort.call(this, viewPort, name);
+
+          if (!this.isActive) {
+            if ('configureRouter' in this.container.viewModel) {
+              var config = new RouterConfiguration();
+              var result = Promise.resolve(this.container.viewModel.configureRouter(config, this));
+
+              return result.then(function () {
+                _this4.configure(config);
+                _this4.activate();
+              });
+            } else {
+              this.activate();
+            }
+          } else {
+            this.dequeueInstruction();
+          }
+        };
+
+        AppRouter.prototype.activate = function activate(options) {
+          if (this.isActive) {
+            return;
+          }
+
+          this.isActive = true;
+          this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
+          this.history.activate(this.options);
+          this.dequeueInstruction();
+        };
+
+        AppRouter.prototype.deactivate = function deactivate() {
+          this.isActive = false;
+          this.history.deactivate();
+        };
+
+        AppRouter.prototype.reset = function reset() {
+          _Router.prototype.reset.call(this);
+          this.queue = [];
+          this.options = null;
+        };
+
         _createClass(AppRouter, [{
           key: 'isRoot',
           get: function () {
             return true;
-          }
-        }, {
-          key: 'loadUrl',
-          value: function loadUrl(url) {
-            var _this = this;
-
-            return this.createNavigationInstruction(url).then(function (instruction) {
-              return _this.queueInstruction(instruction);
-            })['catch'](function (error) {
-              console.error(error);
-
-              if (_this.history.previousFragment) {
-                _this.navigate(_this.history.previousFragment, false);
-              }
-            });
-          }
-        }, {
-          key: 'queueInstruction',
-          value: function queueInstruction(instruction) {
-            var _this2 = this;
-
-            return new Promise(function (resolve) {
-              instruction.resolve = resolve;
-              _this2.queue.unshift(instruction);
-              _this2.dequeueInstruction();
-            });
-          }
-        }, {
-          key: 'dequeueInstruction',
-          value: function dequeueInstruction() {
-            var _this3 = this;
-
-            if (this.isNavigating) {
-              return;
-            }
-
-            var instruction = this.queue.shift();
-            this.queue = [];
-
-            if (!instruction) {
-              return;
-            }
-
-            this.isNavigating = true;
-            this.events.publish('router:navigation:processing', instruction);
-
-            var context = this.createNavigationContext(instruction);
-            var pipeline = this.pipelineProvider.createPipeline(context);
-
-            pipeline.run(context).then(function (result) {
-              _this3.isNavigating = false;
-
-              if (!(result && 'completed' in result && 'output' in result)) {
-                throw new Error('Expected router pipeline to return a navigation result, but got [' + JSON.stringify(result) + '] instead.');
-              }
-
-              if (result.completed) {
-                _this3.history.previousFragment = instruction.fragment;
-              }
-
-              if (result.output instanceof Error) {
-                console.error(result.output);
-                _this3.events.publish('router:navigation:error', { instruction: instruction, result: result });
-              }
-
-              if (isNavigationCommand(result.output)) {
-                result.output.navigate(_this3);
-              } else if (!result.completed) {
-                _this3.navigate(_this3.history.previousFragment || '', false);
-                _this3.events.publish('router:navigation:cancelled', instruction);
-              }
-
-              instruction.resolve(result);
-              _this3.dequeueInstruction();
-            }).then(function (result) {
-              return _this3.events.publish('router:navigation:complete', instruction);
-            })['catch'](function (error) {
-              console.error(error);
-            });
-          }
-        }, {
-          key: 'registerViewPort',
-          value: function registerViewPort(viewPort, name) {
-            var _this4 = this;
-
-            _get(Object.getPrototypeOf(AppRouter.prototype), 'registerViewPort', this).call(this, viewPort, name);
-
-            if (!this.isActive) {
-              if ('configureRouter' in this.container.viewModel) {
-                var result = this.container.viewModel.configureRouter() || Promise.resolve();
-                return result.then(function () {
-                  return _this4.activate();
-                });
-              } else {
-                this.activate();
-              }
-            } else {
-              this.dequeueInstruction();
-            }
-          }
-        }, {
-          key: 'activate',
-          value: function activate(options) {
-            if (this.isActive) {
-              return;
-            }
-
-            this.isActive = true;
-            this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
-            this.history.activate(this.options);
-            this.dequeueInstruction();
-          }
-        }, {
-          key: 'deactivate',
-          value: function deactivate() {
-            this.isActive = false;
-            this.history.deactivate();
-          }
-        }, {
-          key: 'reset',
-          value: function reset() {
-            _get(Object.getPrototypeOf(AppRouter.prototype), 'reset', this).call(this);
-            this.queue = [];
-            this.options = null;
-          }
-        }], [{
-          key: 'inject',
-          value: function inject() {
-            return [Container, History, PipelineProvider, EventAggregator];
           }
         }]);
 

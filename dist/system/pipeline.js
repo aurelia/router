@@ -1,12 +1,12 @@
 System.register(['core-js'], function (_export) {
-  var core, _classCallCheck, _createClass, COMPLETED, CANCELLED, REJECTED, RUNNING, Pipeline;
+  var core, _classCallCheck, pipelineStatus, Pipeline;
 
   function createResult(ctx, next) {
     return {
       status: next.status,
       context: ctx,
       output: next.output,
-      completed: next.status == COMPLETED
+      completed: next.status == pipelineStatus.completed
     };
   }
 
@@ -19,23 +19,14 @@ System.register(['core-js'], function (_export) {
 
       _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+      pipelineStatus = {
+        completed: 'completed',
+        cancelled: 'cancelled',
+        rejected: 'rejected',
+        running: 'running'
+      };
 
-      COMPLETED = 'completed';
-
-      _export('COMPLETED', COMPLETED);
-
-      CANCELLED = 'cancelled';
-
-      _export('CANCELLED', CANCELLED);
-
-      REJECTED = 'rejected';
-
-      _export('REJECTED', REJECTED);
-
-      RUNNING = 'running';
-
-      _export('RUNNING', RUNNING);
+      _export('pipelineStatus', pipelineStatus);
 
       Pipeline = (function () {
         function Pipeline() {
@@ -44,75 +35,71 @@ System.register(['core-js'], function (_export) {
           this.steps = [];
         }
 
-        _createClass(Pipeline, [{
-          key: 'withStep',
-          value: function withStep(step) {
-            var run, steps, i, l;
+        Pipeline.prototype.withStep = function withStep(step) {
+          var run, steps, i, l;
 
-            if (typeof step == 'function') {
-              run = step;
-            } else if (step.isMultiStep) {
-              steps = step.getSteps();
-              for (i = 0, l = steps.length; i < l; i++) {
-                this.withStep(steps[i]);
-              }
-
-              return this;
-            } else {
-              run = step.run.bind(step);
+          if (typeof step == 'function') {
+            run = step;
+          } else if (step.isMultiStep) {
+            steps = step.getSteps();
+            for (i = 0, l = steps.length; i < l; i++) {
+              this.withStep(steps[i]);
             }
 
-            this.steps.push(run);
-
             return this;
+          } else {
+            run = step.run.bind(step);
           }
-        }, {
-          key: 'run',
-          value: function run(ctx) {
-            var index = -1,
-                steps = this.steps,
-                next,
-                currentStep;
 
-            next = function () {
-              index++;
+          this.steps.push(run);
 
-              if (index < steps.length) {
-                currentStep = steps[index];
+          return this;
+        };
 
-                try {
-                  return currentStep(ctx, next);
-                } catch (e) {
-                  return next.reject(e);
-                }
-              } else {
-                return next.complete();
+        Pipeline.prototype.run = function run(ctx) {
+          var index = -1,
+              steps = this.steps,
+              next,
+              currentStep;
+
+          next = function () {
+            index++;
+
+            if (index < steps.length) {
+              currentStep = steps[index];
+
+              try {
+                return currentStep(ctx, next);
+              } catch (e) {
+                return next.reject(e);
               }
-            };
+            } else {
+              return next.complete();
+            }
+          };
 
-            next.complete = function (output) {
-              next.status = COMPLETED;
-              next.output = output;
-              return Promise.resolve(createResult(ctx, next));
-            };
+          next.complete = function (output) {
+            next.status = pipelineStatus.completed;
+            next.output = output;
+            return Promise.resolve(createResult(ctx, next));
+          };
 
-            next.cancel = function (reason) {
-              next.status = CANCELLED;
-              next.output = reason;
-              return Promise.resolve(createResult(ctx, next));
-            };
+          next.cancel = function (reason) {
+            next.status = pipelineStatus.cancelled;
+            next.output = reason;
+            return Promise.resolve(createResult(ctx, next));
+          };
 
-            next.reject = function (error) {
-              next.status = REJECTED;
-              next.output = error;
-              return Promise.reject(createResult(ctx, next));
-            };
+          next.reject = function (error) {
+            next.status = pipelineStatus.rejected;
+            next.output = error;
+            return Promise.reject(createResult(ctx, next));
+          };
 
-            next.status = RUNNING;
+          next.status = pipelineStatus.running;
 
-            return next();
-          }
-        }]);
+          return next();
+        };
 
         return Pipeline;
       })();

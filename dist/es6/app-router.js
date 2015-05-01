@@ -5,6 +5,7 @@ import {Router} from './router';
 import {PipelineProvider} from './pipeline-provider';
 import {isNavigationCommand} from './navigation-commands';
 import {EventAggregator} from 'aurelia-event-aggregator';
+import {RouterConfiguration} from './router-configuration';
 
 export class AppRouter extends Router {
   static inject(){ return [Container, History, PipelineProvider, EventAggregator]; }
@@ -20,9 +21,9 @@ export class AppRouter extends Router {
   }
 
   loadUrl(url) {
-    return this.createNavigationInstruction(url).
-      then(instruction => this.queueInstruction(instruction)).
-      catch(error => {
+    return this.createNavigationInstruction(url)
+      .then(instruction => this.queueInstruction(instruction))
+      .catch(error => {
         console.error(error);
 
         if (this.history.previousFragment) {
@@ -94,8 +95,13 @@ export class AppRouter extends Router {
 
     if (!this.isActive) {
       if('configureRouter' in this.container.viewModel){
-        var result = this.container.viewModel.configureRouter() || Promise.resolve();
-        return result.then(() => this.activate());
+        var config = new RouterConfiguration();
+        var result = Promise.resolve(this.container.viewModel.configureRouter(config, this));
+
+        return result.then(() => {
+          this.configure(config);
+          this.activate();
+        });
       }else{
         this.activate();
       }

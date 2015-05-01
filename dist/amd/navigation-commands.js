@@ -5,11 +5,7 @@ define(['exports', 'core-js'], function (exports, _coreJs) {
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-  Object.defineProperty(exports, '__esModule', {
-    value: true
-  });
+  exports.__esModule = true;
   exports.isNavigationCommand = isNavigationCommand;
 
   var _core = _interopRequire(_coreJs);
@@ -27,18 +23,14 @@ define(['exports', 'core-js'], function (exports, _coreJs) {
       this.shouldContinueProcessing = false;
     }
 
-    _createClass(Redirect, [{
-      key: 'setRouter',
-      value: function setRouter(router) {
-        this.router = router;
-      }
-    }, {
-      key: 'navigate',
-      value: function navigate(appRouter) {
-        var navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
-        navigatingRouter.navigate(this.url, this.options);
-      }
-    }]);
+    Redirect.prototype.setRouter = function setRouter(router) {
+      this.router = router;
+    };
+
+    Redirect.prototype.navigate = function navigate(appRouter) {
+      var navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
+      navigatingRouter.navigate(this.url, this.options);
+    };
 
     return Redirect;
   })();
