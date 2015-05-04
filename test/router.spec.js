@@ -40,10 +40,11 @@ describe('the router', () => {
     });
 
     it('should add a route to navigation if it has a nav=true', () => {
-      var testRoute = {};
+      const config = { route: 'test', moduleId: 'test', title: 'Resume', nav: true };
+      const navModel = router.createNavModel(config);
 
-      router.addRoute({ route: 'test', moduleId: 'test', title: 'Resume', nav: true }, testRoute);
-      expect(router.navigation).toContain(testRoute);
+      router.addRoute(config, navModel);
+      expect(router.navigation).toContain(navModel);
     });
 
     it('should not add a route to navigation if it has a nav=false', () => {
