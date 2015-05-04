@@ -107,6 +107,7 @@ export class RouterConfiguration{
     config.route = ensureConfigValue(config, 'route', this.deriveRoute);
     config.title = ensureConfigValue(config, 'title', this.deriveTitle);
     config.moduleId = ensureConfigValue(config, 'moduleId', this.deriveModuleId);
+    config.settings = config.settings || {};
   }
 
   deriveName(config) {

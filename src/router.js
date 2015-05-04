@@ -3,6 +3,7 @@ import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {join} from 'aurelia-path';
 import {NavigationContext} from './navigation-context';
 import {NavigationInstruction} from './navigation-instruction';
+import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
 import {processPotential} from './util';
 
@@ -175,6 +176,8 @@ export class Router {
     navModel.title = config.title;
     navModel.order = config.nav;
     navModel.href = config.href;
+    navModel.settings = config.settings;
+    navModel.config = config;
 
     return navModel;
   }
@@ -261,6 +264,14 @@ export class Router {
     });
 
     this.catchAllHandler = callback;
+  }
+
+  updateTitle() {
+    if (this.parent) {
+      return this.parent.updateTitle();
+    }
+
+    this.currentInstruction.navigationContext.updateTitle();
   }
 
   reset() {
