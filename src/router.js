@@ -6,7 +6,8 @@ import {NavigationInstruction} from './navigation-instruction';
 import {RouterConfiguration} from './router-configuration';
 import {processPotential} from './util';
 
-const isRooted = /^#?\//;
+const isRootedPath = /^#?\//;
+const isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
 
 export class Router {
   constructor(container, history) {
@@ -58,6 +59,10 @@ export class Router {
   }
 
   createRootedPath(fragment) {
+    if (isAbsoluteUrl.test(fragment)) {
+      return fragment;
+    }
+
     let path = '';
 
     if (this.baseUrl.length && this.baseUrl[0] !== '/') {
@@ -82,7 +87,7 @@ export class Router {
       fragment = '/';
     }
 
-    if (isRooted.test(fragment)) {
+    if (isRootedPath.test(fragment)) {
       fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
     } else {
       fragment = this.createRootedPath(fragment);
