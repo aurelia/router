@@ -11,7 +11,8 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
 
   var _core = _interopRequire(_coreJs);
 
-  var isRooted = /^#?\//;
+  var isRootedPath = /^#?\//;
+  var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
 
   var Router = (function () {
     function Router(container, history) {
@@ -61,6 +62,10 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
     };
 
     Router.prototype.createRootedPath = function createRootedPath(fragment) {
+      if (isAbsoluteUrl.test(fragment)) {
+        return fragment;
+      }
+
       var path = '';
 
       if (this.baseUrl.length && this.baseUrl[0] !== '/') {
@@ -85,7 +90,7 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
         fragment = '/';
       }
 
-      if (isRooted.test(fragment)) {
+      if (isRootedPath.test(fragment)) {
         fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
       } else {
         fragment = this.createRootedPath(fragment);
@@ -145,8 +150,8 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
 
         if (typeof first.handler === 'function') {
           return evaluateNavigationStrategy(instruction, first.handler, first);
-        } else if (first.config && 'navigationStrategy' in first.config) {
-          return evaluateNavigationStrategy(instruction, first.config.navigationStrategy, first.config);
+        } else if (first.handler && 'navigationStrategy' in first.handler) {
+          return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
         }
 
         return Promise.resolve(instruction);
@@ -173,7 +178,7 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
 
       validateRouteConfig(config);
 
-      if (!('viewPorts' in config)) {
+      if (!('viewPorts' in config) && !config.navigationStrategy) {
         config.viewPorts = {
           'default': {
             moduleId: config.moduleId,
@@ -294,10 +299,10 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
   exports.Router = Router;
 
   function validateRouteConfig(config) {
-    var isValid = typeof config === 'object' && (config.moduleId || config.redirect || config.viewPorts) && config.route !== null && config.route !== undefined;
+    var isValid = typeof config === 'object' && (config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts) && config.route !== null && config.route !== undefined;
 
     if (!isValid) {
-      throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, or viewPorts.');
+      throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, navigationStrategy or viewPorts.');
     }
   }
 

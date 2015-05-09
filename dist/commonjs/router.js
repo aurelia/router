@@ -24,7 +24,8 @@ var _RouterConfiguration = require('./router-configuration');
 
 var _processPotential = require('./util');
 
-var isRooted = /^#?\//;
+var isRootedPath = /^#?\//;
+var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
 
 var Router = (function () {
   function Router(container, history) {
@@ -74,6 +75,10 @@ var Router = (function () {
   };
 
   Router.prototype.createRootedPath = function createRootedPath(fragment) {
+    if (isAbsoluteUrl.test(fragment)) {
+      return fragment;
+    }
+
     var path = '';
 
     if (this.baseUrl.length && this.baseUrl[0] !== '/') {
@@ -98,7 +103,7 @@ var Router = (function () {
       fragment = '/';
     }
 
-    if (isRooted.test(fragment)) {
+    if (isRootedPath.test(fragment)) {
       fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
     } else {
       fragment = this.createRootedPath(fragment);
@@ -158,8 +163,8 @@ var Router = (function () {
 
       if (typeof first.handler === 'function') {
         return evaluateNavigationStrategy(instruction, first.handler, first);
-      } else if (first.config && 'navigationStrategy' in first.config) {
-        return evaluateNavigationStrategy(instruction, first.config.navigationStrategy, first.config);
+      } else if (first.handler && 'navigationStrategy' in first.handler) {
+        return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
       }
 
       return Promise.resolve(instruction);
@@ -186,7 +191,7 @@ var Router = (function () {
 
     validateRouteConfig(config);
 
-    if (!('viewPorts' in config)) {
+    if (!('viewPorts' in config) && !config.navigationStrategy) {
       config.viewPorts = {
         'default': {
           moduleId: config.moduleId,
@@ -307,10 +312,10 @@ var Router = (function () {
 exports.Router = Router;
 
 function validateRouteConfig(config) {
-  var isValid = typeof config === 'object' && (config.moduleId || config.redirect || config.viewPorts) && config.route !== null && config.route !== undefined;
+  var isValid = typeof config === 'object' && (config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts) && config.route !== null && config.route !== undefined;
 
   if (!isValid) {
-    throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, or viewPorts.');
+    throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, navigationStrategy or viewPorts.');
   }
 }
 

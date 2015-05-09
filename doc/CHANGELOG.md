@@ -1,3 +1,14 @@
+### 0.8.1 (2015-05-09)
+
+
+#### Bug Fixes
+
+* **pipeline:** fix bug preventing errors in pipeline steps from being handled ([6ee2eb87](http://github.com/aurelia/router/commit/6ee2eb87a8607981794cb02981b94c9e21e6ebc2), closes [#85](http://github.com/aurelia/router/issues/85))
+* **router:**
+  * correctly handle absolute URLs when navigating ([df1633cd](http://github.com/aurelia/router/commit/df1633cddeeae401ef56b63bcc71d8dd2f41a4a0), closes [#92](http://github.com/aurelia/router/issues/92))
+  * using navigationStrategy throws a validation error ([80eb22f0](http://github.com/aurelia/router/commit/80eb22f036b1483d4b0705126b1ba3de5783872f))
+
+
 ## 0.8.0 (2015-04-30)
 
 
