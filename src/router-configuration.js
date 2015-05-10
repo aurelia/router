@@ -37,16 +37,27 @@ export class RouterConfiguration{
 
   mapRoute(config) {
     this.instructions.push(router => {
-      if (Array.isArray(config.route)) {
-        var navModel = {}, i, ii, current;
+      let routeConfigs = [];
 
-        for (i = 0, ii = config.route.length; i < ii; ++i) {
-          current = Object.assign({}, config);
+      if (Array.isArray(config.route)) {
+        for (let i = 0, ii = config.route.length; i < ii; i++) {
+          let current = Object.assign({}, config);
           current.route = config.route[i];
-          this.configureRoute(router, current, navModel);
+          routeConfigs.push(current);
         }
       } else {
-        this.configureRoute(router, Object.assign({}, config));
+        routeConfigs.push(Object.assign({}, config));
+      }
+
+      let navModel;
+      for (let i = 0, ii = routeConfigs.length; i < ii; i++) {
+        let routeConfig = routeConfigs[i];
+        this.ensureDefaultsForRouteConfig(routeConfig);
+        if (!navModel) {
+          navModel = router.createNavModel(routeConfig);
+        }
+
+        router.addRoute(routeConfig, navModel);
       }
     });
 
@@ -91,16 +102,12 @@ export class RouterConfiguration{
     }
   }
 
-  configureRoute(router, config, navModel) {
-    this.ensureDefaultsForRouteConfig(config);
-    router.addRoute(config, navModel);
-  }
-
   ensureDefaultsForRouteConfig(config) {
     config.name =  ensureConfigValue(config, 'name', this.deriveName);
     config.route = ensureConfigValue(config, 'route', this.deriveRoute);
     config.title = ensureConfigValue(config, 'title', this.deriveTitle);
     config.moduleId = ensureConfigValue(config, 'moduleId', this.deriveModuleId);
+    config.settings = config.settings || {};
   }
 
   deriveName(config) {
