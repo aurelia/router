@@ -25,7 +25,7 @@ export class RouterConfiguration{
       let routeConfigs = [];
 
       if (Array.isArray(config.route)) {
-        for (let i = 0, ii = config.route.length; i < ii; i++) {
+        for (let i = 0, ii = config.route.length; i < ii; ++i) {
           let current = Object.assign({}, config);
           current.route = config.route[i];
           routeConfigs.push(current);
@@ -35,7 +35,7 @@ export class RouterConfiguration{
       }
 
       let navModel;
-      for (let i = 0, ii = routeConfigs.length; i < ii; i++) {
+      for (let i = 0, ii = routeConfigs.length; i < ii; ++i) {
         let routeConfig = routeConfigs[i];
         routeConfig.settings = routeConfig.settings || {};
         if (!navModel) {
@@ -55,11 +55,8 @@ export class RouterConfiguration{
   }
 
   exportToRouter(router) {
-    var instructions = this.instructions,
-        pipelineSteps = this.pipelineSteps,
-        i, ii, filterContainer;
-
-    for (i = 0, ii = instructions.length; i < ii; ++i) {
+    let instructions = this.instructions;
+    for (let i = 0, ii = instructions.length; i < ii; ++i) {
       instructions[i](router);
     }
 
@@ -73,15 +70,15 @@ export class RouterConfiguration{
 
     router.options = this.options;
 
+    let pipelineSteps = this.pipelineSteps;
     if (pipelineSteps.length) {
-      // Pipeline steps should only be added at the app router
       if (!router.isRoot) {
         throw new Error('Pipeline steps can only be added to the root router');
       }
 
-      filterContainer = router.container.get(RouteFilterContainer);
-      for (i = 0, ii = pipelineSteps.length; i < ii; ++i) {
-        var {name, step} = pipelineSteps[i];
+      let filterContainer = router.container.get(RouteFilterContainer);
+      for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
+        let {name, step} = pipelineSteps[i];
         filterContainer.addStep(name, step);
       }
     }
