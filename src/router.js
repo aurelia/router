@@ -291,12 +291,16 @@ export class Router {
 }
 
 function validateRouteConfig(config) {
-  let isValid = typeof config === 'object'
-    && (config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts)
-    && config.route !== null && config.route !== undefined;
+  if (typeof config !== 'object') {
+    throw new Error('Invalid Route Config');
+  }
 
-  if (!isValid) {
-    throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, navigationStrategy or viewPorts.');
+  if (typeof config.route !== 'string') {
+    throw new Error('Invalid Route Config: You must specify a route pattern.');
+  }
+
+  if (!(config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts)) {
+    throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.')
   }
 }
 

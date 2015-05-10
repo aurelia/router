@@ -11,28 +11,13 @@ export class RouterConfiguration{
     this.pipelineSteps.push({name, step});
   }
 
-  map(route, config) {
+  map(route) {
     if (Array.isArray(route)) {
-      for (var i = 0; i < route.length; i++) {
-        this.map(route[i]);
-      }
-
+      route.forEach(this.map.bind(this));
       return this;
     }
 
-    if (typeof route == 'string') {
-      if (!config) {
-        config = {};
-      } else if (typeof config == 'string') {
-        config = { moduleId: config };
-      }
-
-      config.route = route;
-    } else {
-      config = route;
-    }
-
-    return this.mapRoute(config);
+    return this.mapRoute(route);
   }
 
   mapRoute(config) {
@@ -52,7 +37,7 @@ export class RouterConfiguration{
       let navModel;
       for (let i = 0, ii = routeConfigs.length; i < ii; i++) {
         let routeConfig = routeConfigs[i];
-        this.ensureDefaultsForRouteConfig(routeConfig);
+        routeConfig.settings = routeConfig.settings || {};
         if (!navModel) {
           navModel = router.createNavModel(routeConfig);
         }
@@ -101,45 +86,4 @@ export class RouterConfiguration{
       }
     }
   }
-
-  ensureDefaultsForRouteConfig(config) {
-    config.name =  ensureConfigValue(config, 'name', this.deriveName);
-    config.route = ensureConfigValue(config, 'route', this.deriveRoute);
-    config.title = ensureConfigValue(config, 'title', this.deriveTitle);
-    config.moduleId = ensureConfigValue(config, 'moduleId', this.deriveModuleId);
-    config.settings = config.settings || {};
-  }
-
-  deriveName(config) {
-    return config.title || (config.route ? stripParametersFromRoute(config.route) : config.moduleId);
-  }
-
-  deriveRoute(config) {
-    return config.moduleId || config.name;
-  }
-
-  deriveTitle(config) {
-    var value = config.name;
-    return value ? value.substr(0, 1).toUpperCase() + value.substr(1) : null;
-  }
-
-  deriveModuleId(config) {
-    return stripParametersFromRoute(config.route);
-  }
-}
-
-function ensureConfigValue(config, property, getter) {
-  var value = config[property];
-
-  if (value || value === '') {
-    return value;
-  }
-
-  return getter(config);
-}
-
-function stripParametersFromRoute(route) {
-  var colonIndex = route.indexOf(':');
-  var length = colonIndex > 0 ? colonIndex - 1 : route.length;
-  return route.substr(0, length);
 }
