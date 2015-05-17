@@ -127,12 +127,22 @@ describe('the router', () => {
       child.baseUrl = 'child-router';
 
       router.configure(config => {
-        config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' });
+        config.map([
+          { name: 'parent', route: 'parent/:id', moduleId: './test' },
+          { name: 'parent-empty', route: '', moduleId: './parent-empty' }
+        ]);
       });
 
       child.configure(config => {
-        config.map({ name: 'child', route: 'child/:id', moduleId: './test' });
+        config.map([
+          { name: 'child', route: 'child/:id', moduleId: './test' },
+          { name: 'empty', route: '', moduleId: './empty' },
+        ]);
       });
+
+      router.navigate('', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/', options);
+      history.navigate.calls.reset();
 
       router.navigate('#/test1', options);
       expect(history.navigate).toHaveBeenCalledWith('#/test1', options);
@@ -168,6 +178,10 @@ describe('the router', () => {
 
       child.navigate('child-router/test9', options);
       expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options);
+      history.navigate.calls.reset();
+
+      child.navigate('', options);
+      expect(history.navigate).toHaveBeenCalledWith('#/child-router/', options);
       history.navigate.calls.reset();
     });
 

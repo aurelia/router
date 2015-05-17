@@ -84,10 +84,6 @@ export class Router {
       return this.parent.navigate(fragment, options);
     }
 
-    if (fragment === '') {
-      fragment = '/';
-    }
-
     if (isRootedPath.test(fragment)) {
       fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
     } else {
