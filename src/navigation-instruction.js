@@ -29,16 +29,16 @@ export class NavigationInstruction {
   }
 
   getWildCardName() {
-    var wildcardIndex = this.config.route.lastIndexOf('*');
+    let wildcardIndex = this.config.route.lastIndexOf('*');
     return this.config.route.substr(wildcardIndex + 1);
   }
 
   getWildcardPath() {
-    var wildcardName = this.getWildCardName(),
-        path = this.params[wildcardName];
+    let wildcardName = this.getWildCardName();
+    let path = this.params[wildcardName] || '';
 
     if (this.queryString) {
-      path += "?" + this.queryString;
+      path += '?' + this.queryString;
     }
 
     return path;
@@ -49,8 +49,8 @@ export class NavigationInstruction {
       return this.fragment;
     }
 
-    var wildcardName = this.getWildCardName(),
-        path = this.params[wildcardName];
+    let wildcardName = this.getWildCardName();
+    let path = this.params[wildcardName] || '';
 
     if (!path) {
       return this.fragment;
