@@ -5,10 +5,11 @@ import {NavigationContext} from './navigation-context';
 import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
-import {processPotential} from './util';
-
-const isRootedPath = /^#?\//;
-const isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+import {
+  processPotential,
+  normalizeAbsolutePath,
+  createRootedPath,
+  resolveUrl} from './util';
 
 export class Router {
   constructor(container, history) {
@@ -41,7 +42,7 @@ export class Router {
 
     for(var i = 0, length = nav.length; i < length; i++) {
       var current = nav[i];
-      current.href = this.createRootedPath(current.relativeHref);
+      current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
     }
   }
 
@@ -59,38 +60,12 @@ export class Router {
     return this;
   }
 
-  createRootedPath(fragment) {
-    if (isAbsoluteUrl.test(fragment)) {
-      return fragment;
-    }
-
-    let path = '';
-
-    if (this.baseUrl.length && this.baseUrl[0] !== '/') {
-      path += '/';
-    }
-
-    path += this.baseUrl;
-
-    if (path[path.length - 1] != '/' && fragment[0] != '/') {
-      path += '/';
-    }
-
-    return normalizeAbsolutePath(path + fragment, this.history._hasPushState);
-  }
-
   navigate(fragment, options) {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
 
-    if (isRootedPath.test(fragment)) {
-      fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
-    } else {
-      fragment = this.createRootedPath(fragment);
-    }
-
-    return this.history.navigate(fragment, options);
+    return this.history.navigate(resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
   navigateToRoute(route, params, options) {
@@ -169,7 +144,7 @@ export class Router {
     }
 
     let path = this.recognizer.generate(name, params);
-    return this.createRootedPath(path);
+    return createRootedPath(path, this.baseUrl, this.history._hasPushState); 
   }
 
   createNavModel(config) {
@@ -295,17 +270,9 @@ function validateRouteConfig(config) {
     throw new Error('Invalid Route Config: You must specify a route pattern.');
   }
 
-  if (!(config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts)) {
+  if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
     throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.')
   }
-}
-
-function normalizeAbsolutePath(path, hasPushState) {
-    if (!hasPushState && path[0] !== '#') {
-      path = '#' + path;
-    }
-
-    return path;
 }
 
 function evaluateNavigationStrategy(instruction, evaluator, context){
