@@ -88,14 +88,15 @@ function loadRoute(routeLoader, navigationContext, viewPortPlan) {
 
       return childRouter.createNavigationInstruction(path, next)
         .then(childInstruction => {
-          viewPortPlan.childNavigationContext = childRouter.createNavigationContext(childInstruction);
+          let childNavigationContext = childRouter.createNavigationContext(childInstruction);
+          viewPortPlan.childNavigationContext = childNavigationContext;
 
-          return buildNavigationPlan(viewPortPlan.childNavigationContext)
+          return buildNavigationPlan(childNavigationContext)
             .then(childPlan => {
-              viewPortPlan.childNavigationContext.plan = childPlan;
-              viewPortInstruction.childNavigationContext = viewPortPlan.childNavigationContext;
+              childNavigationContext.plan = childPlan;
+              viewPortInstruction.childNavigationContext = childNavigationContext;
 
-              return loadNewRoute(routeLoader, viewPortPlan.childNavigationContext);
+              return loadNewRoute(routeLoader, childNavigationContext);
             });
         });
     }
