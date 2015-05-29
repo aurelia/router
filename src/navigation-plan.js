@@ -99,5 +99,11 @@ function hasDifferentParameterValues(prev, next) {
     }
   }
 
+  for (var key in prevParams) {
+    if (prevParams[key] !== nextParams[key]) {
+      return true;
+    }
+  }
+
   return false;
 }
