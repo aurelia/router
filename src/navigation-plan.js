@@ -90,16 +90,20 @@ function hasDifferentParameterValues(prev, next) {
       nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
   for (var key in nextParams) {
-    if (key == nextWildCardName) {
+    if (key === nextWildCardName) {
       continue;
     }
 
-    if (prevParams[key] != nextParams[key]) {
+    if (prevParams[key] !== nextParams[key]) {
       return true;
     }
   }
 
   for (var key in prevParams) {
+    if (key === nextWildCardName) {
+      continue;
+    }
+
     if (prevParams[key] !== nextParams[key]) {
       return true;
     }
