@@ -11,6 +11,7 @@ export class NavigationInstruction {
     this.config = config;
     this.lifecycleArgs = [allParams, config, this];
     this.viewPortInstructions = {};
+    this.parentInstruction = parentInstruction;
 
     if (parentInstruction) {
       this.params.$parent = parentInstruction.params;
