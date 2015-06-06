@@ -39,8 +39,12 @@ export function createRootedPath(fragment, baseUrl, hasPushState) {
 
   path += baseUrl;
 
-  if (path[path.length - 1] != '/' && fragment[0] != '/') {
+  if ((!path.length || path[path.length - 1] != '/') && fragment[0] != '/') {
     path += '/';
+  }
+
+  if (path.length && path[path.length - 1] == '/' && fragment[0] == '/') {
+    path = path.substring(0, path.length - 1);
   }
 
   return normalizeAbsolutePath(path + fragment, hasPushState);
