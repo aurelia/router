@@ -1,13 +1,26 @@
-System.register(['./navigation-commands'], function (_export) {
-  var Redirect, _classCallCheck, activationStrategy, BuildNavigationPlanStep;
+System.register(['./navigation-commands', './util'], function (_export) {
+  'use strict';
+
+  var Redirect, resolveUrl, activationStrategy, BuildNavigationPlanStep;
 
   _export('buildNavigationPlan', buildNavigationPlan);
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
     var prev = navigationContext.prevInstruction;
     var next = navigationContext.nextInstruction;
     var plan = {},
         viewPortName;
+
+    if ('redirect' in next.config) {
+      var redirectLocation = resolveUrl(next.config.redirect, getInstructionBaseUrl(next));
+      if (next.queryString) {
+        redirectLocation += '?' + next.queryString;
+      }
+
+      return Promise.reject(new Redirect(redirectLocation));
+    }
 
     if (prev) {
       var newParams = hasDifferentParameterValues(prev, next);
@@ -71,26 +84,44 @@ System.register(['./navigation-commands'], function (_export) {
         nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
     for (var key in nextParams) {
-      if (key == nextWildCardName) {
+      if (key === nextWildCardName) {
         continue;
       }
 
-      if (prevParams[key] != nextParams[key]) {
+      if (prevParams[key] !== nextParams[key]) {
+        return true;
+      }
+    }
+
+    for (var key in prevParams) {
+      if (key === nextWildCardName) {
+        continue;
+      }
+
+      if (prevParams[key] !== nextParams[key]) {
         return true;
       }
     }
 
     return false;
   }
+
+  function getInstructionBaseUrl(instruction) {
+    var instructionBaseUrlParts = [];
+    while (instruction = instruction.parentInstruction) {
+      instructionBaseUrlParts.unshift(instruction.getBaseUrl());
+    }
+
+    instructionBaseUrlParts.unshift('/');
+    return instructionBaseUrlParts.join('');
+  }
   return {
     setters: [function (_navigationCommands) {
       Redirect = _navigationCommands.Redirect;
+    }, function (_util) {
+      resolveUrl = _util.resolveUrl;
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       activationStrategy = {
         noChange: 'no-change',
         invokeLifecycle: 'invoke-lifecycle',
@@ -105,10 +136,6 @@ System.register(['./navigation-commands'], function (_export) {
         }
 
         BuildNavigationPlanStep.prototype.run = function run(navigationContext, next) {
-          if (navigationContext.nextInstruction.config.redirect) {
-            return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
-          }
-
           return buildNavigationPlan(navigationContext).then(function (plan) {
             navigationContext.plan = plan;
             return next();

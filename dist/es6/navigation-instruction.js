@@ -2,19 +2,29 @@ import core from 'core-js';
 
 export class NavigationInstruction {
   constructor(fragment, queryString, params, queryParams, config, parentInstruction) {
-    const allParams = Object.assign({}, queryParams, params);
-
     this.fragment = fragment;
     this.queryString = queryString;
     this.params = params || {};
     this.queryParams = queryParams;
     this.config = config;
-    this.lifecycleArgs = [allParams, config, this];
     this.viewPortInstructions = {};
+    this.parentInstruction = parentInstruction;
 
-    if (parentInstruction) {
-      this.params.$parent = parentInstruction.params;
-    }
+    let ancestorParams = [];
+    let current = this;
+    do {
+      let currentParams = Object.assign({}, current.params);
+      if (current.config.hasChildRouter) {
+        // remove the param for the injected child route segment
+        delete currentParams[current.getWildCardName()];
+      }
+
+      ancestorParams.unshift(currentParams);
+      current = current.parentInstruction;
+    } while(current);
+
+    let allParams = Object.assign({}, queryParams, ...ancestorParams);
+    this.lifecycleArgs = [allParams, config, this];
   }
 
   addViewPortInstruction(viewPortName, strategy, moduleId, component) {
@@ -29,16 +39,16 @@ export class NavigationInstruction {
   }
 
   getWildCardName() {
-    var wildcardIndex = this.config.route.lastIndexOf('*');
+    let wildcardIndex = this.config.route.lastIndexOf('*');
     return this.config.route.substr(wildcardIndex + 1);
   }
 
   getWildcardPath() {
-    var wildcardName = this.getWildCardName(),
-        path = this.params[wildcardName];
+    let wildcardName = this.getWildCardName();
+    let path = this.params[wildcardName] || '';
 
     if (this.queryString) {
-      path += "?" + this.queryString;
+      path += '?' + this.queryString;
     }
 
     return path;
@@ -49,8 +59,8 @@ export class NavigationInstruction {
       return this.fragment;
     }
 
-    var wildcardName = this.getWildCardName(),
-        path = this.params[wildcardName];
+    let wildcardName = this.getWildCardName();
+    let path = this.params[wildcardName] || '';
 
     if (!path) {
       return this.fragment;

@@ -3,11 +3,13 @@ import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {join} from 'aurelia-path';
 import {NavigationContext} from './navigation-context';
 import {NavigationInstruction} from './navigation-instruction';
+import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
-import {processPotential} from './util';
-
-const isRootedPath = /^#?\//;
-const isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+import {
+  processPotential,
+  normalizeAbsolutePath,
+  createRootedPath,
+  resolveUrl} from './util';
 
 export class Router {
   constructor(container, history) {
@@ -40,7 +42,7 @@ export class Router {
 
     for(var i = 0, length = nav.length; i < length; i++) {
       var current = nav[i];
-      current.href = this.createRootedPath(current.relativeHref);
+      current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
     }
   }
 
@@ -58,42 +60,12 @@ export class Router {
     return this;
   }
 
-  createRootedPath(fragment) {
-    if (isAbsoluteUrl.test(fragment)) {
-      return fragment;
-    }
-
-    let path = '';
-
-    if (this.baseUrl.length && this.baseUrl[0] !== '/') {
-      path += '/';
-    }
-
-    path += this.baseUrl;
-
-    if (path[path.length - 1] != '/' && fragment[0] != '/') {
-      path += '/';
-    }
-
-    return normalizeAbsolutePath(path + fragment, this.history._hasPushState);
-  }
-
   navigate(fragment, options) {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
 
-    if (fragment === '') {
-      fragment = '/';
-    }
-
-    if (isRootedPath.test(fragment)) {
-      fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
-    } else {
-      fragment = this.createRootedPath(fragment);
-    }
-
-    return this.history.navigate(fragment, options);
+    return this.history.navigate(resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
   navigateToRoute(route, params, options) {
@@ -162,7 +134,8 @@ export class Router {
   }
 
   createNavigationContext(instruction) {
-    return new NavigationContext(this, instruction);
+    instruction.navigationContext = new NavigationContext(this, instruction);
+    return instruction.navigationContext;
   }
 
   generate(name, params) {
@@ -171,10 +144,21 @@ export class Router {
     }
 
     let path = this.recognizer.generate(name, params);
-    return this.createRootedPath(path);
+    return createRootedPath(path, this.baseUrl, this.history._hasPushState); 
   }
 
-  addRoute(config, navModel={}) {
+  createNavModel(config) {
+    let navModel = new NavModel(this, 'href' in config ? config.href : config.route);
+    navModel.title = config.title;
+    navModel.order = config.nav;
+    navModel.href = config.href;
+    navModel.settings = config.settings;
+    navModel.config = config;
+
+    return navModel;
+  }
+
+  addRoute(config, navModel) {
     validateRouteConfig(config);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
@@ -186,17 +170,15 @@ export class Router {
       };
     }
 
-    navModel.title = navModel.title || config.title;
-    navModel.setTitle = newTitle => {
-      navModel.title = newTitle;
-    };
-    navModel.settings = config.settings || (config.settings = {});
+    if (!navModel) {
+      navModel = this.createNavModel(config);
+    }
 
     this.routes.push(config);
-    var state = this.recognizer.add({path:config.route, handler: config});
+    let state = this.recognizer.add({path:config.route, handler: config});
 
     if (config.route) {
-      var withChild, settings = config.settings;
+      let withChild, settings = config.settings;
       delete config.settings;
       withChild = JSON.parse(JSON.stringify(config));
       config.settings = settings;
@@ -213,19 +195,9 @@ export class Router {
 
     config.navModel = navModel;
 
-    if ((config.nav || 'order' in navModel) && this.navigation.indexOf(navModel) === -1) {
-      navModel.order = navModel.order || config.nav;
-      navModel.href = navModel.href || config.href;
-      navModel.isActive = false;
-      navModel.config = config;
-
-      if (!config.href) {
-        if (state.types.dynamics || state.types.stars) {
+    if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
+      if ((!navModel.href && navModel.href != '') && (state.types.dynamics || state.types.stars)) {
           throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
-        }
-
-        navModel.relativeHref = config.route;
-        navModel.href = '';
       }
 
       if (typeof navModel.order != 'number') {
@@ -270,6 +242,14 @@ export class Router {
     this.catchAllHandler = callback;
   }
 
+  updateTitle() {
+    if (this.parent) {
+      return this.parent.updateTitle();
+    }
+
+    this.currentInstruction.navigationContext.updateTitle();
+  }
+
   reset() {
     this.fallbackOrder = 100;
     this.recognizer = new RouteRecognizer();
@@ -282,21 +262,17 @@ export class Router {
 }
 
 function validateRouteConfig(config) {
-  let isValid = typeof config === 'object'
-    && (config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts)
-    && config.route !== null && config.route !== undefined;
-
-  if (!isValid) {
-    throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, navigationStrategy or viewPorts.');
+  if (typeof config !== 'object') {
+    throw new Error('Invalid Route Config');
   }
-}
 
-function normalizeAbsolutePath(path, hasPushState) {
-    if (!hasPushState && path[0] !== '#') {
-      path = '#' + path;
-    }
+  if (typeof config.route !== 'string') {
+    throw new Error('Invalid Route Config: You must specify a route pattern.');
+  }
 
-    return path;
+  if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+    throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.')
+  }
 }
 
 function evaluateNavigationStrategy(instruction, evaluator, context){

@@ -1,5 +1,9 @@
 System.register(['aurelia-dependency-injection', './pipeline', './navigation-plan', './route-loading', './navigation-context', './activation', './route-filters'], function (_export) {
-  var Container, Pipeline, BuildNavigationPlanStep, LoadRouteStep, CommitChangesStep, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep, _classCallCheck, PipelineProvider;
+  'use strict';
+
+  var Container, Pipeline, BuildNavigationPlanStep, LoadRouteStep, CommitChangesStep, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep, PipelineProvider;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   return {
     setters: [function (_aureliaDependencyInjection) {
@@ -21,10 +25,6 @@ System.register(['aurelia-dependency-injection', './pipeline', './navigation-pla
       createRouteFilterStep = _routeFilters.createRouteFilterStep;
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       PipelineProvider = (function () {
         function PipelineProvider(container) {
           _classCallCheck(this, PipelineProvider);

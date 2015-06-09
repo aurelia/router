@@ -2,35 +2,39 @@
 
 exports.__esModule = true;
 
-var _Router = require('./router');
+var _router = require('./router');
 
-exports.Router = _Router.Router;
+exports.Router = _router.Router;
 
-var _AppRouter = require('./app-router');
+var _appRouter = require('./app-router');
 
-exports.AppRouter = _AppRouter.AppRouter;
+exports.AppRouter = _appRouter.AppRouter;
 
-var _PipelineProvider = require('./pipeline-provider');
+var _pipelineProvider = require('./pipeline-provider');
 
-exports.PipelineProvider = _PipelineProvider.PipelineProvider;
+exports.PipelineProvider = _pipelineProvider.PipelineProvider;
 
-var _Redirect = require('./navigation-commands');
+var _navigationCommands = require('./navigation-commands');
 
-exports.Redirect = _Redirect.Redirect;
+exports.Redirect = _navigationCommands.Redirect;
 
-var _RouteLoader = require('./route-loading');
+var _routeLoading = require('./route-loading');
 
-exports.RouteLoader = _RouteLoader.RouteLoader;
+exports.RouteLoader = _routeLoading.RouteLoader;
 
-var _RouterConfiguration = require('./router-configuration');
+var _routerConfiguration = require('./router-configuration');
 
-exports.RouterConfiguration = _RouterConfiguration.RouterConfiguration;
+exports.RouterConfiguration = _routerConfiguration.RouterConfiguration;
 
-var _activationStrategy = require('./navigation-plan');
+var _navigationContext = require('./navigation-context');
 
-exports.activationStrategy = _activationStrategy.activationStrategy;
+exports.NavigationContext = _navigationContext.NavigationContext;
 
-var _RouteFilterContainer$createRouteFilterStep = require('./route-filters');
+var _navigationPlan = require('./navigation-plan');
 
-exports.RouteFilterContainer = _RouteFilterContainer$createRouteFilterStep.RouteFilterContainer;
-exports.createRouteFilterStep = _RouteFilterContainer$createRouteFilterStep.createRouteFilterStep;
+exports.activationStrategy = _navigationPlan.activationStrategy;
+
+var _routeFilters = require('./route-filters');
+
+exports.RouteFilterContainer = _routeFilters.RouteFilterContainer;
+exports.createRouteFilterStep = _routeFilters.createRouteFilterStep;

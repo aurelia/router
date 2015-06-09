@@ -1,20 +1,24 @@
-System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navigation-context', './navigation-instruction', './router-configuration', './util'], function (_export) {
-  var core, RouteRecognizer, join, NavigationContext, NavigationInstruction, RouterConfiguration, processPotential, _classCallCheck, _createClass, isRootedPath, isAbsoluteUrl, Router;
+System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navigation-context', './navigation-instruction', './nav-model', './router-configuration', './util'], function (_export) {
+  'use strict';
+
+  var core, RouteRecognizer, join, NavigationContext, NavigationInstruction, NavModel, RouterConfiguration, processPotential, normalizeAbsolutePath, createRootedPath, resolveUrl, Router;
+
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function validateRouteConfig(config) {
-    var isValid = typeof config === 'object' && (config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts) && config.route !== null && config.route !== undefined;
-
-    if (!isValid) {
-      throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, navigationStrategy or viewPorts.');
-    }
-  }
-
-  function normalizeAbsolutePath(path, hasPushState) {
-    if (!hasPushState && path[0] !== '#') {
-      path = '#' + path;
+    if (typeof config !== 'object') {
+      throw new Error('Invalid Route Config');
     }
 
-    return path;
+    if (typeof config.route !== 'string') {
+      throw new Error('Invalid Route Config: You must specify a route pattern.');
+    }
+
+    if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+      throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.');
+    }
   }
 
   function evaluateNavigationStrategy(instruction, evaluator, context) {
@@ -41,21 +45,17 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
       NavigationContext = _navigationContext.NavigationContext;
     }, function (_navigationInstruction) {
       NavigationInstruction = _navigationInstruction.NavigationInstruction;
+    }, function (_navModel) {
+      NavModel = _navModel.NavModel;
     }, function (_routerConfiguration) {
       RouterConfiguration = _routerConfiguration.RouterConfiguration;
     }, function (_util) {
       processPotential = _util.processPotential;
+      normalizeAbsolutePath = _util.normalizeAbsolutePath;
+      createRootedPath = _util.createRootedPath;
+      resolveUrl = _util.resolveUrl;
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-      isRootedPath = /^#?\//;
-      isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
-
       Router = (function () {
         function Router(container, history) {
           _classCallCheck(this, Router);
@@ -85,7 +85,7 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
 
           for (var i = 0, length = nav.length; i < length; i++) {
             var current = nav[i];
-            current.href = this.createRootedPath(current.relativeHref);
+            current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
           }
         };
 
@@ -103,42 +103,12 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
           return this;
         };
 
-        Router.prototype.createRootedPath = function createRootedPath(fragment) {
-          if (isAbsoluteUrl.test(fragment)) {
-            return fragment;
-          }
-
-          var path = '';
-
-          if (this.baseUrl.length && this.baseUrl[0] !== '/') {
-            path += '/';
-          }
-
-          path += this.baseUrl;
-
-          if (path[path.length - 1] != '/' && fragment[0] != '/') {
-            path += '/';
-          }
-
-          return normalizeAbsolutePath(path + fragment, this.history._hasPushState);
-        };
-
         Router.prototype.navigate = function navigate(fragment, options) {
           if (!this.isConfigured && this.parent) {
             return this.parent.navigate(fragment, options);
           }
 
-          if (fragment === '') {
-            fragment = '/';
-          }
-
-          if (isRootedPath.test(fragment)) {
-            fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
-          } else {
-            fragment = this.createRootedPath(fragment);
-          }
-
-          return this.history.navigate(fragment, options);
+          return this.history.navigate(resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
         };
 
         Router.prototype.navigateToRoute = function navigateToRoute(route, params, options) {
@@ -203,7 +173,8 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
         };
 
         Router.prototype.createNavigationContext = function createNavigationContext(instruction) {
-          return new NavigationContext(this, instruction);
+          instruction.navigationContext = new NavigationContext(this, instruction);
+          return instruction.navigationContext;
         };
 
         Router.prototype.generate = function generate(name, params) {
@@ -212,12 +183,21 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
           }
 
           var path = this.recognizer.generate(name, params);
-          return this.createRootedPath(path);
+          return createRootedPath(path, this.baseUrl, this.history._hasPushState);
         };
 
-        Router.prototype.addRoute = function addRoute(config) {
-          var navModel = arguments[1] === undefined ? {} : arguments[1];
+        Router.prototype.createNavModel = function createNavModel(config) {
+          var navModel = new NavModel(this, 'href' in config ? config.href : config.route);
+          navModel.title = config.title;
+          navModel.order = config.nav;
+          navModel.href = config.href;
+          navModel.settings = config.settings;
+          navModel.config = config;
 
+          return navModel;
+        };
+
+        Router.prototype.addRoute = function addRoute(config, navModel) {
           validateRouteConfig(config);
 
           if (!('viewPorts' in config) && !config.navigationStrategy) {
@@ -229,17 +209,15 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
             };
           }
 
-          navModel.title = navModel.title || config.title;
-          navModel.setTitle = function (newTitle) {
-            navModel.title = newTitle;
-          };
-          navModel.settings = config.settings || (config.settings = {});
+          if (!navModel) {
+            navModel = this.createNavModel(config);
+          }
 
           this.routes.push(config);
           var state = this.recognizer.add({ path: config.route, handler: config });
 
           if (config.route) {
-            var withChild,
+            var withChild = undefined,
                 settings = config.settings;
             delete config.settings;
             withChild = JSON.parse(JSON.stringify(config));
@@ -257,19 +235,9 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
 
           config.navModel = navModel;
 
-          if ((config.nav || 'order' in navModel) && this.navigation.indexOf(navModel) === -1) {
-            navModel.order = navModel.order || config.nav;
-            navModel.href = navModel.href || config.href;
-            navModel.isActive = false;
-            navModel.config = config;
-
-            if (!config.href) {
-              if (state.types.dynamics || state.types.stars) {
-                throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
-              }
-
-              navModel.relativeHref = config.route;
-              navModel.href = '';
+          if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
+            if (!navModel.href && navModel.href != '' && (state.types.dynamics || state.types.stars)) {
+              throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
             }
 
             if (typeof navModel.order != 'number') {
@@ -316,6 +284,14 @@ System.register(['core-js', 'aurelia-route-recognizer', 'aurelia-path', './navig
           };
 
           this.catchAllHandler = callback;
+        };
+
+        Router.prototype.updateTitle = function updateTitle() {
+          if (this.parent) {
+            return this.parent.updateTitle();
+          }
+
+          this.currentInstruction.navigationContext.updateTitle();
         };
 
         Router.prototype.reset = function reset() {

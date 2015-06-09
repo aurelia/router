@@ -1,32 +1,41 @@
 System.register(['core-js'], function (_export) {
-  var core, _classCallCheck, NavigationInstruction;
+  'use strict';
+
+  var core, NavigationInstruction;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   return {
     setters: [function (_coreJs) {
       core = _coreJs['default'];
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       NavigationInstruction = (function () {
         function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
           _classCallCheck(this, NavigationInstruction);
-
-          var allParams = Object.assign({}, queryParams, params);
 
           this.fragment = fragment;
           this.queryString = queryString;
           this.params = params || {};
           this.queryParams = queryParams;
           this.config = config;
-          this.lifecycleArgs = [allParams, config, this];
           this.viewPortInstructions = {};
+          this.parentInstruction = parentInstruction;
 
-          if (parentInstruction) {
-            this.params.$parent = parentInstruction.params;
-          }
+          var ancestorParams = [];
+          var current = this;
+          do {
+            var currentParams = Object.assign({}, current.params);
+            if (current.config.hasChildRouter) {
+              delete currentParams[current.getWildCardName()];
+            }
+
+            ancestorParams.unshift(currentParams);
+            current = current.parentInstruction;
+          } while (current);
+
+          var allParams = Object.assign.apply(Object, [{}, queryParams].concat(ancestorParams));
+          this.lifecycleArgs = [allParams, config, this];
         }
 
         NavigationInstruction.prototype.addViewPortInstruction = function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
@@ -46,8 +55,8 @@ System.register(['core-js'], function (_export) {
         };
 
         NavigationInstruction.prototype.getWildcardPath = function getWildcardPath() {
-          var wildcardName = this.getWildCardName(),
-              path = this.params[wildcardName];
+          var wildcardName = this.getWildCardName();
+          var path = this.params[wildcardName] || '';
 
           if (this.queryString) {
             path += '?' + this.queryString;
@@ -61,8 +70,8 @@ System.register(['core-js'], function (_export) {
             return this.fragment;
           }
 
-          var wildcardName = this.getWildCardName(),
-              path = this.params[wildcardName];
+          var wildcardName = this.getWildCardName();
+          var path = this.params[wildcardName] || '';
 
           if (!path) {
             return this.fragment;

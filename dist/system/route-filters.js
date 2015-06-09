@@ -1,7 +1,11 @@
 System.register(['aurelia-dependency-injection'], function (_export) {
-  var Container, _classCallCheck, RouteFilterContainer, RouteFilterStep;
+  'use strict';
+
+  var Container, RouteFilterContainer, RouteFilterStep;
 
   _export('createRouteFilterStep', createRouteFilterStep);
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function createRouteFilterStep(name) {
     function create(routeFilterContainer) {
@@ -18,10 +22,6 @@ System.register(['aurelia-dependency-injection'], function (_export) {
       Container = _aureliaDependencyInjection.Container;
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       RouteFilterContainer = (function () {
         function RouteFilterContainer(container) {
           _classCallCheck(this, RouteFilterContainer);

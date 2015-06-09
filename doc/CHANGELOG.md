@@ -1,3 +1,33 @@
+## 0.9.0 (2015-06-08)
+
+
+#### Bug Fixes
+
+* **navigation:** route config href was not used in router.navigation ([ea60eef9](http://github.com/aurelia/router/commit/ea60eef9e1f70d6bc4a46475da6e9295d0bb0f41))
+* **navigation-instruction:** query string causes error in child routers ([e4c6e688](http://github.com/aurelia/router/commit/e4c6e688faac329dd3d9bdf5a989d9d3870bf88d), closes [#106](http://github.com/aurelia/router/issues/106))
+* **navigation-plan:** handle redirects in child router configs ([52349014](http://github.com/aurelia/router/commit/52349014bfa75e3a05563bbf8d42a40c4a49437e), closes [#103](http://github.com/aurelia/router/issues/103))
+* **router:**
+  * fix problems with absolute path normalization ([b49d2ddd](http://github.com/aurelia/router/commit/b49d2ddd68cda71dfd7b0c8eb7ab58a25a1f5f69), closes [#111](http://github.com/aurelia/router/issues/111))
+  * considering wildcard when comparing route parameter values and using strict equa ([f809626a](http://github.com/aurelia/router/commit/f809626a03bc1bbbb3d7b4f0de073c9c33153a1f))
+  * incorrectly comparing routes parameter values in navigation plan ([7c962066](http://github.com/aurelia/router/commit/7c9620669a0410946266ec1c3631554a53d8d335))
+  * handle navigating to the empty string in a child router ([8f0b8fdc](http://github.com/aurelia/router/commit/8f0b8fdc45e7f4418852cbb0e8fcb99877154703), closes [#99](http://github.com/aurelia/router/issues/99))
+  * export NavigationContext ([1bc53fd6](http://github.com/aurelia/router/commit/1bc53fd6a9efe6092a7b81b390bfb44be0136fc7))
+
+
+#### Features
+
+* **nav-model:** allow title to be set at any time by an active navModel ([5ac335d2](http://github.com/aurelia/router/commit/5ac335d2a8ec908f58c0e879ef61572e18f2b214), closes [#69](http://github.com/aurelia/router/issues/69))
+* **navigation-instruction:** merge ancestor instruction params into current params ([1f274186](http://github.com/aurelia/router/commit/1f27418655a3d3ea5e43cdca76a5302f2c105331))
+* **router-configuration:** don't derive required route config properties ([08f3a81c](http://github.com/aurelia/router/commit/08f3a81c75a9e6f27b61f2458311687ecf2f6590), closes [#94](http://github.com/aurelia/router/issues/94))
+
+
+#### Breaking Changes
+
+* Parent params are no longer available via the `$parent` property. Parent params can be accessed via `navigationInstruction.parentInstruction.params`. Injected `*childRoute` param is no longer available on the params object passed to `activate()`.
+
+ ([1f274186](http://github.com/aurelia/router/commit/1f27418655a3d3ea5e43cdca76a5302f2c105331))
+
+
 ### 0.8.1 (2015-05-09)
 
 

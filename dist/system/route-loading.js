@@ -1,7 +1,11 @@
 System.register(['./navigation-plan', './router-configuration'], function (_export) {
-  var activationStrategy, buildNavigationPlan, RouterConfiguration, _classCallCheck, RouteLoader, LoadRouteStep;
+  'use strict';
+
+  var activationStrategy, buildNavigationPlan, RouterConfiguration, RouteLoader, LoadRouteStep;
 
   _export('loadNewRoute', loadNewRoute);
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function loadNewRoute(routeLoader, navigationContext) {
     var toLoad = determineWhatToLoad(navigationContext);
@@ -57,13 +61,14 @@ System.register(['./navigation-plan', './router-configuration'], function (_expo
         var path = next.getWildcardPath();
 
         return childRouter.createNavigationInstruction(path, next).then(function (childInstruction) {
-          viewPortPlan.childNavigationContext = childRouter.createNavigationContext(childInstruction);
+          var childNavigationContext = childRouter.createNavigationContext(childInstruction);
+          viewPortPlan.childNavigationContext = childNavigationContext;
 
-          return buildNavigationPlan(viewPortPlan.childNavigationContext).then(function (childPlan) {
-            viewPortPlan.childNavigationContext.plan = childPlan;
-            viewPortInstruction.childNavigationContext = viewPortPlan.childNavigationContext;
+          return buildNavigationPlan(childNavigationContext).then(function (childPlan) {
+            childNavigationContext.plan = childPlan;
+            viewPortInstruction.childNavigationContext = childNavigationContext;
 
-            return loadNewRoute(routeLoader, viewPortPlan.childNavigationContext);
+            return loadNewRoute(routeLoader, childNavigationContext);
           });
         });
       }
@@ -103,10 +108,6 @@ System.register(['./navigation-plan', './router-configuration'], function (_expo
       RouterConfiguration = _routerConfiguration.RouterConfiguration;
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       RouteLoader = (function () {
         function RouteLoader() {
           _classCallCheck(this, RouteLoader);

@@ -1,18 +1,15 @@
-define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './navigation-context', './navigation-instruction', './router-configuration', './util'], function (exports, _coreJs, _aureliaRouteRecognizer, _aureliaPath, _navigationContext, _navigationInstruction, _routerConfiguration, _util) {
+define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './navigation-context', './navigation-instruction', './nav-model', './router-configuration', './util'], function (exports, _coreJs, _aureliaRouteRecognizer, _aureliaPath, _navigationContext, _navigationInstruction, _navModel, _routerConfiguration, _util) {
   'use strict';
-
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
-
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   exports.__esModule = true;
 
-  var _core = _interopRequire(_coreJs);
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-  var isRootedPath = /^#?\//;
-  var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+  var _core = _interopRequireDefault(_coreJs);
 
   var Router = (function () {
     function Router(container, history) {
@@ -43,7 +40,7 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
 
       for (var i = 0, length = nav.length; i < length; i++) {
         var current = nav[i];
-        current.href = this.createRootedPath(current.relativeHref);
+        current.href = (0, _util.createRootedPath)(current.relativeHref, this.baseUrl, this.history._hasPushState);
       }
     };
 
@@ -61,42 +58,12 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
       return this;
     };
 
-    Router.prototype.createRootedPath = function createRootedPath(fragment) {
-      if (isAbsoluteUrl.test(fragment)) {
-        return fragment;
-      }
-
-      var path = '';
-
-      if (this.baseUrl.length && this.baseUrl[0] !== '/') {
-        path += '/';
-      }
-
-      path += this.baseUrl;
-
-      if (path[path.length - 1] != '/' && fragment[0] != '/') {
-        path += '/';
-      }
-
-      return normalizeAbsolutePath(path + fragment, this.history._hasPushState);
-    };
-
     Router.prototype.navigate = function navigate(fragment, options) {
       if (!this.isConfigured && this.parent) {
         return this.parent.navigate(fragment, options);
       }
 
-      if (fragment === '') {
-        fragment = '/';
-      }
-
-      if (isRootedPath.test(fragment)) {
-        fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
-      } else {
-        fragment = this.createRootedPath(fragment);
-      }
-
-      return this.history.navigate(fragment, options);
+      return this.history.navigate((0, _util.resolveUrl)(fragment, this.baseUrl, this.history._hasPushState), options);
     };
 
     Router.prototype.navigateToRoute = function navigateToRoute(route, params, options) {
@@ -161,7 +128,8 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
     };
 
     Router.prototype.createNavigationContext = function createNavigationContext(instruction) {
-      return new _navigationContext.NavigationContext(this, instruction);
+      instruction.navigationContext = new _navigationContext.NavigationContext(this, instruction);
+      return instruction.navigationContext;
     };
 
     Router.prototype.generate = function generate(name, params) {
@@ -170,12 +138,21 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
       }
 
       var path = this.recognizer.generate(name, params);
-      return this.createRootedPath(path);
+      return (0, _util.createRootedPath)(path, this.baseUrl, this.history._hasPushState);
     };
 
-    Router.prototype.addRoute = function addRoute(config) {
-      var navModel = arguments[1] === undefined ? {} : arguments[1];
+    Router.prototype.createNavModel = function createNavModel(config) {
+      var navModel = new _navModel.NavModel(this, 'href' in config ? config.href : config.route);
+      navModel.title = config.title;
+      navModel.order = config.nav;
+      navModel.href = config.href;
+      navModel.settings = config.settings;
+      navModel.config = config;
 
+      return navModel;
+    };
+
+    Router.prototype.addRoute = function addRoute(config, navModel) {
       validateRouteConfig(config);
 
       if (!('viewPorts' in config) && !config.navigationStrategy) {
@@ -187,17 +164,15 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
         };
       }
 
-      navModel.title = navModel.title || config.title;
-      navModel.setTitle = function (newTitle) {
-        navModel.title = newTitle;
-      };
-      navModel.settings = config.settings || (config.settings = {});
+      if (!navModel) {
+        navModel = this.createNavModel(config);
+      }
 
       this.routes.push(config);
       var state = this.recognizer.add({ path: config.route, handler: config });
 
       if (config.route) {
-        var withChild,
+        var withChild = undefined,
             settings = config.settings;
         delete config.settings;
         withChild = JSON.parse(JSON.stringify(config));
@@ -215,19 +190,9 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
 
       config.navModel = navModel;
 
-      if ((config.nav || 'order' in navModel) && this.navigation.indexOf(navModel) === -1) {
-        navModel.order = navModel.order || config.nav;
-        navModel.href = navModel.href || config.href;
-        navModel.isActive = false;
-        navModel.config = config;
-
-        if (!config.href) {
-          if (state.types.dynamics || state.types.stars) {
-            throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
-          }
-
-          navModel.relativeHref = config.route;
-          navModel.href = '';
+      if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
+        if (!navModel.href && navModel.href != '' && (state.types.dynamics || state.types.stars)) {
+          throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
         }
 
         if (typeof navModel.order != 'number') {
@@ -265,7 +230,7 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
             instruction.config.moduleId = config;
             done(instruction);
           } else if (typeof config == 'function') {
-            _util.processPotential(config(instruction), done, reject);
+            (0, _util.processPotential)(config(instruction), done, reject);
           } else {
             instruction.config = config;
             done(instruction);
@@ -274,6 +239,14 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
       };
 
       this.catchAllHandler = callback;
+    };
+
+    Router.prototype.updateTitle = function updateTitle() {
+      if (this.parent) {
+        return this.parent.updateTitle();
+      }
+
+      this.currentInstruction.navigationContext.updateTitle();
     };
 
     Router.prototype.reset = function reset() {
@@ -299,19 +272,17 @@ define(['exports', 'core-js', 'aurelia-route-recognizer', 'aurelia-path', './nav
   exports.Router = Router;
 
   function validateRouteConfig(config) {
-    var isValid = typeof config === 'object' && (config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts) && config.route !== null && config.route !== undefined;
-
-    if (!isValid) {
-      throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, navigationStrategy or viewPorts.');
-    }
-  }
-
-  function normalizeAbsolutePath(path, hasPushState) {
-    if (!hasPushState && path[0] !== '#') {
-      path = '#' + path;
+    if (typeof config !== 'object') {
+      throw new Error('Invalid Route Config');
     }
 
-    return path;
+    if (typeof config.route !== 'string') {
+      throw new Error('Invalid Route Config: You must specify a route pattern.');
+    }
+
+    if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+      throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.');
+    }
   }
 
   function evaluateNavigationStrategy(instruction, evaluator, context) {

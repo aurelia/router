@@ -1,5 +1,9 @@
 System.register(['core-js'], function (_export) {
-  var core, _classCallCheck, pipelineStatus, Pipeline;
+  'use strict';
+
+  var core, pipelineStatus, Pipeline;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function createResult(ctx, next) {
     return {
@@ -15,10 +19,6 @@ System.register(['core-js'], function (_export) {
       core = _coreJs['default'];
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       pipelineStatus = {
         completed: 'completed',
         cancelled: 'cancelled',

@@ -1,7 +1,11 @@
 System.register(['core-js'], function (_export) {
-  var core, _classCallCheck, Redirect;
+  'use strict';
+
+  var core, Redirect;
 
   _export('isNavigationCommand', isNavigationCommand);
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function isNavigationCommand(obj) {
     return obj && typeof obj.navigate === 'function';
@@ -12,10 +16,6 @@ System.register(['core-js'], function (_export) {
       core = _coreJs['default'];
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       Redirect = (function () {
         function Redirect(url, options) {
           _classCallCheck(this, Redirect);

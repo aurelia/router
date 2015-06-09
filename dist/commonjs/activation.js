@@ -1,14 +1,14 @@
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 exports.__esModule = true;
 
-var _activationStrategy = require('./navigation-plan');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _isNavigationCommand = require('./navigation-commands');
+var _navigationPlan = require('./navigation-plan');
 
-var _processPotential = require('./util');
+var _navigationCommands = require('./navigation-commands');
+
+var _util = require('./util');
 
 var affirmations = ['yes', 'ok', 'true'];
 
@@ -87,7 +87,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
       try {
         var controller = infos[i];
         var result = controller[callbackName]();
-        return _processPotential.processPotential(result, inspect, next.cancel);
+        return (0, _util.processPotential)(result, inspect, next.cancel);
       } catch (error) {
         return next.cancel(error);
       }
@@ -106,7 +106,7 @@ function findDeactivatable(plan, callbackName, list) {
     var viewPortPlan = plan[viewPortName];
     var prevComponent = viewPortPlan.prevComponent;
 
-    if ((viewPortPlan.strategy == _activationStrategy.activationStrategy.invokeLifecycle || viewPortPlan.strategy == _activationStrategy.activationStrategy.replace) && prevComponent) {
+    if ((viewPortPlan.strategy == _navigationPlan.activationStrategy.invokeLifecycle || viewPortPlan.strategy == _navigationPlan.activationStrategy.replace) && prevComponent) {
 
       var controller = prevComponent.executionContext;
 
@@ -168,7 +168,7 @@ function processActivatable(navigationContext, callbackName, next, ignoreResult)
 
         var current = infos[i];
         var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, current.lifecycleArgs);
-        return _processPotential.processPotential(result, function (val) {
+        return (0, _util.processPotential)(result, function (val) {
           return inspect(val, current.router);
         }, next.cancel);
       } catch (error) {
@@ -193,7 +193,7 @@ function findActivatable(navigationContext, callbackName, list, router) {
     var viewPortInstruction = next.viewPortInstructions[viewPortName];
     var controller = viewPortInstruction.component.executionContext;
 
-    if ((viewPortPlan.strategy === _activationStrategy.activationStrategy.invokeLifecycle || viewPortPlan.strategy === _activationStrategy.activationStrategy.replace) && callbackName in controller) {
+    if ((viewPortPlan.strategy === _navigationPlan.activationStrategy.invokeLifecycle || viewPortPlan.strategy === _navigationPlan.activationStrategy.replace) && callbackName in controller) {
       list.push({
         controller: controller,
         lifecycleArgs: viewPortInstruction.lifecycleArgs,
@@ -214,7 +214,7 @@ function shouldContinue(output, router) {
     return false;
   }
 
-  if (_isNavigationCommand.isNavigationCommand(output)) {
+  if ((0, _navigationCommands.isNavigationCommand)(output)) {
     if (typeof output.setRouter === 'function') {
       output.setRouter(router);
     }

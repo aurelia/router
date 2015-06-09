@@ -1,39 +1,39 @@
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 exports.__esModule = true;
 
-var _Container = require('aurelia-dependency-injection');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _Pipeline = require('./pipeline');
+var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
-var _BuildNavigationPlanStep = require('./navigation-plan');
+var _pipeline = require('./pipeline');
 
-var _LoadRouteStep = require('./route-loading');
+var _navigationPlan = require('./navigation-plan');
 
-var _CommitChangesStep = require('./navigation-context');
+var _routeLoading = require('./route-loading');
 
-var _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep = require('./activation');
+var _navigationContext = require('./navigation-context');
 
-var _createRouteFilterStep = require('./route-filters');
+var _activation = require('./activation');
+
+var _routeFilters = require('./route-filters');
 
 var PipelineProvider = (function () {
   function PipelineProvider(container) {
     _classCallCheck(this, PipelineProvider);
 
     this.container = container;
-    this.steps = [_BuildNavigationPlanStep.BuildNavigationPlanStep, _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep.CanDeactivatePreviousStep, _LoadRouteStep.LoadRouteStep, _createRouteFilterStep.createRouteFilterStep('authorize'), _createRouteFilterStep.createRouteFilterStep('modelbind'), _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep.CanActivateNextStep, _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep.DeactivatePreviousStep, _CanDeactivatePreviousStep$CanActivateNextStep$DeactivatePreviousStep$ActivateNextStep.ActivateNextStep, _createRouteFilterStep.createRouteFilterStep('precommit'), _CommitChangesStep.CommitChangesStep];
+    this.steps = [_navigationPlan.BuildNavigationPlanStep, _activation.CanDeactivatePreviousStep, _routeLoading.LoadRouteStep, (0, _routeFilters.createRouteFilterStep)('authorize'), (0, _routeFilters.createRouteFilterStep)('modelbind'), _activation.CanActivateNextStep, _activation.DeactivatePreviousStep, _activation.ActivateNextStep, (0, _routeFilters.createRouteFilterStep)('precommit'), _navigationContext.CommitChangesStep];
   }
 
   PipelineProvider.inject = function inject() {
-    return [_Container.Container];
+    return [_aureliaDependencyInjection.Container];
   };
 
   PipelineProvider.prototype.createPipeline = function createPipeline(navigationContext) {
     var _this = this;
 
-    var pipeline = new _Pipeline.Pipeline();
+    var pipeline = new _pipeline.Pipeline();
     this.steps.forEach(function (step) {
       return pipeline.withStep(_this.container.get(step));
     });

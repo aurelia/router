@@ -1,11 +1,11 @@
 define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
   'use strict';
 
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+  exports.__esModule = true;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-  exports.__esModule = true;
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   var NavigationContext = (function () {
     function NavigationContext(router, nextInstruction) {
@@ -80,6 +80,13 @@ define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
       });
     };
 
+    NavigationContext.prototype.updateTitle = function updateTitle() {
+      var title = this.buildTitle();
+      if (title) {
+        document.title = title;
+      }
+    };
+
     NavigationContext.prototype.buildTitle = function buildTitle() {
       var separator = arguments[0] === undefined ? ' | ' : arguments[0];
 
@@ -151,11 +158,7 @@ define(['exports', './navigation-plan'], function (exports, _navigationPlan) {
 
     CommitChangesStep.prototype.run = function run(navigationContext, next) {
       return navigationContext.commitChanges(true).then(function () {
-        var title = navigationContext.buildTitle();
-        if (title) {
-          document.title = title;
-        }
-
+        navigationContext.updateTitle();
         return next();
       });
     };

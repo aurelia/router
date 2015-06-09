@@ -1,5 +1,9 @@
 System.register(['./navigation-plan', './navigation-commands', './util'], function (_export) {
-  var activationStrategy, isNavigationCommand, processPotential, _classCallCheck, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
+  'use strict';
+
+  var activationStrategy, isNavigationCommand, processPotential, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
     var infos = findDeactivatable(plan, callbackName),
@@ -172,10 +176,6 @@ System.register(['./navigation-plan', './navigation-commands', './util'], functi
       processPotential = _util.processPotential;
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       affirmations = ['yes', 'ok', 'true'];
 
       _export('affirmations', affirmations);

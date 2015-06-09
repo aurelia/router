@@ -1,10 +1,11 @@
-define(['exports', './navigation-commands'], function (exports, _navigationCommands) {
+define(['exports', './navigation-commands', './util'], function (exports, _navigationCommands, _util) {
   'use strict';
-
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
   exports.__esModule = true;
   exports.buildNavigationPlan = buildNavigationPlan;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
   var activationStrategy = {
     noChange: 'no-change',
     invokeLifecycle: 'invoke-lifecycle',
@@ -18,6 +19,15 @@ define(['exports', './navigation-commands'], function (exports, _navigationComma
     var next = navigationContext.nextInstruction;
     var plan = {},
         viewPortName;
+
+    if ('redirect' in next.config) {
+      var redirectLocation = (0, _util.resolveUrl)(next.config.redirect, getInstructionBaseUrl(next));
+      if (next.queryString) {
+        redirectLocation += '?' + next.queryString;
+      }
+
+      return Promise.reject(new _navigationCommands.Redirect(redirectLocation));
+    }
 
     if (prev) {
       var newParams = hasDifferentParameterValues(prev, next);
@@ -81,10 +91,6 @@ define(['exports', './navigation-commands'], function (exports, _navigationComma
     }
 
     BuildNavigationPlanStep.prototype.run = function run(navigationContext, next) {
-      if (navigationContext.nextInstruction.config.redirect) {
-        return next.cancel(new _navigationCommands.Redirect(navigationContext.nextInstruction.config.redirect));
-      }
-
       return buildNavigationPlan(navigationContext).then(function (plan) {
         navigationContext.plan = plan;
         return next();
@@ -102,15 +108,35 @@ define(['exports', './navigation-commands'], function (exports, _navigationComma
         nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
     for (var key in nextParams) {
-      if (key == nextWildCardName) {
+      if (key === nextWildCardName) {
         continue;
       }
 
-      if (prevParams[key] != nextParams[key]) {
+      if (prevParams[key] !== nextParams[key]) {
+        return true;
+      }
+    }
+
+    for (var key in prevParams) {
+      if (key === nextWildCardName) {
+        continue;
+      }
+
+      if (prevParams[key] !== nextParams[key]) {
         return true;
       }
     }
 
     return false;
+  }
+
+  function getInstructionBaseUrl(instruction) {
+    var instructionBaseUrlParts = [];
+    while (instruction = instruction.parentInstruction) {
+      instructionBaseUrlParts.unshift(instruction.getBaseUrl());
+    }
+
+    instructionBaseUrlParts.unshift('/');
+    return instructionBaseUrlParts.join('');
   }
 });

@@ -1,9 +1,10 @@
 define(['exports', './navigation-plan', './navigation-commands', './util'], function (exports, _navigationPlan, _navigationCommands, _util) {
   'use strict';
 
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
   exports.__esModule = true;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
   var affirmations = ['yes', 'ok', 'true'];
 
   exports.affirmations = affirmations;
@@ -81,7 +82,7 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
         try {
           var controller = infos[i];
           var result = controller[callbackName]();
-          return _util.processPotential(result, inspect, next.cancel);
+          return (0, _util.processPotential)(result, inspect, next.cancel);
         } catch (error) {
           return next.cancel(error);
         }
@@ -162,7 +163,7 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
 
           var current = infos[i];
           var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, current.lifecycleArgs);
-          return _util.processPotential(result, function (val) {
+          return (0, _util.processPotential)(result, function (val) {
             return inspect(val, current.router);
           }, next.cancel);
         } catch (error) {
@@ -208,7 +209,7 @@ define(['exports', './navigation-plan', './navigation-commands', './util'], func
       return false;
     }
 
-    if (_navigationCommands.isNavigationCommand(output)) {
+    if ((0, _navigationCommands.isNavigationCommand)(output)) {
       if (typeof output.setRouter === 'function') {
         output.setRouter(router);
       }

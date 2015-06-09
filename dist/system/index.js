@@ -1,4 +1,6 @@
-System.register(['./router', './app-router', './pipeline-provider', './navigation-commands', './route-loading', './router-configuration', './navigation-plan', './route-filters'], function (_export) {
+System.register(['./router', './app-router', './pipeline-provider', './navigation-commands', './route-loading', './router-configuration', './navigation-context', './navigation-plan', './route-filters'], function (_export) {
+  'use strict';
+
   return {
     setters: [function (_router) {
       _export('Router', _router.Router);
@@ -12,6 +14,8 @@ System.register(['./router', './app-router', './pipeline-provider', './navigatio
       _export('RouteLoader', _routeLoading.RouteLoader);
     }, function (_routerConfiguration) {
       _export('RouterConfiguration', _routerConfiguration.RouterConfiguration);
+    }, function (_navigationContext) {
+      _export('NavigationContext', _navigationContext.NavigationContext);
     }, function (_navigationPlan) {
       _export('activationStrategy', _navigationPlan.activationStrategy);
     }, function (_routeFilters) {
@@ -19,8 +23,6 @@ System.register(['./router', './app-router', './pipeline-provider', './navigatio
 
       _export('createRouteFilterStep', _routeFilters.createRouteFilterStep);
     }],
-    execute: function () {
-      'use strict';
-    }
+    execute: function () {}
   };
 });

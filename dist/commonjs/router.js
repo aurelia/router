@@ -1,31 +1,30 @@
 'use strict';
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+exports.__esModule = true;
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-exports.__esModule = true;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _core = require('core-js');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _core2 = _interopRequireDefault(_core);
+var _coreJs = require('core-js');
 
-var _RouteRecognizer = require('aurelia-route-recognizer');
+var _coreJs2 = _interopRequireDefault(_coreJs);
 
-var _join = require('aurelia-path');
+var _aureliaRouteRecognizer = require('aurelia-route-recognizer');
 
-var _NavigationContext = require('./navigation-context');
+var _aureliaPath = require('aurelia-path');
 
-var _NavigationInstruction = require('./navigation-instruction');
+var _navigationContext = require('./navigation-context');
 
-var _RouterConfiguration = require('./router-configuration');
+var _navigationInstruction = require('./navigation-instruction');
 
-var _processPotential = require('./util');
+var _navModel = require('./nav-model');
 
-var isRootedPath = /^#?\//;
-var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+var _routerConfiguration = require('./router-configuration');
+
+var _util = require('./util');
 
 var Router = (function () {
   function Router(container, history) {
@@ -56,7 +55,7 @@ var Router = (function () {
 
     for (var i = 0, length = nav.length; i < length; i++) {
       var current = nav[i];
-      current.href = this.createRootedPath(current.relativeHref);
+      current.href = (0, _util.createRootedPath)(current.relativeHref, this.baseUrl, this.history._hasPushState);
     }
   };
 
@@ -64,7 +63,7 @@ var Router = (function () {
     this.isConfigured = true;
 
     if (typeof callbackOrConfig == 'function') {
-      var config = new _RouterConfiguration.RouterConfiguration();
+      var config = new _routerConfiguration.RouterConfiguration();
       callbackOrConfig(config);
       config.exportToRouter(this);
     } else {
@@ -74,42 +73,12 @@ var Router = (function () {
     return this;
   };
 
-  Router.prototype.createRootedPath = function createRootedPath(fragment) {
-    if (isAbsoluteUrl.test(fragment)) {
-      return fragment;
-    }
-
-    var path = '';
-
-    if (this.baseUrl.length && this.baseUrl[0] !== '/') {
-      path += '/';
-    }
-
-    path += this.baseUrl;
-
-    if (path[path.length - 1] != '/' && fragment[0] != '/') {
-      path += '/';
-    }
-
-    return normalizeAbsolutePath(path + fragment, this.history._hasPushState);
-  };
-
   Router.prototype.navigate = function navigate(fragment, options) {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
 
-    if (fragment === '') {
-      fragment = '/';
-    }
-
-    if (isRootedPath.test(fragment)) {
-      fragment = normalizeAbsolutePath(fragment, this.history._hasPushState);
-    } else {
-      fragment = this.createRootedPath(fragment);
-    }
-
-    return this.history.navigate(fragment, options);
+    return this.history.navigate((0, _util.resolveUrl)(fragment, this.baseUrl, this.history._hasPushState), options);
   };
 
   Router.prototype.navigateToRoute = function navigateToRoute(route, params, options) {
@@ -159,7 +128,7 @@ var Router = (function () {
 
     if (results && results.length) {
       var first = results[0];
-      var instruction = new _NavigationInstruction.NavigationInstruction(fragment, queryString, first.params, first.queryParams || results.queryParams, first.config || first.handler, parentInstruction);
+      var instruction = new _navigationInstruction.NavigationInstruction(fragment, queryString, first.params, first.queryParams || results.queryParams, first.config || first.handler, parentInstruction);
 
       if (typeof first.handler === 'function') {
         return evaluateNavigationStrategy(instruction, first.handler, first);
@@ -174,7 +143,8 @@ var Router = (function () {
   };
 
   Router.prototype.createNavigationContext = function createNavigationContext(instruction) {
-    return new _NavigationContext.NavigationContext(this, instruction);
+    instruction.navigationContext = new _navigationContext.NavigationContext(this, instruction);
+    return instruction.navigationContext;
   };
 
   Router.prototype.generate = function generate(name, params) {
@@ -183,12 +153,21 @@ var Router = (function () {
     }
 
     var path = this.recognizer.generate(name, params);
-    return this.createRootedPath(path);
+    return (0, _util.createRootedPath)(path, this.baseUrl, this.history._hasPushState);
   };
 
-  Router.prototype.addRoute = function addRoute(config) {
-    var navModel = arguments[1] === undefined ? {} : arguments[1];
+  Router.prototype.createNavModel = function createNavModel(config) {
+    var navModel = new _navModel.NavModel(this, 'href' in config ? config.href : config.route);
+    navModel.title = config.title;
+    navModel.order = config.nav;
+    navModel.href = config.href;
+    navModel.settings = config.settings;
+    navModel.config = config;
 
+    return navModel;
+  };
+
+  Router.prototype.addRoute = function addRoute(config, navModel) {
     validateRouteConfig(config);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
@@ -200,17 +179,15 @@ var Router = (function () {
       };
     }
 
-    navModel.title = navModel.title || config.title;
-    navModel.setTitle = function (newTitle) {
-      navModel.title = newTitle;
-    };
-    navModel.settings = config.settings || (config.settings = {});
+    if (!navModel) {
+      navModel = this.createNavModel(config);
+    }
 
     this.routes.push(config);
     var state = this.recognizer.add({ path: config.route, handler: config });
 
     if (config.route) {
-      var withChild,
+      var withChild = undefined,
           settings = config.settings;
       delete config.settings;
       withChild = JSON.parse(JSON.stringify(config));
@@ -228,19 +205,9 @@ var Router = (function () {
 
     config.navModel = navModel;
 
-    if ((config.nav || 'order' in navModel) && this.navigation.indexOf(navModel) === -1) {
-      navModel.order = navModel.order || config.nav;
-      navModel.href = navModel.href || config.href;
-      navModel.isActive = false;
-      navModel.config = config;
-
-      if (!config.href) {
-        if (state.types.dynamics || state.types.stars) {
-          throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
-        }
-
-        navModel.relativeHref = config.route;
-        navModel.href = '';
+    if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
+      if (!navModel.href && navModel.href != '' && (state.types.dynamics || state.types.stars)) {
+        throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
       }
 
       if (typeof navModel.order != 'number') {
@@ -278,7 +245,7 @@ var Router = (function () {
           instruction.config.moduleId = config;
           done(instruction);
         } else if (typeof config == 'function') {
-          _processPotential.processPotential(config(instruction), done, reject);
+          (0, _util.processPotential)(config(instruction), done, reject);
         } else {
           instruction.config = config;
           done(instruction);
@@ -289,10 +256,18 @@ var Router = (function () {
     this.catchAllHandler = callback;
   };
 
+  Router.prototype.updateTitle = function updateTitle() {
+    if (this.parent) {
+      return this.parent.updateTitle();
+    }
+
+    this.currentInstruction.navigationContext.updateTitle();
+  };
+
   Router.prototype.reset = function reset() {
     this.fallbackOrder = 100;
-    this.recognizer = new _RouteRecognizer.RouteRecognizer();
-    this.childRecognizer = new _RouteRecognizer.RouteRecognizer();
+    this.recognizer = new _aureliaRouteRecognizer.RouteRecognizer();
+    this.childRecognizer = new _aureliaRouteRecognizer.RouteRecognizer();
     this.routes = [];
     this.isNavigating = false;
     this.navigation = [];
@@ -312,19 +287,17 @@ var Router = (function () {
 exports.Router = Router;
 
 function validateRouteConfig(config) {
-  var isValid = typeof config === 'object' && (config.moduleId || config.redirect || config.navigationStrategy || config.viewPorts) && config.route !== null && config.route !== undefined;
-
-  if (!isValid) {
-    throw new Error('Invalid Route Config: You must have at least a route and a moduleId, redirect, navigationStrategy or viewPorts.');
-  }
-}
-
-function normalizeAbsolutePath(path, hasPushState) {
-  if (!hasPushState && path[0] !== '#') {
-    path = '#' + path;
+  if (typeof config !== 'object') {
+    throw new Error('Invalid Route Config');
   }
 
-  return path;
+  if (typeof config.route !== 'string') {
+    throw new Error('Invalid Route Config: You must specify a route pattern.');
+  }
+
+  if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+    throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.');
+  }
 }
 
 function evaluateNavigationStrategy(instruction, evaluator, context) {

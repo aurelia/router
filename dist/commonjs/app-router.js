@@ -1,32 +1,32 @@
 'use strict';
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+exports.__esModule = true;
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-exports.__esModule = true;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _core = require('core-js');
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _core2 = _interopRequireDefault(_core);
+var _coreJs = require('core-js');
 
-var _Container = require('aurelia-dependency-injection');
+var _coreJs2 = _interopRequireDefault(_coreJs);
 
-var _History = require('aurelia-history');
+var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
-var _Router2 = require('./router');
+var _aureliaHistory = require('aurelia-history');
 
-var _PipelineProvider = require('./pipeline-provider');
+var _router = require('./router');
 
-var _isNavigationCommand = require('./navigation-commands');
+var _pipelineProvider = require('./pipeline-provider');
 
-var _EventAggregator = require('aurelia-event-aggregator');
+var _navigationCommands = require('./navigation-commands');
 
-var _RouterConfiguration = require('./router-configuration');
+var _aureliaEventAggregator = require('aurelia-event-aggregator');
+
+var _routerConfiguration = require('./router-configuration');
 
 var AppRouter = (function (_Router) {
   function AppRouter(container, history, pipelineProvider, events) {
@@ -41,7 +41,7 @@ var AppRouter = (function (_Router) {
   _inherits(AppRouter, _Router);
 
   AppRouter.inject = function inject() {
-    return [_Container.Container, _History.History, _PipelineProvider.PipelineProvider, _EventAggregator.EventAggregator];
+    return [_aureliaDependencyInjection.Container, _aureliaHistory.History, _pipelineProvider.PipelineProvider, _aureliaEventAggregator.EventAggregator];
   };
 
   AppRouter.prototype.loadUrl = function loadUrl(url) {
@@ -104,7 +104,7 @@ var AppRouter = (function (_Router) {
         _this3.events.publish('router:navigation:error', { instruction: instruction, result: result });
       }
 
-      if (_isNavigationCommand.isNavigationCommand(result.output)) {
+      if ((0, _navigationCommands.isNavigationCommand)(result.output)) {
         result.output.navigate(_this3);
       } else if (!result.completed) {
         _this3.navigate(_this3.history.previousFragment || '', false);
@@ -127,7 +127,7 @@ var AppRouter = (function (_Router) {
 
     if (!this.isActive) {
       if ('configureRouter' in this.container.viewModel) {
-        var config = new _RouterConfiguration.RouterConfiguration();
+        var config = new _routerConfiguration.RouterConfiguration();
         var result = Promise.resolve(this.container.viewModel.configureRouter(config, this));
 
         return result.then(function () {
@@ -172,15 +172,14 @@ var AppRouter = (function (_Router) {
   }]);
 
   return AppRouter;
-})(_Router2.Router);
+})(_router.Router);
 
 exports.AppRouter = AppRouter;
 
 function findAnchor(el) {
   while (el) {
-    if (el.tagName === 'A') {
-      return el;
-    }el = el.parentNode;
+    if (el.tagName === 'A') return el;
+    el = el.parentNode;
   }
 }
 

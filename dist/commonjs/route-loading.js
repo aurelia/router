@@ -1,13 +1,13 @@
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 exports.__esModule = true;
 exports.loadNewRoute = loadNewRoute;
 
-var _activationStrategy$buildNavigationPlan = require('./navigation-plan');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _RouterConfiguration = require('./router-configuration');
+var _navigationPlan = require('./navigation-plan');
+
+var _routerConfiguration = require('./router-configuration');
 
 var RouteLoader = (function () {
   function RouteLoader() {
@@ -61,7 +61,7 @@ function determineWhatToLoad(navigationContext, toLoad) {
   for (var viewPortName in plan) {
     var viewPortPlan = plan[viewPortName];
 
-    if (viewPortPlan.strategy == _activationStrategy$buildNavigationPlan.activationStrategy.replace) {
+    if (viewPortPlan.strategy == _navigationPlan.activationStrategy.replace) {
       toLoad.push({
         viewPortPlan: viewPortPlan,
         navigationContext: navigationContext
@@ -97,13 +97,14 @@ function loadRoute(routeLoader, navigationContext, viewPortPlan) {
       var path = next.getWildcardPath();
 
       return childRouter.createNavigationInstruction(path, next).then(function (childInstruction) {
-        viewPortPlan.childNavigationContext = childRouter.createNavigationContext(childInstruction);
+        var childNavigationContext = childRouter.createNavigationContext(childInstruction);
+        viewPortPlan.childNavigationContext = childNavigationContext;
 
-        return _activationStrategy$buildNavigationPlan.buildNavigationPlan(viewPortPlan.childNavigationContext).then(function (childPlan) {
-          viewPortPlan.childNavigationContext.plan = childPlan;
-          viewPortInstruction.childNavigationContext = viewPortPlan.childNavigationContext;
+        return (0, _navigationPlan.buildNavigationPlan)(childNavigationContext).then(function (childPlan) {
+          childNavigationContext.plan = childPlan;
+          viewPortInstruction.childNavigationContext = childNavigationContext;
 
-          return loadNewRoute(routeLoader, viewPortPlan.childNavigationContext);
+          return loadNewRoute(routeLoader, childNavigationContext);
         });
       });
     }
@@ -123,7 +124,7 @@ function loadComponent(routeLoader, navigationContext, config) {
 
       component.childRouter = component.childContainer.getChildRouter();
 
-      var config = new _RouterConfiguration.RouterConfiguration();
+      var config = new _routerConfiguration.RouterConfiguration();
       var result = Promise.resolve((_component$executionContext = component.executionContext).configureRouter.apply(_component$executionContext, [config, component.childRouter].concat(lifecycleArgs)));
 
       return result.then(function () {

@@ -1,4 +1,5 @@
 import {Redirect} from './navigation-commands';
+import {resolveUrl} from './util';
 
 export const activationStrategy = {
   noChange: 'no-change',
@@ -10,6 +11,15 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
   var prev = navigationContext.prevInstruction;
   var next = navigationContext.nextInstruction;
   var plan = {}, viewPortName;
+
+  if ('redirect' in next.config) {
+    let redirectLocation = resolveUrl(next.config.redirect, getInstructionBaseUrl(next));
+    if (next.queryString) {
+      redirectLocation += '?' + next.queryString;
+    }
+
+    return Promise.reject(new Redirect(redirectLocation));
+  }
 
   if (prev) {
     var newParams = hasDifferentParameterValues(prev, next);
@@ -71,17 +81,13 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
 }
 
 export class BuildNavigationPlanStep {
-	run(navigationContext, next) {
-    if (navigationContext.nextInstruction.config.redirect) {
-      return next.cancel(new Redirect(navigationContext.nextInstruction.config.redirect));
-    }
-
+  run(navigationContext, next) {
     return buildNavigationPlan(navigationContext)
       .then(plan => {
         navigationContext.plan = plan;
         return next();
       }).catch(next.cancel);
-	}
+  }
 }
 
 function hasDifferentParameterValues(prev, next) {
@@ -90,14 +96,34 @@ function hasDifferentParameterValues(prev, next) {
       nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
   for (var key in nextParams) {
-    if (key == nextWildCardName) {
+    if (key === nextWildCardName) {
       continue;
     }
 
-    if (prevParams[key] != nextParams[key]) {
+    if (prevParams[key] !== nextParams[key]) {
+      return true;
+    }
+  }
+
+  for (var key in prevParams) {
+    if (key === nextWildCardName) {
+      continue;
+    }
+
+    if (prevParams[key] !== nextParams[key]) {
       return true;
     }
   }
 
   return false;
+}
+
+function getInstructionBaseUrl(instruction) {
+    let instructionBaseUrlParts = [];
+    while(instruction = instruction.parentInstruction) {
+      instructionBaseUrlParts.unshift(instruction.getBaseUrl());
+    }
+
+    instructionBaseUrlParts.unshift('/');
+    return instructionBaseUrlParts.join('');
 }

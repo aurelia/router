@@ -1,17 +1,17 @@
 System.register(['./navigation-plan'], function (_export) {
-  var activationStrategy, _classCallCheck, _createClass, NavigationContext, CommitChangesStep;
+  'use strict';
+
+  var activationStrategy, NavigationContext, CommitChangesStep;
+
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   return {
     setters: [function (_navigationPlan) {
       activationStrategy = _navigationPlan.activationStrategy;
     }],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
       NavigationContext = (function () {
         function NavigationContext(router, nextInstruction) {
           _classCallCheck(this, NavigationContext);
@@ -85,6 +85,13 @@ System.register(['./navigation-plan'], function (_export) {
           });
         };
 
+        NavigationContext.prototype.updateTitle = function updateTitle() {
+          var title = this.buildTitle();
+          if (title) {
+            document.title = title;
+          }
+        };
+
         NavigationContext.prototype.buildTitle = function buildTitle() {
           var separator = arguments[0] === undefined ? ' | ' : arguments[0];
 
@@ -156,11 +163,7 @@ System.register(['./navigation-plan'], function (_export) {
 
         CommitChangesStep.prototype.run = function run(navigationContext, next) {
           return navigationContext.commitChanges(true).then(function () {
-            var title = navigationContext.buildTitle();
-            if (title) {
-              document.title = title;
-            }
-
+            navigationContext.updateTitle();
             return next();
           });
         };

@@ -1,11 +1,11 @@
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 exports.__esModule = true;
 exports.createRouteFilterStep = createRouteFilterStep;
 
-var _Container = require('aurelia-dependency-injection');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
 var RouteFilterContainer = (function () {
   function RouteFilterContainer(container) {
@@ -17,7 +17,7 @@ var RouteFilterContainer = (function () {
   }
 
   RouteFilterContainer.inject = function inject() {
-    return [_Container.Container];
+    return [_aureliaDependencyInjection.Container];
   };
 
   RouteFilterContainer.prototype.addStep = function addStep(name, step) {
