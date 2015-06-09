@@ -58,7 +58,7 @@ export class AppRouter extends Router {
     var context = this.createNavigationContext(instruction);
     var pipeline = this.pipelineProvider.createPipeline(context);
 
-    pipeline.run(context).then(result => {
+    return pipeline.run(context).then(result => {
       this.isNavigating = false;
 
       if (!(result && 'completed' in result && 'output' in result)) {
@@ -78,13 +78,20 @@ export class AppRouter extends Router {
         result.output.navigate(this);
       } else if (!result.completed) {
         this.navigate(this.history.previousFragment || '', false);
-        this.events.publish('router:navigation:cancelled', instruction)
+        this.events.publish('router:navigation:cancelled', instruction);
       }
 
       instruction.resolve(result);
       this.dequeueInstruction();
+      return result;
     })
-    .then(result => this.events.publish('router:navigation:complete', instruction))
+    .then(result => {
+      if(result.completed) {
+        this.events.publish('router:navigation:complete', instruction);
+      } else {
+        this.events.publish('router:navigation:cancelled', instruction);
+      }
+    })
     .catch(error => {
       console.error(error);
     });
