@@ -175,14 +175,20 @@ export class Router {
     }
 
     this.routes.push(config);
-    let state = this.recognizer.add({path:config.route, handler: config});
 
-    if (config.route) {
+    let path = config.route;
+    if (path.charAt(0) === '/') {
+      path = path.substr(1);
+    }
+
+    let state = this.recognizer.add({path: path, handler: config});
+
+    if (path) {
       let withChild, settings = config.settings;
       delete config.settings;
       withChild = JSON.parse(JSON.stringify(config));
       config.settings = settings;
-      withChild.route += '/*childRoute';
+      withChild.route = `${path}/*childRoute`;
       withChild.hasChildRouter = true;
       this.childRecognizer.add({
         path: withChild.route,
