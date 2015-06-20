@@ -25,10 +25,7 @@ export class AppRouter extends Router {
       .then(instruction => this.queueInstruction(instruction))
       .catch(error => {
         console.error(error);
-
-        if (this.history.previousFragment) {
-          this.navigate(this.history.previousFragment, false);
-        }
+        restorePreviousLocation(this);
       });
   }
 
@@ -40,53 +37,35 @@ export class AppRouter extends Router {
     });
   }
 
-  dequeueInstruction() {
-    if (this.isNavigating) {
-      return;
-    }
-
-    var instruction = this.queue.shift();
-    this.queue = [];
-
-    if (!instruction) {
-      return;
-    }
-
-    this.isNavigating = true;
-    this.events.publish('router:navigation:processing', instruction);
-
-    var context = this.createNavigationContext(instruction);
-    var pipeline = this.pipelineProvider.createPipeline(context);
-
-    pipeline.run(context).then(result => {
-      this.isNavigating = false;
-
-      if (!(result && 'completed' in result && 'output' in result)) {
-        throw new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
+  dequeueInstruction(isInner) {
+    return Promise.resolve().then(() => {
+      if (this.isNavigating && !isInner) {
+        return;
       }
 
-      if (result.completed) {
-        this.history.previousFragment = instruction.fragment;
+      let instruction = this.queue.shift();
+      this.queue = [];
+
+      if (!instruction) {
+        return;
       }
 
-      if (result.output instanceof Error) {
-        console.error(result.output);
-        this.events.publish('router:navigation:error', { instruction, result });
+      this.isNavigating = true;
+
+      if (!isInner) {
+        this.events.publish('router:navigation:processing', { instruction });
       }
 
-      if (isNavigationCommand(result.output)) {
-        result.output.navigate(this);
-      } else if (!result.completed) {
-        this.navigate(this.history.previousFragment || '', false);
-        this.events.publish('router:navigation:cancelled', instruction)
-      }
+      let context = this.createNavigationContext(instruction);
+      let pipeline = this.pipelineProvider.createPipeline(context);
 
-      instruction.resolve(result);
-      this.dequeueInstruction();
-    })
-    .then(result => this.events.publish('router:navigation:complete', instruction))
-    .catch(error => {
-      console.error(error);
+      return pipeline
+        .run(context)
+        .then(result => processResult(instruction, result, this))
+        .catch(error => {
+          return { output: error instanceof Error ? error : new Error(error) };
+        })
+        .then(result => resolveInstruction(instruction, result, isInner, this));
     });
   }
 
@@ -171,4 +150,58 @@ function targetIsThisWindow(target) {
     targetWindow === window.name ||
     targetWindow === '_self' ||
     (targetWindow === 'top' && window === window.top);
+}
+
+function processResult(instruction, result, router) {
+  if (!(result && 'completed' in result && 'output' in result)) {
+    resut = result || {};
+    result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
+  }
+
+  let finalResult = null;
+  if (isNavigationCommand(result.output)) {
+    result.output.navigate(router);
+  } else {
+    finalResult = result;
+
+    if (!result.completed) {
+      restorePreviousLocation(router);
+    }
+  }
+
+  return router.dequeueInstruction(true)
+    .then(innerResult => finalResult || innerResult || result);
+}
+
+function resolveInstruction(instruction, result, isInner, router) {
+  instruction.resolve(result);
+
+  if (!isInner) {
+    router.isNavigating = false;
+    let eventArgs = { instruction, result };
+    let eventName;
+
+    if (result.output instanceof Error) {
+      eventName = 'error';
+    } else if (!result.completed) {
+      eventName = 'canceled';
+    } else {
+      router.history.previousFragment = instruction.fragment;
+      eventName = 'success';
+    }
+
+    router.events.publish(`router:navigation:${eventName}`, eventArgs);
+    router.events.publish('router:navigation:complete', eventArgs);
+  }
+
+  return result;
+}
+
+function restorePreviousLocation(router) {
+  let previousLocation = router.history.previousLocation;
+  if (previousLocation) {
+    router.navigate(router.history.previousLocation, false);
+  } else {
+    console.error('Router navigation failed, and no previous location could be restored.');
+  }
 }
