@@ -14,6 +14,7 @@ export class AppRouter extends Router {
     this.pipelineProvider = pipelineProvider;
     document.addEventListener('click', handleLinkClick.bind(this), true);
     this.events = events;
+    this.maxInstructionCount = 10;
   }
 
   get isRoot() {
@@ -37,9 +38,9 @@ export class AppRouter extends Router {
     });
   }
 
-  dequeueInstruction(isInner) {
+  dequeueInstruction(instructionCount = 0) {
     return Promise.resolve().then(() => {
-      if (this.isNavigating && !isInner) {
+      if (this.isNavigating && !instructionCount) {
         return;
       }
 
@@ -52,8 +53,10 @@ export class AppRouter extends Router {
 
       this.isNavigating = true;
 
-      if (!isInner) {
+      if (!instructionCount) {
         this.events.publish('router:navigation:processing', { instruction });
+      } else if (instructionCount > this.maxInstructionCount) {
+        throw new Error(`Maximum navigation attempts exceeded. ${this.maxInstructionCount} navigation instructions have been attempted without success. Giving up.`);
       }
 
       let context = this.createNavigationContext(instruction);
@@ -61,11 +64,11 @@ export class AppRouter extends Router {
 
       return pipeline
         .run(context)
-        .then(result => processResult(instruction, result, this))
+        .then(result => processResult(instruction, result, instructionCount, this))
         .catch(error => {
           return { output: error instanceof Error ? error : new Error(error) };
         })
-        .then(result => resolveInstruction(instruction, result, isInner, this));
+        .then(result => resolveInstruction(instruction, result, !!instructionCount, this));
     });
   }
 
@@ -152,7 +155,7 @@ function targetIsThisWindow(target) {
     (targetWindow === 'top' && window === window.top);
 }
 
-function processResult(instruction, result, router) {
+function processResult(instruction, result, instructionCount, router) {
   if (!(result && 'completed' in result && 'output' in result)) {
     resut = result || {};
     result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
@@ -169,14 +172,14 @@ function processResult(instruction, result, router) {
     }
   }
 
-  return router.dequeueInstruction(true)
+  return router.dequeueInstruction(instructionCount + 1)
     .then(innerResult => finalResult || innerResult || result);
 }
 
-function resolveInstruction(instruction, result, isInner, router) {
+function resolveInstruction(instruction, result, isInnerInstruction, router) {
   instruction.resolve(result);
 
-  if (!isInner) {
+  if (!isInnerInstruction) {
     router.isNavigating = false;
     let eventArgs = { instruction, result };
     let eventName;
