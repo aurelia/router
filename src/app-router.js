@@ -58,8 +58,12 @@ export class AppRouter extends Router {
 
       if (!instructionCount) {
         this.events.publish('router:navigation:processing', { instruction });
+      } else if (instructionCount === this.maxInstructionCount - 1) {
+        logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
+        restorePreviousLocation(this);
+        return this.dequeueInstruction(instructionCount + 1);
       } else if (instructionCount > this.maxInstructionCount) {
-        throw new Error(`Maximum navigation attempts exceeded. ${this.maxInstructionCount} navigation instructions have been attempted without success. Giving up.`);
+        throw new Error(`Maximum navigation attempts exceeded. Giving up.`);
       }
 
       let context = this.createNavigationContext(instruction);
