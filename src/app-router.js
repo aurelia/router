@@ -1,4 +1,5 @@
 import core from 'core-js';
+import * as LogManager from 'aurelia-logging';
 import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
 import {Router} from './router';
@@ -6,6 +7,8 @@ import {PipelineProvider} from './pipeline-provider';
 import {isNavigationCommand} from './navigation-commands';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {RouterConfiguration} from './router-configuration';
+
+const logger = LogManager.getLogger('app-router');
 
 export class AppRouter extends Router {
   static inject(){ return [Container, History, PipelineProvider, EventAggregator]; }
@@ -25,7 +28,7 @@ export class AppRouter extends Router {
     return this.createNavigationInstruction(url)
       .then(instruction => this.queueInstruction(instruction))
       .catch(error => {
-        console.error(error);
+        logger.error(error);
         restorePreviousLocation(this);
       });
   }
@@ -206,6 +209,6 @@ function restorePreviousLocation(router) {
   if (previousLocation) {
     router.navigate(router.history.previousLocation, { trigger: false, replace: true });
   } else {
-    console.error('Router navigation failed, and no previous location could be restored.');
+    logger.error('Router navigation failed, and no previous location could be restored.');
   }
 }
