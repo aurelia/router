@@ -189,7 +189,8 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
     } else if (!result.completed) {
       eventName = 'canceled';
     } else {
-      router.history.previousFragment = instruction.fragment;
+      let queryString = instruction.queryString ? ('?' + instruction.queryString) : '';
+      router.history.previousLocation = instruction.fragment + queryString;
       eventName = 'success';
     }
 
