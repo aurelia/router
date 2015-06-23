@@ -204,7 +204,7 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 function restorePreviousLocation(router) {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
-    router.navigate(router.history.previousLocation, false);
+    router.navigate(router.history.previousLocation, { trigger: false, replace: true });
   } else {
     console.error('Router navigation failed, and no previous location could be restored.');
   }
