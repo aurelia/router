@@ -1,4 +1,5 @@
 import core from 'core-js';
+import * as LogManager from 'aurelia-logging';
 import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
 import {Router} from './router';
@@ -7,6 +8,8 @@ import {isNavigationCommand} from './navigation-commands';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {RouterConfiguration} from './router-configuration';
 
+const logger = LogManager.getLogger('app-router');
+
 export class AppRouter extends Router {
   static inject(){ return [Container, History, PipelineProvider, EventAggregator]; }
   constructor(container, history, pipelineProvider, events) {
@@ -14,6 +17,7 @@ export class AppRouter extends Router {
     this.pipelineProvider = pipelineProvider;
     document.addEventListener('click', handleLinkClick.bind(this), true);
     this.events = events;
+    this.maxInstructionCount = 10;
   }
 
   get isRoot() {
@@ -24,11 +28,8 @@ export class AppRouter extends Router {
     return this.createNavigationInstruction(url)
       .then(instruction => this.queueInstruction(instruction))
       .catch(error => {
-        console.error(error);
-
-        if (this.history.previousFragment) {
-          this.navigate(this.history.previousFragment, false);
-        }
+        logger.error(error);
+        restorePreviousLocation(this);
       });
   }
 
@@ -40,53 +41,41 @@ export class AppRouter extends Router {
     });
   }
 
-  dequeueInstruction() {
-    if (this.isNavigating) {
-      return;
-    }
-
-    var instruction = this.queue.shift();
-    this.queue = [];
-
-    if (!instruction) {
-      return;
-    }
-
-    this.isNavigating = true;
-    this.events.publish('router:navigation:processing', instruction);
-
-    var context = this.createNavigationContext(instruction);
-    var pipeline = this.pipelineProvider.createPipeline(context);
-
-    pipeline.run(context).then(result => {
-      this.isNavigating = false;
-
-      if (!(result && 'completed' in result && 'output' in result)) {
-        throw new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
+  dequeueInstruction(instructionCount = 0) {
+    return Promise.resolve().then(() => {
+      if (this.isNavigating && !instructionCount) {
+        return;
       }
 
-      if (result.completed) {
-        this.history.previousFragment = instruction.fragment;
+      let instruction = this.queue.shift();
+      this.queue = [];
+
+      if (!instruction) {
+        return;
       }
 
-      if (result.output instanceof Error) {
-        console.error(result.output);
-        this.events.publish('router:navigation:error', { instruction, result });
+      this.isNavigating = true;
+
+      if (!instructionCount) {
+        this.events.publish('router:navigation:processing', { instruction });
+      } else if (instructionCount === this.maxInstructionCount - 1) {
+        logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
+        restorePreviousLocation(this);
+        return this.dequeueInstruction(instructionCount + 1);
+      } else if (instructionCount > this.maxInstructionCount) {
+        throw new Error(`Maximum navigation attempts exceeded. Giving up.`);
       }
 
-      if (isNavigationCommand(result.output)) {
-        result.output.navigate(this);
-      } else if (!result.completed) {
-        this.navigate(this.history.previousFragment || '', false);
-        this.events.publish('router:navigation:cancelled', instruction)
-      }
+      let context = this.createNavigationContext(instruction);
+      let pipeline = this.pipelineProvider.createPipeline(context);
 
-      instruction.resolve(result);
-      this.dequeueInstruction();
-    })
-    .then(result => this.events.publish('router:navigation:complete', instruction))
-    .catch(error => {
-      console.error(error);
+      return pipeline
+        .run(context)
+        .then(result => processResult(instruction, result, instructionCount, this))
+        .catch(error => {
+          return { output: error instanceof Error ? error : new Error(error) };
+        })
+        .then(result => resolveInstruction(instruction, result, !!instructionCount, this));
     });
   }
 
@@ -171,4 +160,59 @@ function targetIsThisWindow(target) {
     targetWindow === window.name ||
     targetWindow === '_self' ||
     (targetWindow === 'top' && window === window.top);
+}
+
+function processResult(instruction, result, instructionCount, router) {
+  if (!(result && 'completed' in result && 'output' in result)) {
+    resut = result || {};
+    result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
+  }
+
+  let finalResult = null;
+  if (isNavigationCommand(result.output)) {
+    result.output.navigate(router);
+  } else {
+    finalResult = result;
+
+    if (!result.completed) {
+      restorePreviousLocation(router);
+    }
+  }
+
+  return router.dequeueInstruction(instructionCount + 1)
+    .then(innerResult => finalResult || innerResult || result);
+}
+
+function resolveInstruction(instruction, result, isInnerInstruction, router) {
+  instruction.resolve(result);
+
+  if (!isInnerInstruction) {
+    router.isNavigating = false;
+    let eventArgs = { instruction, result };
+    let eventName;
+
+    if (result.output instanceof Error) {
+      eventName = 'error';
+    } else if (!result.completed) {
+      eventName = 'canceled';
+    } else {
+      let queryString = instruction.queryString ? ('?' + instruction.queryString) : '';
+      router.history.previousLocation = instruction.fragment + queryString;
+      eventName = 'success';
+    }
+
+    router.events.publish(`router:navigation:${eventName}`, eventArgs);
+    router.events.publish('router:navigation:complete', eventArgs);
+  }
+
+  return result;
+}
+
+function restorePreviousLocation(router) {
+  let previousLocation = router.history.previousLocation;
+  if (previousLocation) {
+    router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+  } else {
+    logger.error('Router navigation failed, and no previous location could be restored.');
+  }
 }
