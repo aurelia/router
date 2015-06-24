@@ -17,10 +17,6 @@ describe('the router', () => {
     router = new AppRouter(new Container(), history, new PipelineProvider(new Container()));
   });
 
-  it('should have some tests', () => {
-    expect(router).not.toBe(null);
-  });
-
   describe('addRoute', () => {
     it('should register named routes', () => {
       const child = router.createChild(new Container()); 
