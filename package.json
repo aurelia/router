@@ -19,9 +19,9 @@
   },
   "jspm": {
     "main": "index",
-    "format": "register",
+    "format": "amd",
     "directories": {
-      "lib": "dist/system"
+      "lib": "dist/amd"
     },
     "dependencies": {
       "aurelia-dependency-injection": "github:aurelia/dependency-injection@^0.8.1",
