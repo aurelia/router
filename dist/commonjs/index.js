@@ -597,7 +597,7 @@ var NavigationContext = (function () {
 
   _createClass(NavigationContext, [{
     key: 'nextInstructions',
-    get: function () {
+    get: function get() {
       return this.getAllContexts().map(function (c) {
         return c.nextInstruction;
       }).filter(function (c) {
@@ -606,7 +606,7 @@ var NavigationContext = (function () {
     }
   }, {
     key: 'currentInstructions',
-    get: function () {
+    get: function get() {
       return this.getAllContexts().map(function (c) {
         return c.currentInstruction;
       }).filter(function (c) {
@@ -615,7 +615,7 @@ var NavigationContext = (function () {
     }
   }, {
     key: 'prevInstructions',
-    get: function () {
+    get: function get() {
       return this.getAllContexts().map(function (c) {
         return c.prevInstruction;
       }).filter(function (c) {
@@ -1100,7 +1100,7 @@ var Router = (function () {
       delete config.settings;
       withChild = JSON.parse(JSON.stringify(config));
       config.settings = settings;
-      withChild.route = '' + path + '/*childRoute';
+      withChild.route = path + '/*childRoute';
       withChild.hasChildRouter = true;
       this.childRecognizer.add({
         path: withChild.route,
@@ -1184,7 +1184,7 @@ var Router = (function () {
 
   _createClass(Router, [{
     key: 'isRoot',
-    get: function () {
+    get: function get() {
       return false;
     }
   }]);
@@ -1535,7 +1535,7 @@ var AppRouter = (function (_Router) {
       if (!instructionCount) {
         _this4.events.publish('router:navigation:processing', { instruction: instruction });
       } else if (instructionCount === _this4.maxInstructionCount - 1) {
-        logger.error('' + (instructionCount + 1) + ' navigation instructions have been attempted without success. Restoring last known good location.');
+        logger.error(instructionCount + 1 + ' navigation instructions have been attempted without success. Restoring last known good location.');
         restorePreviousLocation(_this4);
         return _this4.dequeueInstruction(instructionCount + 1);
       } else if (instructionCount > _this4.maxInstructionCount) {
@@ -1601,7 +1601,7 @@ var AppRouter = (function (_Router) {
 
   _createClass(AppRouter, [{
     key: 'isRoot',
-    get: function () {
+    get: function get() {
       return true;
     }
   }]);

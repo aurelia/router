@@ -832,7 +832,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
 
         _createClass(NavigationContext, [{
           key: 'nextInstructions',
-          get: function () {
+          get: function get() {
             return this.getAllContexts().map(function (c) {
               return c.nextInstruction;
             }).filter(function (c) {
@@ -841,7 +841,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           }
         }, {
           key: 'currentInstructions',
-          get: function () {
+          get: function get() {
             return this.getAllContexts().map(function (c) {
               return c.currentInstruction;
             }).filter(function (c) {
@@ -850,7 +850,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           }
         }, {
           key: 'prevInstructions',
-          get: function () {
+          get: function get() {
             return this.getAllContexts().map(function (c) {
               return c.prevInstruction;
             }).filter(function (c) {
@@ -1325,7 +1325,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
             delete config.settings;
             withChild = JSON.parse(JSON.stringify(config));
             config.settings = settings;
-            withChild.route = '' + path + '/*childRoute';
+            withChild.route = path + '/*childRoute';
             withChild.hasChildRouter = true;
             this.childRecognizer.add({
               path: withChild.route,
@@ -1409,7 +1409,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
 
         _createClass(Router, [{
           key: 'isRoot',
-          get: function () {
+          get: function get() {
             return false;
           }
         }]);
@@ -1629,7 +1629,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
             if (!instructionCount) {
               _this4.events.publish('router:navigation:processing', { instruction: instruction });
             } else if (instructionCount === _this4.maxInstructionCount - 1) {
-              logger.error('' + (instructionCount + 1) + ' navigation instructions have been attempted without success. Restoring last known good location.');
+              logger.error(instructionCount + 1 + ' navigation instructions have been attempted without success. Restoring last known good location.');
               restorePreviousLocation(_this4);
               return _this4.dequeueInstruction(instructionCount + 1);
             } else if (instructionCount > _this4.maxInstructionCount) {
@@ -1695,7 +1695,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
 
         _createClass(AppRouter, [{
           key: 'isRoot',
-          get: function () {
+          get: function get() {
             return true;
           }
         }]);

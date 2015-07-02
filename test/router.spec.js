@@ -1,6 +1,7 @@
 import {History} from 'aurelia-history';
 import {Container} from 'aurelia-dependency-injection';
-import {AppRouter, PipelineProvider} from '../src/index';
+import {AppRouter} from '../src/app-router';
+import {PipelineProvider} from '../src/pipeline-provider';
 
 class MockHistory extends History {
   activate(){}
@@ -23,7 +24,7 @@ describe('the router', () => {
 
   describe('addRoute', () => {
     it('should register named routes', () => {
-      const child = router.createChild(new Container()); 
+      const child = router.createChild(new Container());
 
       router.addRoute({ name: 'parent', route: 'parent', moduleId: 'parent' });
       child.addRoute({ name: 'child', route: 'child', moduleId: 'child' });
@@ -72,7 +73,7 @@ describe('the router', () => {
     it('should generate route URIs', () => {
       const child = router.createChild(new Container());
       child.baseUrl = 'child-router';
-      
+
       router.configure(config => {
         config.map({ name: 'parent', route: 'parent', moduleId: './test' });
       });
@@ -93,7 +94,7 @@ describe('the router', () => {
     });
 
     it('should delegate to parent when not configured', () => {
-      const child = router.createChild(new Container()); 
+      const child = router.createChild(new Container());
 
       router.configure(config => {
         config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
@@ -151,7 +152,7 @@ describe('the router', () => {
       router.navigate('/test2', options);
       expect(history.navigate).toHaveBeenCalledWith('#/test2', options);
       history.navigate.calls.reset();
-      
+
       router.navigate('test3', options);
       expect(history.navigate).toHaveBeenCalledWith('#/test3', options);
       history.navigate.calls.reset();
@@ -159,11 +160,11 @@ describe('the router', () => {
       child.navigate('#/test4', options);
       expect(history.navigate).toHaveBeenCalledWith('#/test4', options);
       history.navigate.calls.reset();
-      
+
       child.navigate('/test5', options);
       expect(history.navigate).toHaveBeenCalledWith('#/test5', options);
       history.navigate.calls.reset();
-      
+
       child.navigate('test6', options);
       expect(history.navigate).toHaveBeenCalledWith('#/child-router/test6', options);
       history.navigate.calls.reset();
@@ -241,4 +242,3 @@ describe('the router', () => {
     });
   });
 });
-

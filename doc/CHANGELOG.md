@@ -1,3 +1,32 @@
+## 0.10.0 (2015-07-02)
+
+
+#### Bug Fixes
+
+* **router:**
+  * a route with path '/' breaks handleUnknownRoutes ([adf30dc6](http://github.com/aurelia/router/commit/adf30dc69af871939df43d2bbaf028b1e343335e), closes [#116](http://github.com/aurelia/router/issues/116))
+  * use replaceState when restoring previous locations following nav errors ([55196072](http://github.com/aurelia/router/commit/5519607286874efc896625cd5855217b995cfede))
+  * include querystring when restoring previous router location ([2183ab24](http://github.com/aurelia/router/commit/2183ab249b94f4df05c6e058d9c7a77be01c4519))
+
+
+#### Features
+
+* **app-router:** refactor navigation events to be more consistent ([90358136](http://github.com/aurelia/router/commit/90358136324f4bfac8a76dcc12b13abdef796395), closes [#97](http://github.com/aurelia/router/issues/97))
+* **router:**
+  * restore previous location after exceeding max nav attempts ([2e03ca04](http://github.com/aurelia/router/commit/2e03ca047c1241f7c4784f6413173bdebaf4ecad))
+  * use aurelia/logging for error logging ([5f378c1a](http://github.com/aurelia/router/commit/5f378c1ae31ac1ca58060b3971edea60a574f11a))
+  * fail navigations after attempting to execute more than 10 instructions ([a1b1c43e](http://github.com/aurelia/router/commit/a1b1c43ecb83e227deb15447b1eaf783359f4936), closes [#84](http://github.com/aurelia/router/issues/84))
+
+
+#### Breaking Changes
+
+* This changes the names and arguments of the events published by the router during navigation.
+
+fixes #97
+
+ ([90358136](http://github.com/aurelia/router/commit/90358136324f4bfac8a76dcc12b13abdef796395))
+
+
 ## 0.9.0 (2015-06-08)
 
 
