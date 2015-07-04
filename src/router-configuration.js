@@ -1,11 +1,11 @@
 import {RouteFilterContainer} from './route-filters';
 
 export class RouterConfiguration{
-  constructor() {
-    this.instructions = [];
-    this.options = {};
-    this.pipelineSteps = [];
-  }
+  instructions = [];
+  options = {};
+  pipelineSteps = [];
+  title;
+  unknownRouteConfig;
 
   addPipelineStep(name, step) {
     this.pipelineSteps.push({name, step});
