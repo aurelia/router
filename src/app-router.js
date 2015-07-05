@@ -175,6 +175,10 @@ function processResult(instruction, result, instructionCount, router) {
     finalResult = result;
 
     if (!result.completed) {
+      if (result.output instanceof Error) {
+        logger.error(result.output);
+      }
+
       restorePreviousLocation(router);
     }
   }
