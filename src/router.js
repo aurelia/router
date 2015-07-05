@@ -139,8 +139,13 @@ export class Router {
   }
 
   generate(name, params) {
-    if((!this.isConfigured || !this.recognizer.hasRoute(name)) && this.parent){
+    let hasRoute = this.recognizer.hasRoute(name);
+    if((!this.isConfigured || !hasRoute) && this.parent){
       return this.parent.generate(name, params);
+    }
+
+    if (!hasRoute) {
+      throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
     }
 
     let path = this.recognizer.generate(name, params);
