@@ -12,13 +12,22 @@ import {
   resolveUrl} from './util';
 
 export class Router {
+  container: any;
+  history: any;
+  viewPorts: any = {};
+  baseUrl: string = '';
+  isConfigured: boolean = false;
+  fallbackOrder: number = 100;
+  recognizer: RouteRecognizer = new RouteRecognizer();
+  childRecognizer: RouteRecognizer = new RouteRecognizer();
+  routes: any[] = [];
+  isNavigating: boolean = false;
+  navigation: any[] = [];
+
   constructor(container, history) {
     this.container = container;
     this.history = history;
-    this.viewPorts = {};
     this.reset();
-    this.baseUrl = '';
-    this.isConfigured = false;
   }
 
   get isRoot() {
@@ -144,7 +153,7 @@ export class Router {
     }
 
     let path = this.recognizer.generate(name, params);
-    return createRootedPath(path, this.baseUrl, this.history._hasPushState); 
+    return createRootedPath(path, this.baseUrl, this.history._hasPushState);
   }
 
   createNavModel(config) {
