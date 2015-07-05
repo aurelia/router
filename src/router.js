@@ -60,7 +60,7 @@ export class Router {
     return this;
   }
 
-  navigate(fragment, options) {
+  navigate(fragment, options?) {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -144,7 +144,7 @@ export class Router {
     }
 
     let path = this.recognizer.generate(name, params);
-    return createRootedPath(path, this.baseUrl, this.history._hasPushState); 
+    return createRootedPath(path, this.baseUrl, this.history._hasPushState);
   }
 
   createNavModel(config) {
