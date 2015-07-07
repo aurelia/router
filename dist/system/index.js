@@ -550,6 +550,10 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
       finalResult = result;
 
       if (!result.completed) {
+        if (result.output instanceof Error) {
+          logger.error(result.output);
+        }
+
         restorePreviousLocation(router);
       }
     }
@@ -572,8 +576,8 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
       } else if (!result.completed) {
         eventName = 'canceled';
       } else {
-        var queryString = instruction.queryString ? '?' + instruction.queryString : '';
-        router.history.previousLocation = instruction.fragment + queryString;
+        var _queryString = instruction.queryString ? '?' + instruction.queryString : '';
+        router.history.previousLocation = instruction.fragment + _queryString;
         eventName = 'success';
       }
 
@@ -1157,12 +1161,19 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
         function Router(container, history) {
           _classCallCheck(this, Router);
 
-          this.container = container;
-          this.history = history;
           this.viewPorts = {};
-          this.reset();
           this.baseUrl = '';
           this.isConfigured = false;
+          this.fallbackOrder = 100;
+          this.recognizer = new RouteRecognizer();
+          this.childRecognizer = new RouteRecognizer();
+          this.routes = [];
+          this.isNavigating = false;
+          this.navigation = [];
+
+          this.container = container;
+          this.history = history;
+          this.reset();
         }
 
         Router.prototype.registerViewPort = function registerViewPort(viewPort, name) {
@@ -1275,8 +1286,13 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
         };
 
         Router.prototype.generate = function generate(name, params) {
-          if ((!this.isConfigured || !this.recognizer.hasRoute(name)) && this.parent) {
+          var hasRoute = this.recognizer.hasRoute(name);
+          if ((!this.isConfigured || !hasRoute) && this.parent) {
             return this.parent.generate(name, params);
+          }
+
+          if (!hasRoute) {
+            throw new Error('A route with name \'' + name + '\' could not be found. Check that `name: \'' + name + '\'` was specified in the route\'s config.');
           }
 
           var path = this.recognizer.generate(name, params);

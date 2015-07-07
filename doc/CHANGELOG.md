@@ -1,3 +1,12 @@
+### 0.10.1 (2015-07-07)
+
+
+#### Bug Fixes
+
+* **app-router:** log navigation errors before attempting to restore previous location ([5c8ee83d](http://github.com/aurelia/router/commit/5c8ee83df6bffb86d58d7ab55884b639e26e8714))
+* **router:** clarify error message when generating unknown route ([9d0dcd0c](http://github.com/aurelia/router/commit/9d0dcd0cf5eccc754f69b057d99b0197776fa411))
+
+
 ## 0.10.0 (2015-07-02)
 
 

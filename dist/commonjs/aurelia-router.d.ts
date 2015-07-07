@@ -77,11 +77,17 @@ declare module 'aurelia-router' {
     run(navigationContext: any, next: any): any;
   }
   export class NavigationInstruction {
-    constructor(fragment: any, queryString: any, params: any, queryParams: any, config: any, parentInstruction: any);
+    fragment: string;
+    queryString: string;
+    params: any;
+    queryParams: any;
+    config: any;
+    parentInstruction: NavigationInstruction;
+    constructor(fragment: string, queryString?: string, params?: any, queryParams?: any, config?: any, parentInstruction?: NavigationInstruction);
     addViewPortInstruction(viewPortName: any, strategy: any, moduleId: any, component: any): any;
-    getWildCardName(): any;
-    getWildcardPath(): any;
-    getBaseUrl(): any;
+    getWildCardName(): string;
+    getWildcardPath(): string;
+    getBaseUrl(): string;
   }
   
   /**
@@ -115,7 +121,11 @@ declare module 'aurelia-router' {
     getSteps(): any;
   }
   export class RouterConfiguration {
-    constructor();
+    instructions: any;
+    options: any;
+    pipelineSteps: any;
+    title: any;
+    unknownRouteConfig: any;
     addPipelineStep(name: any, step: any): any;
     map(route: any): any;
     mapRoute(config: any): any;
@@ -123,13 +133,24 @@ declare module 'aurelia-router' {
     exportToRouter(router: any): any;
   }
   export class Router {
+    container: any;
+    history: any;
+    viewPorts: any;
+    baseUrl: string;
+    isConfigured: boolean;
+    fallbackOrder: number;
+    recognizer: RouteRecognizer;
+    childRecognizer: RouteRecognizer;
+    routes: any[];
+    isNavigating: boolean;
+    navigation: any[];
     constructor(container: any, history: any);
     isRoot(): any;
     registerViewPort(viewPort: any, name: any): any;
     refreshBaseUrl(): any;
     refreshNavigation(): any;
     configure(callbackOrConfig: any): any;
-    navigate(fragment: any, options: any): any;
+    navigate(fragment: any, options?: any): any;
     navigateToRoute(route: any, params: any, options: any): any;
     navigateBack(): any;
     createChild(container: any): any;

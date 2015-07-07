@@ -558,7 +558,14 @@ export class CommitChangesStep {
 }
 
 export class NavigationInstruction {
-  constructor(fragment, queryString, params, queryParams, config, parentInstruction) {
+  fragment: string;
+  queryString: string;
+  params: any;
+  queryParams: any;
+  config: any;
+  parentInstruction: NavigationInstruction;
+
+  constructor(fragment: string, queryString?: string, params?: any, queryParams?: any, config?: any, parentInstruction?: NavigationInstruction) {
     this.fragment = fragment;
     this.queryString = queryString;
     this.params = params || {};
@@ -584,7 +591,7 @@ export class NavigationInstruction {
     this.lifecycleArgs = [allParams, config, this];
   }
 
-  addViewPortInstruction(viewPortName, strategy, moduleId, component) {
+  addViewPortInstruction(viewPortName, strategy, moduleId, component): any {
     return this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
       strategy: strategy,
@@ -595,12 +602,12 @@ export class NavigationInstruction {
     };
   }
 
-  getWildCardName() {
+  getWildCardName(): string {
     let wildcardIndex = this.config.route.lastIndexOf('*');
     return this.config.route.substr(wildcardIndex + 1);
   }
 
-  getWildcardPath() {
+  getWildcardPath(): string {
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
 
@@ -611,7 +618,7 @@ export class NavigationInstruction {
     return path;
   }
 
-  getBaseUrl() {
+  getBaseUrl(): string {
     if (!this.params) {
       return this.fragment;
     }
@@ -757,11 +764,11 @@ class RouteFilterStep {
   }
 }
 export class RouterConfiguration{
-  constructor() {
-    this.instructions = [];
-    this.options = {};
-    this.pipelineSteps = [];
-  }
+  instructions = [];
+  options = {};
+  pipelineSteps = [];
+  title;
+  unknownRouteConfig;
 
   addPipelineStep(name, step) {
     this.pipelineSteps.push({name, step});
@@ -842,13 +849,22 @@ export class RouterConfiguration{
 }
 
 export class Router {
+  container: any;
+  history: any;
+  viewPorts: any = {};
+  baseUrl: string = '';
+  isConfigured: boolean = false;
+  fallbackOrder: number = 100;
+  recognizer: RouteRecognizer = new RouteRecognizer();
+  childRecognizer: RouteRecognizer = new RouteRecognizer();
+  routes: any[] = [];
+  isNavigating: boolean = false;
+  navigation: any[] = [];
+
   constructor(container, history) {
     this.container = container;
     this.history = history;
-    this.viewPorts = {};
     this.reset();
-    this.baseUrl = '';
-    this.isConfigured = false;
   }
 
   get isRoot() {
@@ -890,7 +906,7 @@ export class Router {
     return this;
   }
 
-  navigate(fragment, options) {
+  navigate(fragment, options?) {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -969,12 +985,17 @@ export class Router {
   }
 
   generate(name, params) {
-    if((!this.isConfigured || !this.recognizer.hasRoute(name)) && this.parent){
+    let hasRoute = this.recognizer.hasRoute(name);
+    if((!this.isConfigured || !hasRoute) && this.parent){
       return this.parent.generate(name, params);
     }
 
+    if (!hasRoute) {
+      throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
+    }
+
     let path = this.recognizer.generate(name, params);
-    return createRootedPath(path, this.baseUrl, this.history._hasPushState); 
+    return createRootedPath(path, this.baseUrl, this.history._hasPushState);
   }
 
   createNavModel(config) {
@@ -1532,6 +1553,10 @@ function processResult(instruction, result, instructionCount, router) {
     finalResult = result;
 
     if (!result.completed) {
+      if (result.output instanceof Error) {
+        logger.error(result.output);
+      }
+
       restorePreviousLocation(router);
     }
   }
