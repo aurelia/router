@@ -1,7 +1,14 @@
 import core from 'core-js';
 
 export class NavigationInstruction {
-  constructor(fragment, queryString, params, queryParams, config, parentInstruction) {
+  fragment: string;
+  queryString: string;
+  params: any;
+  queryParams: any;
+  config: any;
+  parentInstruction: NavigationInstruction;
+
+  constructor(fragment: string, queryString?: string, params?: any, queryParams?: any, config?: any, parentInstruction?: NavigationInstruction) {
     this.fragment = fragment;
     this.queryString = queryString;
     this.params = params || {};
@@ -27,7 +34,7 @@ export class NavigationInstruction {
     this.lifecycleArgs = [allParams, config, this];
   }
 
-  addViewPortInstruction(viewPortName, strategy, moduleId, component) {
+  addViewPortInstruction(viewPortName, strategy, moduleId, component): any {
     return this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
       strategy: strategy,
@@ -38,12 +45,12 @@ export class NavigationInstruction {
     };
   }
 
-  getWildCardName() {
+  getWildCardName(): string {
     let wildcardIndex = this.config.route.lastIndexOf('*');
     return this.config.route.substr(wildcardIndex + 1);
   }
 
-  getWildcardPath() {
+  getWildcardPath(): string {
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
 
@@ -54,7 +61,7 @@ export class NavigationInstruction {
     return path;
   }
 
-  getBaseUrl() {
+  getBaseUrl(): string {
     if (!this.params) {
       return this.fragment;
     }
