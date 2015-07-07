@@ -69,7 +69,7 @@ export class Router {
     return this;
   }
 
-  navigate(fragment, options) {
+  navigate(fragment, options?) {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
