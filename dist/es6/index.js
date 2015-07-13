@@ -871,7 +871,7 @@ export class Router {
     return false;
   }
 
-  registerViewPort(viewPort, name) {
+  registerViewPort(viewPort:Object, name?:string) {
     name = name || 'default';
     this.viewPorts[name] = viewPort;
   }
@@ -892,7 +892,7 @@ export class Router {
     }
   }
 
-  configure(callbackOrConfig) {
+  configure(callbackOrConfig:RouterConfiguration|((config:RouterConfiguration) => RouterConfiguration)):Router {
     this.isConfigured = true;
 
     if (typeof callbackOrConfig == 'function') {
@@ -906,7 +906,7 @@ export class Router {
     return this;
   }
 
-  navigate(fragment, options?) {
+  navigate(fragment:string, options?:Object):boolean {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -914,7 +914,7 @@ export class Router {
     return this.history.navigate(resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
-  navigateToRoute(route, params, options) {
+  navigateToRoute(route:string, params?:Object, options?:Object):boolean {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
@@ -923,13 +923,13 @@ export class Router {
     this.history.navigateBack();
   }
 
-  createChild(container) {
+  createChild(container?:Container):Router {
     var childRouter = new Router(container || this.container.createChild(), this.history);
     childRouter.parent = this;
     return childRouter;
   }
 
-  createNavigationInstruction(url = '', parentInstruction = null) {
+  createNavigationInstruction(url:string = '', parentInstruction?:NavigationInstruction = null):Promise<NavigationInstruction> {
     let fragment = url;
     let queryString = '';
 
@@ -979,12 +979,12 @@ export class Router {
     return Promise.reject(new Error(`Route not found: ${url}`));
   }
 
-  createNavigationContext(instruction) {
+  createNavigationContext(instruction:NavigationInstruction):NavigationContext {
     instruction.navigationContext = new NavigationContext(this, instruction);
     return instruction.navigationContext;
   }
 
-  generate(name, params) {
+  generate(name:string, params?:Object):string {
     let hasRoute = this.recognizer.hasRoute(name);
     if((!this.isConfigured || !hasRoute) && this.parent){
       return this.parent.generate(name, params);
@@ -998,7 +998,7 @@ export class Router {
     return createRootedPath(path, this.baseUrl, this.history._hasPushState);
   }
 
-  createNavModel(config) {
+  createNavModel(config:Object):NavModel {
     let navModel = new NavModel(this, 'href' in config ? config.href : config.route);
     navModel.title = config.title;
     navModel.order = config.nav;
@@ -1009,7 +1009,7 @@ export class Router {
     return navModel;
   }
 
-  addRoute(config, navModel) {
+  addRoute(config:Object, navModel?:NavModel) {
     validateRouteConfig(config);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
@@ -1066,15 +1066,15 @@ export class Router {
     }
   }
 
-  hasRoute(name) {
+  hasRoute(name:string):boolean {
     return !!(this.recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
   }
 
-  hasOwnRoute(name) {
+  hasOwnRoute(name:string):boolean {
     return this.recognizer.hasRoute(name);
   }
 
-  handleUnknownRoutes(config) {
+  handleUnknownRoutes(config?:string|Function|Object) {
     var callback = instruction => new Promise((resolve, reject) => {
       function done(inst){
         inst = inst || instruction;
@@ -1118,7 +1118,7 @@ export class Router {
   }
 }
 
-function validateRouteConfig(config) {
+function validateRouteConfig(config:Object) {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }
@@ -1132,7 +1132,7 @@ function validateRouteConfig(config) {
   }
 }
 
-function evaluateNavigationStrategy(instruction, evaluator, context){
+function evaluateNavigationStrategy(instruction:NavigationInstruction, evaluator:Function, context:Object): Promise<NavigationInstruction> {
   return Promise.resolve(evaluator.call(context, instruction)).then(() => {
     if (!('viewPorts' in instruction.config)) {
       instruction.config.viewPorts = {
