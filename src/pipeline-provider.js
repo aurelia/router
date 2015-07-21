@@ -27,7 +27,7 @@ export class PipelineProvider {
       ActivateNextStep, //optional
       createRouteFilterStep('precommit'),
       CommitChangesStep,
-      createRouteFilterStep('commitcomplete')
+      createRouteFilterStep('postcomplete')
     ];
   }
 
