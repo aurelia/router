@@ -24,6 +24,7 @@ export class Router {
   routes: any[] = [];
   isNavigating: boolean = false;
   navigation: any[] = [];
+  currentInstruction: NavigationInstruction;
 
   constructor(container, history) {
     this.container = container;
