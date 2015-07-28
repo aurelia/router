@@ -1,11 +1,9 @@
 import {History} from 'aurelia-history';
 import {Container} from 'aurelia-dependency-injection';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {
-  AppRouter,
-  PipelineProvider,
-  RouteLoader
-} from '../src/index';
+import {AppRouter} from '../src/app-router';
+import {PipelineProvider} from '../src/pipeline-provider';
+import {RouteLoader} from '../src/route-loading';
 import {Pipeline} from '../src/pipeline';
 
 class MockHistory extends History {
