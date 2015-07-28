@@ -3,7 +3,7 @@ import {RouterConfiguration} from './router-configuration';
 
 export class RouteLoader {
   loadRoute(router, config){
-    throw Error('Route loaders must implment "loadRoute(router, config)".');
+    throw Error('Route loaders must implement "loadRoute(router, config)".');
   }
 }
 
