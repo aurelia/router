@@ -1,3 +1,12 @@
+### 0.10.3 (2015-07-29)
+
+
+#### Bug Fixes
+
+* **route-loading:** fix typo in error message ([6a623111](http://github.com/aurelia/router/commit/6a623111b1e91d165cbcb4dc7cbd3f89b5bca4e9))
+* **test:** incorrect import statements in specs ([33cf4bae](http://github.com/aurelia/router/commit/33cf4bae931e87dda25cebec1a6badd64a04a2d5))
+
+
 ### 0.10.2 (2015-07-13)
 
 
