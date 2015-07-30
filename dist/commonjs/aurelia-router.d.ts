@@ -144,6 +144,7 @@ declare module 'aurelia-router' {
     routes: any[];
     isNavigating: boolean;
     navigation: any[];
+    currentInstruction: NavigationInstruction;
     constructor(container: any, history: any);
     isRoot(): any;
     registerViewPort(viewPort: Object, name?: string): any;

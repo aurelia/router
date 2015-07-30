@@ -1319,7 +1319,7 @@ define(['exports', 'core-js', 'aurelia-dependency-injection', 'aurelia-route-rec
     }
 
     RouteLoader.prototype.loadRoute = function loadRoute(router, config) {
-      throw Error('Route loaders must implment "loadRoute(router, config)".');
+      throw Error('Route loaders must implement "loadRoute(router, config)".');
     };
 
     return RouteLoader;
@@ -1446,7 +1446,7 @@ define(['exports', 'core-js', 'aurelia-dependency-injection', 'aurelia-route-rec
       _classCallCheck(this, PipelineProvider);
 
       this.container = container;
-      this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, createRouteFilterStep('authorize'), createRouteFilterStep('modelbind'), CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep('precommit'), CommitChangesStep];
+      this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, createRouteFilterStep('authorize'), createRouteFilterStep('modelbind'), CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep('precommit'), CommitChangesStep, createRouteFilterStep('postcomplete')];
     }
 
     PipelineProvider.inject = function inject() {

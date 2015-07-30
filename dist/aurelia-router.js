@@ -860,6 +860,7 @@ export class Router {
   routes: any[] = [];
   isNavigating: boolean = false;
   navigation: any[] = [];
+  currentInstruction: NavigationInstruction;
 
   constructor(container, history) {
     this.container = container;
@@ -1235,7 +1236,7 @@ export class Pipeline {
 
 export class RouteLoader {
   loadRoute(router, config){
-    throw Error('Route loaders must implment "loadRoute(router, config)".');
+    throw Error('Route loaders must implement "loadRoute(router, config)".');
   }
 }
 
@@ -1374,7 +1375,8 @@ export class PipelineProvider {
       DeactivatePreviousStep, //optional
       ActivateNextStep, //optional
       createRouteFilterStep('precommit'),
-      CommitChangesStep
+      CommitChangesStep,
+      createRouteFilterStep('postcomplete')
     ];
   }
 

@@ -12,24 +12,24 @@
   },
   "license": "MIT",
   "author": "Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)",
-  "main": "dist/commonjs/index.js",
+  "main": "dist/commonjs/aurelia-router.js",
   "repository": {
     "type": "git",
     "url": "http://github.com/aurelia/router"
   },
   "jspm": {
-    "main": "index",
+    "main": "aurelia-router",
     "format": "amd",
     "directories": {
       "lib": "dist/amd"
     },
     "dependencies": {
-      "aurelia-dependency-injection": "github:aurelia/dependency-injection@^0.9.0",
-      "aurelia-event-aggregator": "github:aurelia/event-aggregator@^0.6.0",
-      "aurelia-history": "github:aurelia/history@^0.6.0",
-      "aurelia-logging": "github:aurelia/logging@^0.6.0",
-      "aurelia-path": "github:aurelia/path@^0.8.0",
-      "aurelia-route-recognizer": "github:aurelia/route-recognizer@^0.6.0",
+      "aurelia-dependency-injection": "github:aurelia/dependency-injection@^0.9.1",
+      "aurelia-event-aggregator": "github:aurelia/event-aggregator@^0.6.2",
+      "aurelia-history": "github:aurelia/history@^0.6.1",
+      "aurelia-logging": "github:aurelia/logging@^0.6.2",
+      "aurelia-path": "github:aurelia/path@^0.8.1",
+      "aurelia-route-recognizer": "github:aurelia/route-recognizer@^0.6.1",
       "core-js": "npm:core-js@^0.9.5"
     },
     "devDependencies": {
