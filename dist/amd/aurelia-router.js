@@ -1556,9 +1556,11 @@ define(['exports', 'core-js', 'aurelia-dependency-injection', 'aurelia-route-rec
       _Router.prototype.registerViewPort.call(this, viewPort, name);
 
       if (!this.isActive) {
-        if ('configureRouter' in this.container.viewModel) {
+        var viewModel = this._findViewModel(viewPort);
+
+        if ('configureRouter' in viewModel) {
           var config = new RouterConfiguration();
-          var result = Promise.resolve(this.container.viewModel.configureRouter(config, this));
+          var result = Promise.resolve(viewModel.configureRouter(config, this));
 
           return result.then(function () {
             _this5.configure(config);
@@ -1569,6 +1571,24 @@ define(['exports', 'core-js', 'aurelia-dependency-injection', 'aurelia-route-rec
         }
       } else {
         this.dequeueInstruction();
+      }
+    };
+
+    AppRouter.prototype._findViewModel = function _findViewModel(viewPort) {
+      if (this.container.viewModel) {
+        return this.container.viewModel;
+      }
+
+      if (viewPort.container) {
+        var _container = viewPort.container;
+
+        while (_container) {
+          if (_container.viewModel) {
+            return this.container.viewModel = _container.viewModel;
+          }
+
+          _container = _container.parent;
+        }
       }
     };
 

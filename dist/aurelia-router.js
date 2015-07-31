@@ -1463,9 +1463,11 @@ export class AppRouter extends Router {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
-      if('configureRouter' in this.container.viewModel){
+      let viewModel = this._findViewModel(viewPort);
+
+      if('configureRouter' in viewModel){
         var config = new RouterConfiguration();
-        var result = Promise.resolve(this.container.viewModel.configureRouter(config, this));
+        var result = Promise.resolve(viewModel.configureRouter(config, this));
 
         return result.then(() => {
           this.configure(config);
@@ -1476,6 +1478,24 @@ export class AppRouter extends Router {
       }
     } else {
       this.dequeueInstruction();
+    }
+  }
+
+  _findViewModel(viewPort){
+    if(this.container.viewModel){
+      return this.container.viewModel;
+    }
+
+    if(viewPort.container){
+      let container = viewPort.container;
+
+      while(container){
+        if(container.viewModel){
+          return this.container.viewModel = container.viewModel;
+        }
+
+        container = container.parent;
+      }
     }
   }
 
