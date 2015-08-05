@@ -1,3 +1,11 @@
+### 0.10.4 (2015-08-05)
+
+
+#### Bug Fixes
+
+* **app-router:** previously assumed very specific component structure ([df9d089a](http://github.com/aurelia/router/commit/df9d089a77dbb10d3547ada9900959a3bb3ff909))
+
+
 ### 0.10.3 (2015-07-29)
 
 
