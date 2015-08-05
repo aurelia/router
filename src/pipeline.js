@@ -1,4 +1,4 @@
-import core from 'core-js';
+import * as core from 'core-js';
 
 function createResult(ctx, next) {
   return {

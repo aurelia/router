@@ -1,4 +1,4 @@
-import core from 'core-js';
+import * as core from 'core-js';
 
 /**
  * Determines if the provided object is a navigation command.
