@@ -184,7 +184,7 @@ function targetIsThisWindow(target) {
 
 function processResult(instruction, result, instructionCount, router) {
   if (!(result && 'completed' in result && 'output' in result)) {
-    resut = result || {};
+    result = result || {};
     result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
   }
 
