@@ -1,4 +1,4 @@
-import core from 'core-js';
+import * as core from 'core-js';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {join} from 'aurelia-path';
 import {Container} from 'aurelia-dependency-injection';
