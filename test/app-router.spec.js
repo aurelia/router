@@ -145,7 +145,7 @@ describe('app-router', () => {
       router.dequeueInstruction()
         .then(result => {
           expect(result.completed).toBe(false);
-          expect(result.status).toBe('cancelled');
+          expect(result.status).toBe('canceled');
           expect(result.output).toBe(output);
           expect(result.context).toBeTruthy();
         })
