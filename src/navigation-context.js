@@ -54,7 +54,10 @@ export class NavigationContext {
       var viewPort = router.viewPorts[viewPortName];
 
       if(!viewPort){
-        throw new Error(`There was no router-view found in the view for ${viewPortInstruction.moduleId}.`);
+        if (!Object.keys(router.viewPorts).length) {
+          return;
+        }
+        throw new Error(`There was no router-view found in the view for the module ${viewPortInstruction.moduleId}.`);
       }
 
       if (viewPortInstruction.strategy === activationStrategy.replace) {
