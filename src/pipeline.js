@@ -11,7 +11,7 @@ function createResult(ctx, next) {
 
 export const pipelineStatus = {
   completed: 'completed',
-  cancelled: 'cancelled',
+  canceled: 'canceled',
   rejected: 'rejected',
   running: 'running'
 };
@@ -70,7 +70,7 @@ export class Pipeline {
     };
 
     next.cancel = reason => {
-      next.status = pipelineStatus.cancelled;
+      next.status = pipelineStatus.canceled;
       next.output = reason;
       return Promise.resolve(createResult(ctx, next));
     };
