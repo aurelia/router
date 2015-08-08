@@ -14,26 +14,9 @@ var jsName = paths.packageName + '.js';
 
 gulp.task('build-index', function(){
   var importsToAdd = [];
-  var files = [
-    'util.js',
-    'navigation-commands.js',
-    'navigation-plan.js',
-    'activation.js',
-    'navigation-context.js',
-    'navigation-instruction.js',
-    'nav-model.js',
-    'route-filters.js',
-    'router-configuration.js',
-    'router.js',
-    'pipeline.js',
-    'route-loading.js',
-    'pipeline-provider.js',
-    'app-router.js'
-    ].map(function(file){
-      return paths.root + file;
-  });
 
-  return gulp.src(files)
+  return gulp.src(paths.source)
+    .pipe(tools.sortFiles())
     .pipe(through2.obj(function(file, enc, callback) {
       file.contents = new Buffer(tools.extractImports(file.contents.toString("utf8"), importsToAdd));
       this.push(file);
