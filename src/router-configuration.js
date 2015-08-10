@@ -1,5 +1,11 @@
 import {RouteFilterContainer} from './route-filters';
+import {RouteConfig} from './interfaces';
 
+/**
+ * Class used to configure a [[Router]] instance.
+ *
+ * @constructor
+ */
 export class RouterConfiguration{
   instructions = [];
   options = {};
@@ -7,11 +13,25 @@ export class RouterConfiguration{
   title;
   unknownRouteConfig;
 
-  addPipelineStep(name, step) {
+  /**
+  * Adds a step to be run during the [[Router]]'s navigation pipeline.
+  * 
+  * @param name The name of the pipeline slot to insert the step into.
+  * @param step The pipeline step.
+  * @chainable
+  */
+  addPipelineStep(name: string, step: Object|Function) {
     this.pipelineSteps.push({name, step});
+    return this;
   }
 
-  map(route) {
+  /**
+  * Maps one or more routes to be registered with the router.
+  * 
+  * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
+  * @chainable
+  */
+  map(route: RouteConfig|RouteConfig[]) {
     if (Array.isArray(route)) {
       route.forEach(this.map.bind(this));
       return this;
@@ -20,7 +40,13 @@ export class RouterConfiguration{
     return this.mapRoute(route);
   }
 
-  mapRoute(config) {
+  /**
+  * Maps a single route to be registered with the router.
+  * 
+  * @param route The [[RouteConfig]] to map.
+  * @chainable
+  */
+  mapRoute(config: RouteConfig) {
     this.instructions.push(router => {
       let routeConfigs = [];
 
@@ -49,12 +75,24 @@ export class RouterConfiguration{
     return this;
   }
 
-  mapUnknownRoutes(config) {
+  /**
+  * Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
+  * 
+  * @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
+  *  [[NavigationInstruction]] and selects a moduleId to load.
+  * @chainable
+  */
+  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => Promise) {
     this.unknownRouteConfig = config;
     return this;
   }
 
-  exportToRouter(router) {
+  /**
+  * Applies the current configuration to the specified [[Router]].
+  * 
+  * @param router The [[Router]] to apply the configuration to.
+  */
+  exportToRouter(router: Router) {
     let instructions = this.instructions;
     for (let i = 0, ii = instructions.length; i < ii; ++i) {
       instructions[i](router);

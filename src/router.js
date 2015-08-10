@@ -2,6 +2,7 @@ import * as core from 'core-js';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {join} from 'aurelia-path';
 import {Container} from 'aurelia-dependency-injection';
+import {History} from 'aurelia-history';
 import {NavigationContext} from './navigation-context';
 import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
@@ -11,21 +12,52 @@ import {
   normalizeAbsolutePath,
   createRootedPath,
   resolveUrl} from './util';
+import {RouteConfig} from './interfaces';
 
+/**
+* The primary class responsible for handling routing and navigation.
+* 
+* @class Router
+* @constructor
+*/
 export class Router {
-  container: any;
-  history: any;
-  viewPorts: any = {};
-  baseUrl: string = '';
-  isConfigured: boolean = false;
+  container: Container;
+  history: History;
+  viewPorts: Object = {};
   fallbackOrder: number = 100;
   recognizer: RouteRecognizer = new RouteRecognizer();
   childRecognizer: RouteRecognizer = new RouteRecognizer();
-  routes: any[] = [];
+  routes: RouteConfig[] = [];
+
+  /**
+  * The [[Router]]'s current base URL, typically based on the [[Router.currentInstruction]].
+  */
+  baseUrl: string = '';
+
+  /**
+  * True if the [[Router]] has been configured.
+  */
+  isConfigured: boolean = false;
+
+  /**
+  * True if the [[Router]] is currently processing a navigation.
+  */
   isNavigating: boolean = false;
-  navigation: any[] = [];
+
+  /**
+  * The navigation models for routes that specified [[RouteConfig.nav]].
+  */
+  navigation: NavModel[] = [];
+
+  /**
+  * The currently active navigation instruction.
+  */
   currentInstruction: NavigationInstruction;
 
+  /**
+  * @param container The [[Container]] to use when child routers.
+  * @param history The [[History]] implementation to delegate navigation requests to.
+  */
   constructor(container, history) {
     this.container = container;
     this.history = history;
@@ -35,36 +67,40 @@ export class Router {
     this.reset();
   }
 
+  /**
+  * Gets a valid undicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
+  */
   get isRoot() {
     return false;
   }
 
+  /**
+  * Registers a viewPort to be used as a rendering target for activated routes.
+  * 
+  * @param viewPort The viewPort.
+  * @param name The name of the viewPort. 'default' if unspecified.
+  */
   registerViewPort(viewPort:Object, name?:string) {
     name = name || 'default';
     this.viewPorts[name] = viewPort;
   }
 
-  refreshBaseUrl() {
-    if (this.parent) {
-      var baseUrl = this.parent.currentInstruction.getBaseUrl();
-      this.baseUrl = this.parent.baseUrl + baseUrl;
-    }
-  }
-
-  refreshNavigation() {
-    var nav = this.navigation;
-
-    for(var i = 0, length = nav.length; i < length; i++) {
-      var current = nav[i];
-      current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
-    }
-  }
-
-  ensureConfigured() {
+  /**
+  * Returns a Promise that resolves when the router is configured.
+  */
+  ensureConfigured():Promise {
     return this._configuredPromise;
   }
 
+  /**
+  * Configures the router.
+  * 
+  * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
+  * @chainable
+  */
   configure(callbackOrConfig:RouterConfiguration|((config:RouterConfiguration) => RouterConfiguration)):Router {
+    this.isConfigured = true;
+
     if (typeof callbackOrConfig == 'function') {
       var config = new RouterConfiguration();
       callbackOrConfig(config);
@@ -79,6 +115,12 @@ export class Router {
     return this;
   }
 
+  /**
+  * Navigates to a new location.
+  * 
+  * @param fragment The URL fragment to use as the navigation destination.
+  * @param options The navigation options.
+  */
   navigate(fragment:string, options?:Object):boolean {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
@@ -87,76 +129,45 @@ export class Router {
     return this.history.navigate(resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
+  /**
+  * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
+  * by [[Router.navigate]].
+  * 
+  * @param route The name of the route to use when generating the navigation location.
+  * @param params The route parameters to be used when populating the route pattern.
+  * @param options The navigation options.
+  */
   navigateToRoute(route:string, params?:Object, options?:Object):boolean {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
 
+  /**
+  * Navigates back to the most recent location in history.                 
+  */
   navigateBack() {
     this.history.navigateBack();
   }
 
+  /**
+   * Creates a child router of the current router.
+   *
+   * @param container The [[Container]] to provide to the child router. Uses the current [[Router]]'s [[Container]] if unspecified.
+   * @returns {Router} The new child Router.
+   */
   createChild(container?:Container):Router {
     var childRouter = new Router(container || this.container.createChild(), this.history);
     childRouter.parent = this;
     return childRouter;
   }
 
-  createNavigationInstruction(url:string = '', parentInstruction?:NavigationInstruction = null):Promise<NavigationInstruction> {
-    let fragment = url;
-    let queryString = '';
-
-    let queryIndex = url.indexOf('?');
-    if (queryIndex != -1) {
-      fragment = url.substr(0, queryIndex);
-      queryString = url.substr(queryIndex + 1);
-    }
-
-    let results = this.recognizer.recognize(url);
-    if (!results || !results.length) {
-      results = this.childRecognizer.recognize(url);
-    }
-
-    if((!results || !results.length) && this.catchAllHandler) {
-      results = [{
-        config: {
-          navModel: {}
-        },
-        handler: this.catchAllHandler,
-        params: {
-          path: fragment
-        }
-      }];
-    }
-
-    if (results && results.length) {
-      let first = results[0];
-      let instruction = new NavigationInstruction(
-        fragment,
-        queryString,
-        first.params,
-        first.queryParams || results.queryParams,
-        first.config || first.handler,
-        parentInstruction
-        );
-
-      if (typeof first.handler === 'function') {
-        return evaluateNavigationStrategy(instruction, first.handler, first);
-      } else if(first.handler && 'navigationStrategy' in first.handler){
-        return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
-      }
-
-      return Promise.resolve(instruction);
-    }
-
-    return Promise.reject(new Error(`Route not found: ${url}`));
-  }
-
-  createNavigationContext(instruction:NavigationInstruction):NavigationContext {
-    instruction.navigationContext = new NavigationContext(this, instruction);
-    return instruction.navigationContext;
-  }
-
+  /**
+  * Generates a URL fragment matching the specified route pattern.
+  * 
+  * @param name The name of the route whose pattern should be used to generate the fragment.
+  * @param params The route params to be used to populate the route pattern.
+  * @returns {string} A string containing the generated URL fragment. 
+  */
   generate(name:string, params?:Object):string {
     let hasRoute = this.recognizer.hasRoute(name);
     if((!this.isConfigured || !hasRoute) && this.parent){
@@ -171,7 +182,12 @@ export class Router {
     return createRootedPath(path, this.baseUrl, this.history._hasPushState);
   }
 
-  createNavModel(config:Object):NavModel {
+  /**
+  * Creates a [[NavModel]] for the specified route config.
+  * 
+  * @param config The route config.
+  */
+  createNavModel(config:RouteConfig):NavModel {
     let navModel = new NavModel(this, 'href' in config ? config.href : config.route);
     navModel.title = config.title;
     navModel.order = config.nav;
@@ -182,7 +198,13 @@ export class Router {
     return navModel;
   }
 
-  addRoute(config:Object, navModel?:NavModel) {
+  /**
+  * Registers a new route with the router.
+  * 
+  * @param config The [[RouteConfig]].
+  * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
+  */
+  addRoute(config:RouteConfig, navModel?:NavModel) {
     validateRouteConfig(config);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
@@ -239,15 +261,32 @@ export class Router {
     }
   }
 
+  /**
+  * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
+  * 
+  * @param name The name of the route to check.
+  * @returns {boolean}
+  */
   hasRoute(name:string):boolean {
     return !!(this.recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
   }
 
+  /**
+  * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
+  * 
+  * @param name The name of the route to check.
+  * @returns {boolean}
+  */
   hasOwnRoute(name:string):boolean {
     return this.recognizer.hasRoute(name);
   }
 
-  handleUnknownRoutes(config?:string|Function|Object) {
+  /**
+  * Register a handler to use when the incoming URL fragment doesn't match any registered routes.
+  * 
+  * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
+  */
+  handleUnknownRoutes(config?:string|Function|RouteConfig) {
     var callback = instruction => new Promise((resolve, reject) => {
       function done(inst){
         inst = inst || instruction;
@@ -272,6 +311,9 @@ export class Router {
     this.catchAllHandler = callback;
   }
 
+  /**
+  * Updates the document title using the current navigation instruction.
+  */
   updateTitle() {
     if (this.parent) {
       return this.parent.updateTitle();
@@ -280,6 +322,9 @@ export class Router {
     this.currentInstruction.navigationContext.updateTitle();
   }
 
+  /**
+  * Resets the Router to its original unconfigured state.
+  */
   reset() {
     this.fallbackOrder = 100;
     this.recognizer = new RouteRecognizer();
@@ -288,6 +333,77 @@ export class Router {
     this.isNavigating = false;
     this.navigation = [];
     this.isConfigured = false;
+  }
+
+  refreshBaseUrl() {
+    if (this.parent) {
+      var baseUrl = this.parent.currentInstruction.getBaseUrl();
+      this.baseUrl = this.parent.baseUrl + baseUrl;
+    }
+  }
+
+  refreshNavigation() {
+    var nav = this.navigation;
+
+    for(var i = 0, length = nav.length; i < length; i++) {
+      var current = nav[i];
+      current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+    }
+  }
+
+  createNavigationInstruction(url:string = '', parentInstruction?:NavigationInstruction = null):Promise<NavigationInstruction> {
+    let fragment = url;
+    let queryString = '';
+
+    let queryIndex = url.indexOf('?');
+    if (queryIndex != -1) {
+      fragment = url.substr(0, queryIndex);
+      queryString = url.substr(queryIndex + 1);
+    }
+
+    let results = this.recognizer.recognize(url);
+    if (!results || !results.length) {
+      results = this.childRecognizer.recognize(url);
+    }
+
+    if((!results || !results.length) && this.catchAllHandler) {
+      results = [{
+        config: {
+          navModel: {}
+        },
+        handler: this.catchAllHandler,
+        params: {
+          path: fragment
+        }
+      }];
+    }
+
+    if (results && results.length) {
+      let first = results[0];
+      let instruction = new NavigationInstruction(
+        fragment,
+        queryString,
+        first.params,
+        first.queryParams || results.queryParams,
+        first.config || first.handler,
+        parentInstruction
+        );
+
+      if (typeof first.handler === 'function') {
+        return evaluateNavigationStrategy(instruction, first.handler, first);
+      } else if(first.handler && 'navigationStrategy' in first.handler){
+        return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
+      }
+
+      return Promise.resolve(instruction);
+    }
+
+    return Promise.reject(new Error(`Route not found: ${url}`));
+  }
+
+  createNavigationContext(instruction:NavigationInstruction):NavigationContext {
+    instruction.navigationContext = new NavigationContext(this, instruction);
+    return instruction.navigationContext;
   }
 }
 
