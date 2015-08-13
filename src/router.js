@@ -29,6 +29,9 @@ export class Router {
   constructor(container, history) {
     this.container = container;
     this.history = history;
+    this._configuredPromise = new Promise((resolve => {
+      this._resolveConfiguredPromise = resolve;
+    }));
     this.reset();
   }
 
@@ -57,9 +60,11 @@ export class Router {
     }
   }
 
-  configure(callbackOrConfig:RouterConfiguration|((config:RouterConfiguration) => RouterConfiguration)):Router {
-    this.isConfigured = true;
+  ensureConfigured() {
+    return this._configuredPromise;
+  }
 
+  configure(callbackOrConfig:RouterConfiguration|((config:RouterConfiguration) => RouterConfiguration)):Router {
     if (typeof callbackOrConfig == 'function') {
       var config = new RouterConfiguration();
       callbackOrConfig(config);
@@ -67,6 +72,9 @@ export class Router {
     } else {
       callbackOrConfig.exportToRouter(this);
     }
+
+    this.isConfigured = true;
+    this._resolveConfiguredPromise();
 
     return this;
   }

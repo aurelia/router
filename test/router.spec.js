@@ -237,4 +237,36 @@ describe('the router', () => {
         .then(done);
     });
   });
+
+  describe('configure', () => {
+    it('notifies when configured', (done) => {
+      expect(router.isConfigured).toBe(false);
+
+      router.ensureConfigured().then(() => {
+        expect(router.isConfigured).toBe(true);
+        done();
+      });
+
+      router.configure(config => {
+        config.map({ route: '', moduleId: './test' });
+      });
+
+      expect(router.isConfigured).toBe(true);
+    });
+
+    it('notifies when already configured', (done) => {
+      expect(router.isConfigured).toBe(false);
+
+      router.configure(config => {
+        config.map({ route: '', moduleId: './test' });
+      });
+
+      expect(router.isConfigured).toBe(true);
+
+      router.ensureConfigured().then(() => {
+        expect(router.isConfigured).toBe(true);
+        done();
+      });
+    });
+  });
 });
