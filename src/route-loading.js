@@ -2,8 +2,8 @@ import {activationStrategy, buildNavigationPlan} from './navigation-plan';
 import {RouterConfiguration} from './router-configuration';
 
 export class RouteLoader {
-  loadRoute(router, config){
-    throw Error('Route loaders must implement "loadRoute(router, config)".');
+  loadRoute(router, config, navigationContext){
+    throw Error('Route loaders must implement "loadRoute(router, config, navigationContext)".');
   }
 }
 
@@ -107,7 +107,7 @@ function loadComponent(routeLoader, navigationContext, config){
   var router = navigationContext.router,
       lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
-  return routeLoader.loadRoute(router, config).then(component => {
+  return routeLoader.loadRoute(router, config, navigationContext).then(component => {
     component.router = router;
     component.config = config;
 
