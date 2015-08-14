@@ -1,1 +1,5411 @@
-{"classes":[{"name":"NavModel","file":"aurelia/router/src/nav-model.js","line":1,"description":"Class for storing and interacting with a route's navigation settings","is_constructor":1,"methods":[{"line":48,"description":"Sets the route's title and updates document.title.\n If the a navigation is in progress, the change will be applied\n to document.title when the navigation completes.","name":"setTitle","params":[{"name":"title","description":"The new title.","type":"String"}]}],"properties":[{"line":12,"description":"True if this nav item is currently active.","name":"isActive","type":"Boolean"},{"line":19,"description":"The title.","name":"title","type":"String"},{"line":26,"description":"This nav item's absolute href.","name":"href","type":"String"},{"line":33,"description":"Data attached to the route at configuration time.","name":"settings","type":"Any"},{"line":40,"description":"The route config.","name":"config","type":"Object"}],"events":[]},{"name":"Redirect","file":"aurelia/router/src/navigation-commands.js","line":13,"description":"Used during the activation lifecycle to cause a redirect.","is_constructor":1,"params":[{"name":"url","description":"The url to redirect to.","type":"String"}],"methods":[{"line":27,"description":"Called by the activation system to set the child router.","name":"setRouter","params":[{"name":"router","description":"","type":"Router"}]},{"line":37,"description":"Called by the navigation pipeline to navigate.","name":"navigate","params":[{"name":"appRouter","description":"- a router which should redirect","type":"Router"}]}],"properties":[],"events":[]}],"methods":[],"properties":[],"events":[]}
+{
+  "id": 2,
+  "name": "\"aurelia-router\"",
+  "kind": 2,
+  "kindString": "Module",
+  "flags": {},
+  "children": [
+    {
+      "id": 121,
+      "name": "ActivateNextStep",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 122,
+          "name": "run",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 123,
+              "name": "run",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 124,
+                  "name": "navigationContext",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 125,
+                  "name": "next",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            122
+          ]
+        }
+      ]
+    },
+    {
+      "id": 255,
+      "name": "AppRouter",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 258,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 259,
+              "name": "new AppRouter",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 260,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 261,
+                  "name": "history",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 262,
+                  "name": "pipelineProvider",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 263,
+                  "name": "events",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "AppRouter",
+                "id": 255,
+                "moduleName": "\"aurelia-router\""
+              },
+              "overwrites": {
+                "type": "reference",
+                "name": "Router.__constructor",
+                "id": 181
+              }
+            }
+          ],
+          "overwrites": {
+            "type": "reference",
+            "name": "Router.__constructor",
+            "id": 181
+          }
+        },
+        {
+          "id": 289,
+          "name": "baseUrl",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "string"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.baseUrl",
+            "id": 172
+          }
+        },
+        {
+          "id": 293,
+          "name": "childRecognizer",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "reference",
+            "name": "RouteRecognizer",
+            "id": 749,
+            "moduleName": "\"aurelia-route-recognizer\""
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.childRecognizer",
+            "id": 176
+          }
+        },
+        {
+          "id": 286,
+          "name": "container",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.container",
+            "id": 169
+          }
+        },
+        {
+          "id": 297,
+          "name": "currentInstruction",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "reference",
+            "name": "NavigationInstruction",
+            "id": 33,
+            "moduleName": "\"aurelia-router\""
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.currentInstruction",
+            "id": 180
+          }
+        },
+        {
+          "id": 291,
+          "name": "fallbackOrder",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "number"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.fallbackOrder",
+            "id": 174
+          }
+        },
+        {
+          "id": 287,
+          "name": "history",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.history",
+            "id": 170
+          }
+        },
+        {
+          "id": 290,
+          "name": "isConfigured",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "boolean"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.isConfigured",
+            "id": 173
+          }
+        },
+        {
+          "id": 295,
+          "name": "isNavigating",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "boolean"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.isNavigating",
+            "id": 178
+          }
+        },
+        {
+          "id": 296,
+          "name": "navigation",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "isArray": true,
+            "name": "any"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.navigation",
+            "id": 179
+          }
+        },
+        {
+          "id": 292,
+          "name": "recognizer",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "reference",
+            "name": "RouteRecognizer",
+            "id": 749,
+            "moduleName": "\"aurelia-route-recognizer\""
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.recognizer",
+            "id": 175
+          }
+        },
+        {
+          "id": 294,
+          "name": "routes",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "isArray": true,
+            "name": "any"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.routes",
+            "id": 177
+          }
+        },
+        {
+          "id": 288,
+          "name": "viewPorts",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.viewPorts",
+            "id": 171
+          }
+        },
+        {
+          "id": 279,
+          "name": "activate",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 280,
+              "name": "activate",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 281,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 336,
+          "name": "addRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 337,
+              "name": "addRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 338,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                },
+                {
+                  "id": 339,
+                  "name": "navModel",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "NavModel",
+                    "id": 60,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.addRoute",
+                "id": 229
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.addRoute",
+            "id": 229
+          }
+        },
+        {
+          "id": 302,
+          "name": "configure",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 303,
+              "name": "configure",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 304,
+                  "name": "callbackOrConfig",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "reference",
+                        "name": "RouterConfiguration",
+                        "id": 79
+                      },
+                      {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 305,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "signatures": [
+                            {
+                              "id": 306,
+                              "name": "__call",
+                              "kind": 4096,
+                              "kindString": "Call signature",
+                              "flags": {},
+                              "parameters": [
+                                {
+                                  "id": 307,
+                                  "name": "config",
+                                  "kind": 32768,
+                                  "kindString": "Parameter",
+                                  "flags": {},
+                                  "type": {
+                                    "type": "reference",
+                                    "name": "RouterConfiguration",
+                                    "id": 79
+                                  }
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "name": "RouterConfiguration",
+                                "id": 79
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Router",
+                "id": 168,
+                "moduleName": "\"aurelia-router\""
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.configure",
+                "id": 195
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.configure",
+            "id": 195
+          }
+        },
+        {
+          "id": 319,
+          "name": "createChild",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 320,
+              "name": "createChild",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 321,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 469,
+                    "moduleName": "\"aurelia-dependency-injection\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Router",
+                "id": 168,
+                "moduleName": "\"aurelia-router\""
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.createChild",
+                "id": 212
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.createChild",
+            "id": 212
+          }
+        },
+        {
+          "id": 333,
+          "name": "createNavModel",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 334,
+              "name": "createNavModel",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 335,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "NavModel",
+                "id": 60,
+                "moduleName": "\"aurelia-router\""
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.createNavModel",
+                "id": 226
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.createNavModel",
+            "id": 226
+          }
+        },
+        {
+          "id": 326,
+          "name": "createNavigationContext",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 327,
+              "name": "createNavigationContext",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 328,
+                  "name": "instruction",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "NavigationInstruction",
+                    "id": 33,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "NavigationContext",
+                "id": 126,
+                "moduleName": "\"aurelia-router\""
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.createNavigationContext",
+                "id": 219
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.createNavigationContext",
+            "id": 219
+          }
+        },
+        {
+          "id": 322,
+          "name": "createNavigationInstruction",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 323,
+              "name": "createNavigationInstruction",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 324,
+                  "name": "url",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 325,
+                  "name": "parentInstruction",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "NavigationInstruction",
+                    "id": 33,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "name": "NavigationInstruction",
+                    "id": 33
+                  }
+                ]
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.createNavigationInstruction",
+                "id": 215
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.createNavigationInstruction",
+            "id": 215
+          }
+        },
+        {
+          "id": 282,
+          "name": "deactivate",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 283,
+              "name": "deactivate",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 272,
+          "name": "dequeueInstruction",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 273,
+              "name": "dequeueInstruction",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 274,
+                  "name": "instructionCount",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 329,
+          "name": "generate",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 330,
+              "name": "generate",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 331,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 332,
+                  "name": "params",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "string"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.generate",
+                "id": 222
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.generate",
+            "id": 222
+          }
+        },
+        {
+          "id": 346,
+          "name": "handleUnknownRoutes",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 347,
+              "name": "handleUnknownRoutes",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 348,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "instrinct",
+                        "name": "string"
+                      },
+                      {
+                        "type": "reference",
+                        "name": "Function"
+                      },
+                      {
+                        "type": "reference",
+                        "name": "Object"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.handleUnknownRoutes",
+                "id": 239
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.handleUnknownRoutes",
+            "id": 239
+          }
+        },
+        {
+          "id": 343,
+          "name": "hasOwnRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 344,
+              "name": "hasOwnRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 345,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "boolean"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.hasOwnRoute",
+                "id": 236
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.hasOwnRoute",
+            "id": 236
+          }
+        },
+        {
+          "id": 340,
+          "name": "hasRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 341,
+              "name": "hasRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 342,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "boolean"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.hasRoute",
+                "id": 233
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.hasRoute",
+            "id": 233
+          }
+        },
+        {
+          "id": 264,
+          "name": "isRoot",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 265,
+              "name": "isRoot",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "overwrites": {
+                "type": "reference",
+                "name": "Router.isRoot",
+                "id": 185
+              }
+            }
+          ],
+          "overwrites": {
+            "type": "reference",
+            "name": "Router.isRoot",
+            "id": 185
+          }
+        },
+        {
+          "id": 266,
+          "name": "loadUrl",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 267,
+              "name": "loadUrl",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 268,
+                  "name": "url",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 308,
+          "name": "navigate",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 309,
+              "name": "navigate",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 310,
+                  "name": "fragment",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 311,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "boolean"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.navigate",
+                "id": 201
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.navigate",
+            "id": 201
+          }
+        },
+        {
+          "id": 317,
+          "name": "navigateBack",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 318,
+              "name": "navigateBack",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.navigateBack",
+                "id": 210
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.navigateBack",
+            "id": 210
+          }
+        },
+        {
+          "id": 312,
+          "name": "navigateToRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 313,
+              "name": "navigateToRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 314,
+                  "name": "route",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 315,
+                  "name": "params",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                },
+                {
+                  "id": 316,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "boolean"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.navigateToRoute",
+                "id": 205
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.navigateToRoute",
+            "id": 205
+          }
+        },
+        {
+          "id": 269,
+          "name": "queueInstruction",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 270,
+              "name": "queueInstruction",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 271,
+                  "name": "instruction",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 298,
+          "name": "refreshBaseUrl",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 299,
+              "name": "refreshBaseUrl",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.refreshBaseUrl",
+                "id": 191
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.refreshBaseUrl",
+            "id": 191
+          }
+        },
+        {
+          "id": 300,
+          "name": "refreshNavigation",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 301,
+              "name": "refreshNavigation",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.refreshNavigation",
+                "id": 193
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.refreshNavigation",
+            "id": 193
+          }
+        },
+        {
+          "id": 275,
+          "name": "registerViewPort",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 276,
+              "name": "registerViewPort",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 277,
+                  "name": "viewPort",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 278,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "overwrites": {
+                "type": "reference",
+                "name": "Router.registerViewPort",
+                "id": 187
+              }
+            }
+          ],
+          "overwrites": {
+            "type": "reference",
+            "name": "Router.registerViewPort",
+            "id": 187
+          }
+        },
+        {
+          "id": 284,
+          "name": "reset",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 285,
+              "name": "reset",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "overwrites": {
+                "type": "reference",
+                "name": "Router.reset",
+                "id": 244
+              }
+            }
+          ],
+          "overwrites": {
+            "type": "reference",
+            "name": "Router.reset",
+            "id": 244
+          }
+        },
+        {
+          "id": 349,
+          "name": "updateTitle",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 350,
+              "name": "updateTitle",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "name": "Router.updateTitle",
+                "id": 242
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "name": "Router.updateTitle",
+            "id": 242
+          }
+        },
+        {
+          "id": 256,
+          "name": "inject",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isStatic": true,
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 257,
+              "name": "inject",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            258
+          ]
+        },
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [
+            289,
+            293,
+            286,
+            297,
+            291,
+            287,
+            290,
+            295,
+            296,
+            292,
+            294,
+            288
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            279,
+            336,
+            302,
+            319,
+            333,
+            326,
+            322,
+            282,
+            272,
+            329,
+            346,
+            343,
+            340,
+            264,
+            266,
+            308,
+            317,
+            312,
+            269,
+            298,
+            300,
+            275,
+            284,
+            349,
+            256
+          ]
+        }
+      ],
+      "extendedTypes": [
+        {
+          "type": "reference",
+          "name": "Router",
+          "id": 168
+        }
+      ]
+    },
+    {
+      "id": 101,
+      "name": "BuildNavigationPlanStep",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 102,
+          "name": "run",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 103,
+              "name": "run",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 104,
+                  "name": "navigationContext",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 105,
+                  "name": "next",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "id": 111,
+      "name": "CanActivateNextStep",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 112,
+          "name": "run",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 113,
+              "name": "run",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 114,
+                  "name": "navigationContext",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 115,
+                  "name": "next",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            112
+          ]
+        }
+      ]
+    },
+    {
+      "id": 106,
+      "name": "CanDeactivatePreviousStep",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 107,
+          "name": "run",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 108,
+              "name": "run",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 109,
+                  "name": "navigationContext",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 110,
+                  "name": "next",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            107
+          ]
+        }
+      ]
+    },
+    {
+      "id": 148,
+      "name": "CommitChangesStep",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 149,
+          "name": "run",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 150,
+              "name": "run",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 151,
+                  "name": "navigationContext",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 152,
+                  "name": "next",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            149
+          ]
+        }
+      ]
+    },
+    {
+      "id": 116,
+      "name": "DeactivatePreviousStep",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 117,
+          "name": "run",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 118,
+              "name": "run",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 119,
+                  "name": "navigationContext",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 120,
+                  "name": "next",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            117
+          ]
+        }
+      ]
+    },
+    {
+      "id": 158,
+      "name": "LoadRouteStep",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 161,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 162,
+              "name": "new LoadRouteStep",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 163,
+                  "name": "routeLoader",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "LoadRouteStep",
+                "id": 158,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 164,
+          "name": "run",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 165,
+              "name": "run",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 166,
+                  "name": "navigationContext",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 167,
+                  "name": "next",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 159,
+          "name": "inject",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isStatic": true,
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 160,
+              "name": "inject",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            161
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            164,
+            159
+          ]
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "name": "NavModel",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "comment": {
+        "shortText": "Class for storing and interacting with a route's navigation settings",
+        "tags": [
+          {
+            "tag": "class",
+            "text": "NavModel"
+          },
+          {
+            "tag": "constructor",
+            "text": "\n"
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": 61,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 62,
+              "name": "new NavModel",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 63,
+                  "name": "router",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 64,
+                  "name": "relativeHref",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "NavModel",
+                "id": 60,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 65,
+          "name": "setTitle",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 66,
+              "name": "setTitle",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Sets the route's title and updates document.title.\n If the a navigation is in progress, the change will be applied\n to document.title when the navigation completes.",
+                "tags": [
+                  {
+                    "tag": "method",
+                    "text": "setTitle"
+                  }
+                ]
+              },
+              "parameters": [
+                {
+                  "id": 67,
+                  "name": "title",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The new title.\n"
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            61
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "id": 126,
+      "name": "NavigationContext",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 127,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 128,
+              "name": "new NavigationContext",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 129,
+                  "name": "router",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 130,
+                  "name": "nextInstruction",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "NavigationContext",
+                "id": 126,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 145,
+          "name": "buildTitle",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 146,
+              "name": "buildTitle",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 147,
+                  "name": "separator",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 140,
+          "name": "commitChanges",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 141,
+              "name": "commitChanges",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 142,
+                  "name": "waitToSwap",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 136,
+          "name": "currentInstructions",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 137,
+              "name": "currentInstructions",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 131,
+          "name": "getAllContexts",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 132,
+              "name": "getAllContexts",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 133,
+                  "name": "acc",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 134,
+          "name": "nextInstructions",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 135,
+              "name": "nextInstructions",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 138,
+          "name": "prevInstructions",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 139,
+              "name": "prevInstructions",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 143,
+          "name": "updateTitle",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 144,
+              "name": "updateTitle",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            127
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            145,
+            140,
+            136,
+            131,
+            134,
+            138,
+            143
+          ]
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "name": "NavigationInstruction",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 40,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 41,
+              "name": "new NavigationInstruction",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 42,
+                  "name": "fragment",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 43,
+                  "name": "queryString",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 44,
+                  "name": "params",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 45,
+                  "name": "queryParams",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 46,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 47,
+                  "name": "parentInstruction",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "NavigationInstruction",
+                    "id": 33,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "NavigationInstruction",
+                "id": 33,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 38,
+          "name": "config",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 34,
+          "name": "fragment",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "string"
+          }
+        },
+        {
+          "id": 36,
+          "name": "params",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 39,
+          "name": "parentInstruction",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "reference",
+            "name": "NavigationInstruction",
+            "id": 33,
+            "moduleName": "\"aurelia-router\""
+          }
+        },
+        {
+          "id": 37,
+          "name": "queryParams",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 35,
+          "name": "queryString",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "string"
+          }
+        },
+        {
+          "id": 48,
+          "name": "addViewPortInstruction",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 49,
+              "name": "addViewPortInstruction",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 50,
+                  "name": "viewPortName",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 51,
+                  "name": "strategy",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 52,
+                  "name": "moduleId",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 53,
+                  "name": "component",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 58,
+          "name": "getBaseUrl",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 59,
+              "name": "getBaseUrl",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "string"
+              }
+            }
+          ]
+        },
+        {
+          "id": 54,
+          "name": "getWildCardName",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 55,
+              "name": "getWildCardName",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "string"
+              }
+            }
+          ]
+        },
+        {
+          "id": 56,
+          "name": "getWildcardPath",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 57,
+              "name": "getWildcardPath",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            40
+          ]
+        },
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [
+            38,
+            34,
+            36,
+            39,
+            37,
+            35
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            48,
+            58,
+            54,
+            56
+          ]
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "name": "Pipeline",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 25,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 26,
+              "name": "new Pipeline",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "type": {
+                "type": "reference",
+                "name": "Pipeline",
+                "id": 24,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 30,
+          "name": "run",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 31,
+              "name": "run",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 32,
+                  "name": "ctx",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "name": "withStep",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 28,
+              "name": "withStep",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 29,
+                  "name": "step",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            25
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            30,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "id": 246,
+      "name": "PipelineProvider",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 249,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 250,
+              "name": "new PipelineProvider",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 251,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "PipelineProvider",
+                "id": 246,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 252,
+          "name": "createPipeline",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 253,
+              "name": "createPipeline",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 254,
+                  "name": "navigationContext",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 247,
+          "name": "inject",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isStatic": true,
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 248,
+              "name": "inject",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            249
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            252,
+            247
+          ]
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "name": "Redirect",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "comment": {
+        "shortText": "Used during the activation lifecycle to cause a redirect.",
+        "tags": [
+          {
+            "tag": "class",
+            "text": "Redirect"
+          },
+          {
+            "tag": "constructor",
+            "text": ""
+          },
+          {
+            "tag": "param",
+            "text": "The url to redirect to.\n",
+            "param": "url"
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": 69,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 70,
+              "name": "new Redirect",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 71,
+                  "name": "url",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 72,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Redirect",
+                "id": 68,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 76,
+          "name": "navigate",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 77,
+              "name": "navigate",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Called by the navigation pipeline to navigate.",
+                "tags": [
+                  {
+                    "tag": "method",
+                    "text": "navigate"
+                  }
+                ]
+              },
+              "parameters": [
+                {
+                  "id": 78,
+                  "name": "appRouter",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "a router which should redirect\n"
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 73,
+          "name": "setRouter",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 74,
+              "name": "setRouter",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Called by the activation system to set the child router.",
+                "tags": [
+                  {
+                    "tag": "method",
+                    "text": "setRouter"
+                  }
+                ]
+              },
+              "parameters": [
+                {
+                  "id": 75,
+                  "name": "router",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "\n"
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            69
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            76,
+            73
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "RouteFilterContainer",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 6,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 7,
+              "name": "new RouteFilterContainer",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 8,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "RouteFilterContainer",
+                "id": 3,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "addStep",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 10,
+              "name": "addStep",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 11,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 12,
+                  "name": "step",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 13,
+                  "name": "index",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "getFilterSteps",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 15,
+              "name": "getFilterSteps",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 16,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "inject",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isStatic": true,
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 5,
+              "name": "inject",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            6
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            9,
+            14,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "RouteFilterStep",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {},
+      "children": [
+        {
+          "id": 18,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 19,
+              "name": "new RouteFilterStep",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 20,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 21,
+                  "name": "routeFilterContainer",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "RouteFilterStep",
+                "id": 17,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "name": "getSteps",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "signatures": [
+            {
+              "id": 23,
+              "name": "getSteps",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            18
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "id": 153,
+      "name": "RouteLoader",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 154,
+          "name": "loadRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 155,
+              "name": "loadRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 156,
+                  "name": "router",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 157,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": 168,
+      "name": "Router",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 181,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 182,
+              "name": "new Router",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 183,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 184,
+                  "name": "history",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Router",
+                "id": 168,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 172,
+          "name": "baseUrl",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "string"
+          }
+        },
+        {
+          "id": 176,
+          "name": "childRecognizer",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "reference",
+            "name": "RouteRecognizer",
+            "id": 749,
+            "moduleName": "\"aurelia-route-recognizer\""
+          }
+        },
+        {
+          "id": 169,
+          "name": "container",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 180,
+          "name": "currentInstruction",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "reference",
+            "name": "NavigationInstruction",
+            "id": 33,
+            "moduleName": "\"aurelia-router\""
+          }
+        },
+        {
+          "id": 174,
+          "name": "fallbackOrder",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "number"
+          }
+        },
+        {
+          "id": 170,
+          "name": "history",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 173,
+          "name": "isConfigured",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "boolean"
+          }
+        },
+        {
+          "id": 178,
+          "name": "isNavigating",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "boolean"
+          }
+        },
+        {
+          "id": 179,
+          "name": "navigation",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "isArray": true,
+            "name": "any"
+          }
+        },
+        {
+          "id": 175,
+          "name": "recognizer",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "reference",
+            "name": "RouteRecognizer",
+            "id": 749,
+            "moduleName": "\"aurelia-route-recognizer\""
+          }
+        },
+        {
+          "id": 177,
+          "name": "routes",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "isArray": true,
+            "name": "any"
+          }
+        },
+        {
+          "id": 171,
+          "name": "viewPorts",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 229,
+          "name": "addRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 230,
+              "name": "addRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 231,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                },
+                {
+                  "id": 232,
+                  "name": "navModel",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "NavModel",
+                    "id": 60,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 195,
+          "name": "configure",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 196,
+              "name": "configure",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 197,
+                  "name": "callbackOrConfig",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "reference",
+                        "name": "RouterConfiguration",
+                        "id": 79
+                      },
+                      {
+                        "type": "reflection",
+                        "declaration": {
+                          "id": 198,
+                          "name": "__type",
+                          "kind": 65536,
+                          "kindString": "Type literal",
+                          "flags": {},
+                          "signatures": [
+                            {
+                              "id": 199,
+                              "name": "__call",
+                              "kind": 4096,
+                              "kindString": "Call signature",
+                              "flags": {},
+                              "parameters": [
+                                {
+                                  "id": 200,
+                                  "name": "config",
+                                  "kind": 32768,
+                                  "kindString": "Parameter",
+                                  "flags": {},
+                                  "type": {
+                                    "type": "reference",
+                                    "name": "RouterConfiguration",
+                                    "id": 79
+                                  }
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "name": "RouterConfiguration",
+                                "id": 79
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Router",
+                "id": 168,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 212,
+          "name": "createChild",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 213,
+              "name": "createChild",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 214,
+                  "name": "container",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Container",
+                    "id": 469,
+                    "moduleName": "\"aurelia-dependency-injection\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Router",
+                "id": 168,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 226,
+          "name": "createNavModel",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 227,
+              "name": "createNavModel",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 228,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "NavModel",
+                "id": 60,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 219,
+          "name": "createNavigationContext",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 220,
+              "name": "createNavigationContext",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 221,
+                  "name": "instruction",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "NavigationInstruction",
+                    "id": 33,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "NavigationContext",
+                "id": 126,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 215,
+          "name": "createNavigationInstruction",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 216,
+              "name": "createNavigationInstruction",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 217,
+                  "name": "url",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 218,
+                  "name": "parentInstruction",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "NavigationInstruction",
+                    "id": 33,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "type": "reference",
+                    "name": "NavigationInstruction",
+                    "id": 33
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": 222,
+          "name": "generate",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 223,
+              "name": "generate",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 224,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 225,
+                  "name": "params",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "string"
+              }
+            }
+          ]
+        },
+        {
+          "id": 239,
+          "name": "handleUnknownRoutes",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 240,
+              "name": "handleUnknownRoutes",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 241,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "instrinct",
+                        "name": "string"
+                      },
+                      {
+                        "type": "reference",
+                        "name": "Function"
+                      },
+                      {
+                        "type": "reference",
+                        "name": "Object"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 236,
+          "name": "hasOwnRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 237,
+              "name": "hasOwnRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 238,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "boolean"
+              }
+            }
+          ]
+        },
+        {
+          "id": 233,
+          "name": "hasRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 234,
+              "name": "hasRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 235,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "boolean"
+              }
+            }
+          ]
+        },
+        {
+          "id": 185,
+          "name": "isRoot",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 186,
+              "name": "isRoot",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 201,
+          "name": "navigate",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 202,
+              "name": "navigate",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 203,
+                  "name": "fragment",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 204,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "boolean"
+              }
+            }
+          ]
+        },
+        {
+          "id": 210,
+          "name": "navigateBack",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 211,
+              "name": "navigateBack",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 205,
+          "name": "navigateToRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 206,
+              "name": "navigateToRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 207,
+                  "name": "route",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 208,
+                  "name": "params",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                },
+                {
+                  "id": 209,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "boolean"
+              }
+            }
+          ]
+        },
+        {
+          "id": 191,
+          "name": "refreshBaseUrl",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 192,
+              "name": "refreshBaseUrl",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 193,
+          "name": "refreshNavigation",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 194,
+              "name": "refreshNavigation",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 187,
+          "name": "registerViewPort",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 188,
+              "name": "registerViewPort",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 189,
+                  "name": "viewPort",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "name": "Object"
+                  }
+                },
+                {
+                  "id": 190,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 244,
+          "name": "reset",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 245,
+              "name": "reset",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 242,
+          "name": "updateTitle",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 243,
+              "name": "updateTitle",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            181
+          ]
+        },
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [
+            172,
+            176,
+            169,
+            180,
+            174,
+            170,
+            173,
+            178,
+            179,
+            175,
+            177,
+            171
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            229,
+            195,
+            212,
+            226,
+            219,
+            215,
+            222,
+            239,
+            236,
+            233,
+            185,
+            201,
+            210,
+            205,
+            191,
+            193,
+            187,
+            244,
+            242
+          ]
+        }
+      ],
+      "extendedBy": [
+        {
+          "type": "reference",
+          "name": "AppRouter",
+          "id": 255
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "name": "RouterConfiguration",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "children": [
+        {
+          "id": 80,
+          "name": "instructions",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 81,
+          "name": "options",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 82,
+          "name": "pipelineSteps",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 83,
+          "name": "title",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 84,
+          "name": "unknownRouteConfig",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isExported": true
+          },
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        },
+        {
+          "id": 85,
+          "name": "addPipelineStep",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 86,
+              "name": "addPipelineStep",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 87,
+                  "name": "name",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 88,
+                  "name": "step",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 98,
+          "name": "exportToRouter",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 99,
+              "name": "exportToRouter",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 100,
+                  "name": "router",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 89,
+          "name": "map",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 90,
+              "name": "map",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 91,
+                  "name": "route",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 92,
+          "name": "mapRoute",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 93,
+              "name": "mapRoute",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 94,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        },
+        {
+          "id": 95,
+          "name": "mapUnknownRoutes",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 96,
+              "name": "mapUnknownRoutes",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 97,
+                  "name": "config",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Properties",
+          "kind": 1024,
+          "children": [
+            80,
+            81,
+            82,
+            83,
+            84
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            85,
+            98,
+            89,
+            92,
+            95
+          ]
+        }
+      ]
+    },
+    {
+      "id": 377,
+      "name": "activationStrategy",
+      "kind": 32,
+      "kindString": "Variable",
+      "flags": {
+        "isExported": true
+      },
+      "type": {
+        "type": "instrinct",
+        "name": "any"
+      }
+    },
+    {
+      "id": 382,
+      "name": "affirmations",
+      "kind": 32,
+      "kindString": "Variable",
+      "flags": {
+        "isExported": true
+      },
+      "type": {
+        "type": "instrinct",
+        "name": "any"
+      }
+    },
+    {
+      "id": 354,
+      "name": "pipelineStatus",
+      "kind": 32,
+      "kindString": "Variable",
+      "flags": {
+        "isExported": true
+      },
+      "type": {
+        "type": "instrinct",
+        "name": "any"
+      }
+    },
+    {
+      "id": 378,
+      "name": "buildNavigationPlan",
+      "kind": 64,
+      "kindString": "Function",
+      "flags": {
+        "isExported": true
+      },
+      "signatures": [
+        {
+          "id": 379,
+          "name": "buildNavigationPlan",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "parameters": [
+            {
+              "id": 380,
+              "name": "navigationContext",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 381,
+              "name": "forceLifecycleMinimum",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        }
+      ]
+    },
+    {
+      "id": 364,
+      "name": "createRootedPath",
+      "kind": 64,
+      "kindString": "Function",
+      "flags": {
+        "isExported": true
+      },
+      "signatures": [
+        {
+          "id": 365,
+          "name": "createRootedPath",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "parameters": [
+            {
+              "id": 366,
+              "name": "fragment",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 367,
+              "name": "baseUrl",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 368,
+              "name": "hasPushState",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        }
+      ]
+    },
+    {
+      "id": 351,
+      "name": "createRouteFilterStep",
+      "kind": 64,
+      "kindString": "Function",
+      "flags": {
+        "isExported": true
+      },
+      "signatures": [
+        {
+          "id": 352,
+          "name": "createRouteFilterStep",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "parameters": [
+            {
+              "id": 353,
+              "name": "name",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        }
+      ]
+    },
+    {
+      "id": 374,
+      "name": "isNavigationCommand",
+      "kind": 64,
+      "kindString": "Function",
+      "flags": {
+        "isExported": true
+      },
+      "signatures": [
+        {
+          "id": 375,
+          "name": "isNavigationCommand",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "comment": {
+            "shortText": "Determines if the provided object is a navigation command.\nA navigation command is anything with a navigate method.",
+            "returns": "\n"
+          },
+          "parameters": [
+            {
+              "id": 376,
+              "name": "obj",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "comment": {
+                "text": "The item to check."
+              },
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        }
+      ]
+    },
+    {
+      "id": 383,
+      "name": "loadNewRoute",
+      "kind": 64,
+      "kindString": "Function",
+      "flags": {
+        "isExported": true
+      },
+      "signatures": [
+        {
+          "id": 384,
+          "name": "loadNewRoute",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "parameters": [
+            {
+              "id": 385,
+              "name": "routeLoader",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 386,
+              "name": "navigationContext",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        }
+      ]
+    },
+    {
+      "id": 360,
+      "name": "normalizeAbsolutePath",
+      "kind": 64,
+      "kindString": "Function",
+      "flags": {
+        "isExported": true
+      },
+      "signatures": [
+        {
+          "id": 361,
+          "name": "normalizeAbsolutePath",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "parameters": [
+            {
+              "id": 362,
+              "name": "path",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 363,
+              "name": "hasPushState",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        }
+      ]
+    },
+    {
+      "id": 355,
+      "name": "processPotential",
+      "kind": 64,
+      "kindString": "Function",
+      "flags": {
+        "isExported": true
+      },
+      "signatures": [
+        {
+          "id": 356,
+          "name": "processPotential",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "parameters": [
+            {
+              "id": 357,
+              "name": "obj",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 358,
+              "name": "resolve",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 359,
+              "name": "reject",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        }
+      ]
+    },
+    {
+      "id": 369,
+      "name": "resolveUrl",
+      "kind": 64,
+      "kindString": "Function",
+      "flags": {
+        "isExported": true
+      },
+      "signatures": [
+        {
+          "id": 370,
+          "name": "resolveUrl",
+          "kind": 4096,
+          "kindString": "Call signature",
+          "flags": {},
+          "parameters": [
+            {
+              "id": 371,
+              "name": "fragment",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 372,
+              "name": "baseUrl",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            },
+            {
+              "id": 373,
+              "name": "hasPushState",
+              "kind": 32768,
+              "kindString": "Parameter",
+              "flags": {},
+              "type": {
+                "type": "instrinct",
+                "name": "any"
+              }
+            }
+          ],
+          "type": {
+            "type": "instrinct",
+            "name": "any"
+          }
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "title": "Classes",
+      "kind": 128,
+      "children": [
+        121,
+        255,
+        101,
+        111,
+        106,
+        148,
+        116,
+        158,
+        60,
+        126,
+        33,
+        24,
+        246,
+        68,
+        3,
+        17,
+        153,
+        168,
+        79
+      ]
+    },
+    {
+      "title": "Variables",
+      "kind": 32,
+      "children": [
+        377,
+        382,
+        354
+      ]
+    },
+    {
+      "title": "Functions",
+      "kind": 64,
+      "children": [
+        378,
+        364,
+        351,
+        374,
+        383,
+        360,
+        355,
+        369
+      ]
+    }
+  ]
+}
