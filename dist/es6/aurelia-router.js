@@ -1,9 +1,360 @@
-import core from 'core-js';
+import * as core from 'core-js';
+import * as LogManager from 'aurelia-logging';
 import {Container} from 'aurelia-dependency-injection';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {join} from 'aurelia-path';
 import {History} from 'aurelia-history';
 import {EventAggregator} from 'aurelia-event-aggregator';
+
+export class RouteFilterContainer {
+  static inject(){ return [Container]; }
+  constructor(container) {
+    this.container = container;
+    this.filters = { };
+    this.filterCache = { };
+  }
+
+  addStep(name, step, index = -1) {
+    var filter = this.filters[name];
+    if (!filter) {
+      filter = this.filters[name] = [];
+    }
+
+    if (index === -1) {
+      index = filter.length;
+    }
+
+    filter.splice(index, 0, step);
+    this.filterCache = {};
+  }
+
+  getFilterSteps(name) {
+    if (this.filterCache[name]) {
+      return this.filterCache[name];
+    }
+
+    var steps = [];
+    var filter = this.filters[name];
+    if (!filter) {
+      return steps;
+    }
+
+    for (var i = 0, l = filter.length; i < l; i++) {
+      if (typeof filter[i] === 'string') {
+        steps.push(...this.getFilterSteps(filter[i]));
+      } else {
+        steps.push(this.container.get(filter[i]));
+      }
+    }
+
+    return this.filterCache[name] = steps;
+  }
+}
+
+export function createRouteFilterStep(name) {
+  function create(routeFilterContainer) {
+    return new RouteFilterStep(name, routeFilterContainer);
+  };
+  create.inject = function() {
+    return [RouteFilterContainer];
+  };
+  return create;
+}
+
+class RouteFilterStep {
+  constructor(name, routeFilterContainer) {
+    this.name = name;
+    this.routeFilterContainer = routeFilterContainer;
+    this.isMultiStep = true;
+  }
+
+  getSteps() {
+    return this.routeFilterContainer.getFilterSteps(this.name);
+  }
+}
+function createResult(ctx, next) {
+  return {
+    status: next.status,
+    context: ctx,
+    output: next.output,
+    completed: next.status == pipelineStatus.completed
+  };
+}
+
+export const pipelineStatus = {
+  completed: 'completed',
+  canceled: 'canceled',
+  rejected: 'rejected',
+  running: 'running'
+};
+
+export class Pipeline {
+  constructor() {
+    this.steps = [];
+  }
+
+  withStep(step) {
+    var run, steps, i, l;
+
+    if (typeof step == 'function') {
+      run = step;
+    } else if (step.isMultiStep) {
+      steps = step.getSteps();
+      for (i = 0, l = steps.length; i < l; i++) {
+        this.withStep(steps[i]);
+      }
+
+      return this;
+    } else {
+      run = step.run.bind(step);
+    }
+
+    this.steps.push(run);
+
+    return this;
+  }
+
+  run(ctx) {
+    var index = -1,
+        steps = this.steps,
+        next, currentStep;
+
+    next = function() {
+      index++;
+
+      if (index < steps.length) {
+        currentStep = steps[index];
+
+        try {
+          return currentStep(ctx, next);
+        } catch(e) {
+          return next.reject(e);
+        }
+      } else {
+        return next.complete();
+      }
+    };
+
+    next.complete = output => {
+      next.status = pipelineStatus.completed;
+      next.output = output;
+      return Promise.resolve(createResult(ctx, next));
+    };
+
+    next.cancel = reason => {
+      next.status = pipelineStatus.canceled;
+      next.output = reason;
+      return Promise.resolve(createResult(ctx, next));
+    };
+
+    next.reject = error => {
+      next.status = pipelineStatus.rejected;
+      next.output = error;
+      return Promise.resolve(createResult(ctx, next));
+    };
+
+    next.status = pipelineStatus.running;
+
+    return next();
+  }
+}
+
+export class NavigationInstruction {
+  fragment: string;
+  queryString: string;
+  params: any;
+  queryParams: any;
+  config: any;
+  parentInstruction: NavigationInstruction;
+
+  constructor(fragment: string, queryString?: string, params?: any, queryParams?: any, config?: any, parentInstruction?: NavigationInstruction) {
+    this.fragment = fragment;
+    this.queryString = queryString;
+    this.params = params || {};
+    this.queryParams = queryParams;
+    this.config = config;
+    this.viewPortInstructions = {};
+    this.parentInstruction = parentInstruction;
+
+    let ancestorParams = [];
+    let current = this;
+    do {
+      let currentParams = Object.assign({}, current.params);
+      if (current.config.hasChildRouter) {
+        // remove the param for the injected child route segment
+        delete currentParams[current.getWildCardName()];
+      }
+
+      ancestorParams.unshift(currentParams);
+      current = current.parentInstruction;
+    } while(current);
+
+    let allParams = Object.assign({}, queryParams, ...ancestorParams);
+    this.lifecycleArgs = [allParams, config, this];
+  }
+
+  addViewPortInstruction(viewPortName, strategy, moduleId, component): any {
+    return this.viewPortInstructions[viewPortName] = {
+      name: viewPortName,
+      strategy: strategy,
+      moduleId: moduleId,
+      component: component,
+      childRouter: component.childRouter,
+      lifecycleArgs: this.lifecycleArgs.slice()
+    };
+  }
+
+  getWildCardName(): string {
+    let wildcardIndex = this.config.route.lastIndexOf('*');
+    return this.config.route.substr(wildcardIndex + 1);
+  }
+
+  getWildcardPath(): string {
+    let wildcardName = this.getWildCardName();
+    let path = this.params[wildcardName] || '';
+
+    if (this.queryString) {
+      path += '?' + this.queryString;
+    }
+
+    return path;
+  }
+
+  getBaseUrl(): string {
+    if (!this.params) {
+      return this.fragment;
+    }
+
+    let wildcardName = this.getWildCardName();
+    let path = this.params[wildcardName] || '';
+
+    if (!path) {
+      return this.fragment;
+    }
+
+    return this.fragment.substr(0, this.fragment.lastIndexOf(path));
+  }
+}
+
+/**
+* Class for storing and interacting with a route's navigation settings.
+*
+* @class NavModel
+* @constructor
+*/
+export class NavModel {
+
+  /**
+  * True if this nav item is currently active.
+  */
+  isActive: boolean = false;
+
+  /**
+  * The title.
+  */
+  title: string = null;
+
+  /**
+  * This nav item's absolute href.
+  */
+  href: string = null;
+
+  /**
+  * This nav item's relative href.
+  */
+  relativeHref: string = null;
+
+  /**
+  * Data attached to the route at configuration time.
+  */
+  settings: any = {};
+
+  /**
+  * The route config.
+  */
+  config: Object = null;
+
+  constructor(router, relativeHref) {
+    this.router = router;
+    this.relativeHref = relativeHref;
+  }
+
+  /**
+  * Sets the route's title and updates document.title.
+  *  If the a navigation is in progress, the change will be applied
+  *  to document.title when the navigation completes.
+  *
+  * @method setTitle
+  * @param title The new title.
+  */
+  setTitle(title) {
+    this.title = title;
+
+    if (this.isActive) {
+      this.router.updateTitle();
+    }
+  }
+}
+
+/**
+* A configuration object that describes a route.
+*/
+interface RouteConfig {
+  /**
+  * The route pattern to match against incoming URL fragments, or an array of patterns.
+  */
+  route: string|string[];
+
+  /**
+  * A unique name for the route that may be used to identify the route when generating URL fragments.
+  * Required when this route should support URL generation, such as with [[Router.generate]] or
+  * the route-href custom attribute.
+  */
+  name?: string;
+
+  /**
+  * The moduleId of the view model that should be activated for this route.
+  */
+  moduleId?: string;
+
+  /**
+  * A URL fragment to redirect to when this route is matched.
+  */
+  redirect?: string;
+
+  /**
+  * A function that can be used to dynamically select the module or modules to activate.
+  * The function is passed the current [[NavigationInstruction]], and should configure
+  * instruction.config with the desired moduleId, viewPorts, or redirect.
+  */
+  //navigationStrategy?: (instruction:NavigationInstruction) => Promise<void>|void;
+
+  /**
+  * The view ports to target when activating this route. If unspecified, the target moduleId is loaded
+  * into the default viewPort (the viewPort with name 'default'). The viewPorts object should have keys
+  * whose property names correspond to names used by <router-view> elements. The values should be objects
+  * specifying the moduleId to load into that viewPort.
+  */
+  viewPorts?: Object;
+
+  /**
+  * When specified, this route will be included in the [[Router.navigation]] nav model. Useful for
+  * dynamically generating menus or other navigation elements. When a number is specified, that value
+  * will be used as a sort order.
+  */
+  nav?: boolean|number;
+
+  /**
+  * The URL fragment to use in nav models. If unspecified, the [[RouteConfig.route]] will be used.
+  * However, if the [[RouteConfig.route]] contains dynamic segments, this property must be specified.
+  */
+  href?: string;
+
+  /**
+  * The document title to set when this route is active.
+  */
+  title?: string;
+}
 
 export function processPotential(obj, resolve, reject){
   if(obj && typeof obj.then === 'function'){
@@ -114,6 +465,128 @@ export class Redirect{
   }
 }
 
+/**
+ * Class used to configure a [[Router]] instance.
+ *
+ * @constructor
+ */
+export class RouterConfiguration{
+  instructions = [];
+  options = {};
+  pipelineSteps = [];
+  title;
+  unknownRouteConfig;
+
+  /**
+  * Adds a step to be run during the [[Router]]'s navigation pipeline.
+  *
+  * @param name The name of the pipeline slot to insert the step into.
+  * @param step The pipeline step.
+  * @chainable
+  */
+  addPipelineStep(name: string, step: Object|Function) {
+    this.pipelineSteps.push({name, step});
+    return this;
+  }
+
+  /**
+  * Maps one or more routes to be registered with the router.
+  *
+  * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
+  * @chainable
+  */
+  map(route: RouteConfig|RouteConfig[]) {
+    if (Array.isArray(route)) {
+      route.forEach(this.map.bind(this));
+      return this;
+    }
+
+    return this.mapRoute(route);
+  }
+
+  /**
+  * Maps a single route to be registered with the router.
+  *
+  * @param route The [[RouteConfig]] to map.
+  * @chainable
+  */
+  mapRoute(config: RouteConfig) {
+    this.instructions.push(router => {
+      let routeConfigs = [];
+
+      if (Array.isArray(config.route)) {
+        for (let i = 0, ii = config.route.length; i < ii; ++i) {
+          let current = Object.assign({}, config);
+          current.route = config.route[i];
+          routeConfigs.push(current);
+        }
+      } else {
+        routeConfigs.push(Object.assign({}, config));
+      }
+
+      let navModel;
+      for (let i = 0, ii = routeConfigs.length; i < ii; ++i) {
+        let routeConfig = routeConfigs[i];
+        routeConfig.settings = routeConfig.settings || {};
+        if (!navModel) {
+          navModel = router.createNavModel(routeConfig);
+        }
+
+        router.addRoute(routeConfig, navModel);
+      }
+    });
+
+    return this;
+  }
+
+  /**
+  * Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
+  *
+  * @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
+  *  [[NavigationInstruction]] and selects a moduleId to load.
+  * @chainable
+  */
+  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => Promise<void>) {
+    this.unknownRouteConfig = config;
+    return this;
+  }
+
+  /**
+  * Applies the current configuration to the specified [[Router]].
+  *
+  * @param router The [[Router]] to apply the configuration to.
+  */
+  exportToRouter(router: Router) {
+    let instructions = this.instructions;
+    for (let i = 0, ii = instructions.length; i < ii; ++i) {
+      instructions[i](router);
+    }
+
+    if (this.title) {
+      router.title = this.title;
+    }
+
+    if (this.unknownRouteConfig) {
+      router.handleUnknownRoutes(this.unknownRouteConfig);
+    }
+
+    router.options = this.options;
+
+    let pipelineSteps = this.pipelineSteps;
+    if (pipelineSteps.length) {
+      if (!router.isRoot) {
+        throw new Error('Pipeline steps can only be added to the root router');
+      }
+
+      let filterContainer = router.container.get(RouteFilterContainer);
+      for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
+        let {name, step} = pipelineSteps[i];
+        filterContainer.addStep(name, step);
+      }
+    }
+  }
+}
+
 export const activationStrategy = {
   noChange: 'no-change',
   invokeLifecycle: 'invoke-lifecycle',
@@ -154,6 +627,8 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
          //TODO: should we tell them if the parent had a lifecycle min change?
         viewPortPlan.strategy = prevViewPortInstruction.component.executionContext
           .determineActivationStrategy(...next.lifecycleArgs);
+      } else if(next.config.activationStrategy){
+        viewPortPlan.strategy = next.config.activationStrategy;
       } else if (newParams || forceLifecycleMinimum) {
         viewPortPlan.strategy = activationStrategy.invokeLifecycle;
       } else {
@@ -168,7 +643,7 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
               .createNavigationContext(childInstruction);
 
             return buildNavigationPlan(
-              viewPortPlan.childNavigationContext, 
+              viewPortPlan.childNavigationContext,
               viewPortPlan.strategy == activationStrategy.invokeLifecycle)
               .then(childPlan => {
                 viewPortPlan.childNavigationContext.plan = childPlan;
@@ -557,686 +1032,9 @@ export class CommitChangesStep {
   }
 }
 
-export class NavigationInstruction {
-  fragment: string;
-  queryString: string;
-  params: any;
-  queryParams: any;
-  config: any;
-  parentInstruction: NavigationInstruction;
-
-  constructor(fragment: string, queryString?: string, params?: any, queryParams?: any, config?: any, parentInstruction?: NavigationInstruction) {
-    this.fragment = fragment;
-    this.queryString = queryString;
-    this.params = params || {};
-    this.queryParams = queryParams;
-    this.config = config;
-    this.viewPortInstructions = {};
-    this.parentInstruction = parentInstruction;
-
-    let ancestorParams = [];
-    let current = this;
-    do {
-      let currentParams = Object.assign({}, current.params);
-      if (current.config.hasChildRouter) {
-        // remove the param for the injected child route segment
-        delete currentParams[current.getWildCardName()];
-      }
-
-      ancestorParams.unshift(currentParams);
-      current = current.parentInstruction;
-    } while(current);
-
-    let allParams = Object.assign({}, queryParams, ...ancestorParams);
-    this.lifecycleArgs = [allParams, config, this];
-  }
-
-  addViewPortInstruction(viewPortName, strategy, moduleId, component): any {
-    return this.viewPortInstructions[viewPortName] = {
-      name: viewPortName,
-      strategy: strategy,
-      moduleId: moduleId,
-      component: component,
-      childRouter: component.childRouter,
-      lifecycleArgs: this.lifecycleArgs.slice()
-    };
-  }
-
-  getWildCardName(): string {
-    let wildcardIndex = this.config.route.lastIndexOf('*');
-    return this.config.route.substr(wildcardIndex + 1);
-  }
-
-  getWildcardPath(): string {
-    let wildcardName = this.getWildCardName();
-    let path = this.params[wildcardName] || '';
-
-    if (this.queryString) {
-      path += '?' + this.queryString;
-    }
-
-    return path;
-  }
-
-  getBaseUrl(): string {
-    if (!this.params) {
-      return this.fragment;
-    }
-
-    let wildcardName = this.getWildCardName();
-    let path = this.params[wildcardName] || '';
-
-    if (!path) {
-      return this.fragment;
-    }
-
-    return this.fragment.substr(0, this.fragment.lastIndexOf(path));
-  }
-}
-
-/**
- * Class for storing and interacting with a route's navigation settings
- *
- * @class NavModel
- * @constructor
- */
-export class NavModel {
-  constructor(router, relativeHref) {
-    this.router = router;
-    this.relativeHref = relativeHref;
-
-    /**
-     * True if this nav item is currently active.
-     * 
-     * @property {Boolean} isActive
-     */
-    this.isActive = false;
-
-    /**
-     * The title.
-     * 
-     * @property {String} title
-     */
-    this.title = null;
-
-    /**
-     * This nav item's absolute href.
-     *  
-     * @property {String} href
-     */
-    this.href = null;
-
-    /**
-     * Data attached to the route at configuration time.
-     *
-     * @property {any} settings
-     */
-    this.settings = {};
-
-    /**
-     * The route config.
-     *
-     * @property {Object} config
-     */
-    this.config = null;
-  }
-
-  /**
-   * Sets the route's title and updates document.title.
-   *  If the a navigation is in progress, the change will be applied
-   *  to document.title when the navigation completes.
-   *
-   * @method setTitle
-   * @param {String} title The new title.
-   */
-  setTitle(title) {
-    this.title = title;
-
-    if (this.isActive) {
-      this.router.updateTitle();
-    }
-  }
-}
-export class RouteFilterContainer {
-  static inject(){ return [Container]; }
-  constructor(container) {
-    this.container = container;
-    this.filters = { };
-    this.filterCache = { };
-  }
-
-  addStep(name, step, index = -1) {
-    var filter = this.filters[name];
-    if (!filter) {
-      filter = this.filters[name] = [];
-    }
-
-    if (index === -1) {
-      index = filter.length;
-    }
-
-    filter.splice(index, 0, step);
-    this.filterCache = {};
-  }
-
-  getFilterSteps(name) {
-    if (this.filterCache[name]) {
-      return this.filterCache[name];
-    }
-
-    var steps = [];
-    var filter = this.filters[name];
-    if (!filter) {
-      return steps;
-    }
-
-    for (var i = 0, l = filter.length; i < l; i++) {
-      if (typeof filter[i] === 'string') {
-        steps.push(...this.getFilterSteps(filter[i]));
-      } else {
-        steps.push(this.container.get(filter[i]));
-      }
-    }
-
-    return this.filterCache[name] = steps;
-  }
-}
-
-export function createRouteFilterStep(name) {
-  function create(routeFilterContainer) {
-    return new RouteFilterStep(name, routeFilterContainer);
-  };
-  create.inject = function() {
-    return [RouteFilterContainer];
-  };
-  return create;
-}
-
-class RouteFilterStep {
-  constructor(name, routeFilterContainer) {
-    this.name = name;
-    this.routeFilterContainer = routeFilterContainer;
-    this.isMultiStep = true;
-  }
-
-  getSteps() {
-    return this.routeFilterContainer.getFilterSteps(this.name);
-  }
-}
-export class RouterConfiguration{
-  instructions = [];
-  options = {};
-  pipelineSteps = [];
-  title;
-  unknownRouteConfig;
-
-  addPipelineStep(name, step) {
-    this.pipelineSteps.push({name, step});
-  }
-
-  map(route) {
-    if (Array.isArray(route)) {
-      route.forEach(this.map.bind(this));
-      return this;
-    }
-
-    return this.mapRoute(route);
-  }
-
-  mapRoute(config) {
-    this.instructions.push(router => {
-      let routeConfigs = [];
-
-      if (Array.isArray(config.route)) {
-        for (let i = 0, ii = config.route.length; i < ii; ++i) {
-          let current = Object.assign({}, config);
-          current.route = config.route[i];
-          routeConfigs.push(current);
-        }
-      } else {
-        routeConfigs.push(Object.assign({}, config));
-      }
-
-      let navModel;
-      for (let i = 0, ii = routeConfigs.length; i < ii; ++i) {
-        let routeConfig = routeConfigs[i];
-        routeConfig.settings = routeConfig.settings || {};
-        if (!navModel) {
-          navModel = router.createNavModel(routeConfig);
-        }
-
-        router.addRoute(routeConfig, navModel);
-      }
-    });
-
-    return this;
-  }
-
-  mapUnknownRoutes(config) {
-    this.unknownRouteConfig = config;
-    return this;
-  }
-
-  exportToRouter(router) {
-    let instructions = this.instructions;
-    for (let i = 0, ii = instructions.length; i < ii; ++i) {
-      instructions[i](router);
-    }
-
-    if (this.title) {
-      router.title = this.title;
-    }
-
-    if (this.unknownRouteConfig) {
-      router.handleUnknownRoutes(this.unknownRouteConfig);
-    }
-
-    router.options = this.options;
-
-    let pipelineSteps = this.pipelineSteps;
-    if (pipelineSteps.length) {
-      if (!router.isRoot) {
-        throw new Error('Pipeline steps can only be added to the root router');
-      }
-
-      let filterContainer = router.container.get(RouteFilterContainer);
-      for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
-        let {name, step} = pipelineSteps[i];
-        filterContainer.addStep(name, step);
-      }
-    }
-  }
-}
-
-export class Router {
-  container: any;
-  history: any;
-  viewPorts: any = {};
-  baseUrl: string = '';
-  isConfigured: boolean = false;
-  fallbackOrder: number = 100;
-  recognizer: RouteRecognizer = new RouteRecognizer();
-  childRecognizer: RouteRecognizer = new RouteRecognizer();
-  routes: any[] = [];
-  isNavigating: boolean = false;
-  navigation: any[] = [];
-  currentInstruction: NavigationInstruction;
-
-  constructor(container, history) {
-    this.container = container;
-    this.history = history;
-    this.reset();
-  }
-
-  get isRoot() {
-    return false;
-  }
-
-  registerViewPort(viewPort:Object, name?:string) {
-    name = name || 'default';
-    this.viewPorts[name] = viewPort;
-  }
-
-  refreshBaseUrl() {
-    if (this.parent) {
-      var baseUrl = this.parent.currentInstruction.getBaseUrl();
-      this.baseUrl = this.parent.baseUrl + baseUrl;
-    }
-  }
-
-  refreshNavigation() {
-    var nav = this.navigation;
-
-    for(var i = 0, length = nav.length; i < length; i++) {
-      var current = nav[i];
-      current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
-    }
-  }
-
-  configure(callbackOrConfig:RouterConfiguration|((config:RouterConfiguration) => RouterConfiguration)):Router {
-    this.isConfigured = true;
-
-    if (typeof callbackOrConfig == 'function') {
-      var config = new RouterConfiguration();
-      callbackOrConfig(config);
-      config.exportToRouter(this);
-    } else {
-      callbackOrConfig.exportToRouter(this);
-    }
-
-    return this;
-  }
-
-  navigate(fragment:string, options?:Object):boolean {
-    if (!this.isConfigured && this.parent) {
-      return this.parent.navigate(fragment, options);
-    }
-
-    return this.history.navigate(resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
-  }
-
-  navigateToRoute(route:string, params?:Object, options?:Object):boolean {
-    let path = this.generate(route, params);
-    return this.navigate(path, options);
-  }
-
-  navigateBack() {
-    this.history.navigateBack();
-  }
-
-  createChild(container?:Container):Router {
-    var childRouter = new Router(container || this.container.createChild(), this.history);
-    childRouter.parent = this;
-    return childRouter;
-  }
-
-  createNavigationInstruction(url:string = '', parentInstruction?:NavigationInstruction = null):Promise<NavigationInstruction> {
-    let fragment = url;
-    let queryString = '';
-
-    let queryIndex = url.indexOf('?');
-    if (queryIndex != -1) {
-      fragment = url.substr(0, queryIndex);
-      queryString = url.substr(queryIndex + 1);
-    }
-
-    let results = this.recognizer.recognize(url);
-    if (!results || !results.length) {
-      results = this.childRecognizer.recognize(url);
-    }
-
-    if((!results || !results.length) && this.catchAllHandler) {
-      results = [{
-        config: {
-          navModel: {}
-        },
-        handler: this.catchAllHandler,
-        params: {
-          path: fragment
-        }
-      }];
-    }
-
-    if (results && results.length) {
-      let first = results[0];
-      let instruction = new NavigationInstruction(
-        fragment,
-        queryString,
-        first.params,
-        first.queryParams || results.queryParams,
-        first.config || first.handler,
-        parentInstruction
-        );
-
-      if (typeof first.handler === 'function') {
-        return evaluateNavigationStrategy(instruction, first.handler, first);
-      } else if(first.handler && 'navigationStrategy' in first.handler){
-        return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
-      }
-
-      return Promise.resolve(instruction);
-    }
-
-    return Promise.reject(new Error(`Route not found: ${url}`));
-  }
-
-  createNavigationContext(instruction:NavigationInstruction):NavigationContext {
-    instruction.navigationContext = new NavigationContext(this, instruction);
-    return instruction.navigationContext;
-  }
-
-  generate(name:string, params?:Object):string {
-    let hasRoute = this.recognizer.hasRoute(name);
-    if((!this.isConfigured || !hasRoute) && this.parent){
-      return this.parent.generate(name, params);
-    }
-
-    if (!hasRoute) {
-      throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
-    }
-
-    let path = this.recognizer.generate(name, params);
-    return createRootedPath(path, this.baseUrl, this.history._hasPushState);
-  }
-
-  createNavModel(config:Object):NavModel {
-    let navModel = new NavModel(this, 'href' in config ? config.href : config.route);
-    navModel.title = config.title;
-    navModel.order = config.nav;
-    navModel.href = config.href;
-    navModel.settings = config.settings;
-    navModel.config = config;
-
-    return navModel;
-  }
-
-  addRoute(config:Object, navModel?:NavModel) {
-    validateRouteConfig(config);
-
-    if (!('viewPorts' in config) && !config.navigationStrategy) {
-      config.viewPorts = {
-        'default': {
-          moduleId: config.moduleId,
-          view: config.view
-        }
-      };
-    }
-
-    if (!navModel) {
-      navModel = this.createNavModel(config);
-    }
-
-    this.routes.push(config);
-
-    let path = config.route;
-    if (path.charAt(0) === '/') {
-      path = path.substr(1);
-    }
-
-    let state = this.recognizer.add({path: path, handler: config});
-
-    if (path) {
-      let withChild, settings = config.settings;
-      delete config.settings;
-      withChild = JSON.parse(JSON.stringify(config));
-      config.settings = settings;
-      withChild.route = `${path}/*childRoute`;
-      withChild.hasChildRouter = true;
-      this.childRecognizer.add({
-        path: withChild.route,
-        handler: withChild
-      });
-
-      withChild.navModel = navModel;
-      withChild.settings = config.settings;
-    }
-
-    config.navModel = navModel;
-
-    if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
-      if ((!navModel.href && navModel.href != '') && (state.types.dynamics || state.types.stars)) {
-          throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
-      }
-
-      if (typeof navModel.order != 'number') {
-        navModel.order = ++this.fallbackOrder;
-      }
-
-      this.navigation.push(navModel);
-      this.navigation = this.navigation.sort((a, b) => a.order - b.order);
-    }
-  }
-
-  hasRoute(name:string):boolean {
-    return !!(this.recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
-  }
-
-  hasOwnRoute(name:string):boolean {
-    return this.recognizer.hasRoute(name);
-  }
-
-  handleUnknownRoutes(config?:string|Function|Object) {
-    var callback = instruction => new Promise((resolve, reject) => {
-      function done(inst){
-        inst = inst || instruction;
-        inst.config.route = inst.params.path;
-        resolve(inst);
-      }
-
-      if (!config) {
-        instruction.config.moduleId = instruction.fragment;
-        done(instruction);
-      } else if (typeof config == 'string') {
-        instruction.config.moduleId = config;
-        done(instruction);
-      } else if (typeof config == 'function') {
-        processPotential(config(instruction), done, reject);
-      } else {
-        instruction.config = config;
-        done(instruction);
-      }
-    });
-
-    this.catchAllHandler = callback;
-  }
-
-  updateTitle() {
-    if (this.parent) {
-      return this.parent.updateTitle();
-    }
-
-    this.currentInstruction.navigationContext.updateTitle();
-  }
-
-  reset() {
-    this.fallbackOrder = 100;
-    this.recognizer = new RouteRecognizer();
-    this.childRecognizer = new RouteRecognizer();
-    this.routes = [];
-    this.isNavigating = false;
-    this.navigation = [];
-    this.isConfigured = false;
-  }
-}
-
-function validateRouteConfig(config:Object) {
-  if (typeof config !== 'object') {
-    throw new Error('Invalid Route Config');
-  }
-
-  if (typeof config.route !== 'string') {
-    throw new Error('Invalid Route Config: You must specify a route pattern.');
-  }
-
-  if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
-    throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.')
-  }
-}
-
-function evaluateNavigationStrategy(instruction:NavigationInstruction, evaluator:Function, context:Object): Promise<NavigationInstruction> {
-  return Promise.resolve(evaluator.call(context, instruction)).then(() => {
-    if (!('viewPorts' in instruction.config)) {
-      instruction.config.viewPorts = {
-        'default': {
-          moduleId: instruction.config.moduleId
-        }
-      };
-    }
-
-    return instruction;
-  });
-}
-
-function createResult(ctx, next) {
-  return {
-    status: next.status,
-    context: ctx,
-    output: next.output,
-    completed: next.status == pipelineStatus.completed
-  };
-}
-
-export const pipelineStatus = {
-  completed: 'completed',
-  cancelled: 'cancelled',
-  rejected: 'rejected',
-  running: 'running'
-};
-
-export class Pipeline {
-  constructor() {
-    this.steps = [];
-  }
-
-  withStep(step) {
-    var run, steps, i, l;
-
-    if (typeof step == 'function') {
-      run = step;
-    } else if (step.isMultiStep) {
-      steps = step.getSteps();
-      for (i = 0, l = steps.length; i < l; i++) {
-        this.withStep(steps[i]);
-      }
-
-      return this;
-    } else {
-      run = step.run.bind(step);
-    }
-
-    this.steps.push(run);
-
-    return this;
-  }
-
-  run(ctx) {
-    var index = -1,
-        steps = this.steps,
-        next, currentStep;
-
-    next = function() {
-      index++;
-
-      if (index < steps.length) {
-        currentStep = steps[index];
-
-        try {
-          return currentStep(ctx, next);
-        } catch(e) {
-          return next.reject(e);
-        }
-      } else {
-        return next.complete();
-      }
-    };
-
-    next.complete = output => {
-      next.status = pipelineStatus.completed;
-      next.output = output;
-      return Promise.resolve(createResult(ctx, next));
-    };
-
-    next.cancel = reason => {
-      next.status = pipelineStatus.cancelled;
-      next.output = reason;
-      return Promise.resolve(createResult(ctx, next));
-    };
-
-    next.reject = error => {
-      next.status = pipelineStatus.rejected;
-      next.output = error;
-      return Promise.resolve(createResult(ctx, next));
-    };
-
-    next.status = pipelineStatus.running;
-
-    return next();
-  }
-}
-
 export class RouteLoader {
-  loadRoute(router, config){
-    throw Error('Route loaders must implement "loadRoute(router, config)".');
+  loadRoute(router, config, navigationContext){
+    throw Error('Route loaders must implement "loadRoute(router, config, navigationContext)".');
   }
 }
 
@@ -1340,7 +1138,7 @@ function loadComponent(routeLoader, navigationContext, config){
   var router = navigationContext.router,
       lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
-  return routeLoader.loadRoute(router, config).then(component => {
+  return routeLoader.loadRoute(router, config, navigationContext).then(component => {
     component.router = router;
     component.config = config;
 
@@ -1357,6 +1155,427 @@ function loadComponent(routeLoader, navigationContext, config){
     }
 
     return component;
+  });
+}
+
+/**
+* The primary class responsible for handling routing and navigation.
+*
+* @class Router
+* @constructor
+*/
+export class Router {
+  container: Container;
+  history: History;
+  viewPorts: Object = {};
+  fallbackOrder: number = 100;
+  recognizer: RouteRecognizer = new RouteRecognizer();
+  childRecognizer: RouteRecognizer = new RouteRecognizer();
+  routes: RouteConfig[] = [];
+
+  /**
+  * The [[Router]]'s current base URL, typically based on the [[Router.currentInstruction]].
+  */
+  baseUrl: string = '';
+
+  /**
+  * True if the [[Router]] has been configured.
+  */
+  isConfigured: boolean = false;
+
+  /**
+  * True if the [[Router]] is currently processing a navigation.
+  */
+  isNavigating: boolean = false;
+
+  /**
+  * The navigation models for routes that specified [[RouteConfig.nav]].
+  */
+  navigation: NavModel[] = [];
+
+  /**
+  * The currently active navigation instruction.
+  */
+  currentInstruction: NavigationInstruction;
+
+  /**
+  * @param container The [[Container]] to use when child routers.
+  * @param history The [[History]] implementation to delegate navigation requests to.
+  */
+  constructor(container, history) {
+    this.container = container;
+    this.history = history;
+    this._configuredPromise = new Promise((resolve => {
+      this._resolveConfiguredPromise = resolve;
+    }));
+    this.reset();
+  }
+
+  /**
+  * Gets a valid undicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
+  */
+  get isRoot() {
+    return false;
+  }
+
+  /**
+  * Registers a viewPort to be used as a rendering target for activated routes.
+  *
+  * @param viewPort The viewPort.
+  * @param name The name of the viewPort. 'default' if unspecified.
+  */
+  registerViewPort(viewPort:Object, name?:string) {
+    name = name || 'default';
+    this.viewPorts[name] = viewPort;
+  }
+
+  /**
+  * Returns a Promise that resolves when the router is configured.
+  */
+  ensureConfigured():Promise<void> {
+    return this._configuredPromise;
+  }
+
+  /**
+  * Configures the router.
+  *
+  * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
+  * @chainable
+  */
+  configure(callbackOrConfig:RouterConfiguration|((config:RouterConfiguration) => RouterConfiguration)):Router {
+    this.isConfigured = true;
+
+    if (typeof callbackOrConfig == 'function') {
+      var config = new RouterConfiguration();
+      callbackOrConfig(config);
+      config.exportToRouter(this);
+    } else {
+      callbackOrConfig.exportToRouter(this);
+    }
+
+    this.isConfigured = true;
+    this._resolveConfiguredPromise();
+
+    return this;
+  }
+
+  /**
+  * Navigates to a new location.
+  *
+  * @param fragment The URL fragment to use as the navigation destination.
+  * @param options The navigation options.
+  */
+  navigate(fragment:string, options?:Object):boolean {
+    if (!this.isConfigured && this.parent) {
+      return this.parent.navigate(fragment, options);
+    }
+
+    return this.history.navigate(resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
+  }
+
+  /**
+  * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
+  * by [[Router.navigate]].
+  *
+  * @param route The name of the route to use when generating the navigation location.
+  * @param params The route parameters to be used when populating the route pattern.
+  * @param options The navigation options.
+  */
+  navigateToRoute(route:string, params?:Object, options?:Object):boolean {
+    let path = this.generate(route, params);
+    return this.navigate(path, options);
+  }
+
+  /**
+  * Navigates back to the most recent location in history.
+  */
+  navigateBack() {
+    this.history.navigateBack();
+  }
+
+  /**
+   * Creates a child router of the current router.
+   *
+   * @param container The [[Container]] to provide to the child router. Uses the current [[Router]]'s [[Container]] if unspecified.
+   * @returns {Router} The new child Router.
+   */
+  createChild(container?:Container):Router {
+    var childRouter = new Router(container || this.container.createChild(), this.history);
+    childRouter.parent = this;
+    return childRouter;
+  }
+
+  /**
+  * Generates a URL fragment matching the specified route pattern.
+  *
+  * @param name The name of the route whose pattern should be used to generate the fragment.
+  * @param params The route params to be used to populate the route pattern.
+  * @returns {string} A string containing the generated URL fragment.
+  */
+  generate(name:string, params?:Object):string {
+    let hasRoute = this.recognizer.hasRoute(name);
+    if((!this.isConfigured || !hasRoute) && this.parent){
+      return this.parent.generate(name, params);
+    }
+
+    if (!hasRoute) {
+      throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
+    }
+
+    let path = this.recognizer.generate(name, params);
+    return createRootedPath(path, this.baseUrl, this.history._hasPushState);
+  }
+
+  /**
+  * Creates a [[NavModel]] for the specified route config.
+  *
+  * @param config The route config.
+  */
+  createNavModel(config:RouteConfig):NavModel {
+    let navModel = new NavModel(this, 'href' in config ? config.href : config.route);
+    navModel.title = config.title;
+    navModel.order = config.nav;
+    navModel.href = config.href;
+    navModel.settings = config.settings;
+    navModel.config = config;
+
+    return navModel;
+  }
+
+  /**
+  * Registers a new route with the router.
+  *
+  * @param config The [[RouteConfig]].
+  * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
+  */
+  addRoute(config:RouteConfig, navModel?:NavModel) {
+    validateRouteConfig(config);
+
+    if (!('viewPorts' in config) && !config.navigationStrategy) {
+      config.viewPorts = {
+        'default': {
+          moduleId: config.moduleId,
+          view: config.view
+        }
+      };
+    }
+
+    if (!navModel) {
+      navModel = this.createNavModel(config);
+    }
+
+    this.routes.push(config);
+
+    let path = config.route;
+    if (path.charAt(0) === '/') {
+      path = path.substr(1);
+    }
+
+    let state = this.recognizer.add({path: path, handler: config});
+
+    if (path) {
+      let withChild, settings = config.settings;
+      delete config.settings;
+      withChild = JSON.parse(JSON.stringify(config));
+      config.settings = settings;
+      withChild.route = `${path}/*childRoute`;
+      withChild.hasChildRouter = true;
+      this.childRecognizer.add({
+        path: withChild.route,
+        handler: withChild
+      });
+
+      withChild.navModel = navModel;
+      withChild.settings = config.settings;
+    }
+
+    config.navModel = navModel;
+
+    if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
+      if ((!navModel.href && navModel.href != '') && (state.types.dynamics || state.types.stars)) {
+          throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
+      }
+
+      if (typeof navModel.order != 'number') {
+        navModel.order = ++this.fallbackOrder;
+      }
+
+      this.navigation.push(navModel);
+      this.navigation = this.navigation.sort((a, b) => a.order - b.order);
+    }
+  }
+
+  /**
+  * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
+  *
+  * @param name The name of the route to check.
+  * @returns {boolean}
+  */
+  hasRoute(name:string):boolean {
+    return !!(this.recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
+  }
+
+  /**
+  * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
+  *
+  * @param name The name of the route to check.
+  * @returns {boolean}
+  */
+  hasOwnRoute(name:string):boolean {
+    return this.recognizer.hasRoute(name);
+  }
+
+  /**
+  * Register a handler to use when the incoming URL fragment doesn't match any registered routes.
+  *
+  * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
+  */
+  handleUnknownRoutes(config?:string|Function|RouteConfig) {
+    var callback = instruction => new Promise((resolve, reject) => {
+      function done(inst){
+        inst = inst || instruction;
+        inst.config.route = inst.params.path;
+        resolve(inst);
+      }
+
+      if (!config) {
+        instruction.config.moduleId = instruction.fragment;
+        done(instruction);
+      } else if (typeof config == 'string') {
+        instruction.config.moduleId = config;
+        done(instruction);
+      } else if (typeof config == 'function') {
+        processPotential(config(instruction), done, reject);
+      } else {
+        instruction.config = config;
+        done(instruction);
+      }
+    });
+
+    this.catchAllHandler = callback;
+  }
+
+  /**
+  * Updates the document title using the current navigation instruction.
+  */
+  updateTitle() {
+    if (this.parent) {
+      return this.parent.updateTitle();
+    }
+
+    this.currentInstruction.navigationContext.updateTitle();
+  }
+
+  /**
+  * Resets the Router to its original unconfigured state.
+  */
+  reset() {
+    this.fallbackOrder = 100;
+    this.recognizer = new RouteRecognizer();
+    this.childRecognizer = new RouteRecognizer();
+    this.routes = [];
+    this.isNavigating = false;
+    this.navigation = [];
+    this.isConfigured = false;
+  }
+
+  refreshBaseUrl() {
+    if (this.parent) {
+      var baseUrl = this.parent.currentInstruction.getBaseUrl();
+      this.baseUrl = this.parent.baseUrl + baseUrl;
+    }
+  }
+
+  refreshNavigation() {
+    var nav = this.navigation;
+
+    for(var i = 0, length = nav.length; i < length; i++) {
+      var current = nav[i];
+      current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+    }
+  }
+
+  createNavigationInstruction(url:string = '', parentInstruction?:NavigationInstruction = null):Promise<NavigationInstruction> {
+    let fragment = url;
+    let queryString = '';
+
+    let queryIndex = url.indexOf('?');
+    if (queryIndex != -1) {
+      fragment = url.substr(0, queryIndex);
+      queryString = url.substr(queryIndex + 1);
+    }
+
+    let results = this.recognizer.recognize(url);
+    if (!results || !results.length) {
+      results = this.childRecognizer.recognize(url);
+    }
+
+    if((!results || !results.length) && this.catchAllHandler) {
+      results = [{
+        config: {
+          navModel: {}
+        },
+        handler: this.catchAllHandler,
+        params: {
+          path: fragment
+        }
+      }];
+    }
+
+    if (results && results.length) {
+      let first = results[0];
+      let instruction = new NavigationInstruction(
+        fragment,
+        queryString,
+        first.params,
+        first.queryParams || results.queryParams,
+        first.config || first.handler,
+        parentInstruction
+        );
+
+      if (typeof first.handler === 'function') {
+        return evaluateNavigationStrategy(instruction, first.handler, first);
+      } else if(first.handler && 'navigationStrategy' in first.handler){
+        return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
+      }
+
+      return Promise.resolve(instruction);
+    }
+
+    return Promise.reject(new Error(`Route not found: ${url}`));
+  }
+
+  createNavigationContext(instruction:NavigationInstruction):NavigationContext {
+    instruction.navigationContext = new NavigationContext(this, instruction);
+    return instruction.navigationContext;
+  }
+}
+
+function validateRouteConfig(config:Object) {
+  if (typeof config !== 'object') {
+    throw new Error('Invalid Route Config');
+  }
+
+  if (typeof config.route !== 'string') {
+    throw new Error('Invalid Route Config: You must specify a route pattern.');
+  }
+
+  if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+    throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.')
+  }
+}
+
+function evaluateNavigationStrategy(instruction:NavigationInstruction, evaluator:Function, context:Object): Promise<NavigationInstruction> {
+  return Promise.resolve(evaluator.call(context, instruction)).then(() => {
+    if (!('viewPorts' in instruction.config)) {
+      instruction.config.viewPorts = {
+        'default': {
+          moduleId: instruction.config.moduleId
+        }
+      };
+    }
+
+    return instruction;
   });
 }
 
@@ -1387,7 +1606,6 @@ export class PipelineProvider {
   }
 }
 
-import * as LogManager from 'aurelia-logging';
 const logger = LogManager.getLogger('app-router');
 
 export class AppRouter extends Router {
@@ -1564,7 +1782,7 @@ function targetIsThisWindow(target) {
 
 function processResult(instruction, result, instructionCount, router) {
   if (!(result && 'completed' in result && 'output' in result)) {
-    resut = result || {};
+    result = result || {};
     result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
   }
 

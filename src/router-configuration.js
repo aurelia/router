@@ -15,7 +15,7 @@ export class RouterConfiguration{
 
   /**
   * Adds a step to be run during the [[Router]]'s navigation pipeline.
-  * 
+  *
   * @param name The name of the pipeline slot to insert the step into.
   * @param step The pipeline step.
   * @chainable
@@ -27,7 +27,7 @@ export class RouterConfiguration{
 
   /**
   * Maps one or more routes to be registered with the router.
-  * 
+  *
   * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
   * @chainable
   */
@@ -42,7 +42,7 @@ export class RouterConfiguration{
 
   /**
   * Maps a single route to be registered with the router.
-  * 
+  *
   * @param route The [[RouteConfig]] to map.
   * @chainable
   */
@@ -77,19 +77,19 @@ export class RouterConfiguration{
 
   /**
   * Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
-  * 
+  *
   * @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => Promise) {
+  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => Promise<void>) {
     this.unknownRouteConfig = config;
     return this;
   }
 
   /**
   * Applies the current configuration to the specified [[Router]].
-  * 
+  *
   * @param router The [[Router]] to apply the configuration to.
   */
   exportToRouter(router: Router) {

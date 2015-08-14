@@ -1,6 +1,6 @@
 {
   "name": "aurelia-router",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "description": "A powerful client-side router.",
   "keywords": [
     "aurelia",
@@ -17,11 +17,11 @@
   },
   "dependencies": {
     "aurelia-dependency-injection": "^0.9.1",
-    "aurelia-event-aggregator": "^0.6.2",
+    "aurelia-event-aggregator": "^0.7.0",
     "aurelia-history": "^0.6.1",
-    "aurelia-logging": "^0.6.2",
+    "aurelia-logging": "^0.6.4",
     "aurelia-path": "^0.8.1",
-    "aurelia-route-recognizer": "^0.6.1",
+    "aurelia-route-recognizer": "^0.6.2",
     "core-js": "zloirock/core-js"
   }
 }

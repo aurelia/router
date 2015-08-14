@@ -1,9 +1,11 @@
-System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recognizer', 'aurelia-path', 'aurelia-history', 'aurelia-event-aggregator', 'aurelia-logging'], function (_export) {
+System.register(['core-js', 'aurelia-logging', 'aurelia-dependency-injection', 'aurelia-route-recognizer', 'aurelia-path', 'aurelia-history', 'aurelia-event-aggregator'], function (_export) {
   'use strict';
 
-  var core, Container, RouteRecognizer, join, History, EventAggregator, LogManager, isRootedPath, isAbsoluteUrl, Redirect, activationStrategy, BuildNavigationPlanStep, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, NavigationContext, CommitChangesStep, NavigationInstruction, NavModel, RouteFilterContainer, RouteFilterStep, RouterConfiguration, Router, pipelineStatus, Pipeline, RouteLoader, LoadRouteStep, PipelineProvider, logger, AppRouter;
+  var core, LogManager, Container, RouteRecognizer, join, History, EventAggregator, RouteFilterContainer, RouteFilterStep, pipelineStatus, Pipeline, NavigationInstruction, NavModel, isRootedPath, isAbsoluteUrl, Redirect, RouterConfiguration, activationStrategy, BuildNavigationPlanStep, affirmations, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, NavigationContext, CommitChangesStep, RouteLoader, LoadRouteStep, Router, PipelineProvider, logger, AppRouter;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+  _export('createRouteFilterStep', createRouteFilterStep);
 
   _export('processPotential', processPotential);
 
@@ -17,13 +19,30 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
 
   _export('buildNavigationPlan', buildNavigationPlan);
 
-  _export('createRouteFilterStep', createRouteFilterStep);
-
   _export('loadNewRoute', loadNewRoute);
 
-  function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+  function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+  function createRouteFilterStep(name) {
+    function create(routeFilterContainer) {
+      return new RouteFilterStep(name, routeFilterContainer);
+    };
+    create.inject = function () {
+      return [RouteFilterContainer];
+    };
+    return create;
+  }
+
+  function createResult(ctx, next) {
+    return {
+      status: next.status,
+      context: ctx,
+      output: next.output,
+      completed: next.status == pipelineStatus.completed
+    };
+  }
 
   function processPotential(obj, resolve, reject) {
     if (obj && typeof obj.then === 'function') {
@@ -124,6 +143,8 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           var _prevViewPortInstruction$component$executionContext;
 
           viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, next.lifecycleArgs);
+        } else if (next.config.activationStrategy) {
+          viewPortPlan.strategy = next.config.activationStrategy;
         } else if (newParams || forceLifecycleMinimum) {
           viewPortPlan.strategy = activationStrategy.invokeLifecycle;
         } else {
@@ -361,53 +382,6 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
     return output;
   }
 
-  function createRouteFilterStep(name) {
-    function create(routeFilterContainer) {
-      return new RouteFilterStep(name, routeFilterContainer);
-    };
-    create.inject = function () {
-      return [RouteFilterContainer];
-    };
-    return create;
-  }
-
-  function validateRouteConfig(config) {
-    if (typeof config !== 'object') {
-      throw new Error('Invalid Route Config');
-    }
-
-    if (typeof config.route !== 'string') {
-      throw new Error('Invalid Route Config: You must specify a route pattern.');
-    }
-
-    if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
-      throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.');
-    }
-  }
-
-  function evaluateNavigationStrategy(instruction, evaluator, context) {
-    return Promise.resolve(evaluator.call(context, instruction)).then(function () {
-      if (!('viewPorts' in instruction.config)) {
-        instruction.config.viewPorts = {
-          'default': {
-            moduleId: instruction.config.moduleId
-          }
-        };
-      }
-
-      return instruction;
-    });
-  }
-
-  function createResult(ctx, next) {
-    return {
-      status: next.status,
-      context: ctx,
-      output: next.output,
-      completed: next.status == pipelineStatus.completed
-    };
-  }
-
   function loadNewRoute(routeLoader, navigationContext) {
     var toLoad = determineWhatToLoad(navigationContext);
     var loadPromises = toLoad.map(function (current) {
@@ -480,7 +454,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
     var router = navigationContext.router,
         lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
-    return routeLoader.loadRoute(router, config).then(function (component) {
+    return routeLoader.loadRoute(router, config, navigationContext).then(function (component) {
       component.router = router;
       component.config = config;
 
@@ -502,9 +476,37 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
     });
   }
 
+  function validateRouteConfig(config) {
+    if (typeof config !== 'object') {
+      throw new Error('Invalid Route Config');
+    }
+
+    if (typeof config.route !== 'string') {
+      throw new Error('Invalid Route Config: You must specify a route pattern.');
+    }
+
+    if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+      throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.');
+    }
+  }
+
+  function evaluateNavigationStrategy(instruction, evaluator, context) {
+    return Promise.resolve(evaluator.call(context, instruction)).then(function () {
+      if (!('viewPorts' in instruction.config)) {
+        instruction.config.viewPorts = {
+          'default': {
+            moduleId: instruction.config.moduleId
+          }
+        };
+      }
+
+      return instruction;
+    });
+  }
+
   function findAnchor(el) {
     while (el) {
-      if (el.tagName === 'A') return el;
+      if (el.tagName === "A") return el;
       el = el.parentNode;
     }
   }
@@ -523,7 +525,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
       if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
         var href = target.getAttribute('href');
 
-        if (href !== null && !(href.charAt(0) === '#' || /^[a-z]+:/i.test(href))) {
+        if (href !== null && !(href.charAt(0) === "#" || /^[a-z]+:/i.test(href))) {
           evt.preventDefault();
           this.history.navigate(href);
         }
@@ -539,7 +541,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
 
   function processResult(instruction, result, instructionCount, router) {
     if (!(result && 'completed' in result && 'output' in result)) {
-      resut = result || {};
+      result = result || {};
       result.output = new Error('Expected router pipeline to return a navigation result, but got [' + JSON.stringify(result) + '] instead.');
     }
 
@@ -576,8 +578,8 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
       } else if (!result.completed) {
         eventName = 'canceled';
       } else {
-        var _queryString = instruction.queryString ? '?' + instruction.queryString : '';
-        router.history.previousLocation = instruction.fragment + _queryString;
+        var queryString = instruction.queryString ? '?' + instruction.queryString : '';
+        router.history.previousLocation = instruction.fragment + queryString;
         eventName = 'success';
       }
 
@@ -598,7 +600,9 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
   }
   return {
     setters: [function (_coreJs) {
-      core = _coreJs['default'];
+      core = _coreJs;
+    }, function (_aureliaLogging) {
+      LogManager = _aureliaLogging;
     }, function (_aureliaDependencyInjection) {
       Container = _aureliaDependencyInjection.Container;
     }, function (_aureliaRouteRecognizer) {
@@ -609,10 +613,270 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
       History = _aureliaHistory.History;
     }, function (_aureliaEventAggregator) {
       EventAggregator = _aureliaEventAggregator.EventAggregator;
-    }, function (_aureliaLogging) {
-      LogManager = _aureliaLogging;
     }],
     execute: function () {
+      RouteFilterContainer = (function () {
+        RouteFilterContainer.inject = function inject() {
+          return [Container];
+        };
+
+        function RouteFilterContainer(container) {
+          _classCallCheck(this, RouteFilterContainer);
+
+          this.container = container;
+          this.filters = {};
+          this.filterCache = {};
+        }
+
+        RouteFilterContainer.prototype.addStep = function addStep(name, step) {
+          var index = arguments.length <= 2 || arguments[2] === undefined ? -1 : arguments[2];
+
+          var filter = this.filters[name];
+          if (!filter) {
+            filter = this.filters[name] = [];
+          }
+
+          if (index === -1) {
+            index = filter.length;
+          }
+
+          filter.splice(index, 0, step);
+          this.filterCache = {};
+        };
+
+        RouteFilterContainer.prototype.getFilterSteps = function getFilterSteps(name) {
+          if (this.filterCache[name]) {
+            return this.filterCache[name];
+          }
+
+          var steps = [];
+          var filter = this.filters[name];
+          if (!filter) {
+            return steps;
+          }
+
+          for (var i = 0, l = filter.length; i < l; i++) {
+            if (typeof filter[i] === 'string') {
+              steps.push.apply(steps, this.getFilterSteps(filter[i]));
+            } else {
+              steps.push(this.container.get(filter[i]));
+            }
+          }
+
+          return this.filterCache[name] = steps;
+        };
+
+        return RouteFilterContainer;
+      })();
+
+      _export('RouteFilterContainer', RouteFilterContainer);
+
+      RouteFilterStep = (function () {
+        function RouteFilterStep(name, routeFilterContainer) {
+          _classCallCheck(this, RouteFilterStep);
+
+          this.name = name;
+          this.routeFilterContainer = routeFilterContainer;
+          this.isMultiStep = true;
+        }
+
+        RouteFilterStep.prototype.getSteps = function getSteps() {
+          return this.routeFilterContainer.getFilterSteps(this.name);
+        };
+
+        return RouteFilterStep;
+      })();
+
+      pipelineStatus = {
+        completed: 'completed',
+        canceled: 'canceled',
+        rejected: 'rejected',
+        running: 'running'
+      };
+
+      _export('pipelineStatus', pipelineStatus);
+
+      Pipeline = (function () {
+        function Pipeline() {
+          _classCallCheck(this, Pipeline);
+
+          this.steps = [];
+        }
+
+        Pipeline.prototype.withStep = function withStep(step) {
+          var run, steps, i, l;
+
+          if (typeof step == 'function') {
+            run = step;
+          } else if (step.isMultiStep) {
+            steps = step.getSteps();
+            for (i = 0, l = steps.length; i < l; i++) {
+              this.withStep(steps[i]);
+            }
+
+            return this;
+          } else {
+            run = step.run.bind(step);
+          }
+
+          this.steps.push(run);
+
+          return this;
+        };
+
+        Pipeline.prototype.run = function run(ctx) {
+          var index = -1,
+              steps = this.steps,
+              next,
+              currentStep;
+
+          next = function () {
+            index++;
+
+            if (index < steps.length) {
+              currentStep = steps[index];
+
+              try {
+                return currentStep(ctx, next);
+              } catch (e) {
+                return next.reject(e);
+              }
+            } else {
+              return next.complete();
+            }
+          };
+
+          next.complete = function (output) {
+            next.status = pipelineStatus.completed;
+            next.output = output;
+            return Promise.resolve(createResult(ctx, next));
+          };
+
+          next.cancel = function (reason) {
+            next.status = pipelineStatus.canceled;
+            next.output = reason;
+            return Promise.resolve(createResult(ctx, next));
+          };
+
+          next.reject = function (error) {
+            next.status = pipelineStatus.rejected;
+            next.output = error;
+            return Promise.resolve(createResult(ctx, next));
+          };
+
+          next.status = pipelineStatus.running;
+
+          return next();
+        };
+
+        return Pipeline;
+      })();
+
+      _export('Pipeline', Pipeline);
+
+      NavigationInstruction = (function () {
+        function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
+          _classCallCheck(this, NavigationInstruction);
+
+          this.fragment = fragment;
+          this.queryString = queryString;
+          this.params = params || {};
+          this.queryParams = queryParams;
+          this.config = config;
+          this.viewPortInstructions = {};
+          this.parentInstruction = parentInstruction;
+
+          var ancestorParams = [];
+          var current = this;
+          do {
+            var currentParams = Object.assign({}, current.params);
+            if (current.config.hasChildRouter) {
+              delete currentParams[current.getWildCardName()];
+            }
+
+            ancestorParams.unshift(currentParams);
+            current = current.parentInstruction;
+          } while (current);
+
+          var allParams = Object.assign.apply(Object, [{}, queryParams].concat(ancestorParams));
+          this.lifecycleArgs = [allParams, config, this];
+        }
+
+        NavigationInstruction.prototype.addViewPortInstruction = function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
+          return this.viewPortInstructions[viewPortName] = {
+            name: viewPortName,
+            strategy: strategy,
+            moduleId: moduleId,
+            component: component,
+            childRouter: component.childRouter,
+            lifecycleArgs: this.lifecycleArgs.slice()
+          };
+        };
+
+        NavigationInstruction.prototype.getWildCardName = function getWildCardName() {
+          var wildcardIndex = this.config.route.lastIndexOf('*');
+          return this.config.route.substr(wildcardIndex + 1);
+        };
+
+        NavigationInstruction.prototype.getWildcardPath = function getWildcardPath() {
+          var wildcardName = this.getWildCardName();
+          var path = this.params[wildcardName] || '';
+
+          if (this.queryString) {
+            path += '?' + this.queryString;
+          }
+
+          return path;
+        };
+
+        NavigationInstruction.prototype.getBaseUrl = function getBaseUrl() {
+          if (!this.params) {
+            return this.fragment;
+          }
+
+          var wildcardName = this.getWildCardName();
+          var path = this.params[wildcardName] || '';
+
+          if (!path) {
+            return this.fragment;
+          }
+
+          return this.fragment.substr(0, this.fragment.lastIndexOf(path));
+        };
+
+        return NavigationInstruction;
+      })();
+
+      _export('NavigationInstruction', NavigationInstruction);
+
+      NavModel = (function () {
+        function NavModel(router, relativeHref) {
+          _classCallCheck(this, NavModel);
+
+          this.isActive = false;
+          this.title = null;
+          this.href = null;
+          this.relativeHref = null;
+          this.settings = {};
+          this.config = null;
+
+          this.router = router;
+          this.relativeHref = relativeHref;
+        }
+
+        NavModel.prototype.setTitle = function setTitle(title) {
+          this.title = title;
+
+          if (this.isActive) {
+            this.router.updateTitle();
+          }
+        };
+
+        return NavModel;
+      })();
+
+      _export('NavModel', NavModel);
+
       isRootedPath = /^#?\//;
       isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
 
@@ -638,6 +902,101 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
       })();
 
       _export('Redirect', Redirect);
+
+      RouterConfiguration = (function () {
+        function RouterConfiguration() {
+          _classCallCheck(this, RouterConfiguration);
+
+          this.instructions = [];
+          this.options = {};
+          this.pipelineSteps = [];
+        }
+
+        RouterConfiguration.prototype.addPipelineStep = function addPipelineStep(name, step) {
+          this.pipelineSteps.push({ name: name, step: step });
+          return this;
+        };
+
+        RouterConfiguration.prototype.map = function map(route) {
+          if (Array.isArray(route)) {
+            route.forEach(this.map.bind(this));
+            return this;
+          }
+
+          return this.mapRoute(route);
+        };
+
+        RouterConfiguration.prototype.mapRoute = function mapRoute(config) {
+          this.instructions.push(function (router) {
+            var routeConfigs = [];
+
+            if (Array.isArray(config.route)) {
+              for (var i = 0, ii = config.route.length; i < ii; ++i) {
+                var current = Object.assign({}, config);
+                current.route = config.route[i];
+                routeConfigs.push(current);
+              }
+            } else {
+              routeConfigs.push(Object.assign({}, config));
+            }
+
+            var navModel = undefined;
+            for (var i = 0, ii = routeConfigs.length; i < ii; ++i) {
+              var routeConfig = routeConfigs[i];
+              routeConfig.settings = routeConfig.settings || {};
+              if (!navModel) {
+                navModel = router.createNavModel(routeConfig);
+              }
+
+              router.addRoute(routeConfig, navModel);
+            }
+          });
+
+          return this;
+        };
+
+        RouterConfiguration.prototype.mapUnknownRoutes = function mapUnknownRoutes(config) {
+          this.unknownRouteConfig = config;
+          return this;
+        };
+
+        RouterConfiguration.prototype.exportToRouter = function exportToRouter(router) {
+          var instructions = this.instructions;
+          for (var i = 0, ii = instructions.length; i < ii; ++i) {
+            instructions[i](router);
+          }
+
+          if (this.title) {
+            router.title = this.title;
+          }
+
+          if (this.unknownRouteConfig) {
+            router.handleUnknownRoutes(this.unknownRouteConfig);
+          }
+
+          router.options = this.options;
+
+          var pipelineSteps = this.pipelineSteps;
+          if (pipelineSteps.length) {
+            if (!router.isRoot) {
+              throw new Error('Pipeline steps can only be added to the root router');
+            }
+
+            var filterContainer = router.container.get(RouteFilterContainer);
+            for (var i = 0, ii = pipelineSteps.length; i < ii; ++i) {
+              var _pipelineSteps$i = pipelineSteps[i];
+              var _name = _pipelineSteps$i.name;
+              var step = _pipelineSteps$i.step;
+
+              filterContainer.addStep(_name, step);
+            }
+          }
+        };
+
+        return RouterConfiguration;
+      })();
+
+      _export('RouterConfiguration', RouterConfiguration);
 
       activationStrategy = {
         noChange: 'no-change',
@@ -735,7 +1094,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
         }
 
         NavigationContext.prototype.getAllContexts = function getAllContexts() {
-          var acc = arguments[0] === undefined ? [] : arguments[0];
+          var acc = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 
           acc.push(this);
           if (this.plan) {
@@ -805,7 +1164,7 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
         };
 
         NavigationContext.prototype.buildTitle = function buildTitle() {
-          var separator = arguments[0] === undefined ? ' | ' : arguments[0];
+          var separator = arguments.length <= 0 || arguments[0] === undefined ? ' | ' : arguments[0];
 
           var next = this.nextInstruction,
               title = next.config.navModel.title || '',
@@ -885,294 +1244,61 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
 
       _export('CommitChangesStep', CommitChangesStep);
 
-      NavigationInstruction = (function () {
-        function NavigationInstruction(fragment, queryString, params, queryParams, config, parentInstruction) {
-          _classCallCheck(this, NavigationInstruction);
-
-          this.fragment = fragment;
-          this.queryString = queryString;
-          this.params = params || {};
-          this.queryParams = queryParams;
-          this.config = config;
-          this.viewPortInstructions = {};
-          this.parentInstruction = parentInstruction;
-
-          var ancestorParams = [];
-          var current = this;
-          do {
-            var currentParams = Object.assign({}, current.params);
-            if (current.config.hasChildRouter) {
-              delete currentParams[current.getWildCardName()];
-            }
-
-            ancestorParams.unshift(currentParams);
-            current = current.parentInstruction;
-          } while (current);
-
-          var allParams = Object.assign.apply(Object, [{}, queryParams].concat(ancestorParams));
-          this.lifecycleArgs = [allParams, config, this];
+      RouteLoader = (function () {
+        function RouteLoader() {
+          _classCallCheck(this, RouteLoader);
         }
 
-        NavigationInstruction.prototype.addViewPortInstruction = function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
-          return this.viewPortInstructions[viewPortName] = {
-            name: viewPortName,
-            strategy: strategy,
-            moduleId: moduleId,
-            component: component,
-            childRouter: component.childRouter,
-            lifecycleArgs: this.lifecycleArgs.slice()
-          };
+        RouteLoader.prototype.loadRoute = function loadRoute(router, config, navigationContext) {
+          throw Error('Route loaders must implement "loadRoute(router, config, navigationContext)".');
         };
 
-        NavigationInstruction.prototype.getWildCardName = function getWildCardName() {
-          var wildcardIndex = this.config.route.lastIndexOf('*');
-          return this.config.route.substr(wildcardIndex + 1);
-        };
-
-        NavigationInstruction.prototype.getWildcardPath = function getWildcardPath() {
-          var wildcardName = this.getWildCardName();
-          var path = this.params[wildcardName] || '';
-
-          if (this.queryString) {
-            path += '?' + this.queryString;
-          }
-
-          return path;
-        };
-
-        NavigationInstruction.prototype.getBaseUrl = function getBaseUrl() {
-          if (!this.params) {
-            return this.fragment;
-          }
-
-          var wildcardName = this.getWildCardName();
-          var path = this.params[wildcardName] || '';
-
-          if (!path) {
-            return this.fragment;
-          }
-
-          return this.fragment.substr(0, this.fragment.lastIndexOf(path));
-        };
-
-        return NavigationInstruction;
+        return RouteLoader;
       })();
 
-      _export('NavigationInstruction', NavigationInstruction);
+      _export('RouteLoader', RouteLoader);
 
-      NavModel = (function () {
-        function NavModel(router, relativeHref) {
-          _classCallCheck(this, NavModel);
+      LoadRouteStep = (function () {
+        LoadRouteStep.inject = function inject() {
+          return [RouteLoader];
+        };
 
-          this.router = router;
-          this.relativeHref = relativeHref;
+        function LoadRouteStep(routeLoader) {
+          _classCallCheck(this, LoadRouteStep);
 
-          this.isActive = false;
-
-          this.title = null;
-
-          this.href = null;
-
-          this.settings = {};
-
-          this.config = null;
+          this.routeLoader = routeLoader;
         }
 
-        NavModel.prototype.setTitle = function setTitle(title) {
-          this.title = title;
-
-          if (this.isActive) {
-            this.router.updateTitle();
-          }
+        LoadRouteStep.prototype.run = function run(navigationContext, next) {
+          return loadNewRoute(this.routeLoader, navigationContext).then(next)['catch'](next.cancel);
         };
 
-        return NavModel;
+        return LoadRouteStep;
       })();
 
-      _export('NavModel', NavModel);
-
-      RouteFilterContainer = (function () {
-        function RouteFilterContainer(container) {
-          _classCallCheck(this, RouteFilterContainer);
-
-          this.container = container;
-          this.filters = {};
-          this.filterCache = {};
-        }
-
-        RouteFilterContainer.inject = function inject() {
-          return [Container];
-        };
-
-        RouteFilterContainer.prototype.addStep = function addStep(name, step) {
-          var index = arguments[2] === undefined ? -1 : arguments[2];
-
-          var filter = this.filters[name];
-          if (!filter) {
-            filter = this.filters[name] = [];
-          }
-
-          if (index === -1) {
-            index = filter.length;
-          }
-
-          filter.splice(index, 0, step);
-          this.filterCache = {};
-        };
-
-        RouteFilterContainer.prototype.getFilterSteps = function getFilterSteps(name) {
-          if (this.filterCache[name]) {
-            return this.filterCache[name];
-          }
-
-          var steps = [];
-          var filter = this.filters[name];
-          if (!filter) {
-            return steps;
-          }
-
-          for (var i = 0, l = filter.length; i < l; i++) {
-            if (typeof filter[i] === 'string') {
-              steps.push.apply(steps, this.getFilterSteps(filter[i]));
-            } else {
-              steps.push(this.container.get(filter[i]));
-            }
-          }
-
-          return this.filterCache[name] = steps;
-        };
-
-        return RouteFilterContainer;
-      })();
-
-      _export('RouteFilterContainer', RouteFilterContainer);
-
-      RouteFilterStep = (function () {
-        function RouteFilterStep(name, routeFilterContainer) {
-          _classCallCheck(this, RouteFilterStep);
-
-          this.name = name;
-          this.routeFilterContainer = routeFilterContainer;
-          this.isMultiStep = true;
-        }
-
-        RouteFilterStep.prototype.getSteps = function getSteps() {
-          return this.routeFilterContainer.getFilterSteps(this.name);
-        };
-
-        return RouteFilterStep;
-      })();
-
-      RouterConfiguration = (function () {
-        function RouterConfiguration() {
-          _classCallCheck(this, RouterConfiguration);
-
-          this.instructions = [];
-          this.options = {};
-          this.pipelineSteps = [];
-        }
-
-        RouterConfiguration.prototype.addPipelineStep = function addPipelineStep(name, step) {
-          this.pipelineSteps.push({ name: name, step: step });
-        };
-
-        RouterConfiguration.prototype.map = function map(route) {
-          if (Array.isArray(route)) {
-            route.forEach(this.map.bind(this));
-            return this;
-          }
-
-          return this.mapRoute(route);
-        };
-
-        RouterConfiguration.prototype.mapRoute = function mapRoute(config) {
-          this.instructions.push(function (router) {
-            var routeConfigs = [];
-
-            if (Array.isArray(config.route)) {
-              for (var i = 0, ii = config.route.length; i < ii; ++i) {
-                var current = Object.assign({}, config);
-                current.route = config.route[i];
-                routeConfigs.push(current);
-              }
-            } else {
-              routeConfigs.push(Object.assign({}, config));
-            }
-
-            var navModel = undefined;
-            for (var i = 0, ii = routeConfigs.length; i < ii; ++i) {
-              var routeConfig = routeConfigs[i];
-              routeConfig.settings = routeConfig.settings || {};
-              if (!navModel) {
-                navModel = router.createNavModel(routeConfig);
-              }
-
-              router.addRoute(routeConfig, navModel);
-            }
-          });
-
-          return this;
-        };
-
-        RouterConfiguration.prototype.mapUnknownRoutes = function mapUnknownRoutes(config) {
-          this.unknownRouteConfig = config;
-          return this;
-        };
-
-        RouterConfiguration.prototype.exportToRouter = function exportToRouter(router) {
-          var instructions = this.instructions;
-          for (var i = 0, ii = instructions.length; i < ii; ++i) {
-            instructions[i](router);
-          }
-
-          if (this.title) {
-            router.title = this.title;
-          }
-
-          if (this.unknownRouteConfig) {
-            router.handleUnknownRoutes(this.unknownRouteConfig);
-          }
-
-          router.options = this.options;
-
-          var pipelineSteps = this.pipelineSteps;
-          if (pipelineSteps.length) {
-            if (!router.isRoot) {
-              throw new Error('Pipeline steps can only be added to the root router');
-            }
-
-            var filterContainer = router.container.get(RouteFilterContainer);
-            for (var i = 0, ii = pipelineSteps.length; i < ii; ++i) {
-              var _pipelineSteps$i = pipelineSteps[i];
-              var _name = _pipelineSteps$i.name;
-              var step = _pipelineSteps$i.step;
-
-              filterContainer.addStep(_name, step);
-            }
-          }
-        };
-
-        return RouterConfiguration;
-      })();
-
-      _export('RouterConfiguration', RouterConfiguration);
+      _export('LoadRouteStep', LoadRouteStep);
 
       Router = (function () {
         function Router(container, history) {
+          var _this = this;
+
           _classCallCheck(this, Router);
 
           this.viewPorts = {};
-          this.baseUrl = '';
-          this.isConfigured = false;
           this.fallbackOrder = 100;
           this.recognizer = new RouteRecognizer();
           this.childRecognizer = new RouteRecognizer();
           this.routes = [];
+          this.baseUrl = '';
+          this.isConfigured = false;
           this.isNavigating = false;
           this.navigation = [];
 
           this.container = container;
           this.history = history;
+          this._configuredPromise = new Promise(function (resolve) {
+            _this._resolveConfiguredPromise = resolve;
+          });
           this.reset();
         }
 
@@ -1181,20 +1307,8 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           this.viewPorts[name] = viewPort;
         };
 
-        Router.prototype.refreshBaseUrl = function refreshBaseUrl() {
-          if (this.parent) {
-            var baseUrl = this.parent.currentInstruction.getBaseUrl();
-            this.baseUrl = this.parent.baseUrl + baseUrl;
-          }
-        };
-
-        Router.prototype.refreshNavigation = function refreshNavigation() {
-          var nav = this.navigation;
-
-          for (var i = 0, length = nav.length; i < length; i++) {
-            var current = nav[i];
-            current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
-          }
+        Router.prototype.ensureConfigured = function ensureConfigured() {
+          return this._configuredPromise;
         };
 
         Router.prototype.configure = function configure(callbackOrConfig) {
@@ -1207,6 +1321,9 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           } else {
             callbackOrConfig.exportToRouter(this);
           }
+
+          this.isConfigured = true;
+          this._resolveConfiguredPromise();
 
           return this;
         };
@@ -1232,57 +1349,6 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           var childRouter = new Router(container || this.container.createChild(), this.history);
           childRouter.parent = this;
           return childRouter;
-        };
-
-        Router.prototype.createNavigationInstruction = function createNavigationInstruction() {
-          var url = arguments[0] === undefined ? '' : arguments[0];
-          var parentInstruction = arguments[1] === undefined ? null : arguments[1];
-
-          var fragment = url;
-          var queryString = '';
-
-          var queryIndex = url.indexOf('?');
-          if (queryIndex != -1) {
-            fragment = url.substr(0, queryIndex);
-            queryString = url.substr(queryIndex + 1);
-          }
-
-          var results = this.recognizer.recognize(url);
-          if (!results || !results.length) {
-            results = this.childRecognizer.recognize(url);
-          }
-
-          if ((!results || !results.length) && this.catchAllHandler) {
-            results = [{
-              config: {
-                navModel: {}
-              },
-              handler: this.catchAllHandler,
-              params: {
-                path: fragment
-              }
-            }];
-          }
-
-          if (results && results.length) {
-            var first = results[0];
-            var instruction = new NavigationInstruction(fragment, queryString, first.params, first.queryParams || results.queryParams, first.config || first.handler, parentInstruction);
-
-            if (typeof first.handler === 'function') {
-              return evaluateNavigationStrategy(instruction, first.handler, first);
-            } else if (first.handler && 'navigationStrategy' in first.handler) {
-              return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
-            }
-
-            return Promise.resolve(instruction);
-          }
-
-          return Promise.reject(new Error('Route not found: ' + url));
-        };
-
-        Router.prototype.createNavigationContext = function createNavigationContext(instruction) {
-          instruction.navigationContext = new NavigationContext(this, instruction);
-          return instruction.navigationContext;
         };
 
         Router.prototype.generate = function generate(name, params) {
@@ -1423,6 +1489,73 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           this.isConfigured = false;
         };
 
+        Router.prototype.refreshBaseUrl = function refreshBaseUrl() {
+          if (this.parent) {
+            var baseUrl = this.parent.currentInstruction.getBaseUrl();
+            this.baseUrl = this.parent.baseUrl + baseUrl;
+          }
+        };
+
+        Router.prototype.refreshNavigation = function refreshNavigation() {
+          var nav = this.navigation;
+
+          for (var i = 0, length = nav.length; i < length; i++) {
+            var current = nav[i];
+            current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+          }
+        };
+
+        Router.prototype.createNavigationInstruction = function createNavigationInstruction() {
+          var url = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+          var parentInstruction = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+          var fragment = url;
+          var queryString = '';
+
+          var queryIndex = url.indexOf('?');
+          if (queryIndex != -1) {
+            fragment = url.substr(0, queryIndex);
+            queryString = url.substr(queryIndex + 1);
+          }
+
+          var results = this.recognizer.recognize(url);
+          if (!results || !results.length) {
+            results = this.childRecognizer.recognize(url);
+          }
+
+          if ((!results || !results.length) && this.catchAllHandler) {
+            results = [{
+              config: {
+                navModel: {}
+              },
+              handler: this.catchAllHandler,
+              params: {
+                path: fragment
+              }
+            }];
+          }
+
+          if (results && results.length) {
+            var first = results[0];
+            var _instruction = new NavigationInstruction(fragment, queryString, first.params, first.queryParams || results.queryParams, first.config || first.handler, parentInstruction);
+
+            if (typeof first.handler === 'function') {
+              return evaluateNavigationStrategy(_instruction, first.handler, first);
+            } else if (first.handler && 'navigationStrategy' in first.handler) {
+              return evaluateNavigationStrategy(_instruction, first.handler.navigationStrategy, first.handler);
+            }
+
+            return Promise.resolve(_instruction);
+          }
+
+          return Promise.reject(new Error('Route not found: ' + url));
+        };
+
+        Router.prototype.createNavigationContext = function createNavigationContext(instruction) {
+          instruction.navigationContext = new NavigationContext(this, instruction);
+          return instruction.navigationContext;
+        };
+
         _createClass(Router, [{
           key: 'isRoot',
           get: function get() {
@@ -1435,128 +1568,11 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
 
       _export('Router', Router);
 
-      pipelineStatus = {
-        completed: 'completed',
-        cancelled: 'cancelled',
-        rejected: 'rejected',
-        running: 'running'
-      };
-
-      _export('pipelineStatus', pipelineStatus);
-
-      Pipeline = (function () {
-        function Pipeline() {
-          _classCallCheck(this, Pipeline);
-
-          this.steps = [];
-        }
-
-        Pipeline.prototype.withStep = function withStep(step) {
-          var run, steps, i, l;
-
-          if (typeof step == 'function') {
-            run = step;
-          } else if (step.isMultiStep) {
-            steps = step.getSteps();
-            for (i = 0, l = steps.length; i < l; i++) {
-              this.withStep(steps[i]);
-            }
-
-            return this;
-          } else {
-            run = step.run.bind(step);
-          }
-
-          this.steps.push(run);
-
-          return this;
-        };
-
-        Pipeline.prototype.run = function run(ctx) {
-          var index = -1,
-              steps = this.steps,
-              next,
-              currentStep;
-
-          next = function () {
-            index++;
-
-            if (index < steps.length) {
-              currentStep = steps[index];
-
-              try {
-                return currentStep(ctx, next);
-              } catch (e) {
-                return next.reject(e);
-              }
-            } else {
-              return next.complete();
-            }
-          };
-
-          next.complete = function (output) {
-            next.status = pipelineStatus.completed;
-            next.output = output;
-            return Promise.resolve(createResult(ctx, next));
-          };
-
-          next.cancel = function (reason) {
-            next.status = pipelineStatus.cancelled;
-            next.output = reason;
-            return Promise.resolve(createResult(ctx, next));
-          };
-
-          next.reject = function (error) {
-            next.status = pipelineStatus.rejected;
-            next.output = error;
-            return Promise.resolve(createResult(ctx, next));
-          };
-
-          next.status = pipelineStatus.running;
-
-          return next();
-        };
-
-        return Pipeline;
-      })();
-
-      _export('Pipeline', Pipeline);
-
-      RouteLoader = (function () {
-        function RouteLoader() {
-          _classCallCheck(this, RouteLoader);
-        }
-
-        RouteLoader.prototype.loadRoute = function loadRoute(router, config) {
-          throw Error('Route loaders must implement "loadRoute(router, config)".');
-        };
-
-        return RouteLoader;
-      })();
-
-      _export('RouteLoader', RouteLoader);
-
-      LoadRouteStep = (function () {
-        function LoadRouteStep(routeLoader) {
-          _classCallCheck(this, LoadRouteStep);
-
-          this.routeLoader = routeLoader;
-        }
-
-        LoadRouteStep.inject = function inject() {
-          return [RouteLoader];
-        };
-
-        LoadRouteStep.prototype.run = function run(navigationContext, next) {
-          return loadNewRoute(this.routeLoader, navigationContext).then(next)['catch'](next.cancel);
-        };
-
-        return LoadRouteStep;
-      })();
-
-      _export('LoadRouteStep', LoadRouteStep);
-
       PipelineProvider = (function () {
+        PipelineProvider.inject = function inject() {
+          return [Container];
+        };
+
         function PipelineProvider(container) {
           _classCallCheck(this, PipelineProvider);
 
@@ -1564,16 +1580,12 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, createRouteFilterStep('authorize'), createRouteFilterStep('modelbind'), CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep('precommit'), CommitChangesStep, createRouteFilterStep('postcomplete')];
         }
 
-        PipelineProvider.inject = function inject() {
-          return [Container];
-        };
-
         PipelineProvider.prototype.createPipeline = function createPipeline(navigationContext) {
-          var _this = this;
+          var _this2 = this;
 
           var pipeline = new Pipeline();
           this.steps.forEach(function (step) {
-            return pipeline.withStep(_this.container.get(step));
+            return pipeline.withStep(_this2.container.get(step));
           });
           return pipeline;
         };
@@ -1586,6 +1598,12 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
       logger = LogManager.getLogger('app-router');
 
       AppRouter = (function (_Router) {
+        _inherits(AppRouter, _Router);
+
+        AppRouter.inject = function inject() {
+          return [Container, History, PipelineProvider, EventAggregator];
+        };
+
         function AppRouter(container, history, pipelineProvider, events) {
           _classCallCheck(this, AppRouter);
 
@@ -1596,77 +1614,71 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           this.maxInstructionCount = 10;
         }
 
-        _inherits(AppRouter, _Router);
-
-        AppRouter.inject = function inject() {
-          return [Container, History, PipelineProvider, EventAggregator];
-        };
-
         AppRouter.prototype.loadUrl = function loadUrl(url) {
-          var _this2 = this;
+          var _this3 = this;
 
           return this.createNavigationInstruction(url).then(function (instruction) {
-            return _this2.queueInstruction(instruction);
+            return _this3.queueInstruction(instruction);
           })['catch'](function (error) {
             logger.error(error);
-            restorePreviousLocation(_this2);
+            restorePreviousLocation(_this3);
           });
         };
 
         AppRouter.prototype.queueInstruction = function queueInstruction(instruction) {
-          var _this3 = this;
+          var _this4 = this;
 
           return new Promise(function (resolve) {
             instruction.resolve = resolve;
-            _this3.queue.unshift(instruction);
-            _this3.dequeueInstruction();
+            _this4.queue.unshift(instruction);
+            _this4.dequeueInstruction();
           });
         };
 
         AppRouter.prototype.dequeueInstruction = function dequeueInstruction() {
-          var _this4 = this;
+          var _this5 = this;
 
-          var instructionCount = arguments[0] === undefined ? 0 : arguments[0];
+          var instructionCount = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
           return Promise.resolve().then(function () {
-            if (_this4.isNavigating && !instructionCount) {
+            if (_this5.isNavigating && !instructionCount) {
               return;
             }
 
-            var instruction = _this4.queue.shift();
-            _this4.queue = [];
+            var instruction = _this5.queue.shift();
+            _this5.queue = [];
 
             if (!instruction) {
               return;
             }
 
-            _this4.isNavigating = true;
+            _this5.isNavigating = true;
 
             if (!instructionCount) {
-              _this4.events.publish('router:navigation:processing', { instruction: instruction });
-            } else if (instructionCount === _this4.maxInstructionCount - 1) {
+              _this5.events.publish('router:navigation:processing', { instruction: instruction });
+            } else if (instructionCount === _this5.maxInstructionCount - 1) {
               logger.error(instructionCount + 1 + ' navigation instructions have been attempted without success. Restoring last known good location.');
-              restorePreviousLocation(_this4);
-              return _this4.dequeueInstruction(instructionCount + 1);
-            } else if (instructionCount > _this4.maxInstructionCount) {
+              restorePreviousLocation(_this5);
+              return _this5.dequeueInstruction(instructionCount + 1);
+            } else if (instructionCount > _this5.maxInstructionCount) {
               throw new Error('Maximum navigation attempts exceeded. Giving up.');
             }
 
-            var context = _this4.createNavigationContext(instruction);
-            var pipeline = _this4.pipelineProvider.createPipeline(context);
+            var context = _this5.createNavigationContext(instruction);
+            var pipeline = _this5.pipelineProvider.createPipeline(context);
 
             return pipeline.run(context).then(function (result) {
-              return processResult(instruction, result, instructionCount, _this4);
+              return processResult(instruction, result, instructionCount, _this5);
             })['catch'](function (error) {
               return { output: error instanceof Error ? error : new Error(error) };
             }).then(function (result) {
-              return resolveInstruction(instruction, result, !!instructionCount, _this4);
+              return resolveInstruction(instruction, result, !!instructionCount, _this5);
             });
           });
         };
 
         AppRouter.prototype.registerViewPort = function registerViewPort(viewPort, name) {
-          var _this5 = this;
+          var _this6 = this;
 
           _Router.prototype.registerViewPort.call(this, viewPort, name);
 
@@ -1678,8 +1690,8 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
               var result = Promise.resolve(viewModel.configureRouter(config, this));
 
               return result.then(function () {
-                _this5.configure(config);
-                _this5.activate();
+                _this6.configure(config);
+                _this6.activate();
               });
             } else {
               this.activate();
@@ -1695,14 +1707,14 @@ System.register(['core-js', 'aurelia-dependency-injection', 'aurelia-route-recog
           }
 
           if (viewPort.container) {
-            var _container = viewPort.container;
+            var container = viewPort.container;
 
-            while (_container) {
-              if (_container.viewModel) {
-                return this.container.viewModel = _container.viewModel;
+            while (container) {
+              if (container.viewModel) {
+                return this.container.viewModel = container.viewModel;
               }
 
-              _container = _container.parent;
+              container = container.parent;
             }
           }
         };

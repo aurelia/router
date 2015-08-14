@@ -34,7 +34,7 @@ export class NavModel {
   /**
   * The route config.
   */
-  config: object = null;
+  config: Object = null;
 
   constructor(router, relativeHref) {
     this.router = router;

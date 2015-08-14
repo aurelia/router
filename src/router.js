@@ -16,7 +16,7 @@ import {RouteConfig} from './interfaces';
 
 /**
 * The primary class responsible for handling routing and navigation.
-* 
+*
 * @class Router
 * @constructor
 */
@@ -76,7 +76,7 @@ export class Router {
 
   /**
   * Registers a viewPort to be used as a rendering target for activated routes.
-  * 
+  *
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
@@ -88,13 +88,13 @@ export class Router {
   /**
   * Returns a Promise that resolves when the router is configured.
   */
-  ensureConfigured():Promise {
+  ensureConfigured():Promise<void> {
     return this._configuredPromise;
   }
 
   /**
   * Configures the router.
-  * 
+  *
   * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
   * @chainable
   */
@@ -117,7 +117,7 @@ export class Router {
 
   /**
   * Navigates to a new location.
-  * 
+  *
   * @param fragment The URL fragment to use as the navigation destination.
   * @param options The navigation options.
   */
@@ -132,7 +132,7 @@ export class Router {
   /**
   * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
   * by [[Router.navigate]].
-  * 
+  *
   * @param route The name of the route to use when generating the navigation location.
   * @param params The route parameters to be used when populating the route pattern.
   * @param options The navigation options.
@@ -143,7 +143,7 @@ export class Router {
   }
 
   /**
-  * Navigates back to the most recent location in history.                 
+  * Navigates back to the most recent location in history.
   */
   navigateBack() {
     this.history.navigateBack();
@@ -163,10 +163,10 @@ export class Router {
 
   /**
   * Generates a URL fragment matching the specified route pattern.
-  * 
+  *
   * @param name The name of the route whose pattern should be used to generate the fragment.
   * @param params The route params to be used to populate the route pattern.
-  * @returns {string} A string containing the generated URL fragment. 
+  * @returns {string} A string containing the generated URL fragment.
   */
   generate(name:string, params?:Object):string {
     let hasRoute = this.recognizer.hasRoute(name);
@@ -184,7 +184,7 @@ export class Router {
 
   /**
   * Creates a [[NavModel]] for the specified route config.
-  * 
+  *
   * @param config The route config.
   */
   createNavModel(config:RouteConfig):NavModel {
@@ -200,7 +200,7 @@ export class Router {
 
   /**
   * Registers a new route with the router.
-  * 
+  *
   * @param config The [[RouteConfig]].
   * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
   */
@@ -263,7 +263,7 @@ export class Router {
 
   /**
   * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
-  * 
+  *
   * @param name The name of the route to check.
   * @returns {boolean}
   */
@@ -273,7 +273,7 @@ export class Router {
 
   /**
   * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
-  * 
+  *
   * @param name The name of the route to check.
   * @returns {boolean}
   */
@@ -283,7 +283,7 @@ export class Router {
 
   /**
   * Register a handler to use when the incoming URL fragment doesn't match any registered routes.
-  * 
+  *
   * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
   */
   handleUnknownRoutes(config?:string|Function|RouteConfig) {
