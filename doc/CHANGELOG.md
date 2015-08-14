@@ -1,3 +1,28 @@
+### 0.11.0 (2015-08-14)
+
+
+#### Bug Fixes
+
+* **router:** Use correct import for core-js We were previously using `import core from core-j ([a4dba7bd](http://github.com/aurelia/router/commit/a4dba7bddd219ebb91b5fff0bd0fdd23bc68cceb))
+
+
+#### Features
+
+* **docs:**
+  * generate api.json from .d.ts file ([070c9a17](http://github.com/aurelia/router/commit/070c9a1798b12a2f9a56835b027e9cb385b8e19a))
+  * generate api.json from .d.ts file ([a9650133](http://github.com/aurelia/router/commit/a9650133908134a3c65af332daed4cf0cdebc3e3))
+* **navigation-plan:** enable configuring the activationStrategy on the route config instead of the vie ([edf87ad9](http://github.com/aurelia/router/commit/edf87ad9d9a63f9539dba312aa7bd0ea7e9b8667))
+* **route-loading:** pass additional context data to the route loader ([5ac66a30](http://github.com/aurelia/router/commit/5ac66a30e2d5fc618e34bda11a5b4334712fe6e3))
+* **router:** add ensureConfigured method ([14ec352c](http://github.com/aurelia/router/commit/14ec352caa9769bcd9b22267611e2f551f8c104c))
+
+
+#### Breaking Changes
+
+* This is a minor breaking change to any code inspecting instruction pipeline status. To update, change uses of the property or string value `cancelled` to `canceled`.
+
+ ([dcecd013](http://github.com/aurelia/router/commit/dcecd0136c68a28d442e04947ae36996cd7fe5e8))
+
+
 ### 0.10.4 (2015-08-05)
 
 
