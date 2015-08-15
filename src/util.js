@@ -1,18 +1,18 @@
-export function processPotential(obj, resolve, reject){
-  if(obj && typeof obj.then === 'function'){
-    var dfd = obj.then(resolve);
+export function processPotential(obj, resolve, reject) {
+  if (obj && typeof obj.then === 'function') {
+    let dfd = obj.then(resolve);
 
-    if(typeof dfd.catch === 'function'){
+    if (typeof dfd.catch === 'function') {
       return dfd.catch(reject);
-    } else if(typeof dfd.fail === 'function'){
+    } else if (typeof dfd.fail === 'function') {
       return dfd.fail(reject);
     }
 
     return dfd;
-  } else{
-    try{
+  } else {
+    try {
       return resolve(obj);
-    }catch(error){
+    } catch(error) {
       return reject(error);
     }
   }

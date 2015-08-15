@@ -1,37 +1,39 @@
 import {activationStrategy} from './navigation-plan';
+import {Router} from './router';
+import {NavigationInstruction} from './navigation-instruction';
 
 export class NavigationContext {
-  constructor(router, nextInstruction) {
+  constructor(router : Router, nextInstruction : NavigationInstruction) {
     this.router = router;
     this.nextInstruction = nextInstruction;
     this.currentInstruction = router.currentInstruction;
     this.prevInstruction = router.currentInstruction;
   }
 
-  getAllContexts(acc = []) {
+  getAllContexts(acc : Array = []) : Array {
     acc.push(this);
-    if(this.plan) {
-      for (var key in this.plan) {
+    if (this.plan) {
+      for (let key in this.plan) {
         this.plan[key].childNavigationContext && this.plan[key].childNavigationContext.getAllContexts(acc);
       }
     }
     return acc;
   }
 
-  get nextInstructions() {
+  get nextInstructions() : Array<NavigationInstruction> {
     return this.getAllContexts().map(c => c.nextInstruction).filter(c => c);
   }
 
-  get currentInstructions() {
+  get currentInstructions() : Array<NavigationInstruction> {
     return this.getAllContexts().map(c => c.currentInstruction).filter(c => c);
   }
 
-  get prevInstructions() {
+  get prevInstructions() : Array<NavigationInstruction> {
     return this.getAllContexts().map(c => c.prevInstruction).filter(c => c);
   }
 
-  commitChanges(waitToSwap) {
-    var next = this.nextInstruction,
+  commitChanges(waitToSwap : boolean) {
+    let next = this.nextInstruction,
         prev = this.prevInstruction,
         viewPortInstructions = next.viewPortInstructions,
         router = this.router,
@@ -49,25 +51,25 @@ export class NavigationContext {
     router.refreshBaseUrl();
     router.refreshNavigation();
 
-    for (var viewPortName in viewPortInstructions) {
-      var viewPortInstruction = viewPortInstructions[viewPortName];
-      var viewPort = router.viewPorts[viewPortName];
+    for (let viewPortName in viewPortInstructions) {
+      let viewPortInstruction = viewPortInstructions[viewPortName];
+      let viewPort = router.viewPorts[viewPortName];
 
-      if(!viewPort){
+      if (!viewPort) {
         throw new Error(`There was no router-view found in the view for ${viewPortInstruction.moduleId}.`);
       }
 
       if (viewPortInstruction.strategy === activationStrategy.replace) {
-        if(waitToSwap){
+        if (waitToSwap) {
           delaySwaps.push({viewPort, viewPortInstruction});
         }
 
-        loads.push(viewPort.process(viewPortInstruction, waitToSwap).then(x => {
+        loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
           if ('childNavigationContext' in viewPortInstruction) {
             return viewPortInstruction.childNavigationContext.commitChanges();
           }
         }));
-      }else{
+      } else {
         if ('childNavigationContext' in viewPortInstruction) {
           loads.push(viewPortInstruction.childNavigationContext.commitChanges(waitToSwap));
         }
@@ -79,24 +81,24 @@ export class NavigationContext {
     });
   }
 
-  updateTitle() {
+  updateTitle() : void {
     let title = this.buildTitle();
     if (title) {
       document.title = title;
     }
   }
 
-  buildTitle(separator=' | ') {
-    var next = this.nextInstruction,
+  buildTitle(separator : string = ' | ') : string {
+    let next = this.nextInstruction,
         title = next.config.navModel.title || '',
         viewPortInstructions = next.viewPortInstructions,
         childTitles = [];
 
-    for (var viewPortName in viewPortInstructions) {
-      var viewPortInstruction = viewPortInstructions[viewPortName];
+    for (let viewPortName in viewPortInstructions) {
+      let viewPortInstruction = viewPortInstructions[viewPortName];
 
       if ('childNavigationContext' in viewPortInstruction) {
-        var childTitle = viewPortInstruction.childNavigationContext.buildTitle(separator);
+        let childTitle = viewPortInstruction.childNavigationContext.buildTitle(separator);
         if (childTitle) {
           childTitles.push(childTitle);
         }
@@ -116,7 +118,7 @@ export class NavigationContext {
 }
 
 export class CommitChangesStep {
-  run(navigationContext, next) {
+  run(navigationContext : NavigationContext, next : Function) {
     return navigationContext.commitChanges(true).then(() => {
       navigationContext.updateTitle();
       return next();

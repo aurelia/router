@@ -7,12 +7,13 @@ import {PipelineProvider} from './pipeline-provider';
 import {isNavigationCommand} from './navigation-commands';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {RouterConfiguration} from './router-configuration';
+import {NavigationInstruction} from './navigation-instruction';
 
 const logger = LogManager.getLogger('app-router');
 
 export class AppRouter extends Router {
   static inject(){ return [Container, History, PipelineProvider, EventAggregator]; }
-  constructor(container, history, pipelineProvider, events) {
+  constructor(container : Container, history: History, pipelineProvider : PipelineProvider, events : EventAggregator) {
     super(container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener('click', handleLinkClick.bind(this), true);
@@ -20,11 +21,11 @@ export class AppRouter extends Router {
     this.maxInstructionCount = 10;
   }
 
-  get isRoot() {
+  get isRoot() : boolean {
     return true;
   }
 
-  loadUrl(url) {
+  loadUrl(url) : Promise<NavigationInstruction> {
     return this.createNavigationInstruction(url)
       .then(instruction => this.queueInstruction(instruction))
       .catch(error => {
@@ -33,15 +34,15 @@ export class AppRouter extends Router {
       });
   }
 
-  queueInstruction(instruction) {
-    return new Promise(resolve => {
+  queueInstruction(instruction : NavigationInstruction) : Promise {
+    return new Promise((resolve) => {
       instruction.resolve = resolve;
       this.queue.unshift(instruction);
       this.dequeueInstruction();
     });
   }
 
-  dequeueInstruction(instructionCount = 0) {
+  dequeueInstruction(instructionCount : number = 0) : Promise {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
         return;
@@ -79,21 +80,21 @@ export class AppRouter extends Router {
     });
   }
 
-  registerViewPort(viewPort, name) {
+  registerViewPort(viewPort : Object, name : string) : void {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
       let viewModel = this._findViewModel(viewPort);
 
-      if('configureRouter' in viewModel){
-        var config = new RouterConfiguration();
-        var result = Promise.resolve(viewModel.configureRouter(config, this));
+      if ('configureRouter' in viewModel) {
+        let config = new RouterConfiguration();
+        let result = Promise.resolve(viewModel.configureRouter(config, this));
 
         return result.then(() => {
           this.configure(config);
           this.activate();
         });
-      }else{
+      } else {
         this.activate();
       }
     } else {
@@ -101,16 +102,16 @@ export class AppRouter extends Router {
     }
   }
 
-  _findViewModel(viewPort){
-    if(this.container.viewModel){
+  _findViewModel(viewPort : Object) {
+    if (this.container.viewModel) {
       return this.container.viewModel;
     }
 
-    if(viewPort.container){
+    if (viewPort.container) {
       let container = viewPort.container;
 
-      while(container){
-        if(container.viewModel){
+      while(container) {
+        if (container.viewModel) {
           return this.container.viewModel = container.viewModel;
         }
 
@@ -119,7 +120,7 @@ export class AppRouter extends Router {
     }
   }
 
-  activate(options) {
+  activate(options : Object) : void {
     if (this.isActive) {
       return;
     }
@@ -130,12 +131,12 @@ export class AppRouter extends Router {
     this.dequeueInstruction();
   }
 
-  deactivate() {
+  deactivate() : void {
     this.isActive = false;
     this.history.deactivate();
   }
 
-  reset() {
+  reset() : void {
     super.reset();
     this.queue = [];
     this.options = null;
@@ -154,14 +155,14 @@ function handleLinkClick(evt) {
     return;
   }
 
-  var target = findAnchor(evt.target);
+  let target = findAnchor(evt.target);
   if (!target) {
     return;
   }
 
   if (this.history._hasPushState) {
     if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
-      var href = target.getAttribute('href');
+      let href = target.getAttribute('href');
 
       // Ensure the protocol is not part of URL, meaning its relative.
       // Stop the event bubbling to ensure the link will not cause a page refresh.
@@ -174,7 +175,7 @@ function handleLinkClick(evt) {
 }
 
 function targetIsThisWindow(target) {
-  var targetWindow = target.getAttribute('target');
+  let targetWindow = target.getAttribute('target');
 
   return !targetWindow ||
     targetWindow === window.name ||
