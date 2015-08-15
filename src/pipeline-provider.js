@@ -10,10 +10,11 @@ import {
   ActivateNextStep
 } from './activation';
 import {createRouteFilterStep} from './route-filters';
+import {NavigationContext} from './navigation-context';
 
 export class PipelineProvider {
-  static inject(){ return [Container]; }
-  constructor(container){
+  static inject() {return [Container];}
+  constructor(container : Container) {
     this.container = container;
     this.steps = [
       BuildNavigationPlanStep,
@@ -31,7 +32,7 @@ export class PipelineProvider {
     ];
   }
 
-  createPipeline(navigationContext) {
+  createPipeline(navigationContext : NavigationContext) : Pipeline {
     var pipeline = new Pipeline();
     this.steps.forEach(step => pipeline.withStep(this.container.get(step)));
     return pipeline;

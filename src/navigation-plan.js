@@ -7,10 +7,10 @@ export const activationStrategy = {
   replace: 'replace'
 };
 
-export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
-  var prev = navigationContext.prevInstruction;
-  var next = navigationContext.nextInstruction;
-  var plan = {}, viewPortName;
+export function buildNavigationPlan(navigationContext : NavigationContext, forceLifecycleMinimum) : Promise {
+  let prev = navigationContext.prevInstruction;
+  let next = navigationContext.nextInstruction;
+  let plan = {}, viewPortName;
 
   if ('redirect' in next.config) {
     let redirectLocation = resolveUrl(next.config.redirect, getInstructionBaseUrl(next));
@@ -22,13 +22,13 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
   }
 
   if (prev) {
-    var newParams = hasDifferentParameterValues(prev, next);
-    var pending = [];
+    let newParams = hasDifferentParameterValues(prev, next);
+    let pending = [];
 
     for (viewPortName in prev.viewPortInstructions) {
-      var prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
-      var nextViewPortConfig = next.config.viewPorts[viewPortName];
-      var viewPortPlan = plan[viewPortName] = {
+      let prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
+      let nextViewPortConfig = next.config.viewPorts[viewPortName];
+      let viewPortPlan = plan[viewPortName] = {
         name: viewPortName,
         config: nextViewPortConfig,
         prevComponent: prevViewPortInstruction.component,
@@ -50,8 +50,8 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
       }
 
       if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
-        var path = next.getWildcardPath();
-        var task = prevViewPortInstruction.childRouter
+        let path = next.getWildcardPath();
+        let task = prevViewPortInstruction.childRouter
           .createNavigationInstruction(path, next).then(childInstruction => {
             viewPortPlan.childNavigationContext = prevViewPortInstruction.childRouter
               .createNavigationContext(childInstruction);
@@ -69,7 +69,7 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
     }
 
     return Promise.all(pending).then(() => plan);
-  }else{
+  } else {
     for (viewPortName in next.config.viewPorts) {
       plan[viewPortName] = {
         name: viewPortName,
@@ -83,7 +83,7 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
 }
 
 export class BuildNavigationPlanStep {
-  run(navigationContext, next) {
+  run(navigationContext : NavigationContext, next : Function) {
     return buildNavigationPlan(navigationContext)
       .then(plan => {
         navigationContext.plan = plan;
@@ -92,12 +92,12 @@ export class BuildNavigationPlanStep {
   }
 }
 
-function hasDifferentParameterValues(prev, next) {
-  var prevParams = prev.params,
+function hasDifferentParameterValues(prev : NavigationInstruction, next : NavigationInstruction) : boolean {
+  let prevParams = prev.params,
       nextParams = next.params,
       nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
-  for (var key in nextParams) {
+  for (let key in nextParams) {
     if (key === nextWildCardName) {
       continue;
     }
@@ -107,7 +107,7 @@ function hasDifferentParameterValues(prev, next) {
     }
   }
 
-  for (var key in prevParams) {
+  for (let key in prevParams) {
     if (key === nextWildCardName) {
       continue;
     }
@@ -120,9 +120,9 @@ function hasDifferentParameterValues(prev, next) {
   return false;
 }
 
-function getInstructionBaseUrl(instruction) {
+function getInstructionBaseUrl(instruction : NavigationInstruction) : string {
     let instructionBaseUrlParts = [];
-    while(instruction = instruction.parentInstruction) {
+    while (instruction = instruction.parentInstruction) {
       instructionBaseUrlParts.unshift(instruction.getBaseUrl());
     }
 

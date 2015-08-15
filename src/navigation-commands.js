@@ -6,7 +6,7 @@ import * as core from 'core-js';
  * @param {object} obj The item to check.
  * @return {boolean}
  */
-export function isNavigationCommand(obj){
+export function isNavigationCommand(obj) : boolean {
   return obj && typeof obj.navigate === 'function';
 }
 
@@ -17,10 +17,10 @@ export function isNavigationCommand(obj){
 * @constructor
 * @param {String} url The url to redirect to.
 */
-export class Redirect{
-  constructor(url, options?) {
+export class Redirect {
+  constructor(url : string, options : Object = {}) {
     this.url = url;
-    this.options = Object.assign({ trigger: true, replace: true }, options || {});
+    this.options = Object.assign({ trigger: true, replace: true }, options);
     this.shouldContinueProcessing = false;
   }
 
@@ -30,7 +30,7 @@ export class Redirect{
   * @method setRouter
   * @param {Router} router
   */
-  setRouter(router){
+  setRouter(router : Router) : void {
     this.router = router;
   }
 
@@ -40,7 +40,7 @@ export class Redirect{
   * @method navigate
   * @param {Router} appRouter - a router which should redirect
   */
-  navigate(appRouter){
+  navigate(appRouter : Router) : void {
     var navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
     navigatingRouter.navigate(this.url, this.options);
   }

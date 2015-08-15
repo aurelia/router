@@ -17,14 +17,12 @@ export const pipelineStatus = {
 };
 
 export class Pipeline {
-  constructor() {
-    this.steps = [];
-  }
+  steps: Array = [];
 
   withStep(step) {
-    var run, steps, i, l;
+    let run, steps, i, l;
 
-    if (typeof step == 'function') {
+    if (typeof step === 'function') {
       run = step;
     } else if (step.isMultiStep) {
       steps = step.getSteps();
@@ -43,7 +41,7 @@ export class Pipeline {
   }
 
   run(ctx) {
-    var index = -1,
+    let index = -1,
         steps = this.steps,
         next, currentStep;
 
@@ -63,19 +61,19 @@ export class Pipeline {
       }
     };
 
-    next.complete = output => {
+    next.complete = (output) => {
       next.status = pipelineStatus.completed;
       next.output = output;
       return Promise.resolve(createResult(ctx, next));
     };
 
-    next.cancel = reason => {
+    next.cancel = (reason) => {
       next.status = pipelineStatus.canceled;
       next.output = reason;
       return Promise.resolve(createResult(ctx, next));
     };
 
-    next.reject = error => {
+    next.reject = (error) => {
       next.status = pipelineStatus.rejected;
       next.output = error;
       return Promise.resolve(createResult(ctx, next));
