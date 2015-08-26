@@ -95,7 +95,7 @@ function addPreviousDeactivatable(component, callbackName, list) : void {
     for (let viewPortName in viewPortInstructions) {
       let viewPortInstruction = viewPortInstructions[viewPortName];
       let prevComponent = viewPortInstruction.component;
-      let prevController = prevComponent.executionContext;
+      let prevController = prevComponent.bindingContext;
 
       if (callbackName in prevController) {
         list.push(prevController);
@@ -145,7 +145,7 @@ function findActivatable(navigationContext : NavigationContext, callbackName : s
   Object.keys(plan).filter((viewPortName) => {
     let viewPortPlan = plan[viewPortName];
     let viewPortInstruction = next.viewPortInstructions[viewPortName];
-    let controller = viewPortInstruction.component.executionContext;
+    let controller = viewPortInstruction.component.bindingContext;
 
     if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in controller) {
       list.push({
