@@ -18,7 +18,7 @@ export function isNavigationCommand(obj){
 * @param {String} url The url to redirect to.
 */
 export class Redirect{
-  constructor(url, options) {
+  constructor(url, options?) {
     this.url = url;
     this.options = Object.assign({ trigger: true, replace: true }, options || {});
     this.shouldContinueProcessing = false;
