@@ -79,7 +79,7 @@ function loadRoute(routeLoader : RouteLoader, navigationContext : NavigationCont
       component
       );
 
-    let controller = component.executionContext,
+    let controller = component.bindingContext,
         childRouter = component.childRouter;
 
     if (childRouter) {
@@ -110,11 +110,11 @@ function loadComponent(routeLoader : RouteLoader, navigationContext : Navigation
     component.router = router;
     component.config = config;
 
-    if ('configureRouter' in component.executionContext) {
+    if('configureRouter' in component.bindingContext){
       component.childRouter = component.childContainer.getChildRouter();
 
       let config = new RouterConfiguration();
-      let result = Promise.resolve(component.executionContext.configureRouter(config, component.childRouter, ...lifecycleArgs));
+      let result = Promise.resolve(component.bindingContext.configureRouter(config, component.childRouter, ...lifecycleArgs));
 
       return result.then(() => {
         component.childRouter.configure(config);

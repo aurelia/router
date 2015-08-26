@@ -68,7 +68,7 @@ function findDeactivatable(plan, callbackName, list : Array<Object> = []) : Arra
         viewPortPlan.strategy == activationStrategy.replace) &&
         prevComponent) {
 
-      let controller = prevComponent.executionContext;
+      let controller = prevComponent.bindingContext;
 
       if (callbackName in controller) {
         list.push(controller);
@@ -86,7 +86,7 @@ function findDeactivatable(plan, callbackName, list : Array<Object> = []) : Arra
 }
 
 function addPreviousDeactivatable(component, callbackName, list) : void {
-  let controller = component.executionContext,
+  let controller = component.bindingContext,
       childRouter = component.childRouter;
 
   if (childRouter && childRouter.currentInstruction) {
