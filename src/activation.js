@@ -70,7 +70,7 @@ function findDeactivatable(plan, callbackName, list) {
 
       var controller = prevComponent.bindingContext;
 
-      for (callbackName in controller) {
+      if (controller !== undefined && callbackName in controller) {
         list.push(controller);
       }
     }
@@ -97,7 +97,7 @@ function addPreviousDeactivatable(component, callbackName, list) {
       var prevComponent = viewPortInstruction.component;
       var prevController = prevComponent.bindingContext;
 
-      for (callbackName in prevController) {
+      if (prevController !== undefined && callbackName in prevController) {
         list.push(prevController);
       }
 
