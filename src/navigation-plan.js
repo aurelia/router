@@ -37,9 +37,9 @@ export function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
 
       if (prevViewPortInstruction.moduleId != nextViewPortConfig.moduleId) {
         viewPortPlan.strategy = activationStrategy.replace;
-      } else if ('determineActivationStrategy' in prevViewPortInstruction.component.executionContext) {
+      } else if ('determineActivationStrategy' in prevViewPortInstruction.component.bindingContext) {
          //TODO: should we tell them if the parent had a lifecycle min change?
-        viewPortPlan.strategy = prevViewPortInstruction.component.executionContext
+        viewPortPlan.strategy = prevViewPortInstruction.component.bindingContext
           .determineActivationStrategy(...next.lifecycleArgs);
       } else if(next.config.activationStrategy){
         viewPortPlan.strategy = next.config.activationStrategy;

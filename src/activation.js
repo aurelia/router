@@ -68,7 +68,7 @@ function findDeactivatable(plan, callbackName, list) {
         viewPortPlan.strategy == activationStrategy.replace) &&
         prevComponent) {
 
-      var controller = prevComponent.executionContext;
+      var controller = prevComponent.bindingContext;
 
       if (callbackName in controller) {
         list.push(controller);
@@ -86,7 +86,7 @@ function findDeactivatable(plan, callbackName, list) {
 }
 
 function addPreviousDeactivatable(component, callbackName, list) {
-  var controller = component.executionContext,
+  var controller = component.bindingContext,
       childRouter = component.childRouter;
 
   if (childRouter && childRouter.currentInstruction) {
@@ -95,7 +95,7 @@ function addPreviousDeactivatable(component, callbackName, list) {
     for (var viewPortName in viewPortInstructions) {
       var viewPortInstruction = viewPortInstructions[viewPortName];
       var prevComponent = viewPortInstruction.component;
-      var prevController = prevComponent.executionContext;
+      var prevController = prevComponent.bindingContext;
 
       if (callbackName in prevController) {
         list.push(prevController);
@@ -147,7 +147,7 @@ function findActivatable(navigationContext, callbackName, list, router) {
   Object.keys(plan).filter(viewPortName => {
     var viewPortPlan = plan[viewPortName];
     var viewPortInstruction = next.viewPortInstructions[viewPortName];
-    var controller = viewPortInstruction.component.executionContext;
+    var controller = viewPortInstruction.component.bindingContext;
 
     if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in controller) {
       list.push({
