@@ -69,7 +69,7 @@ declare module 'aurelia-router' {
   export class RouteFilterContainer {
     static inject(): any;
     constructor(container: any);
-    addStep(name: any, step: any, index?: any): any;
+    addStep(name: any, step: any, index?: any): void;
     getFilterSteps(name: any): any;
   }
   export function createRouteFilterStep(name: any): any;
@@ -144,7 +144,7 @@ declare module 'aurelia-router' {
       * @method setTitle
       * @param title The new title.
       */
-    setTitle(title: any): any;
+    setTitle(title: any): void;
   }
   export function processPotential(obj: any, resolve: any, reject: any): any;
   export function normalizeAbsolutePath(path: any, hasPushState: any): any;
@@ -157,7 +157,7 @@ declare module 'aurelia-router' {
    * @param {object} obj The item to check.
    * @return {boolean}
    */
-  export function isNavigationCommand(obj: any): any;
+  export function isNavigationCommand(obj: any): boolean;
   
   /**
   * Used during the activation lifecycle to cause a redirect.
@@ -175,7 +175,7 @@ declare module 'aurelia-router' {
       * @method setRouter
       * @param {Router} router
       */
-    setRouter(router: any): any;
+    setRouter(router: any): void;
     
     /**
       * Called by the navigation pipeline to navigate.
@@ -183,7 +183,7 @@ declare module 'aurelia-router' {
       * @method navigate
       * @param {Router} appRouter - a router which should redirect
       */
-    navigate(appRouter: any): any;
+    navigate(appRouter: any): void;
   }
   
   /**
@@ -237,10 +237,10 @@ declare module 'aurelia-router' {
       *
       * @param router The [[Router]] to apply the configuration to.
       */
-    exportToRouter(router: Router): any;
+    exportToRouter(router: Router): void;
   }
   export const activationStrategy: any;
-  export function buildNavigationPlan(navigationContext: any, forceLifecycleMinimum: any): any;
+  export function buildNavigationPlan(navigationContext: any, forceLifecycleMinimum: any): Promise<any>;
   export class BuildNavigationPlanStep {
     run(navigationContext: any, next: any): any;
   }
@@ -263,22 +263,22 @@ declare module 'aurelia-router' {
     nextInstructions(): any;
     currentInstructions(): any;
     prevInstructions(): any;
-    commitChanges(waitToSwap: any): any;
-    updateTitle(): any;
+    commitChanges(waitToSwap: any): Promise<void>;
+    updateTitle(): void;
     buildTitle(separator?: any): any;
   }
   export class CommitChangesStep {
     run(navigationContext: any, next: any): any;
   }
   export class RouteLoader {
-    loadRoute(router: any, config: any, navigationContext: any): any;
+    loadRoute(router: any, config: any, navigationContext: any): void;
   }
   export class LoadRouteStep {
     static inject(): any;
     constructor(routeLoader: any);
-    run(navigationContext: any, next: any): any;
+    run(navigationContext: any, next: any): Promise<any>;
   }
-  export function loadNewRoute(routeLoader: any, navigationContext: any): any;
+  export function loadNewRoute(routeLoader: any, navigationContext: any): Promise<any>;
   
   /**
   * The primary class responsible for handling routing and navigation.
@@ -337,7 +337,7 @@ declare module 'aurelia-router' {
       * @param viewPort The viewPort.
       * @param name The name of the viewPort. 'default' if unspecified.
       */
-    registerViewPort(viewPort: Object, name?: string): any;
+    registerViewPort(viewPort: Object, name?: string): void;
     
     /**
       * Returns a Promise that resolves when the router is configured.
@@ -373,7 +373,7 @@ declare module 'aurelia-router' {
     /**
       * Navigates back to the most recent location in history.
       */
-    navigateBack(): any;
+    navigateBack(): void;
     
     /**
        * Creates a child router of the current router.
@@ -405,7 +405,7 @@ declare module 'aurelia-router' {
       * @param config The [[RouteConfig]].
       * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
       */
-    addRoute(config: RouteConfig, navModel?: NavModel): any;
+    addRoute(config: RouteConfig, navModel?: NavModel): void;
     
     /**
       * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
@@ -428,7 +428,7 @@ declare module 'aurelia-router' {
       *
       * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
       */
-    handleUnknownRoutes(config?: string | Function | RouteConfig): any;
+    handleUnknownRoutes(config?: string | Function | RouteConfig): void;
     
     /**
       * Updates the document title using the current navigation instruction.
@@ -438,9 +438,9 @@ declare module 'aurelia-router' {
     /**
       * Resets the Router to its original unconfigured state.
       */
-    reset(): any;
-    refreshBaseUrl(): any;
-    refreshNavigation(): any;
+    reset(): void;
+    refreshBaseUrl(): void;
+    refreshNavigation(): void;
     createNavigationInstruction(url?: string, parentInstruction?: NavigationInstruction): Promise<NavigationInstruction>;
     createNavigationContext(instruction: NavigationInstruction): NavigationContext;
   }
@@ -453,12 +453,12 @@ declare module 'aurelia-router' {
     static inject(): any;
     constructor(container: any, history: any, pipelineProvider: any, events: any);
     isRoot(): any;
-    loadUrl(url: any): any;
-    queueInstruction(instruction: any): any;
-    dequeueInstruction(instructionCount?: any): any;
-    registerViewPort(viewPort: any, name: any): any;
-    activate(options: any): any;
-    deactivate(): any;
-    reset(): any;
+    loadUrl(url: any): Promise<any>;
+    queueInstruction(instruction: any): Promise<any>;
+    dequeueInstruction(instructionCount?: any): void;
+    registerViewPort(viewPort: any, name: any): Promise<void>;
+    activate(options: any): void;
+    deactivate(): void;
+    reset(): void;
   }
 }
