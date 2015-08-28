@@ -347,7 +347,8 @@ export class Router {
 
     for(var i = 0, length = nav.length; i < length; i++) {
       var current = nav[i];
-      current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+      if (!current.href)
+        current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
     }
   }
 
