@@ -5,25 +5,25 @@ import {processPotential} from './util';
 export var affirmations = ['yes', 'ok', 'true'];
 
 export class CanDeactivatePreviousStep {
-  run(navigationContext, next) {
+  run(navigationContext: any, next: any): any {
     return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
   }
 }
 
 export class CanActivateNextStep {
-  run(navigationContext, next) {
+  run(navigationContext: any, next: any): any {
     return processActivatable(navigationContext, 'canActivate', next);
   }
 }
 
 export class DeactivatePreviousStep {
-  run(navigationContext, next) {
+  run(navigationContext: any, next: any): any {
     return processDeactivatable(navigationContext.plan, 'deactivate', next, true);
   }
 }
 
 export class ActivateNextStep {
-  run(navigationContext, next) {
+  run(navigationContext: any, next: any): any {
     return processActivatable(navigationContext, 'activate', next, true);
   }
 }
