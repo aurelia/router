@@ -12,7 +12,7 @@ const logger = LogManager.getLogger('app-router');
 
 export class AppRouter extends Router {
   static inject(){ return [Container, History, PipelineProvider, EventAggregator]; }
-  constructor(container, history, pipelineProvider, events) {
+  constructor(container: any, history: any, pipelineProvider: any, events: any) {
     super(container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener('click', handleLinkClick.bind(this), true);
@@ -20,11 +20,11 @@ export class AppRouter extends Router {
     this.maxInstructionCount = 10;
   }
 
-  get isRoot() {
+  get isRoot(): any {
     return true;
   }
 
-  loadUrl(url) {
+  loadUrl(url: any): Promise<any> {
     return this.createNavigationInstruction(url)
       .then(instruction => this.queueInstruction(instruction))
       .catch(error => {
@@ -33,7 +33,7 @@ export class AppRouter extends Router {
       });
   }
 
-  queueInstruction(instruction) {
+  queueInstruction(instruction: any): Promise<any> {
     return new Promise(resolve => {
       instruction.resolve = resolve;
       this.queue.unshift(instruction);
@@ -41,7 +41,7 @@ export class AppRouter extends Router {
     });
   }
 
-  dequeueInstruction(instructionCount = 0) {
+  dequeueInstruction(instructionCount = 0): Promise<any> {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
         return;
@@ -79,7 +79,7 @@ export class AppRouter extends Router {
     });
   }
 
-  registerViewPort(viewPort, name) {
+  registerViewPort(viewPort: any, name: any): Promise<void> {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
@@ -119,7 +119,7 @@ export class AppRouter extends Router {
     }
   }
 
-  activate(options) {
+  activate(options: any): void {
     if (this.isActive) {
       return;
     }
@@ -130,12 +130,12 @@ export class AppRouter extends Router {
     this.dequeueInstruction();
   }
 
-  deactivate() {
+  deactivate(): void {
     this.isActive = false;
     this.history.deactivate();
   }
 
-  reset() {
+  reset(): void {
     super.reset();
     this.queue = [];
     this.options = null;
