@@ -61,9 +61,6 @@ export class Router {
   constructor(container, history) {
     this.container = container;
     this.history = history;
-    this._configuredPromise = new Promise((resolve => {
-      this._resolveConfiguredPromise = resolve;
-    }));
     this.reset();
   }
 
@@ -332,6 +329,13 @@ export class Router {
     this.routes = [];
     this.isNavigating = false;
     this.navigation = [];
+
+    if (this.isConfigured || !this._configuredPromise) {
+      this._configuredPromise = new Promise((resolve => {
+        this._resolveConfiguredPromise = resolve;
+      }));
+    }
+
     this.isConfigured = false;
   }
 
