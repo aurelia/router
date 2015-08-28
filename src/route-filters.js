@@ -8,7 +8,7 @@ export class RouteFilterContainer {
     this.filterCache = { };
   }
 
-  addStep(name, step, index = -1) {
+  addStep(name: any, step: any, index = -1): void {
     var filter = this.filters[name];
     if (!filter) {
       filter = this.filters[name] = [];
@@ -22,7 +22,7 @@ export class RouteFilterContainer {
     this.filterCache = {};
   }
 
-  getFilterSteps(name) {
+  getFilterSteps(name: any): any {
     if (this.filterCache[name]) {
       return this.filterCache[name];
     }
@@ -45,7 +45,7 @@ export class RouteFilterContainer {
   }
 }
 
-export function createRouteFilterStep(name) {
+export function createRouteFilterStep(name: any): any {
   function create(routeFilterContainer) {
     return new RouteFilterStep(name, routeFilterContainer);
   };
@@ -62,7 +62,7 @@ class RouteFilterStep {
     this.isMultiStep = true;
   }
 
-  getSteps() {
+  getSteps(): any {
     return this.routeFilterContainer.getFilterSteps(this.name);
   }
 }
