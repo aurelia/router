@@ -49,7 +49,7 @@ export class NavModel {
   * @method setTitle
   * @param title The new title.
   */
-  setTitle(title : string) : void {
+  setTitle(title: string): void {
     this.title = title;
 
     if (this.isActive) {

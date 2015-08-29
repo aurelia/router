@@ -9,21 +9,21 @@ export function processPotential(obj, resolve, reject) {
     }
 
     return dfd;
-  } else {
-    try {
-      return resolve(obj);
-    } catch(error) {
-      return reject(error);
-    }
+  }
+
+  try {
+    return resolve(obj);
+  } catch(error) {
+    return reject(error);
   }
 }
 
 export function normalizeAbsolutePath(path, hasPushState) {
-    if (!hasPushState && path[0] !== '#') {
-      path = '#' + path;
-    }
+  if (!hasPushState && path[0] !== '#') {
+    path = '#' + path;
+  }
 
-    return path;
+  return path;
 }
 
 export function createRootedPath(fragment, baseUrl, hasPushState) {
@@ -39,11 +39,11 @@ export function createRootedPath(fragment, baseUrl, hasPushState) {
 
   path += baseUrl;
 
-  if ((!path.length || path[path.length - 1] != '/') && fragment[0] != '/') {
+  if ((!path.length || path[path.length - 1] !== '/') && fragment[0] !== '/') {
     path += '/';
   }
 
-  if (path.length && path[path.length - 1] == '/' && fragment[0] == '/') {
+  if (path.length && path[path.length - 1] === '/' && fragment[0] === '/') {
     path = path.substring(0, path.length - 1);
   }
 
@@ -53,9 +53,9 @@ export function createRootedPath(fragment, baseUrl, hasPushState) {
 export function resolveUrl(fragment, baseUrl, hasPushState) {
   if (isRootedPath.test(fragment)) {
     return normalizeAbsolutePath(fragment, hasPushState);
-  } else {
-    return createRootedPath(fragment, baseUrl, hasPushState);
   }
+
+  return createRootedPath(fragment, baseUrl, hasPushState);
 }
 
 const isRootedPath = /^#?\//;

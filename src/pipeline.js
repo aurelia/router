@@ -1,11 +1,11 @@
-import * as core from 'core-js';
+import 'core-js';
 
 function createResult(ctx, next) {
   return {
     status: next.status,
     context: ctx,
     output: next.output,
-    completed: next.status == pipelineStatus.completed
+    completed: next.status === pipelineStatus.completed
   };
 }
 
@@ -20,13 +20,13 @@ export class Pipeline {
   steps: Array = [];
 
   withStep(step) {
-    let run, steps, i, l;
+    let run;
 
     if (typeof step === 'function') {
       run = step;
     } else if (step.isMultiStep) {
-      steps = step.getSteps();
-      for (i = 0, l = steps.length; i < l; i++) {
+      let steps = step.getSteps();
+      for (let i = 0, l = steps.length; i < l; i++) {
         this.withStep(steps[i]);
       }
 
@@ -41,15 +41,14 @@ export class Pipeline {
   }
 
   run(ctx) {
-    let index = -1,
-        steps = this.steps,
-        next, currentStep;
+    let index = -1;
+    let steps = this.steps;
 
-    next = function() {
+    function next() {
       index++;
 
       if (index < steps.length) {
-        currentStep = steps[index];
+        let currentStep = steps[index];
 
         try {
           return currentStep(ctx, next);
@@ -59,7 +58,7 @@ export class Pipeline {
       } else {
         return next.complete();
       }
-    };
+    }
 
     next.complete = (output) => {
       next.status = pipelineStatus.completed;

@@ -1,4 +1,4 @@
-import * as core from 'core-js';
+import 'core-js';
 
 export class NavigationInstruction {
   fragment: string;
@@ -28,14 +28,14 @@ export class NavigationInstruction {
 
       ancestorParams.unshift(currentParams);
       current = current.parentInstruction;
-    } while(current);
+    } while (current);
 
     let allParams = Object.assign({}, queryParams, ...ancestorParams);
     this.lifecycleArgs = [allParams, config, this];
   }
 
   addViewPortInstruction(viewPortName, strategy, moduleId, component): any {
-    return this.viewPortInstructions[viewPortName] = {
+    let viewportInstruction = this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
       strategy: strategy,
       moduleId: moduleId,
@@ -43,6 +43,8 @@ export class NavigationInstruction {
       childRouter: component.childRouter,
       lifecycleArgs: this.lifecycleArgs.slice()
     };
+
+    return viewportInstruction;
   }
 
   getWildCardName(): string {

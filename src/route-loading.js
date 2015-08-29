@@ -2,25 +2,26 @@ import {activationStrategy, buildNavigationPlan} from './navigation-plan';
 import {RouterConfiguration} from './router-configuration';
 
 export class RouteLoader {
-  loadRoute(router : any, config : any, navigationContext : any) {
+  loadRoute(router: any, config: any, navigationContext: any) {
     throw Error('Route loaders must implement "loadRoute(router, config, navigationContext)".');
   }
 }
 
 export class LoadRouteStep {
-  static inject() {return [RouteLoader];}
-  constructor(routeLoader : RouteLoader) {
+  static inject() { return [RouteLoader]; }
+
+  constructor(routeLoader: RouteLoader) {
     this.routeLoader = routeLoader;
   }
 
-  run(navigationContext : NavigationContext, next : Function) {
+  run(navigationContext: NavigationContext, next: Function) {
     return loadNewRoute(this.routeLoader, navigationContext)
       .then(next)
       .catch(next.cancel);
   }
 }
 
-export function loadNewRoute(routeLoader : RouteLoader, navigationContext : NavigationContext) {
+export function loadNewRoute(routeLoader: RouteLoader, navigationContext: NavigationContext) {
   let toLoad = determineWhatToLoad(navigationContext);
   let loadPromises = toLoad.map((current) => loadRoute(
     routeLoader,
@@ -32,14 +33,14 @@ export function loadNewRoute(routeLoader : RouteLoader, navigationContext : Navi
   return Promise.all(loadPromises);
 }
 
-function determineWhatToLoad(navigationContext : NavigationContext, toLoad : Array = []) {
+function determineWhatToLoad(navigationContext: NavigationContext, toLoad: Array = []) {
   let plan = navigationContext.plan;
   let next = navigationContext.nextInstruction;
 
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
 
-    if (viewPortPlan.strategy == activationStrategy.replace) {
+    if (viewPortPlan.strategy === activationStrategy.replace) {
       toLoad.push({
         viewPortPlan: viewPortPlan,
         navigationContext: navigationContext
@@ -66,7 +67,7 @@ function determineWhatToLoad(navigationContext : NavigationContext, toLoad : Arr
   return toLoad;
 }
 
-function loadRoute(routeLoader : RouteLoader, navigationContext : NavigationContext, viewPortPlan : any) {
+function loadRoute(routeLoader: RouteLoader, navigationContext: NavigationContext, viewPortPlan: any) {
   let moduleId = viewPortPlan.config.moduleId;
   let next = navigationContext.nextInstruction;
 
@@ -78,9 +79,7 @@ function loadRoute(routeLoader : RouteLoader, navigationContext : NavigationCont
       component
       );
 
-    let controller = component.bindingContext,
-        childRouter = component.childRouter;
-
+    let childRouter = component.childRouter;
     if (childRouter) {
       let path = next.getWildcardPath();
 
@@ -101,9 +100,9 @@ function loadRoute(routeLoader : RouteLoader, navigationContext : NavigationCont
   });
 }
 
-function loadComponent(routeLoader : RouteLoader, navigationContext : NavigationContext, config : any) {
-  let router = navigationContext.router,
-      lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
+function loadComponent(routeLoader: RouteLoader, navigationContext: NavigationContext, config: any) {
+  let router = navigationContext.router;
+  let lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
   return routeLoader.loadRoute(router, config, navigationContext).then((component) => {
     component.router = router;
@@ -112,11 +111,11 @@ function loadComponent(routeLoader : RouteLoader, navigationContext : Navigation
     if ('configureRouter' in component.bindingContext) {
       component.childRouter = component.childContainer.getChildRouter();
 
-      let config = new RouterConfiguration();
-      let result = Promise.resolve(component.bindingContext.configureRouter(config, component.childRouter, ...lifecycleArgs));
+      let routerConfig = new RouterConfiguration();
+      let result = Promise.resolve(component.bindingContext.configureRouter(routerConfig, component.childRouter, ...lifecycleArgs));
 
       return result.then(() => {
-        component.childRouter.configure(config);
+        component.childRouter.configure(routerConfig);
         return component;
       });
     }

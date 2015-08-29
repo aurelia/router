@@ -1,4 +1,4 @@
-import * as core from 'core-js';
+import 'core-js';
 import * as LogManager from 'aurelia-logging';
 import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
@@ -11,8 +11,9 @@ import {RouterConfiguration} from './router-configuration';
 const logger = LogManager.getLogger('app-router');
 
 export class AppRouter extends Router {
-  static inject(){ return [Container, History, PipelineProvider, EventAggregator]; }
-  constructor(container : Container, history: History, pipelineProvider : PipelineProvider, events : EventAggregator) {
+  static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
+
+  constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
     super(container, history);
     this.pipelineProvider = pipelineProvider;
     document.addEventListener('click', handleLinkClick.bind(this), true);
@@ -20,11 +21,11 @@ export class AppRouter extends Router {
     this.maxInstructionCount = 10;
   }
 
-  get isRoot() : boolean {
+  get isRoot(): boolean {
     return true;
   }
 
-  loadUrl(url) : Promise<NavigationInstruction> {
+  loadUrl(url): Promise<NavigationInstruction> {
     return this.createNavigationInstruction(url)
       .then(instruction => this.queueInstruction(instruction))
       .catch(error => {
@@ -33,7 +34,7 @@ export class AppRouter extends Router {
       });
   }
 
-  queueInstruction(instruction : NavigationInstruction) : Promise {
+  queueInstruction(instruction: NavigationInstruction): Promise {
     return new Promise((resolve) => {
       instruction.resolve = resolve;
       this.queue.unshift(instruction);
@@ -41,17 +42,17 @@ export class AppRouter extends Router {
     });
   }
 
-  dequeueInstruction(instructionCount : number = 0) : Promise {
+  dequeueInstruction(instructionCount: number = 0): Promise {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
-        return;
+        return undefined;
       }
 
       let instruction = this.queue.shift();
       this.queue = [];
 
       if (!instruction) {
-        return;
+        return undefined;
       }
 
       this.isNavigating = true;
@@ -79,7 +80,7 @@ export class AppRouter extends Router {
     });
   }
 
-  registerViewPort(viewPort : Object, name : string) : void {
+  registerViewPort(viewPort: Object, name: string): void {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
@@ -93,15 +94,15 @@ export class AppRouter extends Router {
           this.configure(config);
           this.activate();
         });
-      } else {
-        this.activate();
       }
+
+      this.activate();
     } else {
       this.dequeueInstruction();
     }
   }
 
-  _findViewModel(viewPort : Object) {
+  _findViewModel(viewPort: Object) {
     if (this.container.viewModel) {
       return this.container.viewModel;
     }
@@ -109,9 +110,10 @@ export class AppRouter extends Router {
     if (viewPort.container) {
       let container = viewPort.container;
 
-      while(container) {
+      while (container) {
         if (container.viewModel) {
-          return this.container.viewModel = container.viewModel;
+          this.container.viewModel = container.viewModel;
+          return container.viewModel;
         }
 
         container = container.parent;
@@ -119,7 +121,7 @@ export class AppRouter extends Router {
     }
   }
 
-  activate(options : Object) : void {
+  activate(options: Object): void {
     if (this.isActive) {
       return;
     }
@@ -130,12 +132,12 @@ export class AppRouter extends Router {
     this.dequeueInstruction();
   }
 
-  deactivate() : void {
+  deactivate(): void {
     this.isActive = false;
     this.history.deactivate();
   }
 
-  reset() : void {
+  reset(): void {
     super.reset();
     this.queue = [];
     this.options = null;
@@ -144,7 +146,10 @@ export class AppRouter extends Router {
 
 function findAnchor(el) {
   while (el) {
-    if (el.tagName === "A") return el;
+    if (el.tagName === 'A') {
+      return el;
+    }
+
     el = el.parentNode;
   }
 }
@@ -165,7 +170,7 @@ function handleLinkClick(evt) {
 
       // Ensure the protocol is not part of URL, meaning its relative.
       // Stop the event bubbling to ensure the link will not cause a page refresh.
-      if (href !== null && !(href.charAt(0) === "#" || (/^[a-z]+:/i).test(href))) {
+      if (href !== null && !(href.charAt(0) === '#' || (/^[a-z]+:/i).test(href))) {
         evt.preventDefault();
         this.history.navigate(href);
       }

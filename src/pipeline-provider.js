@@ -13,8 +13,9 @@ import {createRouteFilterStep} from './route-filters';
 import {NavigationContext} from './navigation-context';
 
 export class PipelineProvider {
-  static inject() {return [Container];}
-  constructor(container : Container) {
+  static inject() { return [Container]; }
+
+  constructor(container: Container) {
     this.container = container;
     this.steps = [
       BuildNavigationPlanStep,
@@ -32,8 +33,8 @@ export class PipelineProvider {
     ];
   }
 
-  createPipeline(navigationContext : NavigationContext) : Pipeline {
-    var pipeline = new Pipeline();
+  createPipeline(navigationContext: NavigationContext): Pipeline {
+    let pipeline = new Pipeline();
     this.steps.forEach(step => pipeline.withStep(this.container.get(step)));
     return pipeline;
   }

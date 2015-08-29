@@ -1,14 +1,15 @@
 import {Container} from 'aurelia-dependency-injection';
 
 export class RouteFilterContainer {
-  static inject() {return [Container];}
-  constructor(container : Container) {
+  static inject() { return [Container]; }
+
+  constructor(container: Container) {
     this.container = container;
     this.filters = { };
     this.filterCache = { };
   }
 
-  addStep(name : string, step : any, index : number = -1) : void {
+  addStep(name: string, step: any, index: number = -1): void {
     let filter = this.filters[name];
     if (!filter) {
       filter = this.filters[name] = [];
@@ -22,7 +23,7 @@ export class RouteFilterContainer {
     this.filterCache = {};
   }
 
-  getFilterSteps(name : string) {
+  getFilterSteps(name: string) {
     if (this.filterCache[name]) {
       return this.filterCache[name];
     }
@@ -41,24 +42,27 @@ export class RouteFilterContainer {
       }
     }
 
-    return this.filterCache[name] = steps;
+    this.filterCache[name] = steps;
+    return steps;
   }
 }
 
-export function createRouteFilterStep(name : string) : Function {
+export function createRouteFilterStep(name: string): Function {
   function create(routeFilterContainer) {
     return new RouteFilterStep(name, routeFilterContainer);
-  };
+  }
+
   create.inject = function() {
     return [RouteFilterContainer];
   };
+
   return create;
 }
 
 class RouteFilterStep {
   isMultiStep: boolean = true;
 
-  constructor(name : string, routeFilterContainer : RouteFilterContainer) {
+  constructor(name: string, routeFilterContainer: RouteFilterContainer) {
     this.name = name;
     this.routeFilterContainer = routeFilterContainer;
   }

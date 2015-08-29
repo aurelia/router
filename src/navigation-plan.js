@@ -7,10 +7,10 @@ export const activationStrategy = {
   replace: 'replace'
 };
 
-export function buildNavigationPlan(navigationContext : NavigationContext, forceLifecycleMinimum) : Promise {
+export function buildNavigationPlan(navigationContext: NavigationContext, forceLifecycleMinimum): Promise {
   let prev = navigationContext.prevInstruction;
   let next = navigationContext.nextInstruction;
-  let plan = {}, viewPortName;
+  let plan = {};
 
   if ('redirect' in next.config) {
     let redirectLocation = resolveUrl(next.config.redirect, getInstructionBaseUrl(next));
@@ -25,7 +25,7 @@ export function buildNavigationPlan(navigationContext : NavigationContext, force
     let newParams = hasDifferentParameterValues(prev, next);
     let pending = [];
 
-    for (viewPortName in prev.viewPortInstructions) {
+    for (let viewPortName in prev.viewPortInstructions) {
       let prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
       let nextViewPortConfig = next.config.viewPorts[viewPortName];
       let viewPortPlan = plan[viewPortName] = {
@@ -35,13 +35,13 @@ export function buildNavigationPlan(navigationContext : NavigationContext, force
         prevModuleId: prevViewPortInstruction.moduleId
       };
 
-      if (prevViewPortInstruction.moduleId != nextViewPortConfig.moduleId) {
+      if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
         viewPortPlan.strategy = activationStrategy.replace;
       } else if ('determineActivationStrategy' in prevViewPortInstruction.component.bindingContext) {
          //TODO: should we tell them if the parent had a lifecycle min change?
         viewPortPlan.strategy = prevViewPortInstruction.component.bindingContext
           .determineActivationStrategy(...next.lifecycleArgs);
-      } else if(next.config.activationStrategy){
+      } else if (next.config.activationStrategy) {
         viewPortPlan.strategy = next.config.activationStrategy;
       } else if (newParams || forceLifecycleMinimum) {
         viewPortPlan.strategy = activationStrategy.invokeLifecycle;
@@ -52,13 +52,13 @@ export function buildNavigationPlan(navigationContext : NavigationContext, force
       if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
         let path = next.getWildcardPath();
         let task = prevViewPortInstruction.childRouter
-          .createNavigationInstruction(path, next).then(childInstruction => {
+          .createNavigationInstruction(path, next).then(childInstruction => { // eslint-disable-line no-loop-func
             viewPortPlan.childNavigationContext = prevViewPortInstruction.childRouter
               .createNavigationContext(childInstruction);
 
             return buildNavigationPlan(
               viewPortPlan.childNavigationContext,
-              viewPortPlan.strategy == activationStrategy.invokeLifecycle)
+              viewPortPlan.strategy === activationStrategy.invokeLifecycle)
               .then(childPlan => {
                 viewPortPlan.childNavigationContext.plan = childPlan;
               });
@@ -69,21 +69,21 @@ export function buildNavigationPlan(navigationContext : NavigationContext, force
     }
 
     return Promise.all(pending).then(() => plan);
-  } else {
-    for (viewPortName in next.config.viewPorts) {
-      plan[viewPortName] = {
-        name: viewPortName,
-        strategy: activationStrategy.replace,
-        config: next.config.viewPorts[viewPortName]
-      };
-    }
-
-    return Promise.resolve(plan);
   }
+
+  for (let viewPortName in next.config.viewPorts) {
+    plan[viewPortName] = {
+      name: viewPortName,
+      strategy: activationStrategy.replace,
+      config: next.config.viewPorts[viewPortName]
+    };
+  }
+
+  return Promise.resolve(plan);
 }
 
 export class BuildNavigationPlanStep {
-  run(navigationContext : NavigationContext, next : Function) {
+  run(navigationContext: NavigationContext, next: Function) {
     return buildNavigationPlan(navigationContext)
       .then(plan => {
         navigationContext.plan = plan;
@@ -92,10 +92,10 @@ export class BuildNavigationPlanStep {
   }
 }
 
-function hasDifferentParameterValues(prev : NavigationInstruction, next : NavigationInstruction) : boolean {
-  let prevParams = prev.params,
-      nextParams = next.params,
-      nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
+function hasDifferentParameterValues(prev: NavigationInstruction, next: NavigationInstruction): boolean {
+  let prevParams = prev.params;
+  let nextParams = next.params;
+  let nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
   for (let key in nextParams) {
     if (key === nextWildCardName) {
@@ -120,12 +120,15 @@ function hasDifferentParameterValues(prev : NavigationInstruction, next : Naviga
   return false;
 }
 
-function getInstructionBaseUrl(instruction : NavigationInstruction) : string {
-    let instructionBaseUrlParts = [];
-    while (instruction = instruction.parentInstruction) {
-      instructionBaseUrlParts.unshift(instruction.getBaseUrl());
-    }
+function getInstructionBaseUrl(instruction: NavigationInstruction): string {
+  let instructionBaseUrlParts = [];
+  instruction = instruction.parentInstruction;
 
-    instructionBaseUrlParts.unshift('/');
-    return instructionBaseUrlParts.join('');
+  while (instruction) {
+    instructionBaseUrlParts.unshift(instruction.getBaseUrl());
+    instruction = instruction.parentInstruction;
+  }
+
+  instructionBaseUrlParts.unshift('/');
+  return instructionBaseUrlParts.join('');
 }

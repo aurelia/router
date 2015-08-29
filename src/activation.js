@@ -5,39 +5,39 @@ import {processPotential} from './util';
 export let affirmations = ['yes', 'ok', 'true'];
 
 export class CanDeactivatePreviousStep {
-  run(navigationContext : NavigationContext, next : Function) {
+  run(navigationContext: NavigationContext, next: Function) {
     return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
   }
 }
 
 export class CanActivateNextStep {
-  run(navigationContext : NavigationContext, next : Function) {
+  run(navigationContext: NavigationContext, next: Function) {
     return processActivatable(navigationContext, 'canActivate', next);
   }
 }
 
 export class DeactivatePreviousStep {
-  run(navigationContext : NavigationContext, next : Function) {
+  run(navigationContext: NavigationContext, next: Function) {
     return processDeactivatable(navigationContext.plan, 'deactivate', next, true);
   }
 }
 
 export class ActivateNextStep {
-  run(navigationContext : NavigationContext, next : Function) {
+  run(navigationContext: NavigationContext, next: Function) {
     return processActivatable(navigationContext, 'activate', next, true);
   }
 }
 
 function processDeactivatable(plan, callbackName, next, ignoreResult) {
-  let infos = findDeactivatable(plan, callbackName),
-      i = infos.length; //query from inside out
+  let infos = findDeactivatable(plan, callbackName);
+  let i = infos.length; //query from inside out
 
   function inspect(val) {
     if (ignoreResult || shouldContinue(val)) {
       return iterate();
-    } else {
-      return next.cancel(val);
     }
+
+    return next.cancel(val);
   }
 
   function iterate() {
@@ -49,23 +49,22 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
       } catch(error) {
         return next.cancel(error);
       }
-    } else {
-      return next();
     }
+
+    return next();
   }
 
   return iterate();
 }
 
-function findDeactivatable(plan, callbackName, list : Array<Object> = []) : Array<Object> {
+function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<Object> {
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
     let prevComponent = viewPortPlan.prevComponent;
 
-    if ((viewPortPlan.strategy == activationStrategy.invokeLifecycle ||
-        viewPortPlan.strategy == activationStrategy.replace) &&
+    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle ||
+        viewPortPlan.strategy === activationStrategy.replace) &&
         prevComponent) {
-
       let controller = prevComponent.bindingContext;
 
       if (callbackName in controller) {
@@ -83,9 +82,8 @@ function findDeactivatable(plan, callbackName, list : Array<Object> = []) : Arra
   return list;
 }
 
-function addPreviousDeactivatable(component, callbackName, list) : void {
-  let controller = component.bindingContext,
-      childRouter = component.childRouter;
+function addPreviousDeactivatable(component, callbackName, list): void {
+  let childRouter = component.childRouter;
 
   if (childRouter && childRouter.currentInstruction) {
     let viewPortInstructions = childRouter.currentInstruction.viewPortInstructions;
@@ -104,17 +102,17 @@ function addPreviousDeactivatable(component, callbackName, list) : void {
   }
 }
 
-function processActivatable(navigationContext : NavigationContext, callbackName : any, next : Function, ignoreResult : boolean) {
-  let infos = findActivatable(navigationContext, callbackName),
-      length = infos.length,
-      i = -1; //query from top down
+function processActivatable(navigationContext: NavigationContext, callbackName: any, next: Function, ignoreResult: boolean) {
+  let infos = findActivatable(navigationContext, callbackName);
+  let length = infos.length;
+  let i = -1; //query from top down
 
   function inspect(val, router) {
     if (ignoreResult || shouldContinue(val, router)) {
       return iterate();
-    } else {
-      return next.cancel(val);
     }
+
+    return next.cancel(val);
   }
 
   function iterate() {
@@ -128,15 +126,15 @@ function processActivatable(navigationContext : NavigationContext, callbackName 
       } catch(error) {
         return next.cancel(error);
       }
-    } else {
-      return next();
     }
+
+    return next();
   }
 
   return iterate();
 }
 
-function findActivatable(navigationContext : NavigationContext, callbackName : string, list : Array<Object> = [], router : Router) : Array<Object> {
+function findActivatable(navigationContext: NavigationContext, callbackName: string, list: Array<Object> = [], router: Router): Array<Object> {
   let plan = navigationContext.plan;
   let next = navigationContext.nextInstruction;
 
@@ -166,24 +164,24 @@ function findActivatable(navigationContext : NavigationContext, callbackName : s
   return list;
 }
 
-function shouldContinue(output, router : Router) {
-  if(output instanceof Error) {
+function shouldContinue(output, router: Router) {
+  if (output instanceof Error) {
     return false;
   }
 
-  if(isNavigationCommand(output)){
-    if(typeof output.setRouter === 'function') {
+  if (isNavigationCommand(output)) {
+    if (typeof output.setRouter === 'function') {
       output.setRouter(router);
     }
 
     return !!output.shouldContinueProcessing;
   }
 
-  if(typeof output === 'string') {
+  if (typeof output === 'string') {
     return affirmations.indexOf(output.toLowerCase()) !== -1;
   }
 
-  if(typeof output === 'undefined') {
+  if (output === undefined) {
     return true;
   }
 

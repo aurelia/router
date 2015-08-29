@@ -9,9 +9,9 @@ import {RouteConfig} from './interfaces';
 export class RouterConfiguration {
   instructions = [];
   options = {};
-  pipelineSteps : Array<Object> = [];
-  title : string;
-  unknownRouteConfig : any;
+  pipelineSteps: Array<Object> = [];
+  title: string;
+  unknownRouteConfig: any;
 
   /**
   * Adds a step to be run during the [[Router]]'s navigation pipeline.
@@ -20,7 +20,7 @@ export class RouterConfiguration {
   * @param step The pipeline step.
   * @chainable
   */
-  addPipelineStep(name: string, step: Object|Function) : RouterConfiguration {
+  addPipelineStep(name: string, step: Object|Function): RouterConfiguration {
     this.pipelineSteps.push({name, step});
     return this;
   }
@@ -31,7 +31,7 @@ export class RouterConfiguration {
   * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
   * @chainable
   */
-  map(route: RouteConfig|RouteConfig[]) : RouterConfiguration {
+  map(route: RouteConfig|RouteConfig[]): RouterConfiguration {
     if (Array.isArray(route)) {
       route.forEach(this.map.bind(this));
       return this;
@@ -46,7 +46,7 @@ export class RouterConfiguration {
   * @param route The [[RouteConfig]] to map.
   * @chainable
   */
-  mapRoute(config: RouteConfig) : RouterConfiguration {
+  mapRoute(config: RouteConfig): RouterConfiguration {
     this.instructions.push(router => {
       let routeConfigs = [];
 
@@ -82,7 +82,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => Promise<void>) : RouterConfiguration {
+  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => Promise<void>): RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
@@ -92,7 +92,7 @@ export class RouterConfiguration {
   *
   * @param router The [[Router]] to apply the configuration to.
   */
-  exportToRouter(router: Router) : void {
+  exportToRouter(router: Router): void {
     let instructions = this.instructions;
     for (let i = 0, ii = instructions.length; i < ii; ++i) {
       instructions[i](router);

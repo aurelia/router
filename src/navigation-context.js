@@ -1,14 +1,14 @@
 import {activationStrategy} from './navigation-plan';
 
 export class NavigationContext {
-  constructor(router : Router, nextInstruction : NavigationInstruction) {
+  constructor(router: Router, nextInstruction: NavigationInstruction) {
     this.router = router;
     this.nextInstruction = nextInstruction;
     this.currentInstruction = router.currentInstruction;
     this.prevInstruction = router.currentInstruction;
   }
 
-  getAllContexts(acc : Array = []) : Array {
+  getAllContexts(acc: Array = []): Array {
     acc.push(this);
     if (this.plan) {
       for (let key in this.plan) {
@@ -18,25 +18,25 @@ export class NavigationContext {
     return acc;
   }
 
-  get nextInstructions() : Array<NavigationInstruction> {
+  get nextInstructions(): Array<NavigationInstruction> {
     return this.getAllContexts().map(c => c.nextInstruction).filter(c => c);
   }
 
-  get currentInstructions() : Array<NavigationInstruction> {
+  get currentInstructions(): Array<NavigationInstruction> {
     return this.getAllContexts().map(c => c.currentInstruction).filter(c => c);
   }
 
-  get prevInstructions() : Array<NavigationInstruction> {
+  get prevInstructions(): Array<NavigationInstruction> {
     return this.getAllContexts().map(c => c.prevInstruction).filter(c => c);
   }
 
-  commitChanges(waitToSwap : boolean) {
-    let next = this.nextInstruction,
-        prev = this.prevInstruction,
-        viewPortInstructions = next.viewPortInstructions,
-        router = this.router,
-        loads = [],
-        delaySwaps = [];
+  commitChanges(waitToSwap: boolean) {
+    let next = this.nextInstruction;
+    let prev = this.prevInstruction;
+    let viewPortInstructions = next.viewPortInstructions;
+    let router = this.router;
+    let loads = [];
+    let delaySwaps = [];
 
     router.currentInstruction = next;
 
@@ -79,18 +79,18 @@ export class NavigationContext {
     });
   }
 
-  updateTitle() : void {
+  updateTitle(): void {
     let title = this.buildTitle();
     if (title) {
       document.title = title;
     }
   }
 
-  buildTitle(separator : string = ' | ') : string {
-    let next = this.nextInstruction,
-        title = next.config.navModel.title || '',
-        viewPortInstructions = next.viewPortInstructions,
-        childTitles = [];
+  buildTitle(separator: string = ' | '): string {
+    let next = this.nextInstruction;
+    let title = next.config.navModel.title || '';
+    let viewPortInstructions = next.viewPortInstructions;
+    let childTitles = [];
 
     for (let viewPortName in viewPortInstructions) {
       let viewPortInstruction = viewPortInstructions[viewPortName];
@@ -116,7 +116,7 @@ export class NavigationContext {
 }
 
 export class CommitChangesStep {
-  run(navigationContext : NavigationContext, next : Function) {
+  run(navigationContext: NavigationContext, next: Function) {
     return navigationContext.commitChanges(true).then(() => {
       navigationContext.updateTitle();
       return next();
