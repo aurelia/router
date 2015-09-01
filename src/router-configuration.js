@@ -82,7 +82,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => Promise<void>) : RouterConfiguration {
+  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => void|Promise<void>) : RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
