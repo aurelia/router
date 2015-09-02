@@ -7,7 +7,7 @@ export const activationStrategy = {
   replace: 'replace'
 };
 
-export function buildNavigationPlan(navigationContext: NavigationContext, forceLifecycleMinimum): Promise {
+export function buildNavigationPlan(navigationContext: NavigationContext, forceLifecycleMinimum): Promise<Object> {
   let prev = navigationContext.prevInstruction;
   let next = navigationContext.nextInstruction;
   let plan = {};

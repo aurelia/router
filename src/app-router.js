@@ -34,7 +34,7 @@ export class AppRouter extends Router {
       });
   }
 
-  queueInstruction(instruction: NavigationInstruction): Promise {
+  queueInstruction(instruction: NavigationInstruction): Promise<any> {
     return new Promise((resolve) => {
       instruction.resolve = resolve;
       this.queue.unshift(instruction);
@@ -42,7 +42,7 @@ export class AppRouter extends Router {
     });
   }
 
-  dequeueInstruction(instructionCount: number = 0): Promise {
+  dequeueInstruction(instructionCount: number = 0): Promise<any> {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
         return undefined;

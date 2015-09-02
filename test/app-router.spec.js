@@ -20,7 +20,7 @@ class MockEventAggregator {
 class MockLoader extends RouteLoader {
   loadRoute(router, config) {
     return Promise.resolve({
-      executionContext: {}
+      bindingContext: {}
     });
   }
 }

@@ -8,7 +8,7 @@ export class NavigationContext {
     this.prevInstruction = router.currentInstruction;
   }
 
-  getAllContexts(acc: Array = []): Array {
+  getAllContexts(acc?: Array<NavigationContext> = []): Array<NavigationContext> {
     acc.push(this);
     if (this.plan) {
       for (let key in this.plan) {

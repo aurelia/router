@@ -16,8 +16,12 @@ export const pipelineStatus = {
   running: 'running'
 };
 
+interface PipelineStep {
+  run(context: Object, next: Function): void;
+}
+
 export class Pipeline {
-  steps: Array = [];
+  steps: Array<Function|PipelineStep> = [];
 
   withStep(step) {
     let run;

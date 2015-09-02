@@ -33,7 +33,7 @@ export function loadNewRoute(routeLoader: RouteLoader, navigationContext: Naviga
   return Promise.all(loadPromises);
 }
 
-function determineWhatToLoad(navigationContext: NavigationContext, toLoad: Array = []) {
+function determineWhatToLoad(navigationContext: NavigationContext, toLoad: Array<Object> = []) {
   let plan = navigationContext.plan;
   let next = navigationContext.nextInstruction;
 
