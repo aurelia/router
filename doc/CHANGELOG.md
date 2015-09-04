@@ -1,3 +1,21 @@
+## 0.12.0 (2015-09-04)
+
+
+#### Bug Fixes
+
+* **all:** update executionContext to bindingContext ([236db1db](http://github.com/aurelia/router/commit/236db1db949292e6d39583a4a794c3459605d3d2))
+* **build:** update linting, testing and tools ([2203b887](http://github.com/aurelia/router/commit/2203b88733b2aee4c731a2e4845096bc57aacef2))
+* **navigation-commands:** parameter options in constructor of Redirect class is optional ([b43af880](http://github.com/aurelia/router/commit/b43af8800c7a36fa29dc7e4a7a969eaa65e90709))
+* **router:**
+  * reset configuration promise in reset() ([a65100e9](http://github.com/aurelia/router/commit/a65100e9120a2637a02e2a41b6f4a8b2911d769d), closes [#189](http://github.com/aurelia/router/issues/189))
+  * check if href property in route table exists in refreshNavigation ([d624152d](http://github.com/aurelia/router/commit/d624152d3fe710d6cec5866d30dc9a7d525b0943))
+
+
+#### Features
+
+* **docs:** generate api.json from .d.ts file ([80b2a132](http://github.com/aurelia/router/commit/80b2a132e03d6e0d7b4760078923ab55efcd5287))
+
+
 ### 0.11.0 (2015-08-14)
 
 

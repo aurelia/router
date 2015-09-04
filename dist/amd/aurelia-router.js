@@ -1,4 +1,4 @@
-define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection', 'aurelia-route-recognizer', 'aurelia-path', 'aurelia-history', 'aurelia-event-aggregator'], function (exports, _coreJs, _aureliaLogging, _aureliaDependencyInjection, _aureliaRouteRecognizer, _aureliaPath, _aureliaHistory, _aureliaEventAggregator) {
+define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection', 'aurelia-route-recognizer', 'aurelia-history', 'aurelia-event-aggregator'], function (exports, _coreJs, _aureliaLogging, _aureliaDependencyInjection, _aureliaRouteRecognizer, _aureliaHistory, _aureliaEventAggregator) {
   'use strict';
 
   exports.__esModule = true;
@@ -66,7 +66,8 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
         }
       }
 
-      return this.filterCache[name] = steps;
+      this.filterCache[name] = steps;
+      return steps;
     };
 
     return RouteFilterContainer;
@@ -77,10 +78,12 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   function createRouteFilterStep(name) {
     function create(routeFilterContainer) {
       return new RouteFilterStep(name, routeFilterContainer);
-    };
+    }
+
     create.inject = function () {
       return [RouteFilterContainer];
     };
+
     return create;
   }
 
@@ -88,9 +91,10 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     function RouteFilterStep(name, routeFilterContainer) {
       _classCallCheck(this, RouteFilterStep);
 
+      this.isMultiStep = true;
+
       this.name = name;
       this.routeFilterContainer = routeFilterContainer;
-      this.isMultiStep = true;
     }
 
     RouteFilterStep.prototype.getSteps = function getSteps() {
@@ -105,7 +109,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       status: next.status,
       context: ctx,
       output: next.output,
-      completed: next.status == pipelineStatus.completed
+      completed: next.status === pipelineStatus.completed
     };
   }
 
@@ -126,13 +130,13 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     }
 
     Pipeline.prototype.withStep = function withStep(step) {
-      var run, steps, i, l;
+      var run = undefined;
 
-      if (typeof step == 'function') {
+      if (typeof step === 'function') {
         run = step;
       } else if (step.isMultiStep) {
-        steps = step.getSteps();
-        for (i = 0, l = steps.length; i < l; i++) {
+        var steps = step.getSteps();
+        for (var i = 0, l = steps.length; i < l; i++) {
           this.withStep(steps[i]);
         }
 
@@ -147,16 +151,14 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     };
 
     Pipeline.prototype.run = function run(ctx) {
-      var index = -1,
-          steps = this.steps,
-          next,
-          currentStep;
+      var index = -1;
+      var steps = this.steps;
 
-      next = function () {
+      function next() {
         index++;
 
         if (index < steps.length) {
-          currentStep = steps[index];
+          var currentStep = steps[index];
 
           try {
             return currentStep(ctx, next);
@@ -166,7 +168,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
         } else {
           return next.complete();
         }
-      };
+      }
 
       next.complete = function (output) {
         next.status = pipelineStatus.completed;
@@ -225,7 +227,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     }
 
     NavigationInstruction.prototype.addViewPortInstruction = function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
-      return this.viewPortInstructions[viewPortName] = {
+      var viewportInstruction = this.viewPortInstructions[viewPortName] = {
         name: viewPortName,
         strategy: strategy,
         moduleId: moduleId,
@@ -233,6 +235,8 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
         childRouter: component.childRouter,
         lifecycleArgs: this.lifecycleArgs.slice()
       };
+
+      return viewportInstruction;
     };
 
     NavigationInstruction.prototype.getWildCardName = function getWildCardName() {
@@ -310,12 +314,12 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       }
 
       return dfd;
-    } else {
-      try {
-        return resolve(obj);
-      } catch (error) {
-        return reject(error);
-      }
+    }
+
+    try {
+      return resolve(obj);
+    } catch (error) {
+      return reject(error);
     }
   }
 
@@ -340,11 +344,11 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
     path += baseUrl;
 
-    if ((!path.length || path[path.length - 1] != '/') && fragment[0] != '/') {
+    if ((!path.length || path[path.length - 1] !== '/') && fragment[0] !== '/') {
       path += '/';
     }
 
-    if (path.length && path[path.length - 1] == '/' && fragment[0] == '/') {
+    if (path.length && path[path.length - 1] === '/' && fragment[0] === '/') {
       path = path.substring(0, path.length - 1);
     }
 
@@ -354,9 +358,9 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   function resolveUrl(fragment, baseUrl, hasPushState) {
     if (isRootedPath.test(fragment)) {
       return normalizeAbsolutePath(fragment, hasPushState);
-    } else {
-      return createRootedPath(fragment, baseUrl, hasPushState);
     }
+
+    return createRootedPath(fragment, baseUrl, hasPushState);
   }
 
   var isRootedPath = /^#?\//;
@@ -367,11 +371,13 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   }
 
   var Redirect = (function () {
-    function Redirect(url, options) {
+    function Redirect(url) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
       _classCallCheck(this, Redirect);
 
       this.url = url;
-      this.options = Object.assign({ trigger: true, replace: true }, options || {});
+      this.options = Object.assign({ trigger: true, replace: true }, options);
       this.shouldContinueProcessing = false;
     }
 
@@ -494,8 +500,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   function buildNavigationPlan(navigationContext, forceLifecycleMinimum) {
     var prev = navigationContext.prevInstruction;
     var next = navigationContext.nextInstruction;
-    var plan = {},
-        viewPortName;
+    var plan = {};
 
     if ('redirect' in next.config) {
       var redirectLocation = resolveUrl(next.config.redirect, getInstructionBaseUrl(next));
@@ -510,7 +515,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       var newParams = hasDifferentParameterValues(prev, next);
       var pending = [];
 
-      for (viewPortName in prev.viewPortInstructions) {
+      var _loop = function (viewPortName) {
         var prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
         var nextViewPortConfig = next.config.viewPorts[viewPortName];
         var viewPortPlan = plan[viewPortName] = {
@@ -520,12 +525,12 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
           prevModuleId: prevViewPortInstruction.moduleId
         };
 
-        if (prevViewPortInstruction.moduleId != nextViewPortConfig.moduleId) {
+        if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
           viewPortPlan.strategy = activationStrategy.replace;
-        } else if ('determineActivationStrategy' in prevViewPortInstruction.component.executionContext) {
-          var _prevViewPortInstruction$component$executionContext;
+        } else if ('determineActivationStrategy' in prevViewPortInstruction.component.bindingContext) {
+          var _prevViewPortInstruction$component$bindingContext;
 
-          viewPortPlan.strategy = (_prevViewPortInstruction$component$executionContext = prevViewPortInstruction.component.executionContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$executionContext, next.lifecycleArgs);
+          viewPortPlan.strategy = (_prevViewPortInstruction$component$bindingContext = prevViewPortInstruction.component.bindingContext).determineActivationStrategy.apply(_prevViewPortInstruction$component$bindingContext, next.lifecycleArgs);
         } else if (next.config.activationStrategy) {
           viewPortPlan.strategy = next.config.activationStrategy;
         } else if (newParams || forceLifecycleMinimum) {
@@ -539,29 +544,33 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
           var task = prevViewPortInstruction.childRouter.createNavigationInstruction(path, next).then(function (childInstruction) {
             viewPortPlan.childNavigationContext = prevViewPortInstruction.childRouter.createNavigationContext(childInstruction);
 
-            return buildNavigationPlan(viewPortPlan.childNavigationContext, viewPortPlan.strategy == activationStrategy.invokeLifecycle).then(function (childPlan) {
+            return buildNavigationPlan(viewPortPlan.childNavigationContext, viewPortPlan.strategy === activationStrategy.invokeLifecycle).then(function (childPlan) {
               viewPortPlan.childNavigationContext.plan = childPlan;
             });
           });
 
           pending.push(task);
         }
+      };
+
+      for (var viewPortName in prev.viewPortInstructions) {
+        _loop(viewPortName);
       }
 
       return Promise.all(pending).then(function () {
         return plan;
       });
-    } else {
-      for (viewPortName in next.config.viewPorts) {
-        plan[viewPortName] = {
-          name: viewPortName,
-          strategy: activationStrategy.replace,
-          config: next.config.viewPorts[viewPortName]
-        };
-      }
-
-      return Promise.resolve(plan);
     }
+
+    for (var viewPortName in next.config.viewPorts) {
+      plan[viewPortName] = {
+        name: viewPortName,
+        strategy: activationStrategy.replace,
+        config: next.config.viewPorts[viewPortName]
+      };
+    }
+
+    return Promise.resolve(plan);
   }
 
   var BuildNavigationPlanStep = (function () {
@@ -582,9 +591,9 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   exports.BuildNavigationPlanStep = BuildNavigationPlanStep;
 
   function hasDifferentParameterValues(prev, next) {
-    var prevParams = prev.params,
-        nextParams = next.params,
-        nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
+    var prevParams = prev.params;
+    var nextParams = next.params;
+    var nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
     for (var key in nextParams) {
       if (key === nextWildCardName) {
@@ -611,8 +620,11 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
   function getInstructionBaseUrl(instruction) {
     var instructionBaseUrlParts = [];
-    while (instruction = instruction.parentInstruction) {
+    instruction = instruction.parentInstruction;
+
+    while (instruction) {
       instructionBaseUrlParts.unshift(instruction.getBaseUrl());
+      instruction = instruction.parentInstruction;
     }
 
     instructionBaseUrlParts.unshift('/');
@@ -680,15 +692,15 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   exports.ActivateNextStep = ActivateNextStep;
 
   function processDeactivatable(plan, callbackName, next, ignoreResult) {
-    var infos = findDeactivatable(plan, callbackName),
-        i = infos.length;
+    var infos = findDeactivatable(plan, callbackName);
+    var i = infos.length;
 
     function inspect(val) {
       if (ignoreResult || shouldContinue(val)) {
         return iterate();
-      } else {
-        return next.cancel(val);
       }
+
+      return next.cancel(val);
     }
 
     function iterate() {
@@ -700,24 +712,23 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
         } catch (error) {
           return next.cancel(error);
         }
-      } else {
-        return next();
       }
+
+      return next();
     }
 
     return iterate();
   }
 
-  function findDeactivatable(plan, callbackName, list) {
-    list = list || [];
+  function findDeactivatable(plan, callbackName) {
+    var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
 
     for (var viewPortName in plan) {
       var viewPortPlan = plan[viewPortName];
       var prevComponent = viewPortPlan.prevComponent;
 
-      if ((viewPortPlan.strategy == activationStrategy.invokeLifecycle || viewPortPlan.strategy == activationStrategy.replace) && prevComponent) {
-
-        var controller = prevComponent.executionContext;
+      if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && prevComponent) {
+        var controller = prevComponent.bindingContext;
 
         if (callbackName in controller) {
           list.push(controller);
@@ -735,8 +746,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   }
 
   function addPreviousDeactivatable(component, callbackName, list) {
-    var controller = component.executionContext,
-        childRouter = component.childRouter;
+    var childRouter = component.childRouter;
 
     if (childRouter && childRouter.currentInstruction) {
       var viewPortInstructions = childRouter.currentInstruction.viewPortInstructions;
@@ -744,7 +754,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       for (var viewPortName in viewPortInstructions) {
         var viewPortInstruction = viewPortInstructions[viewPortName];
         var prevComponent = viewPortInstruction.component;
-        var prevController = prevComponent.executionContext;
+        var prevController = prevComponent.bindingContext;
 
         if (callbackName in prevController) {
           list.push(prevController);
@@ -756,16 +766,16 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   }
 
   function processActivatable(navigationContext, callbackName, next, ignoreResult) {
-    var infos = findActivatable(navigationContext, callbackName),
-        length = infos.length,
-        i = -1;
+    var infos = findActivatable(navigationContext, callbackName);
+    var length = infos.length;
+    var i = -1;
 
     function inspect(val, router) {
       if (ignoreResult || shouldContinue(val, router)) {
         return iterate();
-      } else {
-        return next.cancel(val);
       }
+
+      return next.cancel(val);
     }
 
     function iterate() {
@@ -773,34 +783,40 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
       if (i < length) {
         try {
-          var _current$controller;
+          var _ret2 = (function () {
+            var _current$controller;
 
-          var current = infos[i];
-          var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, current.lifecycleArgs);
-          return processPotential(result, function (val) {
-            return inspect(val, current.router);
-          }, next.cancel);
+            var current = infos[i];
+            var result = (_current$controller = current.controller)[callbackName].apply(_current$controller, current.lifecycleArgs);
+            return {
+              v: processPotential(result, function (val) {
+                return inspect(val, current.router);
+              }, next.cancel)
+            };
+          })();
+
+          if (typeof _ret2 === 'object') return _ret2.v;
         } catch (error) {
           return next.cancel(error);
         }
-      } else {
-        return next();
       }
+
+      return next();
     }
 
     return iterate();
   }
 
   function findActivatable(navigationContext, callbackName, list, router) {
+    if (list === undefined) list = [];
+
     var plan = navigationContext.plan;
     var next = navigationContext.nextInstruction;
-
-    list = list || [];
 
     Object.keys(plan).filter(function (viewPortName) {
       var viewPortPlan = plan[viewPortName];
       var viewPortInstruction = next.viewPortInstructions[viewPortName];
-      var controller = viewPortInstruction.component.executionContext;
+      var controller = viewPortInstruction.component.bindingContext;
 
       if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in controller) {
         list.push({
@@ -835,7 +851,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       return affirmations.indexOf(output.toLowerCase()) !== -1;
     }
 
-    if (typeof output === 'undefined') {
+    if (output === undefined) {
       return true;
     }
 
@@ -865,12 +881,12 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     };
 
     NavigationContext.prototype.commitChanges = function commitChanges(waitToSwap) {
-      var next = this.nextInstruction,
-          prev = this.prevInstruction,
-          viewPortInstructions = next.viewPortInstructions,
-          router = this.router,
-          loads = [],
-          delaySwaps = [];
+      var next = this.nextInstruction;
+      var prev = this.prevInstruction;
+      var viewPortInstructions = next.viewPortInstructions;
+      var router = this.router;
+      var loads = [];
+      var delaySwaps = [];
 
       router.currentInstruction = next;
 
@@ -883,7 +899,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       router.refreshBaseUrl();
       router.refreshNavigation();
 
-      for (var viewPortName in viewPortInstructions) {
+      var _loop2 = function (viewPortName) {
         var viewPortInstruction = viewPortInstructions[viewPortName];
         var viewPort = router.viewPorts[viewPortName];
 
@@ -906,6 +922,10 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
             loads.push(viewPortInstruction.childNavigationContext.commitChanges(waitToSwap));
           }
         }
+      };
+
+      for (var viewPortName in viewPortInstructions) {
+        _loop2(viewPortName);
       }
 
       return Promise.all(loads).then(function () {
@@ -925,10 +945,10 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     NavigationContext.prototype.buildTitle = function buildTitle() {
       var separator = arguments.length <= 0 || arguments[0] === undefined ? ' | ' : arguments[0];
 
-      var next = this.nextInstruction,
-          title = next.config.navModel.title || '',
-          viewPortInstructions = next.viewPortInstructions,
-          childTitles = [];
+      var next = this.nextInstruction;
+      var title = next.config.navModel.title || '';
+      var viewPortInstructions = next.viewPortInstructions;
+      var childTitles = [];
 
       for (var viewPortName in viewPortInstructions) {
         var viewPortInstruction = viewPortInstructions[viewPortName];
@@ -1046,16 +1066,16 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     return Promise.all(loadPromises);
   }
 
-  function determineWhatToLoad(navigationContext, toLoad) {
+  function determineWhatToLoad(navigationContext) {
+    var toLoad = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+
     var plan = navigationContext.plan;
     var next = navigationContext.nextInstruction;
-
-    toLoad = toLoad || [];
 
     for (var viewPortName in plan) {
       var viewPortPlan = plan[viewPortName];
 
-      if (viewPortPlan.strategy == activationStrategy.replace) {
+      if (viewPortPlan.strategy === activationStrategy.replace) {
         toLoad.push({
           viewPortPlan: viewPortPlan,
           navigationContext: navigationContext
@@ -1084,9 +1104,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     return loadComponent(routeLoader, navigationContext, viewPortPlan.config).then(function (component) {
       var viewPortInstruction = next.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
 
-      var controller = component.executionContext,
-          childRouter = component.childRouter;
-
+      var childRouter = component.childRouter;
       if (childRouter) {
         var path = next.getWildcardPath();
 
@@ -1106,25 +1124,31 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
   }
 
   function loadComponent(routeLoader, navigationContext, config) {
-    var router = navigationContext.router,
-        lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
+    var router = navigationContext.router;
+    var lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
     return routeLoader.loadRoute(router, config, navigationContext).then(function (component) {
       component.router = router;
       component.config = config;
 
-      if ('configureRouter' in component.executionContext) {
-        var _component$executionContext;
+      if ('configureRouter' in component.bindingContext) {
+        var _ret4 = (function () {
+          var _component$bindingContext;
 
-        component.childRouter = component.childContainer.getChildRouter();
+          component.childRouter = component.childContainer.getChildRouter();
 
-        var config = new RouterConfiguration();
-        var result = Promise.resolve((_component$executionContext = component.executionContext).configureRouter.apply(_component$executionContext, [config, component.childRouter].concat(lifecycleArgs)));
+          var routerConfig = new RouterConfiguration();
+          var result = Promise.resolve((_component$bindingContext = component.bindingContext).configureRouter.apply(_component$bindingContext, [routerConfig, component.childRouter].concat(lifecycleArgs)));
 
-        return result.then(function () {
-          component.childRouter.configure(config);
-          return component;
-        });
+          return {
+            v: result.then(function () {
+              component.childRouter.configure(routerConfig);
+              return component;
+            })
+          };
+        })();
+
+        if (typeof _ret4 === 'object') return _ret4.v;
       }
 
       return component;
@@ -1133,8 +1157,6 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
   var Router = (function () {
     function Router(container, history) {
-      var _this = this;
-
       _classCallCheck(this, Router);
 
       this.viewPorts = {};
@@ -1149,9 +1171,6 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
       this.container = container;
       this.history = history;
-      this._configuredPromise = new Promise(function (resolve) {
-        _this._resolveConfiguredPromise = resolve;
-      });
       this.reset();
     }
 
@@ -1167,10 +1186,10 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     Router.prototype.configure = function configure(callbackOrConfig) {
       this.isConfigured = true;
 
-      if (typeof callbackOrConfig == 'function') {
-        var config = new RouterConfiguration();
-        callbackOrConfig(config);
-        config.exportToRouter(this);
+      if (typeof callbackOrConfig === 'function') {
+        var _config = new RouterConfiguration();
+        callbackOrConfig(_config);
+        _config.exportToRouter(this);
       } else {
         callbackOrConfig.exportToRouter(this);
       }
@@ -1255,10 +1274,9 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       var state = this.recognizer.add({ path: path, handler: config });
 
       if (path) {
-        var withChild = undefined,
-            settings = config.settings;
+        var settings = config.settings;
         delete config.settings;
-        withChild = JSON.parse(JSON.stringify(config));
+        var withChild = JSON.parse(JSON.stringify(config));
         config.settings = settings;
         withChild.route = path + '/*childRoute';
         withChild.hasChildRouter = true;
@@ -1274,11 +1292,11 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       config.navModel = navModel;
 
       if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
-        if (!navModel.href && navModel.href != '' && (state.types.dynamics || state.types.stars)) {
+        if (!navModel.href && navModel.href !== '' && (state.types.dynamics || state.types.stars)) {
           throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
         }
 
-        if (typeof navModel.order != 'number') {
+        if (typeof navModel.order !== 'number') {
           navModel.order = ++this.fallbackOrder;
         }
 
@@ -1309,10 +1327,10 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
           if (!config) {
             instruction.config.moduleId = instruction.fragment;
             done(instruction);
-          } else if (typeof config == 'string') {
+          } else if (typeof config === 'string') {
             instruction.config.moduleId = config;
             done(instruction);
-          } else if (typeof config == 'function') {
+          } else if (typeof config === 'function') {
             processPotential(config(instruction), done, reject);
           } else {
             instruction.config = config;
@@ -1333,12 +1351,21 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     };
 
     Router.prototype.reset = function reset() {
+      var _this = this;
+
       this.fallbackOrder = 100;
       this.recognizer = new _aureliaRouteRecognizer.RouteRecognizer();
       this.childRecognizer = new _aureliaRouteRecognizer.RouteRecognizer();
       this.routes = [];
       this.isNavigating = false;
       this.navigation = [];
+
+      if (this.isConfigured || !this._configuredPromise) {
+        this._configuredPromise = new Promise(function (resolve) {
+          _this._resolveConfiguredPromise = resolve;
+        });
+      }
+
       this.isConfigured = false;
     };
 
@@ -1352,9 +1379,11 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
     Router.prototype.refreshNavigation = function refreshNavigation() {
       var nav = this.navigation;
 
-      for (var i = 0, length = nav.length; i < length; i++) {
+      for (var i = 0, _length = nav.length; i < _length; i++) {
         var current = nav[i];
-        current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+        if (!current.href) {
+          current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+        }
       }
     };
 
@@ -1366,7 +1395,7 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
       var queryString = '';
 
       var queryIndex = url.indexOf('?');
-      if (queryIndex != -1) {
+      if (queryIndex !== -1) {
         fragment = url.substr(0, queryIndex);
         queryString = url.substr(queryIndex + 1);
       }
@@ -1523,14 +1552,14 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
       return Promise.resolve().then(function () {
         if (_this5.isNavigating && !instructionCount) {
-          return;
+          return undefined;
         }
 
         var instruction = _this5.queue.shift();
         _this5.queue = [];
 
         if (!instruction) {
-          return;
+          return undefined;
         }
 
         _this5.isNavigating = true;
@@ -1567,16 +1596,22 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
         var viewModel = this._findViewModel(viewPort);
 
         if ('configureRouter' in viewModel) {
-          var config = new RouterConfiguration();
-          var result = Promise.resolve(viewModel.configureRouter(config, this));
+          var _ret5 = (function () {
+            var config = new RouterConfiguration();
+            var result = Promise.resolve(viewModel.configureRouter(config, _this6));
 
-          return result.then(function () {
-            _this6.configure(config);
-            _this6.activate();
-          });
-        } else {
-          this.activate();
+            return {
+              v: result.then(function () {
+                _this6.configure(config);
+                _this6.activate();
+              })
+            };
+          })();
+
+          if (typeof _ret5 === 'object') return _ret5.v;
         }
+
+        this.activate();
       } else {
         this.dequeueInstruction();
       }
@@ -1592,7 +1627,8 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
         while (container) {
           if (container.viewModel) {
-            return this.container.viewModel = container.viewModel;
+            this.container.viewModel = container.viewModel;
+            return container.viewModel;
           }
 
           container = container.parent;
@@ -1636,7 +1672,10 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
   function findAnchor(el) {
     while (el) {
-      if (el.tagName === "A") return el;
+      if (el.tagName === 'A') {
+        return el;
+      }
+
       el = el.parentNode;
     }
   }
@@ -1653,11 +1692,11 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
 
     if (this.history._hasPushState) {
       if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
-        var href = target.getAttribute('href');
+        var _href = target.getAttribute('href');
 
-        if (href !== null && !(href.charAt(0) === "#" || /^[a-z]+:/i.test(href))) {
+        if (_href !== null && !(_href.charAt(0) === '#' || /^[a-z]+:/i.test(_href))) {
           evt.preventDefault();
-          this.history.navigate(href);
+          this.history.navigate(_href);
         }
       }
     }
