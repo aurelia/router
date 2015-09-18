@@ -56,4 +56,12 @@ interface RouteConfig {
   * The document title to set when this route is active.
   */
   title?: string;
+
+  /**
+  * Arbitrary data to attach to the route. This can be used to attached custom data needed by components
+  * like pipeline steps and activated modules.
+  */
+  settings?: any;
+
+  [x: string]: any;
 }
