@@ -91,23 +91,22 @@ export class Router {
   * Configures the router.
   *
   * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
-  * @chainable
   */
-  configure(callbackOrConfig: RouterConfiguration|((config: RouterConfiguration) => RouterConfiguration)): Router {
+  configure(callbackOrConfig: RouterConfiguration|((config: RouterConfiguration) => RouterConfiguration)): Promise {
     this.isConfigured = true;
 
+    let result = callbackOrConfig;
+    let config;
     if (typeof callbackOrConfig === 'function') {
-      let config = new RouterConfiguration();
-      callbackOrConfig(config);
-      config.exportToRouter(this);
-    } else {
-      callbackOrConfig.exportToRouter(this);
+      config = new RouterConfiguration();
+      result = callbackOrConfig(config);
     }
 
-    this.isConfigured = true;
-    this._resolveConfiguredPromise();
-
-    return this;
+    return Promise.resolve(result).then((c) => {
+      (c || config).exportToRouter(this);
+      this.isConfigured = true;
+      this._resolveConfiguredPromise();
+    });
   }
 
   /**

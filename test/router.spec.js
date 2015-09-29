@@ -66,172 +66,166 @@ describe('the router', () => {
   });
 
   describe('generate', () => {
-    it('should generate route URIs', () => {
+    it('should generate route URIs', (done) => {
       const child = router.createChild(new Container());
       child.baseUrl = 'child-router';
 
-      router.configure(config => {
-        config.map({ name: 'parent', route: 'parent', moduleId: './test' });
+      Promise.all([
+        router.configure(config => config.map({ name: 'parent', route: 'parent', moduleId: './test' })),
+        child.configure(config => config.map({ name: 'child', route: 'child', moduleId: './test' }))
+      ]).then(() => {
+        expect(router.generate('parent')).toBe('#/parent');
+        expect(child.generate('parent')).toBe('#/parent');
+        expect(child.generate('child')).toBe('#/child-router/child');
+
+        router.history._hasPushState = true;
+
+        expect(router.generate('parent')).toBe('/parent');
+        expect(child.generate('parent')).toBe('/parent');
+        expect(child.generate('child')).toBe('/child-router/child');
+
+        done();
       });
-
-      child.configure(config => {
-        config.map({ name: 'child', route: 'child', moduleId: './test' });
-      });
-
-      expect(router.generate('parent')).toBe('#/parent');
-      expect(child.generate('parent')).toBe('#/parent');
-      expect(child.generate('child')).toBe('#/child-router/child');
-
-      router.history._hasPushState = true;
-
-      expect(router.generate('parent')).toBe('/parent');
-      expect(child.generate('parent')).toBe('/parent');
-      expect(child.generate('child')).toBe('/child-router/child');
     });
 
-    it('should delegate to parent when not configured', () => {
+    it('should delegate to parent when not configured', (done) => {
       const child = router.createChild(new Container());
 
-      router.configure(config => {
-        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
-      });
-
-      expect(child.generate('test', { id: 1 })).toBe('#/test/1');
+      router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(() => {
+           expect(child.generate('test', { id: 1 })).toBe('#/test/1');
+           done();
+        });
     });
 
-    it('should delegate to parent when generating unknown route', () => {
+    it('should delegate to parent when generating unknown route', (done) => {
       const child = router.createChild(new Container());
 
-      router.configure(config => {
-        config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' });
+      Promise.all([
+        router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
+        child.configure(config => config.map({ name: 'child', route: 'child/:id', moduleId: './test' }))
+      ]).then(() => {
+        expect(child.generate('child', { id: 1 })).toBe('#/child/1');
+        expect(child.generate('parent', { id: 1 })).toBe('#/parent/1');
+        done();
       });
-
-      child.configure(config => {
-        config.map({ name: 'child', route: 'child/:id', moduleId: './test' });
-      });
-
-      expect(child.generate('child', { id: 1 })).toBe('#/child/1');
-      expect(child.generate('parent', { id: 1 })).toBe('#/parent/1');
     });
   });
 
-  describe('navigate', () => {
-    it('should navigate to absolute paths', () => {
+  describe('navigate', (done) => {
+    it('should navigate to absolute paths', (done) => {
       const options = {};
       spyOn(history, 'navigate');
 
       const child = router.createChild(new Container());
       child.baseUrl = 'child-router';
 
-      router.configure(config => {
-        config.map([
-          { name: 'parent', route: 'parent/:id', moduleId: './test' },
-          { name: 'parent-empty', route: '', moduleId: './parent-empty' }
-        ]);
+      Promise.all([
+        router.configure(config => {
+          config.map([
+            { name: 'parent', route: 'parent/:id', moduleId: './test' },
+            { name: 'parent-empty', route: '', moduleId: './parent-empty' }
+          ]);
+        }),
+        child.configure(config => {
+          config.map([
+            { name: 'child', route: 'child/:id', moduleId: './test' },
+            { name: 'empty', route: '', moduleId: './empty' },
+          ]);
+        })
+      ]).then(() => {
+        router.navigate('', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/', options);
+        history.navigate.calls.reset();
+
+        router.navigate('#/test1', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test1', options);
+        history.navigate.calls.reset();
+
+        router.navigate('/test2', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test2', options);
+        history.navigate.calls.reset();
+
+        router.navigate('test3', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test3', options);
+        history.navigate.calls.reset();
+
+        child.navigate('#/test4', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test4', options);
+        history.navigate.calls.reset();
+
+        child.navigate('/test5', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test5', options);
+        history.navigate.calls.reset();
+
+        child.navigate('test6', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test6', options);
+        history.navigate.calls.reset();
+
+        child.navigate('#/child-router/test7', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test7', options);
+        history.navigate.calls.reset();
+
+        child.navigate('/child-router/test8', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test8', options);
+        history.navigate.calls.reset();
+
+        child.navigate('child-router/test9', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options);
+        history.navigate.calls.reset();
+
+        child.navigate('', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/', options);
+        history.navigate.calls.reset();
+
+        done();
       });
-
-      child.configure(config => {
-        config.map([
-          { name: 'child', route: 'child/:id', moduleId: './test' },
-          { name: 'empty', route: '', moduleId: './empty' },
-        ]);
-      });
-
-      router.navigate('', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/', options);
-      history.navigate.calls.reset();
-
-      router.navigate('#/test1', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/test1', options);
-      history.navigate.calls.reset();
-
-      router.navigate('/test2', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/test2', options);
-      history.navigate.calls.reset();
-
-      router.navigate('test3', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/test3', options);
-      history.navigate.calls.reset();
-
-      child.navigate('#/test4', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/test4', options);
-      history.navigate.calls.reset();
-
-      child.navigate('/test5', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/test5', options);
-      history.navigate.calls.reset();
-
-      child.navigate('test6', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/child-router/test6', options);
-      history.navigate.calls.reset();
-
-      child.navigate('#/child-router/test7', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/child-router/test7', options);
-      history.navigate.calls.reset();
-
-      child.navigate('/child-router/test8', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/child-router/test8', options);
-      history.navigate.calls.reset();
-
-      child.navigate('child-router/test9', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options);
-      history.navigate.calls.reset();
-
-      child.navigate('', options);
-      expect(history.navigate).toHaveBeenCalledWith('#/child-router/', options);
-      history.navigate.calls.reset();
     });
 
-    it('should navigate to named routes', () => {
+    it('should navigate to named routes', (done) => {
       const options = {};
       spyOn(history, 'navigate');
 
-      router.configure(config => {
-        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
-      });
-
-      router.navigateToRoute('test', { id: 123 }, options);
-      expect(history.navigate).toHaveBeenCalledWith('#/test/123', options);
+      router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(() => {
+          router.navigateToRoute('test', { id: 123 }, options);
+          expect(history.navigate).toHaveBeenCalledWith('#/test/123', options);
+          done();          
+        });
     });
   });
 
   describe('createNavigationInstruction', () => {
-    it('should reject when router not configured', done => {
+    it('should reject when router not configured', (done) => {
       router.createNavigationInstruction()
         .then(x => expect(true).toBeFalsy('should have rejected'))
         .catch(reason => expect(reason).toBeTruthy())
         .then(done);
     });
 
-    it('should reject when route not found', done => {
-      router.configure(config => {
-        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
-      });
-
-      router.createNavigationInstruction('test')
-        .then(x => expect(true).toBeFalsy('should have rejected'))
+    it('should reject when route not found', (done) => {
+      router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(() => router.createNavigationInstruction('test'))
+        .then(() => expect(true).toBeFalsy('should have rejected'))
         .catch(reason => expect(reason).toBeTruthy())
         .then(done);
     });
 
-    it('should resolve matching routes', done => {
-      router.configure(config => {
-        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
-      });
-
-      router.createNavigationInstruction('test/123?foo=456')
+    it('should resolve matching routes', (done) => {
+      router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(() => router.createNavigationInstruction('test/123?foo=456'))
         .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'test/123', queryString: 'foo=456' })))
         .catch(reason => expect(true).toBeFalsy('should have succeeded'))
         .then(done);
     });
 
-    it('should use catchAllHandler when route doesn\'t match', done => {
-      router.configure(config => {
-        config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
-      });
-      router.handleUnknownRoutes('test');
-
-      router.createNavigationInstruction('foo/123?bar=456')
+    it('should use catchAllHandler when route doesn\'t match', (done) => {
+      router
+        .configure(config => {
+          config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
+          config.unknownRouteConfig = 'test';
+        })
+        .then(() => router.createNavigationInstruction('foo/123?bar=456'))
         .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'foo/123', queryString: 'bar=456' })))
         .catch(reason => expect(true).toBeFalsy('should have succeeded'))
         .then(done);
@@ -247,26 +241,44 @@ describe('the router', () => {
         done();
       });
 
-      router.configure(config => {
-        config.map({ route: '', moduleId: './test' });
-      });
-
-      expect(router.isConfigured).toBe(true);
+      router.configure(config => config.map({ route: '', moduleId: './test' }));
     });
 
     it('notifies when already configured', (done) => {
       expect(router.isConfigured).toBe(false);
 
+      router.configure(config => config.map({ route: '', moduleId: './test' }))
+        .then(() => {
+          expect(router.isConfigured).toBe(true);
+
+          router.ensureConfigured().then(() => {
+            expect(router.isConfigured).toBe(true);
+            done();
+          });
+        });
+    });
+
+    it('waits for async callbacks', (done) => {
+      let resolve;
+      let promise = new Promise(r => resolve = r);
+
+      expect(router.isConfigured).toBe(false);
+
       router.configure(config => {
-        config.map({ route: '', moduleId: './test' });
+        return promise.then(x => {
+         config.map({ route: '', moduleId: './test' });
+        });
       });
 
       expect(router.isConfigured).toBe(true);
+      expect(router.routes.length).toBe(0);
 
       router.ensureConfigured().then(() => {
-        expect(router.isConfigured).toBe(true);
+        expect(router.routes.length).toBe(1);
         done();
       });
+
+      resolve();
     });
   });
 });

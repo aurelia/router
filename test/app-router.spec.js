@@ -85,6 +85,27 @@ describe('app-router', () => {
       });
   });
 
+  it('configures only once with multiple viewPorts', (done) => {
+    let routeConfig = { route: '', moduleId: './test' };
+    let viewModel = {
+      configureRouter(config) {
+        config.map([routeConfig]);
+      }
+    };
+
+    spyOn(viewModel, 'configureRouter').and.callThrough();
+
+    container.viewModel = viewModel;
+
+    Promise.all([router.registerViewPort(viewPort), router.registerViewPort(viewPort, 'second')])
+      .then(result => {
+        expect(viewModel.configureRouter.calls.count()).toBe(1);
+        expect(router.isConfigured).toBe(true);
+        expect(router.routes.length).toBe(1);
+        done();
+      });
+  });
+
   describe('dequeueInstruction', () => {
     let processingResult;
     let completedResult;
