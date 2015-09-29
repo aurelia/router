@@ -1,8 +1,6 @@
 import {History} from 'aurelia-history';
 import {Container} from 'aurelia-dependency-injection';
-import {EventAggregator} from 'aurelia-event-aggregator';
 import {AppRouter} from '../src/app-router';
-import {PipelineProvider} from '../src/pipeline-provider';
 import {RouteLoader} from '../src/route-loading';
 import {Pipeline} from '../src/pipeline';
 
@@ -11,10 +9,6 @@ class MockHistory extends History {
   deactivate() {}
   navigate() {}
   navigateBack() {}
-}
-
-class MockEventAggregator {
-  publish(name, data) {}
 }
 
 class MockLoader extends RouteLoader {
@@ -39,7 +33,7 @@ describe('app-router', () => {
     history = new MockHistory();
     container = new Container();
     container.registerSingleton(RouteLoader, MockLoader);
-    ea = { publish(){} };
+    ea = { publish() {} };
     viewPort = {
       process(viewPortInstruction) {
         viewPortInstruction.behavior = {};
@@ -115,7 +109,7 @@ describe('app-router', () => {
 
       spyOn(ea, 'publish');
       processingResult = jasmine.objectContaining({ instruction });
-      completedResult = jasmine.objectContaining({ instruction, result: jasmine.objectContaining({}) })
+      completedResult = jasmine.objectContaining({ instruction, result: jasmine.objectContaining({}) });
     });
 
     it('triggers events on successful navigations', (done) => {

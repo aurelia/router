@@ -56,7 +56,7 @@ export class Pipeline {
 
         try {
           return currentStep(ctx, next);
-        } catch(e) {
+        } catch (e) {
           return next.reject(e);
         }
       } else {

@@ -1,10 +1,10 @@
 import {Redirect, isNavigationCommand} from '../src/navigation-commands';
-import core from 'core-js';
+import 'core-js';
 
 describe('isNavigationCommand', () => {
   it('should return true for object which has a navigate method', () => {
-    var nc = {
-      navigate(){}
+    let nc = {
+      navigate() {}
     };
 
     expect(isNavigationCommand(nc)).toBe(true);
@@ -19,14 +19,14 @@ describe('isNavigationCommand', () => {
 
 describe('Redirect', () => {
   it('should accept url in constructor and pass this url to passed router\'s navigate method as first parameter', () => {
-    var testurl = 'http://aurelia.io/',
-        redirect = new Redirect(testurl),
-        mockrouter = {
-          url: '',
-          navigate(url) {
-        	 this.url = url;
-          }
-        };
+    let testurl = 'http://aurelia.io/';
+    let redirect = new Redirect(testurl);
+    let mockrouter = {
+      url: '',
+      navigate(url) {
+        this.url = url;
+      }
+    };
 
     redirect.setRouter(mockrouter);
 
@@ -38,20 +38,20 @@ describe('Redirect', () => {
   });
 
   it('should accept options in constructor to use the app router', () => {
-    var testurl = 'http://aurelia.io/',
-        redirect = new Redirect(testurl, {useAppRouter:true}),
-        mockrouter = {
-          url: '',
-          navigate(url) {
-        	 this.url = url;
-          }
-        },
-        mockapprouter = {
-          url: '',
-          navigate(url) {
-        	 this.url = url;
-          }
-        };
+    let testurl = 'http://aurelia.io/';
+    let redirect = new Redirect(testurl, {useAppRouter: true});
+    let mockrouter = {
+      url: '',
+      navigate(url) {
+        this.url = url;
+      }
+    };
+    let mockapprouter = {
+      url: '',
+      navigate(url) {
+        this.url = url;
+      }
+    };
 
     redirect.setRouter(mockrouter);
 

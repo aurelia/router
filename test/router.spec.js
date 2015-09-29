@@ -4,10 +4,10 @@ import {AppRouter} from '../src/app-router';
 import {PipelineProvider} from '../src/pipeline-provider';
 
 class MockHistory extends History {
-  activate(){}
-  deactivate(){}
-  navigate(){}
-  navigateBack(){}
+  activate() {}
+  deactivate() {}
+  navigate() {}
+  navigateBack() {}
 }
 
 describe('the router', () => {
@@ -45,7 +45,7 @@ describe('the router', () => {
     });
 
     it('should not add a route to navigation if it has a nav=false', () => {
-      var testRoute = {};
+      let testRoute = {};
 
       router.addRoute({ route: 'test', moduleId: 'test', title: 'Resume', nav: false }, testRoute);
       expect(router.navigation).not.toContain(testRoute);
@@ -62,7 +62,6 @@ describe('the router', () => {
         'number2': { moduleId: 'test2' }
       }})).not.toThrow();
     });
-
   });
 
   describe('generate', () => {
@@ -93,8 +92,8 @@ describe('the router', () => {
 
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => {
-           expect(child.generate('test', { id: 1 })).toBe('#/test/1');
-           done();
+          expect(child.generate('test', { id: 1 })).toBe('#/test/1');
+          done();
         });
     });
 
@@ -112,7 +111,7 @@ describe('the router', () => {
     });
   });
 
-  describe('navigate', (done) => {
+  describe('navigate', () => {
     it('should navigate to absolute paths', (done) => {
       const options = {};
       spyOn(history, 'navigate');
@@ -130,7 +129,7 @@ describe('the router', () => {
         child.configure(config => {
           config.map([
             { name: 'child', route: 'child/:id', moduleId: './test' },
-            { name: 'empty', route: '', moduleId: './empty' },
+            { name: 'empty', route: '', moduleId: './empty' }
           ]);
         })
       ]).then(() => {
@@ -190,7 +189,7 @@ describe('the router', () => {
         .then(() => {
           router.navigateToRoute('test', { id: 123 }, options);
           expect(history.navigate).toHaveBeenCalledWith('#/test/123', options);
-          done();          
+          done();
         });
     });
   });
@@ -266,7 +265,7 @@ describe('the router', () => {
 
       router.configure(config => {
         return promise.then(x => {
-         config.map({ route: '', moduleId: './test' });
+          config.map({ route: '', moduleId: './test' });
         });
       });
 

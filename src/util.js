@@ -13,7 +13,7 @@ export function processPotential(obj, resolve, reject) {
 
   try {
     return resolve(obj);
-  } catch(error) {
+  } catch (error) {
     return reject(error);
   }
 }

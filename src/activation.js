@@ -46,7 +46,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
         let controller = infos[i];
         let result = controller[callbackName]();
         return processPotential(result, inspect, next.cancel);
-      } catch(error) {
+      } catch (error) {
         return next.cancel(error);
       }
     }
@@ -123,7 +123,7 @@ function processActivatable(navigationContext: NavigationContext, callbackName: 
         let current = infos[i];
         let result = current.controller[callbackName](...current.lifecycleArgs);
         return processPotential(result, val => inspect(val, current.router), next.cancel);
-      } catch(error) {
+      } catch (error) {
         return next.cancel(error);
       }
     }
