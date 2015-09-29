@@ -6,7 +6,6 @@ import {Router} from './router';
 import {PipelineProvider} from './pipeline-provider';
 import {isNavigationCommand} from './navigation-commands';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {RouterConfiguration} from './router-configuration';
 
 const logger = LogManager.getLogger('app-router');
 
@@ -85,21 +84,19 @@ export class AppRouter extends Router {
 
     if (!this.isActive) {
       let viewModel = this._findViewModel(viewPort);
-
       if ('configureRouter' in viewModel) {
-        let config = new RouterConfiguration();
-        let result = Promise.resolve(viewModel.configureRouter(config, this));
-
-        return result.then(() => {
-          this.configure(config);
-          this.activate();
-        });
+        if (!this.isConfigured) {
+          return this.configure(config => viewModel.configureRouter(config, this))
+            .then(() => { this.activate(); });
+        }
+      } else {
+        this.activate();
       }
-
-      this.activate();
     } else {
       this.dequeueInstruction();
     }
+
+    return Promise.resolve();
   }
 
   _findViewModel(viewPort: Object) {

@@ -1,5 +1,4 @@
 import {activationStrategy, buildNavigationPlan} from './navigation-plan';
-import {RouterConfiguration} from './router-configuration';
 
 export class RouteLoader {
   loadRoute(router: any, config: any, navigationContext: any) {
@@ -105,19 +104,16 @@ function loadComponent(routeLoader: RouteLoader, navigationContext: NavigationCo
   let lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
   return routeLoader.loadRoute(router, config, navigationContext).then((component) => {
+    let {bindingContext, childContainer} = component;
     component.router = router;
     component.config = config;
 
-    if ('configureRouter' in component.bindingContext) {
-      component.childRouter = component.childContainer.getChildRouter();
+    if ('configureRouter' in bindingContext) {
+      let childRouter = childContainer.getChildRouter();
+      component.childRouter = childRouter;
 
-      let routerConfig = new RouterConfiguration();
-      let result = Promise.resolve(component.bindingContext.configureRouter(routerConfig, component.childRouter, ...lifecycleArgs));
-
-      return result.then(() => {
-        component.childRouter.configure(routerConfig);
-        return component;
-      });
+      return childRouter.configure(c => bindingContext.configureRouter(c, childRouter, ...lifecycleArgs))
+        .then(() => component);
     }
 
     return component;
