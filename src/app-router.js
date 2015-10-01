@@ -15,7 +15,6 @@ export class AppRouter extends Router {
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
     super(container, history);
     this.pipelineProvider = pipelineProvider;
-    document.addEventListener('click', handleLinkClick.bind(this), true);
     this.events = events;
     this.maxInstructionCount = 10;
   }
@@ -139,49 +138,6 @@ export class AppRouter extends Router {
     this.queue = [];
     this.options = null;
   }
-}
-
-function findAnchor(el) {
-  while (el) {
-    if (el.tagName === 'A') {
-      return el;
-    }
-
-    el = el.parentNode;
-  }
-}
-
-function handleLinkClick(evt) {
-  if (!this.isActive) {
-    return;
-  }
-
-  let target = findAnchor(evt.target);
-  if (!target) {
-    return;
-  }
-
-  if (this.history._hasPushState) {
-    if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
-      let href = target.getAttribute('href');
-
-      // Ensure the protocol is not part of URL, meaning its relative.
-      // Stop the event bubbling to ensure the link will not cause a page refresh.
-      if (href !== null && !(href.charAt(0) === '#' || (/^[a-z]+:/i).test(href))) {
-        evt.preventDefault();
-        this.history.navigate(href);
-      }
-    }
-  }
-}
-
-function targetIsThisWindow(target) {
-  let targetWindow = target.getAttribute('target');
-
-  return !targetWindow ||
-    targetWindow === window.name ||
-    targetWindow === '_self' ||
-    (targetWindow === 'top' && window === window.top);
 }
 
 function processResult(instruction, result, instructionCount, router) {
