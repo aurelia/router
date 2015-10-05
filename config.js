@@ -18,6 +18,7 @@ System.config({
     "aurelia-event-aggregator": "github:aurelia/event-aggregator@0.8.0",
     "aurelia-history": "github:aurelia/history@0.7.0",
     "aurelia-logging": "github:aurelia/logging@0.7.0",
+    "aurelia-pal": "github:aurelia/pal@0.1.9",
     "aurelia-path": "github:aurelia/path@0.9.0",
     "aurelia-route-recognizer": "github:aurelia/route-recognizer@0.7.0",
     "babel": "npm:babel-core@5.2.2",

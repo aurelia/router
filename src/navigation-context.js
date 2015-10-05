@@ -1,4 +1,5 @@
 import {activationStrategy} from './navigation-plan';
+import {DOM} from 'aurelia-pal';
 
 export class NavigationContext {
   constructor(router: Router, nextInstruction: NavigationInstruction) {
@@ -82,7 +83,7 @@ export class NavigationContext {
   updateTitle(): void {
     let title = this.buildTitle();
     if (title) {
-      document.title = title;
+      DOM.title = title;
     }
   }
 
