@@ -2,8 +2,6 @@ import {activationStrategy} from './navigation-plan';
 import {isNavigationCommand} from './navigation-commands';
 import {processPotential} from './util';
 
-export let affirmations = ['yes', 'ok', 'true'];
-
 export class CanDeactivatePreviousStep {
   run(navigationContext: NavigationContext, next: Function) {
     return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
@@ -175,10 +173,6 @@ function shouldContinue(output, router: Router) {
     }
 
     return !!output.shouldContinueProcessing;
-  }
-
-  if (typeof output === 'string') {
-    return affirmations.indexOf(output.toLowerCase()) !== -1;
   }
 
   if (output === undefined) {
