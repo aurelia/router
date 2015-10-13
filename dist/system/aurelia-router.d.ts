@@ -2,6 +2,7 @@ declare module 'aurelia-router' {
   import 'core-js';
   import * as LogManager from 'aurelia-logging';
   import { Container }  from 'aurelia-dependency-injection';
+  import { DOM }  from 'aurelia-pal';
   import { RouteRecognizer }  from 'aurelia-route-recognizer';
   import { History }  from 'aurelia-history';
   import { EventAggregator }  from 'aurelia-event-aggregator';
@@ -67,6 +68,13 @@ declare module 'aurelia-router' {
       * The document title to set when this route is active.
       */
     title?: string;
+    
+    /**
+      * Arbitrary data to attach to the route. This can be used to attached custom data needed by components
+      * like pipeline steps and activated modules.
+      */
+    settings?: any;
+    [x: string]: any;
   }
   export class RouteFilterContainer {
     static inject(): any;
@@ -247,7 +255,6 @@ declare module 'aurelia-router' {
   export class BuildNavigationPlanStep {
     run(navigationContext: NavigationContext, next: Function): any;
   }
-  export let affirmations: any;
   export class CanDeactivatePreviousStep {
     run(navigationContext: NavigationContext, next: Function): any;
   }
@@ -351,9 +358,8 @@ declare module 'aurelia-router' {
       * Configures the router.
       *
       * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
-      * @chainable
       */
-    configure(callbackOrConfig: RouterConfiguration | ((config: RouterConfiguration) => RouterConfiguration)): Router;
+    configure(callbackOrConfig: RouterConfiguration | ((config: RouterConfiguration) => RouterConfiguration)): Promise<void>;
     
     /**
       * Navigates to a new location.

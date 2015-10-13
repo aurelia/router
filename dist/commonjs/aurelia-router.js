@@ -27,6 +27,8 @@ var LogManager = _interopRequireWildcard(_aureliaLogging);
 
 var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
+var _aureliaPal = require('aurelia-pal');
+
 var _aureliaRouteRecognizer = require('aurelia-route-recognizer');
 
 var _aureliaHistory = require('aurelia-history');
@@ -646,10 +648,6 @@ function getInstructionBaseUrl(instruction) {
   return instructionBaseUrlParts.join('');
 }
 
-var affirmations = ['yes', 'ok', 'true'];
-
-exports.affirmations = affirmations;
-
 var CanDeactivatePreviousStep = (function () {
   function CanDeactivatePreviousStep() {
     _classCallCheck(this, CanDeactivatePreviousStep);
@@ -862,10 +860,6 @@ function shouldContinue(output, router) {
     return !!output.shouldContinueProcessing;
   }
 
-  if (typeof output === 'string') {
-    return affirmations.indexOf(output.toLowerCase()) !== -1;
-  }
-
   if (output === undefined) {
     return true;
   }
@@ -953,7 +947,7 @@ var NavigationContext = (function () {
   NavigationContext.prototype.updateTitle = function updateTitle() {
     var title = this.buildTitle();
     if (title) {
-      document.title = title;
+      _aureliaPal.DOM.title = title;
     }
   };
 
@@ -1143,21 +1137,21 @@ function loadComponent(routeLoader, navigationContext, config) {
   var lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
   return routeLoader.loadRoute(router, config, navigationContext).then(function (component) {
+    var bindingContext = component.bindingContext;
+    var childContainer = component.childContainer;
+
     component.router = router;
     component.config = config;
 
-    if ('configureRouter' in component.bindingContext) {
+    if ('configureRouter' in bindingContext) {
       var _ret4 = (function () {
-        var _component$bindingContext;
-
-        component.childRouter = component.childContainer.getChildRouter();
-
-        var routerConfig = new RouterConfiguration();
-        var result = Promise.resolve((_component$bindingContext = component.bindingContext).configureRouter.apply(_component$bindingContext, [routerConfig, component.childRouter].concat(lifecycleArgs)));
+        var childRouter = childContainer.getChildRouter();
+        component.childRouter = childRouter;
 
         return {
-          v: result.then(function () {
-            component.childRouter.configure(routerConfig);
+          v: childRouter.configure(function (c) {
+            return bindingContext.configureRouter.apply(bindingContext, [c, childRouter].concat(lifecycleArgs));
+          }).then(function () {
             return component;
           })
         };
@@ -1199,20 +1193,22 @@ var Router = (function () {
   };
 
   Router.prototype.configure = function configure(callbackOrConfig) {
+    var _this = this;
+
     this.isConfigured = true;
 
+    var result = callbackOrConfig;
+    var config = undefined;
     if (typeof callbackOrConfig === 'function') {
-      var _config = new RouterConfiguration();
-      callbackOrConfig(_config);
-      _config.exportToRouter(this);
-    } else {
-      callbackOrConfig.exportToRouter(this);
+      config = new RouterConfiguration();
+      result = callbackOrConfig(config);
     }
 
-    this.isConfigured = true;
-    this._resolveConfiguredPromise();
-
-    return this;
+    return Promise.resolve(result).then(function (c) {
+      (c || config).exportToRouter(_this);
+      _this.isConfigured = true;
+      _this._resolveConfiguredPromise();
+    });
   };
 
   Router.prototype.navigate = function navigate(fragment, options) {
@@ -1289,10 +1285,10 @@ var Router = (function () {
     var state = this.recognizer.add({ path: path, handler: config });
 
     if (path) {
-      var settings = config.settings;
+      var _settings = config.settings;
       delete config.settings;
       var withChild = JSON.parse(JSON.stringify(config));
-      config.settings = settings;
+      config.settings = _settings;
       withChild.route = path + '/*childRoute';
       withChild.hasChildRouter = true;
       this.childRecognizer.add({
@@ -1366,7 +1362,7 @@ var Router = (function () {
   };
 
   Router.prototype.reset = function reset() {
-    var _this = this;
+    var _this2 = this;
 
     this.fallbackOrder = 100;
     this.recognizer = new _aureliaRouteRecognizer.RouteRecognizer();
@@ -1377,7 +1373,7 @@ var Router = (function () {
 
     if (this.isConfigured || !this._configuredPromise) {
       this._configuredPromise = new Promise(function (resolve) {
-        _this._resolveConfiguredPromise = resolve;
+        _this2._resolveConfiguredPromise = resolve;
       });
     }
 
@@ -1506,11 +1502,11 @@ var PipelineProvider = (function () {
   }
 
   PipelineProvider.prototype.createPipeline = function createPipeline(navigationContext) {
-    var _this2 = this;
+    var _this3 = this;
 
     var pipeline = new Pipeline();
     this.steps.forEach(function (step) {
-      return pipeline.withStep(_this2.container.get(step));
+      return pipeline.withStep(_this3.container.get(step));
     });
     return pipeline;
   };
@@ -1534,102 +1530,102 @@ var AppRouter = (function (_Router) {
 
     _Router.call(this, container, history);
     this.pipelineProvider = pipelineProvider;
-    document.addEventListener('click', handleLinkClick.bind(this), true);
     this.events = events;
     this.maxInstructionCount = 10;
   }
 
   AppRouter.prototype.loadUrl = function loadUrl(url) {
-    var _this3 = this;
+    var _this4 = this;
 
     return this.createNavigationInstruction(url).then(function (instruction) {
-      return _this3.queueInstruction(instruction);
+      return _this4.queueInstruction(instruction);
     })['catch'](function (error) {
       logger.error(error);
-      restorePreviousLocation(_this3);
+      restorePreviousLocation(_this4);
     });
   };
 
   AppRouter.prototype.queueInstruction = function queueInstruction(instruction) {
-    var _this4 = this;
+    var _this5 = this;
 
     return new Promise(function (resolve) {
       instruction.resolve = resolve;
-      _this4.queue.unshift(instruction);
-      _this4.dequeueInstruction();
+      _this5.queue.unshift(instruction);
+      _this5.dequeueInstruction();
     });
   };
 
   AppRouter.prototype.dequeueInstruction = function dequeueInstruction() {
-    var _this5 = this;
+    var _this6 = this;
 
     var instructionCount = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
     return Promise.resolve().then(function () {
-      if (_this5.isNavigating && !instructionCount) {
+      if (_this6.isNavigating && !instructionCount) {
         return undefined;
       }
 
-      var instruction = _this5.queue.shift();
-      _this5.queue = [];
+      var instruction = _this6.queue.shift();
+      _this6.queue = [];
 
       if (!instruction) {
         return undefined;
       }
 
-      _this5.isNavigating = true;
+      _this6.isNavigating = true;
 
       if (!instructionCount) {
-        _this5.events.publish('router:navigation:processing', { instruction: instruction });
-      } else if (instructionCount === _this5.maxInstructionCount - 1) {
+        _this6.events.publish('router:navigation:processing', { instruction: instruction });
+      } else if (instructionCount === _this6.maxInstructionCount - 1) {
         logger.error(instructionCount + 1 + ' navigation instructions have been attempted without success. Restoring last known good location.');
-        restorePreviousLocation(_this5);
-        return _this5.dequeueInstruction(instructionCount + 1);
-      } else if (instructionCount > _this5.maxInstructionCount) {
+        restorePreviousLocation(_this6);
+        return _this6.dequeueInstruction(instructionCount + 1);
+      } else if (instructionCount > _this6.maxInstructionCount) {
         throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 
-      var context = _this5.createNavigationContext(instruction);
-      var pipeline = _this5.pipelineProvider.createPipeline(context);
+      var context = _this6.createNavigationContext(instruction);
+      var pipeline = _this6.pipelineProvider.createPipeline(context);
 
       return pipeline.run(context).then(function (result) {
-        return processResult(instruction, result, instructionCount, _this5);
+        return processResult(instruction, result, instructionCount, _this6);
       })['catch'](function (error) {
         return { output: error instanceof Error ? error : new Error(error) };
       }).then(function (result) {
-        return resolveInstruction(instruction, result, !!instructionCount, _this5);
+        return resolveInstruction(instruction, result, !!instructionCount, _this6);
       });
     });
   };
 
   AppRouter.prototype.registerViewPort = function registerViewPort(viewPort, name) {
-    var _this6 = this;
+    var _this7 = this;
 
     _Router.prototype.registerViewPort.call(this, viewPort, name);
 
     if (!this.isActive) {
-      var viewModel = this._findViewModel(viewPort);
+      var _ret5 = (function () {
+        var viewModel = _this7._findViewModel(viewPort);
+        if ('configureRouter' in viewModel) {
+          if (!_this7.isConfigured) {
+            return {
+              v: _this7.configure(function (config) {
+                return viewModel.configureRouter(config, _this7);
+              }).then(function () {
+                _this7.activate();
+              })
+            };
+          }
+        } else {
+          _this7.activate();
+        }
+      })();
 
-      if ('configureRouter' in viewModel) {
-        var _ret5 = (function () {
-          var config = new RouterConfiguration();
-          var result = Promise.resolve(viewModel.configureRouter(config, _this6));
-
-          return {
-            v: result.then(function () {
-              _this6.configure(config);
-              _this6.activate();
-            })
-          };
-        })();
-
-        if (typeof _ret5 === 'object') return _ret5.v;
-      }
-
-      this.activate();
+      if (typeof _ret5 === 'object') return _ret5.v;
     } else {
       this.dequeueInstruction();
     }
+
+    return Promise.resolve();
   };
 
   AppRouter.prototype._findViewModel = function _findViewModel(viewPort) {
@@ -1684,44 +1680,6 @@ var AppRouter = (function (_Router) {
 })(Router);
 
 exports.AppRouter = AppRouter;
-
-function findAnchor(el) {
-  while (el) {
-    if (el.tagName === 'A') {
-      return el;
-    }
-
-    el = el.parentNode;
-  }
-}
-
-function handleLinkClick(evt) {
-  if (!this.isActive) {
-    return;
-  }
-
-  var target = findAnchor(evt.target);
-  if (!target) {
-    return;
-  }
-
-  if (this.history._hasPushState) {
-    if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
-      var _href = target.getAttribute('href');
-
-      if (_href !== null && !(_href.charAt(0) === '#' || /^[a-z]+:/i.test(_href))) {
-        evt.preventDefault();
-        this.history.navigate(_href);
-      }
-    }
-  }
-}
-
-function targetIsThisWindow(target) {
-  var targetWindow = target.getAttribute('target');
-
-  return !targetWindow || targetWindow === window.name || targetWindow === '_self' || targetWindow === 'top' && window === window.top;
-}
 
 function processResult(instruction, result, instructionCount, router) {
   if (!(result && 'completed' in result && 'output' in result)) {

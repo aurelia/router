@@ -1,6 +1,7 @@
 import 'core-js';
 import * as LogManager from 'aurelia-logging';
 import {Container} from 'aurelia-dependency-injection';
+import {DOM} from 'aurelia-pal';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {History} from 'aurelia-history';
 import {EventAggregator} from 'aurelia-event-aggregator';
@@ -133,7 +134,7 @@ export class Pipeline {
 
         try {
           return currentStep(ctx, next);
-        } catch(e) {
+        } catch (e) {
           return next.reject(e);
         }
       } else {
@@ -362,6 +363,14 @@ interface RouteConfig {
   * The document title to set when this route is active.
   */
   title?: string;
+
+  /**
+  * Arbitrary data to attach to the route. This can be used to attached custom data needed by components
+  * like pipeline steps and activated modules.
+  */
+  settings?: any;
+
+  [x: string]: any;
 }
 
 export function processPotential(obj, resolve, reject) {
@@ -379,7 +388,7 @@ export function processPotential(obj, resolve, reject) {
 
   try {
     return resolve(obj);
-  } catch(error) {
+  } catch (error) {
     return reject(error);
   }
 }
@@ -727,8 +736,6 @@ function getInstructionBaseUrl(instruction: NavigationInstruction): string {
   return instructionBaseUrlParts.join('');
 }
 
-export let affirmations = ['yes', 'ok', 'true'];
-
 export class CanDeactivatePreviousStep {
   run(navigationContext: NavigationContext, next: Function) {
     return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
@@ -771,7 +778,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
         let controller = infos[i];
         let result = controller[callbackName]();
         return processPotential(result, inspect, next.cancel);
-      } catch(error) {
+      } catch (error) {
         return next.cancel(error);
       }
     }
@@ -848,7 +855,7 @@ function processActivatable(navigationContext: NavigationContext, callbackName: 
         let current = infos[i];
         let result = current.controller[callbackName](...current.lifecycleArgs);
         return processPotential(result, val => inspect(val, current.router), next.cancel);
-      } catch(error) {
+      } catch (error) {
         return next.cancel(error);
       }
     }
@@ -900,10 +907,6 @@ function shouldContinue(output, router: Router) {
     }
 
     return !!output.shouldContinueProcessing;
-  }
-
-  if (typeof output === 'string') {
-    return affirmations.indexOf(output.toLowerCase()) !== -1;
   }
 
   if (output === undefined) {
@@ -995,7 +998,7 @@ export class NavigationContext {
   updateTitle(): void {
     let title = this.buildTitle();
     if (title) {
-      document.title = title;
+      DOM.title = title;
     }
   }
 
@@ -1141,19 +1144,16 @@ function loadComponent(routeLoader: RouteLoader, navigationContext: NavigationCo
   let lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
   return routeLoader.loadRoute(router, config, navigationContext).then((component) => {
+    let {bindingContext, childContainer} = component;
     component.router = router;
     component.config = config;
 
-    if ('configureRouter' in component.bindingContext) {
-      component.childRouter = component.childContainer.getChildRouter();
+    if ('configureRouter' in bindingContext) {
+      let childRouter = childContainer.getChildRouter();
+      component.childRouter = childRouter;
 
-      let routerConfig = new RouterConfiguration();
-      let result = Promise.resolve(component.bindingContext.configureRouter(routerConfig, component.childRouter, ...lifecycleArgs));
-
-      return result.then(() => {
-        component.childRouter.configure(routerConfig);
-        return component;
-      });
+      return childRouter.configure(c => bindingContext.configureRouter(c, childRouter, ...lifecycleArgs))
+        .then(() => component);
     }
 
     return component;
@@ -1239,23 +1239,22 @@ export class Router {
   * Configures the router.
   *
   * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
-  * @chainable
   */
-  configure(callbackOrConfig: RouterConfiguration|((config: RouterConfiguration) => RouterConfiguration)): Router {
+  configure(callbackOrConfig: RouterConfiguration|((config: RouterConfiguration) => RouterConfiguration)): Promise<void> {
     this.isConfigured = true;
 
+    let result = callbackOrConfig;
+    let config;
     if (typeof callbackOrConfig === 'function') {
-      let config = new RouterConfiguration();
-      callbackOrConfig(config);
-      config.exportToRouter(this);
-    } else {
-      callbackOrConfig.exportToRouter(this);
+      config = new RouterConfiguration();
+      result = callbackOrConfig(config);
     }
 
-    this.isConfigured = true;
-    this._resolveConfiguredPromise();
-
-    return this;
+    return Promise.resolve(result).then((c) => {
+      (c || config).exportToRouter(this);
+      this.isConfigured = true;
+      this._resolveConfiguredPromise();
+    });
   }
 
   /**
@@ -1623,7 +1622,6 @@ export class AppRouter extends Router {
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
     super(container, history);
     this.pipelineProvider = pipelineProvider;
-    document.addEventListener('click', handleLinkClick.bind(this), true);
     this.events = events;
     this.maxInstructionCount = 10;
   }
@@ -1692,21 +1690,19 @@ export class AppRouter extends Router {
 
     if (!this.isActive) {
       let viewModel = this._findViewModel(viewPort);
-
       if ('configureRouter' in viewModel) {
-        let config = new RouterConfiguration();
-        let result = Promise.resolve(viewModel.configureRouter(config, this));
-
-        return result.then(() => {
-          this.configure(config);
-          this.activate();
-        });
+        if (!this.isConfigured) {
+          return this.configure(config => viewModel.configureRouter(config, this))
+            .then(() => { this.activate(); });
+        }
+      } else {
+        this.activate();
       }
-
-      this.activate();
     } else {
       this.dequeueInstruction();
     }
+
+    return Promise.resolve();
   }
 
   _findViewModel(viewPort: Object) {
@@ -1749,49 +1745,6 @@ export class AppRouter extends Router {
     this.queue = [];
     this.options = null;
   }
-}
-
-function findAnchor(el) {
-  while (el) {
-    if (el.tagName === 'A') {
-      return el;
-    }
-
-    el = el.parentNode;
-  }
-}
-
-function handleLinkClick(evt) {
-  if (!this.isActive) {
-    return;
-  }
-
-  let target = findAnchor(evt.target);
-  if (!target) {
-    return;
-  }
-
-  if (this.history._hasPushState) {
-    if (!evt.altKey && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && targetIsThisWindow(target)) {
-      let href = target.getAttribute('href');
-
-      // Ensure the protocol is not part of URL, meaning its relative.
-      // Stop the event bubbling to ensure the link will not cause a page refresh.
-      if (href !== null && !(href.charAt(0) === '#' || (/^[a-z]+:/i).test(href))) {
-        evt.preventDefault();
-        this.history.navigate(href);
-      }
-    }
-  }
-}
-
-function targetIsThisWindow(target) {
-  let targetWindow = target.getAttribute('target');
-
-  return !targetWindow ||
-    targetWindow === window.name ||
-    targetWindow === '_self' ||
-    (targetWindow === 'top' && window === window.top);
 }
 
 function processResult(instruction, result, instructionCount, router) {
