@@ -1,4 +1,4 @@
-import {activationStrategy, buildNavigationPlan} from './navigation-plan';
+import {activationStrategy, _buildNavigationPlan} from './navigation-plan';
 
 export class RouteLoader {
   loadRoute(router: any, config: any, navigationContext: any) {
@@ -20,7 +20,7 @@ export class LoadRouteStep {
   }
 }
 
-export function loadNewRoute(routeLoader: RouteLoader, navigationContext: NavigationContext) {
+function loadNewRoute(routeLoader: RouteLoader, navigationContext: NavigationContext) {
   let toLoad = determineWhatToLoad(navigationContext);
   let loadPromises = toLoad.map((current) => loadRoute(
     routeLoader,
@@ -40,21 +40,17 @@ function determineWhatToLoad(navigationContext: NavigationContext, toLoad: Array
     let viewPortPlan = plan[viewPortName];
 
     if (viewPortPlan.strategy === activationStrategy.replace) {
-      toLoad.push({
-        viewPortPlan: viewPortPlan,
-        navigationContext: navigationContext
-      });
+      toLoad.push({ viewPortPlan, navigationContext });
 
       if (viewPortPlan.childNavigationContext) {
         determineWhatToLoad(viewPortPlan.childNavigationContext, toLoad);
       }
     } else {
       let viewPortInstruction = next.addViewPortInstruction(
-          viewPortName,
-          viewPortPlan.strategy,
-          viewPortPlan.prevModuleId,
-          viewPortPlan.prevComponent
-          );
+        viewPortName,
+        viewPortPlan.strategy,
+        viewPortPlan.prevModuleId,
+        viewPortPlan.prevComponent);
 
       if (viewPortPlan.childNavigationContext) {
         viewPortInstruction.childNavigationContext = viewPortPlan.childNavigationContext;
@@ -75,19 +71,18 @@ function loadRoute(routeLoader: RouteLoader, navigationContext: NavigationContex
       viewPortPlan.name,
       viewPortPlan.strategy,
       moduleId,
-      component
-      );
+      component);
 
     let childRouter = component.childRouter;
     if (childRouter) {
       let path = next.getWildcardPath();
 
-      return childRouter.createNavigationInstruction(path, next)
+      return childRouter._createNavigationInstruction(path, next)
         .then((childInstruction) => {
-          let childNavigationContext = childRouter.createNavigationContext(childInstruction);
+          let childNavigationContext = childRouter._createNavigationContext(childInstruction);
           viewPortPlan.childNavigationContext = childNavigationContext;
 
-          return buildNavigationPlan(childNavigationContext)
+          return _buildNavigationPlan(childNavigationContext)
             .then((childPlan) => {
               childNavigationContext.plan = childPlan;
               viewPortInstruction.childNavigationContext = childNavigationContext;

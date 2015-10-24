@@ -52,8 +52,8 @@ export class NavigationContext {
 
     next.config.navModel.isActive = true;
 
-    router.refreshBaseUrl();
-    router.refreshNavigation();
+    router._refreshBaseUrl();
+    router._refreshNavigation();
 
     for (let viewPortName in viewPortInstructions) {
       let viewPortInstruction = viewPortInstructions[viewPortName];

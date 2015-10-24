@@ -194,9 +194,9 @@ describe('the router', () => {
     });
   });
 
-  describe('createNavigationInstruction', () => {
+  describe('_createNavigationInstruction', () => {
     it('should reject when router not configured', (done) => {
-      router.createNavigationInstruction()
+      router._createNavigationInstruction()
         .then(x => expect(true).toBeFalsy('should have rejected'))
         .catch(reason => expect(reason).toBeTruthy())
         .then(done);
@@ -204,7 +204,7 @@ describe('the router', () => {
 
     it('should reject when route not found', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
-        .then(() => router.createNavigationInstruction('test'))
+        .then(() => router._createNavigationInstruction('test'))
         .then(() => expect(true).toBeFalsy('should have rejected'))
         .catch(reason => expect(reason).toBeTruthy())
         .then(done);
@@ -212,7 +212,7 @@ describe('the router', () => {
 
     it('should resolve matching routes', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
-        .then(() => router.createNavigationInstruction('test/123?foo=456'))
+        .then(() => router._createNavigationInstruction('test/123?foo=456'))
         .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'test/123', queryString: 'foo=456' })))
         .catch(reason => expect(true).toBeFalsy('should have succeeded'))
         .then(done);
@@ -224,7 +224,7 @@ describe('the router', () => {
           config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
           config.unknownRouteConfig = 'test';
         })
-        .then(() => router.createNavigationInstruction('foo/123?bar=456'))
+        .then(() => router._createNavigationInstruction('foo/123?bar=456'))
         .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'foo/123', queryString: 'bar=456' })))
         .catch(reason => expect(true).toBeFalsy('should have succeeded'))
         .then(done);

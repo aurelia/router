@@ -10,8 +10,10 @@ import {
   ActivateNextStep
 } from './activation';
 import {createRouteFilterStep} from './route-filters';
-import {NavigationContext} from './navigation-context';
 
+/**
+* Class responsible for creating the navigation pipeline.
+*/
 export class PipelineProvider {
   static inject() { return [Container]; }
 
@@ -33,9 +35,12 @@ export class PipelineProvider {
     ];
   }
 
-  createPipeline(navigationContext: NavigationContext): Pipeline {
+  /**
+  * Create the navigation pipeline.
+  */
+  createPipeline(): Pipeline {
     let pipeline = new Pipeline();
-    this.steps.forEach(step => pipeline.withStep(this.container.get(step)));
+    this.steps.forEach(step => pipeline.addStep(this.container.get(step)));
     return pipeline;
   }
 }

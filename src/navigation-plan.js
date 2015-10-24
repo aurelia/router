@@ -1,19 +1,32 @@
 import {Redirect} from './navigation-commands';
-import {resolveUrl} from './util';
+import {_resolveUrl} from './util';
 
+/**
+* The strategy to use when activating modules during navigation.
+*/
 export const activationStrategy = {
   noChange: 'no-change',
   invokeLifecycle: 'invoke-lifecycle',
   replace: 'replace'
 };
 
-export function buildNavigationPlan(navigationContext: NavigationContext, forceLifecycleMinimum): Promise<Object> {
+export class BuildNavigationPlanStep {
+  run(navigationContext: NavigationContext, next: Function) {
+    return _buildNavigationPlan(navigationContext)
+      .then(plan => {
+        navigationContext.plan = plan;
+        return next();
+      }).catch(next.cancel);
+  }
+}
+
+export function _buildNavigationPlan(navigationContext: NavigationContext, forceLifecycleMinimum): Promise<Object> {
   let prev = navigationContext.prevInstruction;
   let next = navigationContext.nextInstruction;
   let plan = {};
 
   if ('redirect' in next.config) {
-    let redirectLocation = resolveUrl(next.config.redirect, getInstructionBaseUrl(next));
+    let redirectLocation = _resolveUrl(next.config.redirect, getInstructionBaseUrl(next));
     if (next.queryString) {
       redirectLocation += '?' + next.queryString;
     }
@@ -52,11 +65,11 @@ export function buildNavigationPlan(navigationContext: NavigationContext, forceL
       if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
         let path = next.getWildcardPath();
         let task = prevViewPortInstruction.childRouter
-          .createNavigationInstruction(path, next).then(childInstruction => { // eslint-disable-line no-loop-func
+          ._createNavigationInstruction(path, next).then(childInstruction => { // eslint-disable-line no-loop-func
             viewPortPlan.childNavigationContext = prevViewPortInstruction.childRouter
-              .createNavigationContext(childInstruction);
+              ._createNavigationContext(childInstruction);
 
-            return buildNavigationPlan(
+            return _buildNavigationPlan(
               viewPortPlan.childNavigationContext,
               viewPortPlan.strategy === activationStrategy.invokeLifecycle)
               .then(childPlan => {
@@ -80,16 +93,6 @@ export function buildNavigationPlan(navigationContext: NavigationContext, forceL
   }
 
   return Promise.resolve(plan);
-}
-
-export class BuildNavigationPlanStep {
-  run(navigationContext: NavigationContext, next: Function) {
-    return buildNavigationPlan(navigationContext)
-      .then(plan => {
-        navigationContext.plan = plan;
-        return next();
-      }).catch(next.cancel);
-  }
 }
 
 function hasDifferentParameterValues(prev: NavigationInstruction, next: NavigationInstruction): boolean {

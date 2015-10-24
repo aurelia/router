@@ -1,6 +1,6 @@
 import {activationStrategy} from './navigation-plan';
 import {isNavigationCommand} from './navigation-commands';
-import {processPotential} from './util';
+import {_processPotential} from './util';
 
 export class CanDeactivatePreviousStep {
   run(navigationContext: NavigationContext, next: Function) {
@@ -43,7 +43,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
       try {
         let controller = infos[i];
         let result = controller[callbackName]();
-        return processPotential(result, inspect, next.cancel);
+        return _processPotential(result, inspect, next.cancel);
       } catch (error) {
         return next.cancel(error);
       }
@@ -120,7 +120,7 @@ function processActivatable(navigationContext: NavigationContext, callbackName: 
       try {
         let current = infos[i];
         let result = current.controller[callbackName](...current.lifecycleArgs);
-        return processPotential(result, val => inspect(val, current.router), next.cancel);
+        return _processPotential(result, val => inspect(val, current.router), next.cancel);
       } catch (error) {
         return next.cancel(error);
       }
