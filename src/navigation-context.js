@@ -2,6 +2,11 @@ import {activationStrategy} from './navigation-plan';
 import {DOM} from 'aurelia-pal';
 
 export class NavigationContext {
+  router: Router;
+  nextInstruction: NavigationInstruction;
+  currentInstruction: NavigationInstruction;
+  prevInstruction: NavigationInstruction;
+
   constructor(router: Router, nextInstruction: NavigationInstruction) {
     this.router = router;
     this.nextInstruction = nextInstruction;
