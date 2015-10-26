@@ -1,4 +1,4 @@
-export function processPotential(obj, resolve, reject) {
+export function _processPotential(obj, resolve, reject) {
   if (obj && typeof obj.then === 'function') {
     let dfd = obj.then(resolve);
 
@@ -18,7 +18,7 @@ export function processPotential(obj, resolve, reject) {
   }
 }
 
-export function normalizeAbsolutePath(path, hasPushState) {
+export function _normalizeAbsolutePath(path, hasPushState) {
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
   }
@@ -26,7 +26,7 @@ export function normalizeAbsolutePath(path, hasPushState) {
   return path;
 }
 
-export function createRootedPath(fragment, baseUrl, hasPushState) {
+export function _createRootedPath(fragment, baseUrl, hasPushState) {
   if (isAbsoluteUrl.test(fragment)) {
     return fragment;
   }
@@ -47,15 +47,15 @@ export function createRootedPath(fragment, baseUrl, hasPushState) {
     path = path.substring(0, path.length - 1);
   }
 
-  return normalizeAbsolutePath(path + fragment, hasPushState);
+  return _normalizeAbsolutePath(path + fragment, hasPushState);
 }
 
-export function resolveUrl(fragment, baseUrl, hasPushState) {
+export function _resolveUrl(fragment, baseUrl, hasPushState) {
   if (isRootedPath.test(fragment)) {
-    return normalizeAbsolutePath(fragment, hasPushState);
+    return _normalizeAbsolutePath(fragment, hasPushState);
   }
 
-  return createRootedPath(fragment, baseUrl, hasPushState);
+  return _createRootedPath(fragment, baseUrl, hasPushState);
 }
 
 const isRootedPath = /^#?\//;

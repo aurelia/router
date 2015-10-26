@@ -46,7 +46,7 @@ describe('app-router', () => {
     provider = {
       createPipeline() {
         let p = new Pipeline();
-        p.withStep({ run(ctx, next) { return pipelineStep(ctx, next); } });
+        p.addStep({ run(ctx, next) { return pipelineStep(ctx, next); } });
         return p;
       }
     };
@@ -115,7 +115,7 @@ describe('app-router', () => {
     it('triggers events on successful navigations', (done) => {
       pipelineStep = (ctx, next) => next.complete({});
 
-      router.dequeueInstruction()
+      router._dequeueInstruction()
         .then(result => {
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:processing', processingResult);
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:success', completedResult);
@@ -129,7 +129,7 @@ describe('app-router', () => {
       let output = {};
       pipelineStep = (ctx, next) => next.complete(output);
 
-      router.dequeueInstruction()
+      router._dequeueInstruction()
         .then(result => {
           expect(result.completed).toBe(true);
           expect(result.status).toBe('completed');
@@ -143,7 +143,7 @@ describe('app-router', () => {
     it('triggers events on canceled navigations', (done) => {
       pipelineStep = (ctx, next) => next.cancel('test');
 
-      router.dequeueInstruction()
+      router._dequeueInstruction()
         .then(result => {
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:processing', processingResult);
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:canceled', completedResult);
@@ -157,7 +157,7 @@ describe('app-router', () => {
       let output = {};
       pipelineStep = (ctx, next) => next.cancel(output);
 
-      router.dequeueInstruction()
+      router._dequeueInstruction()
         .then(result => {
           expect(result.completed).toBe(false);
           expect(result.status).toBe('canceled');
@@ -171,7 +171,7 @@ describe('app-router', () => {
     it('triggers events on error navigations', (done) => {
       pipelineStep = (ctx, next) => { throw new Error('test'); };
 
-      router.dequeueInstruction()
+      router._dequeueInstruction()
         .then(result => {
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:processing', processingResult);
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:error', completedResult);
@@ -185,7 +185,7 @@ describe('app-router', () => {
       let output = new Error('test');
       pipelineStep = (ctx, next) => next.reject(output);
 
-      router.dequeueInstruction()
+      router._dequeueInstruction()
         .then(result => {
           expect(result.completed).toBe(false);
           expect(result.status).toBe('rejected');

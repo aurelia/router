@@ -1,14 +1,45 @@
 import 'core-js';
 
+/**
+* Class used to represent an instruction during a navigation.
+*/
 export class NavigationInstruction {
+  /**
+  * The URL fragment.
+  */
   fragment: string;
+
+  /**
+  * The query string.
+  */
   queryString: string;
-  params: any;
-  queryParams: any;
-  config: any;
+
+  /**
+  * Parameters extracted from the route pattern.
+  */
+  params: Object;
+
+  /**
+  * Parameters extracted from the query string.
+  */
+  queryParams: Object;
+
+  /**
+  * The route config for the route matching this instruction.
+  */
+  config: Object;
+
+  /**
+  * The parent instruction, if this instruction was created by a child router.
+  */
   parentInstruction: NavigationInstruction;
 
-  constructor(fragment: string, queryString?: string, params?: any, queryParams?: any, config?: any, parentInstruction?: NavigationInstruction) {
+  /**
+  * viewPort instructions to used activation.
+  */
+  viewPortInstructions: Object[];
+
+  constructor(fragment: string, queryString?: string, params?: Object, queryParams?: Object, config?: Object, parentInstruction?: NavigationInstruction) {
     this.fragment = fragment;
     this.queryString = queryString;
     this.params = params || {};
@@ -34,6 +65,9 @@ export class NavigationInstruction {
     this.lifecycleArgs = [allParams, config, this];
   }
 
+  /**
+  * Adds a viewPort instruction.
+  */
   addViewPortInstruction(viewPortName, strategy, moduleId, component): any {
     let viewportInstruction = this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
@@ -47,11 +81,18 @@ export class NavigationInstruction {
     return viewportInstruction;
   }
 
+  /**
+  * Gets the name of the route pattern's wildcard parameter, if applicable.
+  */
   getWildCardName(): string {
     let wildcardIndex = this.config.route.lastIndexOf('*');
     return this.config.route.substr(wildcardIndex + 1);
   }
 
+  /**
+  * Gets the path and query string created by filling the route
+  * pattern's wildcard parameter with the matching param.
+  */
   getWildcardPath(): string {
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
@@ -63,6 +104,9 @@ export class NavigationInstruction {
     return path;
   }
 
+  /**
+  * Gets the instruction's base URL, accounting for wildcard route parameters.
+  */
   getBaseUrl(): string {
     if (!this.params) {
       return this.fragment;

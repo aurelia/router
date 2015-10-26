@@ -1,8 +1,5 @@
 /**
 * Class for storing and interacting with a route's navigation settings.
-*
-* @class NavModel
-* @constructor
 */
 export class NavModel {
 
@@ -46,7 +43,6 @@ export class NavModel {
   *  If the a navigation is in progress, the change will be applied
   *  to document.title when the navigation completes.
   *
-  * @method setTitle
   * @param title The new title.
   */
   setTitle(title: string): void {

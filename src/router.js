@@ -7,9 +7,9 @@ import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
 import {
-  processPotential,
-  createRootedPath,
-  resolveUrl} from './util';
+  _processPotential,
+  _createRootedPath,
+  _resolveUrl} from './util';
 import {RouteConfig} from './interfaces';
 
 /**
@@ -53,6 +53,11 @@ export class Router {
   currentInstruction: NavigationInstruction;
 
   /**
+  * The parent router, or null if this instance is not a child router.
+  */
+  parent: Router;
+
+  /**
   * @param container The [[Container]] to use when child routers.
   * @param history The [[History]] implementation to delegate navigation requests to.
   */
@@ -66,7 +71,7 @@ export class Router {
   * Gets a valid indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
   */
   get isRoot(): boolean {
-    return false;
+    return !this.parent;
   }
 
   /**
@@ -120,7 +125,7 @@ export class Router {
       return this.parent.navigate(fragment, options);
     }
 
-    return this.history.navigate(resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
+    return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
   /**
@@ -139,7 +144,7 @@ export class Router {
   /**
   * Navigates back to the most recent location in history.
   */
-  navigateBack() {
+  navigateBack(): void {
     this.history.navigateBack();
   }
 
@@ -173,7 +178,7 @@ export class Router {
     }
 
     let path = this.recognizer.generate(name, params);
-    return createRootedPath(path, this.baseUrl, this.history._hasPushState);
+    return _createRootedPath(path, this.baseUrl, this.history._hasPushState);
   }
 
   /**
@@ -295,7 +300,7 @@ export class Router {
         instruction.config.moduleId = config;
         done(instruction);
       } else if (typeof config === 'function') {
-        processPotential(config(instruction), done, reject);
+        _processPotential(config(instruction), done, reject);
       } else {
         instruction.config = config;
         done(instruction);
@@ -336,25 +341,25 @@ export class Router {
     this.isConfigured = false;
   }
 
-  refreshBaseUrl(): void {
+  _refreshBaseUrl(): void {
     if (this.parent) {
       let baseUrl = this.parent.currentInstruction.getBaseUrl();
       this.baseUrl = this.parent.baseUrl + baseUrl;
     }
   }
 
-  refreshNavigation(): void {
+  _refreshNavigation(): void {
     let nav = this.navigation;
 
     for (let i = 0, length = nav.length; i < length; i++) {
       let current = nav[i];
       if (!current.href) {
-        current.href = createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+        current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
       }
     }
   }
 
-  createNavigationInstruction(url: string = '', parentInstruction: NavigationInstruction = null): Promise<NavigationInstruction> {
+  _createNavigationInstruction(url: string = '', parentInstruction: NavigationInstruction = null): Promise<NavigationInstruction> {
     let fragment = url;
     let queryString = '';
 
@@ -404,7 +409,7 @@ export class Router {
     return Promise.reject(new Error(`Route not found: ${url}`));
   }
 
-  createNavigationContext(instruction:NavigationInstruction):NavigationContext {
+  _createNavigationContext(instruction:NavigationInstruction):NavigationContext {
     instruction.navigationContext = new NavigationContext(this, instruction);
     return instruction.navigationContext;
   }

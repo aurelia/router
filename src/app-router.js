@@ -9,6 +9,9 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 
 const logger = LogManager.getLogger('app-router');
 
+/**
+* The main application router.
+*/
 export class AppRouter extends Router {
   static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
 
@@ -19,28 +22,88 @@ export class AppRouter extends Router {
     this.maxInstructionCount = 10;
   }
 
-  get isRoot(): boolean {
-    return true;
-  }
-
+  /**
+  * Loads the specified URL.
+  *
+  * @param url The URL fragment to load.
+  */
   loadUrl(url): Promise<NavigationInstruction> {
-    return this.createNavigationInstruction(url)
-      .then(instruction => this.queueInstruction(instruction))
+    return this._createNavigationInstruction(url)
+      .then(instruction => this._queueInstruction(instruction))
       .catch(error => {
         logger.error(error);
         restorePreviousLocation(this);
       });
   }
 
-  queueInstruction(instruction: NavigationInstruction): Promise<any> {
+  /**
+  * Registers a viewPort to be used as a rendering target for activated routes.
+  *
+  * @param viewPort The viewPort.
+  * @param name The name of the viewPort. 'default' if unspecified.
+  */
+  registerViewPort(viewPort: Object, name: string): Promise<any> {
+    super.registerViewPort(viewPort, name);
+
+    if (!this.isActive) {
+      let viewModel = this._findViewModel(viewPort);
+      if ('configureRouter' in viewModel) {
+        if (!this.isConfigured) {
+          return this.configure(config => viewModel.configureRouter(config, this))
+            .then(() => { this.activate(); });
+        }
+      } else {
+        this.activate();
+      }
+    } else {
+      this._dequeueInstruction();
+    }
+
+    return Promise.resolve();
+  }
+
+  /**
+  * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
+  *
+  * @params options The set of options to activate the router with.
+  */
+  activate(options: Object): void {
+    if (this.isActive) {
+      return;
+    }
+
+    this.isActive = true;
+    this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
+    this.history.activate(this.options);
+    this._dequeueInstruction();
+  }
+
+  /**
+  * Deactivates the router.
+  */
+  deactivate(): void {
+    this.isActive = false;
+    this.history.deactivate();
+  }
+
+  /**
+  * Resets the router to its initial state.
+  */
+  reset(): void {
+    super.reset();
+    this.queue = [];
+    this.options = null;
+  }
+
+  _queueInstruction(instruction: NavigationInstruction): Promise<any> {
     return new Promise((resolve) => {
       instruction.resolve = resolve;
       this.queue.unshift(instruction);
-      this.dequeueInstruction();
+      this._dequeueInstruction();
     });
   }
 
-  dequeueInstruction(instructionCount: number = 0): Promise<any> {
+  _dequeueInstruction(instructionCount: number = 0): Promise<any> {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
         return undefined;
@@ -60,13 +123,13 @@ export class AppRouter extends Router {
       } else if (instructionCount === this.maxInstructionCount - 1) {
         logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
         restorePreviousLocation(this);
-        return this.dequeueInstruction(instructionCount + 1);
+        return this._dequeueInstruction(instructionCount + 1);
       } else if (instructionCount > this.maxInstructionCount) {
         throw new Error(`Maximum navigation attempts exceeded. Giving up.`);
       }
 
-      let context = this.createNavigationContext(instruction);
-      let pipeline = this.pipelineProvider.createPipeline(context);
+      let context = this._createNavigationContext(instruction);
+      let pipeline = this.pipelineProvider.createPipeline();
 
       return pipeline
         .run(context)
@@ -78,27 +141,7 @@ export class AppRouter extends Router {
     });
   }
 
-  registerViewPort(viewPort: Object, name: string): void {
-    super.registerViewPort(viewPort, name);
-
-    if (!this.isActive) {
-      let viewModel = this._findViewModel(viewPort);
-      if ('configureRouter' in viewModel) {
-        if (!this.isConfigured) {
-          return this.configure(config => viewModel.configureRouter(config, this))
-            .then(() => { this.activate(); });
-        }
-      } else {
-        this.activate();
-      }
-    } else {
-      this.dequeueInstruction();
-    }
-
-    return Promise.resolve();
-  }
-
-  _findViewModel(viewPort: Object) {
+  _findViewModel(viewPort: Object): Object {
     if (this.container.viewModel) {
       return this.container.viewModel;
     }
@@ -115,28 +158,6 @@ export class AppRouter extends Router {
         container = container.parent;
       }
     }
-  }
-
-  activate(options: Object): void {
-    if (this.isActive) {
-      return;
-    }
-
-    this.isActive = true;
-    this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
-    this.history.activate(this.options);
-    this.dequeueInstruction();
-  }
-
-  deactivate(): void {
-    this.isActive = false;
-    this.history.deactivate();
-  }
-
-  reset(): void {
-    super.reset();
-    this.queue = [];
-    this.options = null;
   }
 }
 
@@ -161,7 +182,7 @@ function processResult(instruction, result, instructionCount, router) {
     }
   }
 
-  return router.dequeueInstruction(instructionCount + 1)
+  return router._dequeueInstruction(instructionCount + 1)
     .then(innerResult => finalResult || innerResult || result);
 }
 
