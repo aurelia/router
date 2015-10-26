@@ -1,5 +1,4 @@
 import {activationStrategy} from './navigation-plan';
-import {DOM} from 'aurelia-pal';
 
 export class NavigationContext {
   router: Router;
@@ -88,7 +87,7 @@ export class NavigationContext {
   updateTitle(): void {
     let title = this.buildTitle();
     if (title) {
-      DOM.title = title;
+      this.router.history.setTitle(title);
     }
   }
 
