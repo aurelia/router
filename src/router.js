@@ -286,6 +286,10 @@ export class Router {
   * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
   */
   handleUnknownRoutes(config?: string|Function|RouteConfig): void {
+    if (!config) {
+      throw new Error('Invalid unknown route handler');
+    }
+
     let callback = instruction => new Promise((resolve, reject) => {
       function done(inst) {
         inst = inst || instruction;
@@ -293,10 +297,7 @@ export class Router {
         resolve(inst);
       }
 
-      if (!config) {
-        instruction.config.moduleId = instruction.fragment;
-        done(instruction);
-      } else if (typeof config === 'string') {
+      if (typeof config === 'string') {
         instruction.config.moduleId = config;
         done(instruction);
       } else if (typeof config === 'function') {
