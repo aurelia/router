@@ -218,16 +218,82 @@ describe('the router', () => {
         .then(done);
     });
 
-    it('should use catchAllHandler when route doesn\'t match', (done) => {
-      router
-        .configure(config => {
-          config.map({ name: 'test', route: 'test/:id', moduleId: './test' });
-          config.unknownRouteConfig = 'test';
-        })
-        .then(() => router._createNavigationInstruction('foo/123?bar=456'))
-        .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'foo/123', queryString: 'bar=456' })))
-        .catch(reason => expect(true).toBeFalsy('should have succeeded'))
-        .then(done);
+    describe('catchAllHandler', () => {
+      let expectedInstructionShape = jasmine.objectContaining({ config: jasmine.objectContaining({ moduleId: 'test' }) });
+
+      it('should use string moduleId handler', (done) => {
+        router
+          .configure(config => {
+            config.unknownRouteConfig = 'test';
+          })
+          .then(() => router._createNavigationInstruction('foo/123?bar=456'))
+          .then(x => expect(x).toEqual(expectedInstructionShape))
+          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .then(done);
+      });
+
+      it('should use route config handler', (done) => {
+        router
+          .configure(config => {
+            config.unknownRouteConfig = { moduleId: 'test' };
+          })
+          .then(() => router._createNavigationInstruction('foo/123?bar=456'))
+          .then(x => expect(x).toEqual(expectedInstructionShape))
+          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .then(done);
+      });
+
+      it('should use function handler', (done) => {
+        router
+          .configure(config => {
+            config.unknownRouteConfig = instruction => ({ moduleId: 'test' });
+          })
+          .then(() => router._createNavigationInstruction('foo/123?bar=456'))
+          .then(x => expect(x).toEqual(expectedInstructionShape))
+          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .then(done);
+      });
+
+      it('should use async function handler', (done) => {
+        router
+          .configure(config => {
+            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' });
+          })
+          .then(() => router._createNavigationInstruction('foo/123?bar=456'))
+          .then(x => expect(x).toEqual(expectedInstructionShape))
+          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .then(done);
+      });
+
+      it('should pass instruction to function handler', (done) => {
+        router
+          .configure(config => {
+            config.unknownRouteConfig = instruction => {
+              expect(instruction).toEqual(jasmine.objectContaining({ fragment: 'foo/123', queryString: 'bar=456', config: null }));
+              return { moduleId: 'test' };
+            };
+          })
+          .then(() => router._createNavigationInstruction('foo/123?bar=456'))
+          .then(x => expect(x).toEqual(expectedInstructionShape))
+          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .then(done);
+      });
+
+      it('should throw on invalid handlers', () => {
+        expect(() => {
+          router.handleUnknownRoutes(null);
+        }).toThrow();
+      });
+
+      it('should reject invalid configs', (done) => {
+        router
+          .configure(config => {
+            config.unknownRouteConfig = instruction => null;
+          })
+          .then(() => router._createNavigationInstruction('foo/123?bar=456'))
+          .then(x => expect(true).toBeFalsy('should have rejected', x))
+          .catch(reason => done());
+      });
     });
   });
 

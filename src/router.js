@@ -7,7 +7,6 @@ import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
 import {
-  _processPotential,
   _createRootedPath,
   _resolveUrl} from './util';
 import {RouteConfig} from './interfaces';
@@ -290,25 +289,13 @@ export class Router {
       throw new Error('Invalid unknown route handler');
     }
 
-    let callback = instruction => new Promise((resolve, reject) => {
-      function done(inst) {
-        inst = inst || instruction;
-        inst.config.route = inst.params.path;
-        resolve(inst);
-      }
-
-      if (typeof config === 'string') {
-        instruction.config.moduleId = config;
-        done(instruction);
-      } else if (typeof config === 'function') {
-        _processPotential(config(instruction), done, reject);
-      } else {
-        instruction.config = config;
-        done(instruction);
-      }
-    });
-
-    this.catchAllHandler = callback;
+    this.catchAllHandler = instruction => {
+      return this._createRouteConfig(config, instruction)
+        .then(c => {
+          instruction.config = c;
+          return instruction;
+        });
+    };
   }
 
   /**
@@ -376,15 +363,16 @@ export class Router {
     }
 
     if ((!results || !results.length) && this.catchAllHandler) {
-      results = [{
-        config: {
-          navModel: {}
-        },
-        handler: this.catchAllHandler,
-        params: {
-          path: fragment
-        }
-      }];
+      let params = { path: fragment };
+      let instruction = new NavigationInstruction(
+        fragment,
+        queryString,
+        params,
+        results && results.queryParams,
+        null, // config will be created by the catchAllHandler
+        parentInstruction);
+
+      return evaluateNavigationStrategy(instruction, this.catchAllHandler);
     }
 
     if (results && results.length) {
@@ -395,8 +383,7 @@ export class Router {
         first.params,
         first.queryParams || results.queryParams,
         first.config || first.handler,
-        parentInstruction
-        );
+        parentInstruction);
 
       if (typeof first.handler === 'function') {
         return evaluateNavigationStrategy(instruction, first.handler, first);
@@ -410,9 +397,33 @@ export class Router {
     return Promise.reject(new Error(`Route not found: ${url}`));
   }
 
-  _createNavigationContext(instruction:NavigationInstruction):NavigationContext {
+  _createNavigationContext(instruction: NavigationInstruction): NavigationContext {
     instruction.navigationContext = new NavigationContext(this, instruction);
     return instruction.navigationContext;
+  }
+
+  _createRouteConfig(config, instruction) {
+    return Promise.resolve(config)
+      .then(c => {
+        if (typeof c === 'string') {
+          return { moduleId: c };
+        } else if (typeof c === 'function') {
+          return c(instruction);
+        }
+
+        return c;
+      })
+      .then(c => typeof c === 'string' ? { moduleId: c } : c)
+      .then(c => {
+        c.route = instruction.params.path;
+        validateRouteConfig(c);
+
+        if (!c.navModel) {
+          c.navModel = this.createNavModel(c);
+        }
+
+        return c;
+      });
   }
 }
 

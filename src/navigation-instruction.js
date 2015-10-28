@@ -52,7 +52,7 @@ export class NavigationInstruction {
     let current = this;
     do {
       let currentParams = Object.assign({}, current.params);
-      if (current.config.hasChildRouter) {
+      if (current.config && current.config.hasChildRouter) {
         // remove the param for the injected child route segment
         delete currentParams[current.getWildCardName()];
       }
