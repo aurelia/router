@@ -21,9 +21,6 @@ export class Router {
   container: Container;
   history: History;
   viewPorts: Object = {};
-  fallbackOrder: number = 100;
-  recognizer: RouteRecognizer = new RouteRecognizer();
-  childRecognizer: RouteRecognizer = new RouteRecognizer();
   routes: RouteConfig[] = [];
 
   /**
@@ -55,6 +52,10 @@ export class Router {
   * The parent router, or null if this instance is not a child router.
   */
   parent: Router;
+
+  _fallbackOrder: number = 100;
+  _recognizer: RouteRecognizer = new RouteRecognizer();
+  _childRecognizer: RouteRecognizer = new RouteRecognizer();
 
   /**
   * @param container The [[Container]] to use when child routers.
@@ -171,7 +172,7 @@ export class Router {
   * @returns {string} A string containing the generated URL fragment.
   */
   generate(name: string, params?: Object): string {
-    let hasRoute = this.recognizer.hasRoute(name);
+    let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params);
     }
@@ -180,7 +181,7 @@ export class Router {
       throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
     }
 
-    let path = this.recognizer.generate(name, params);
+    let path = this._recognizer.generate(name, params);
     return _createRootedPath(path, this.baseUrl, this.history._hasPushState);
   }
 
@@ -229,7 +230,7 @@ export class Router {
       path = path.substr(1);
     }
 
-    let state = this.recognizer.add({path: path, handler: config});
+    let state = this._recognizer.add({path: path, handler: config});
 
     if (path) {
       let settings = config.settings;
@@ -238,7 +239,7 @@ export class Router {
       config.settings = settings;
       withChild.route = `${path}/*childRoute`;
       withChild.hasChildRouter = true;
-      this.childRecognizer.add({
+      this._childRecognizer.add({
         path: withChild.route,
         handler: withChild
       });
@@ -255,7 +256,7 @@ export class Router {
       }
 
       if (typeof navModel.order !== 'number') {
-        navModel.order = ++this.fallbackOrder;
+        navModel.order = ++this._fallbackOrder;
       }
 
       this.navigation.push(navModel);
@@ -267,20 +268,18 @@ export class Router {
   * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
   *
   * @param name The name of the route to check.
-  * @returns {boolean}
   */
   hasRoute(name: string): boolean {
-    return !!(this.recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
+    return !!(this._recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
   }
 
   /**
   * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
   *
   * @param name The name of the route to check.
-  * @returns {boolean}
   */
   hasOwnRoute(name: string): boolean {
-    return this.recognizer.hasRoute(name);
+    return this._recognizer.hasRoute(name);
   }
 
   /**
@@ -317,9 +316,9 @@ export class Router {
   * Resets the Router to its original unconfigured state.
   */
   reset(): void {
-    this.fallbackOrder = 100;
-    this.recognizer = new RouteRecognizer();
-    this.childRecognizer = new RouteRecognizer();
+    this._fallbackOrder = 100;
+    this._recognizer = new RouteRecognizer();
+    this._childRecognizer = new RouteRecognizer();
     this.routes = [];
     this.isNavigating = false;
     this.navigation = [];
@@ -361,9 +360,9 @@ export class Router {
       queryString = url.substr(queryIndex + 1);
     }
 
-    let results = this.recognizer.recognize(url);
+    let results = this._recognizer.recognize(url);
     if (!results || !results.length) {
-      results = this.childRecognizer.recognize(url);
+      results = this._childRecognizer.recognize(url);
     }
 
     if ((!results || !results.length) && this.catchAllHandler) {
