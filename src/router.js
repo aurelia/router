@@ -68,7 +68,7 @@ export class Router {
   }
 
   /**
-  * Gets a valid indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
+  * Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
   */
   get isRoot(): boolean {
     return !this.parent;
