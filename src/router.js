@@ -107,7 +107,11 @@ export class Router {
     }
 
     return Promise.resolve(result).then((c) => {
-      (c || config).exportToRouter(this);
+      if (c && c.exportToRouter) {
+        config = c;
+      }
+
+      config.exportToRouter(this);
       this.isConfigured = true;
       this._resolveConfiguredPromise();
     });
