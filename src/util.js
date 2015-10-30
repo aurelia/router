@@ -1,23 +1,3 @@
-export function _processPotential(obj, resolve, reject) {
-  if (obj && typeof obj.then === 'function') {
-    let dfd = obj.then(resolve);
-
-    if (typeof dfd.catch === 'function') {
-      return dfd.catch(reject);
-    } else if (typeof dfd.fail === 'function') {
-      return dfd.fail(reject);
-    }
-
-    return dfd;
-  }
-
-  try {
-    return resolve(obj);
-  } catch (error) {
-    return reject(error);
-  }
-}
-
 export function _normalizeAbsolutePath(path, hasPushState) {
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;

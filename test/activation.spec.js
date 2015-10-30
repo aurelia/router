@@ -76,6 +76,15 @@ describe('activation', () => {
       });
     });
 
+    it('should cancel for context that throws in canDeactivate', (done) => {
+      let singleNavPromiseContext = { plan: {first: viewPortFactory(() => { throw new Error('oops') }) } };
+
+      sut.run(singleNavPromiseContext, next).then(() => {
+        expect(nextResult).toBe('cancel');
+        done();
+      });
+    });
+
     it('should return true when all plans return true', () => {
       let doubleNavContext = { plan: { first: viewPortFactory(() => (true)), second: viewPortFactory(() => (true))} };
 
