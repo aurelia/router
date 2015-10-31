@@ -4,13 +4,11 @@ export class NavigationContext {
   router: Router;
   nextInstruction: NavigationInstruction;
   currentInstruction: NavigationInstruction;
-  prevInstruction: NavigationInstruction;
 
   constructor(router: Router, nextInstruction: NavigationInstruction) {
     this.router = router;
     this.nextInstruction = nextInstruction;
     this.currentInstruction = router.currentInstruction;
-    this.prevInstruction = router.currentInstruction;
   }
 
   getAllContexts(acc?: Array<NavigationContext> = []): Array<NavigationContext> {
@@ -31,13 +29,9 @@ export class NavigationContext {
     return this.getAllContexts().map(c => c.currentInstruction).filter(c => c);
   }
 
-  get prevInstructions(): Array<NavigationInstruction> {
-    return this.getAllContexts().map(c => c.prevInstruction).filter(c => c);
-  }
-
   commitChanges(waitToSwap: boolean) {
     let next = this.nextInstruction;
-    let prev = this.prevInstruction;
+    let current = this.currentInstruction;
     let viewPortInstructions = next.viewPortInstructions;
     let router = this.router;
     let loads = [];
@@ -45,8 +39,8 @@ export class NavigationContext {
 
     router.currentInstruction = next;
 
-    if (prev) {
-      prev.config.navModel.isActive = false;
+    if (current) {
+      current.config.navModel.isActive = false;
     }
 
     next.config.navModel.isActive = true;
