@@ -7,7 +7,7 @@ describe('activation', () => {
   let viewPortFactory = (resultHandler, strategy = activationStrategy.invokeLifecycle) => {
     return {
       strategy: strategy,
-      prevComponent: { bindingContext: { canDeactivate: resultHandler } }
+      prevComponent: { viewModel: { canDeactivate: resultHandler } }
     };
   };
 
@@ -122,21 +122,21 @@ describe('activation', () => {
     });
 
     describe('with router and currentInstruction', ()=> {
-      let bindingContext = { };
+      let viewModel = { };
       let viewPort = viewPortFactory(() => (true));
       let navContextWithRouter = { plan: { first: viewPort } };
 
-      viewPort.prevComponent.childRouter = { currentInstruction: { viewPortInstructions: { first: { component: { bindingContext: bindingContext }}}} };
+      viewPort.prevComponent.childRouter = { currentInstruction: { viewPortInstructions: { first: { component: { viewModel: viewModel }}}} };
 
       it('should return true when router instruction canDeactivate', () => {
-        bindingContext.canDeactivate = () => (true);
+        viewModel.canDeactivate = () => (true);
 
         sut.run(navContextWithRouter, next);
         expect(nextResult).toBe(true);
       });
 
       it('should cancel when router instruction cannot deactivate', () => {
-        bindingContext.canDeactivate = () => (false);
+        viewModel.canDeactivate = () => (false);
 
         navContextWithRouter.plan = { first: viewPort };
 

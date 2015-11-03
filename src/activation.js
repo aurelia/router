@@ -40,8 +40,8 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
   function iterate() {
     if (i--) {
       try {
-        let controller = infos[i];
-        let result = controller[callbackName]();
+        let viewModel = infos[i];
+        let result = viewModel[callbackName]();
         return processPotential(result, inspect, next.cancel);
       } catch (error) {
         return next.cancel(error);
@@ -62,10 +62,10 @@ function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<
     if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle ||
         viewPortPlan.strategy === activationStrategy.replace) &&
         prevComponent) {
-      let controller = prevComponent.bindingContext;
+      let viewModel = prevComponent.viewModel;
 
-      if (callbackName in controller) {
-        list.push(controller);
+      if (callbackName in viewModel) {
+        list.push(viewModel);
       }
     }
 
@@ -88,10 +88,10 @@ function addPreviousDeactivatable(component, callbackName, list): void {
     for (let viewPortName in viewPortInstructions) {
       let viewPortInstruction = viewPortInstructions[viewPortName];
       let prevComponent = viewPortInstruction.component;
-      let prevController = prevComponent.bindingContext;
+      let prevViewModel = prevComponent.viewModel;
 
-      if (callbackName in prevController) {
-        list.push(prevController);
+      if (callbackName in prevViewModel) {
+        list.push(prevViewModel);
       }
 
       addPreviousDeactivatable(prevComponent, callbackName, list);
@@ -118,7 +118,7 @@ function processActivatable(navigationContext: NavigationContext, callbackName: 
     if (i < length) {
       try {
         let current = infos[i];
-        let result = current.controller[callbackName](...current.lifecycleArgs);
+        let result = current.viewModel[callbackName](...current.lifecycleArgs);
         return processPotential(result, val => inspect(val, current.router), next.cancel);
       } catch (error) {
         return next.cancel(error);
@@ -138,11 +138,11 @@ function findActivatable(navigationContext: NavigationContext, callbackName: str
   Object.keys(plan).filter((viewPortName) => {
     let viewPortPlan = plan[viewPortName];
     let viewPortInstruction = next.viewPortInstructions[viewPortName];
-    let controller = viewPortInstruction.component.bindingContext;
+    let viewModel = viewPortInstruction.component.viewModel;
 
-    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in controller) {
+    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in viewModel) {
       list.push({
-        controller: controller,
+        viewModel: viewModel,
         lifecycleArgs: viewPortInstruction.lifecycleArgs,
         router: router
       });

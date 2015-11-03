@@ -99,15 +99,15 @@ function loadComponent(routeLoader: RouteLoader, navigationContext: NavigationCo
   let lifecycleArgs = navigationContext.nextInstruction.lifecycleArgs;
 
   return routeLoader.loadRoute(router, config, navigationContext).then((component) => {
-    let {bindingContext, childContainer} = component;
+    let {viewModel, childContainer} = component;
     component.router = router;
     component.config = config;
 
-    if ('configureRouter' in bindingContext) {
+    if ('configureRouter' in viewModel) {
       let childRouter = childContainer.getChildRouter();
       component.childRouter = childRouter;
 
-      return childRouter.configure(c => bindingContext.configureRouter(c, childRouter, ...lifecycleArgs))
+      return childRouter.configure(c => viewModel.configureRouter(c, childRouter, ...lifecycleArgs))
         .then(() => component);
     }
 
