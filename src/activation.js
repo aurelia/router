@@ -2,26 +2,26 @@ import {activationStrategy} from './navigation-plan';
 import {isNavigationCommand} from './navigation-commands';
 
 export class CanDeactivatePreviousStep {
-  run(navigationContext: NavigationContext, next: Function) {
-    return processDeactivatable(navigationContext.plan, 'canDeactivate', next);
+  run(navigationInstruction: NavigationInstruction, next: Function) {
+    return processDeactivatable(navigationInstruction.plan, 'canDeactivate', next);
   }
 }
 
 export class CanActivateNextStep {
-  run(navigationContext: NavigationContext, next: Function) {
-    return processActivatable(navigationContext, 'canActivate', next);
+  run(navigationInstruction: NavigationInstruction, next: Function) {
+    return processActivatable(navigationInstruction, 'canActivate', next);
   }
 }
 
 export class DeactivatePreviousStep {
-  run(navigationContext: NavigationContext, next: Function) {
-    return processDeactivatable(navigationContext.plan, 'deactivate', next, true);
+  run(navigationInstruction: NavigationInstruction, next: Function) {
+    return processDeactivatable(navigationInstruction.plan, 'deactivate', next, true);
   }
 }
 
 export class ActivateNextStep {
-  run(navigationContext: NavigationContext, next: Function) {
-    return processActivatable(navigationContext, 'activate', next, true);
+  run(navigationInstruction: NavigationInstruction, next: Function) {
+    return processActivatable(navigationInstruction, 'activate', next, true);
   }
 }
 
@@ -69,8 +69,8 @@ function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<
       }
     }
 
-    if (viewPortPlan.childNavigationContext) {
-      findDeactivatable(viewPortPlan.childNavigationContext.plan, callbackName, list);
+    if (viewPortPlan.childNavigationInstruction) {
+      findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
     } else if (prevComponent) {
       addPreviousDeactivatable(prevComponent, callbackName, list);
     }
@@ -99,8 +99,8 @@ function addPreviousDeactivatable(component, callbackName, list): void {
   }
 }
 
-function processActivatable(navigationContext: NavigationContext, callbackName: any, next: Function, ignoreResult: boolean) {
-  let infos = findActivatable(navigationContext, callbackName);
+function processActivatable(navigationInstruction: NavigationInstruction, callbackName: any, next: Function, ignoreResult: boolean) {
+  let infos = findActivatable(navigationInstruction, callbackName);
   let length = infos.length;
   let i = -1; //query from top down
 
@@ -131,26 +131,25 @@ function processActivatable(navigationContext: NavigationContext, callbackName: 
   return iterate();
 }
 
-function findActivatable(navigationContext: NavigationContext, callbackName: string, list: Array<Object> = [], router: Router): Array<Object> {
-  let plan = navigationContext.plan;
-  let next = navigationContext.nextInstruction;
+function findActivatable(navigationInstruction: NavigationInstruction, callbackName: string, list: Array<Object> = [], router: Router): Array<Object> {
+  let plan = navigationInstruction.plan;
 
   Object.keys(plan).filter((viewPortName) => {
     let viewPortPlan = plan[viewPortName];
-    let viewPortInstruction = next.viewPortInstructions[viewPortName];
+    let viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
     let viewModel = viewPortInstruction.component.viewModel;
 
     if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in viewModel) {
       list.push({
-        viewModel: viewModel,
+        viewModel,
         lifecycleArgs: viewPortInstruction.lifecycleArgs,
-        router: router
+        router
       });
     }
 
-    if (viewPortPlan.childNavigationContext) {
+    if (viewPortPlan.childNavigationInstruction) {
       findActivatable(
-        viewPortPlan.childNavigationContext,
+        viewPortPlan.childNavigationInstruction,
         callbackName,
         list,
         viewPortInstruction.component.childRouter || router

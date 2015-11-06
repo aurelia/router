@@ -22,93 +22,93 @@ describe('activation', () => {
     });
 
     it('should return true for context that canDeactivate', () => {
-      let singleNavContext = { plan: { first: viewPortFactory(() => (true)) } };
+      let instruction = { plan: { first: viewPortFactory(() => (true)) } };
 
-      step.run(singleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe(true);
     });
 
     it('should return true for context that canDeactivate with activationStrategy.replace', () => {
-      let singleNavContext = { plan: { first: viewPortFactory(() => (true), activationStrategy.replace) } };
+      let instruction = { plan: { first: viewPortFactory(() => (true), activationStrategy.replace) } };
 
-      step.run(singleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe(true);
     });
 
     it('should cancel for context that cannot Deactivate', () => {
-      let singleNavContext = { plan: { first: viewPortFactory(() => (false)) } };
+      let instruction = { plan: { first: viewPortFactory(() => (false)) } };
 
-      step.run(singleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe('cancel');
     });
 
     it('should return true for context that cannot Deactivate with unknown strategy', () => {
-      let singleNavContext = { plan: { first: viewPortFactory(() => (false), 'unknown') } };
+      let instruction = { plan: { first: viewPortFactory(() => (false), 'unknown') } };
 
-      step.run(singleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe(true);
     });
 
 
     it('should return true for context that canDeactivate with a promise', (done) => {
-      let singleNavPromiseContext = { plan: {first: viewPortFactory(() => (Promise.resolve(true))) } };
+      let instruction = { plan: {first: viewPortFactory(() => (Promise.resolve(true))) } };
 
-      step.run(singleNavPromiseContext, state.next).then(() => {
+      step.run(instruction, state.next).then(() => {
         expect(state.result).toBe(true);
         done();
       });
     });
 
     it('should cancel for context that cantDeactivate with a promise', (done) => {
-      let singleNavPromiseContext = { plan: {first: viewPortFactory(() => (Promise.resolve(false))) } };
+      let instruction = { plan: {first: viewPortFactory(() => (Promise.resolve(false))) } };
 
-      step.run(singleNavPromiseContext, state.next).then(() => {
+      step.run(instruction, state.next).then(() => {
         expect(state.result).toBe('cancel');
         done();
       });
     });
 
     it('should cancel for context that throws in canDeactivate', (done) => {
-      let singleNavPromiseContext = { plan: {first: viewPortFactory(() => { throw new Error('oops') }) } };
+      let instruction = { plan: {first: viewPortFactory(() => { throw new Error('oops'); }) } };
 
-      sut.run(singleNavPromiseContext, next).then(() => {
-        expect(nextResult).toBe('cancel');
+      step.run(instruction, state.next).then(() => {
+        expect(state.result).toBe('cancel');
         done();
       });
     });
 
     it('should return true when all plans return true', () => {
-      let doubleNavContext = { plan: { first: viewPortFactory(() => (true)), second: viewPortFactory(() => (true))} };
+      let instruction = { plan: { first: viewPortFactory(() => (true)), second: viewPortFactory(() => (true))} };
 
-      step.run(doubleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe(true);
     });
 
     it('should cancel when some plans return false', () => {
-      let doubleNavContext = { plan: {first: viewPortFactory(() => (true)), second: viewPortFactory(() => (false))} };
+      let instruction = { plan: {first: viewPortFactory(() => (true)), second: viewPortFactory(() => (false))} };
 
-      step.run(doubleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe('cancel');
     });
 
-    describe('with a childNavigationContext', () => {
+    describe('with a childNavigationInstruction', () => {
       it('should return true when child is true', () => {
         let viewPort = viewPortFactory(() => (true));
-        let navContextWithChild = { plan: { first: viewPort } };
+        let instruction = { plan: { first: viewPort } };
 
-        viewPort.childNavigationContext = { plan: { first: viewPortFactory(() => (true)) } };
+        viewPort.childNavigationInstruction = { plan: { first: viewPortFactory(() => (true)) } };
 
-        step.run(navContextWithChild, state.next);
+        step.run(instruction, state.next);
         expect(state.result).toBe(true);
       });
 
       it('should cancel when child is false', () => {
         let viewPort = viewPortFactory(() => (true));
-        let navContextWithChild = { plan: { first: viewPort } };
+        let instruction = { plan: { first: viewPort } };
 
-        viewPort.childNavigationContext = { plan: { first: viewPortFactory(() => (false)) } };
+        viewPort.childNavigationInstruction = { plan: { first: viewPortFactory(() => (false)) } };
 
-        step.run(navContextWithChild, state.next);
+        step.run(instruction, state.next);
         expect(state.result).toBe('cancel');
       });
     });
@@ -116,23 +116,23 @@ describe('activation', () => {
     describe('with router and currentInstruction', ()=> {
       let viewModel = { };
       let viewPort = viewPortFactory(() => (true));
-      let navContextWithRouter = { plan: { first: viewPort } };
+      let instruction = { plan: { first: viewPort } };
 
       viewPort.prevComponent.childRouter = { currentInstruction: { viewPortInstructions: { first: { component: { viewModel: viewModel }}}} };
 
       it('should return true when router instruction canDeactivate', () => {
         viewModel.canDeactivate = () => (true);
 
-        step.run(navContextWithRouter, state.next);
+        step.run(instruction, state.next);
         expect(state.result).toBe(true);
       });
 
       it('should cancel when router instruction cannot deactivate', () => {
         viewModel.canDeactivate = () => (false);
 
-        navContextWithRouter.plan = { first: viewPort };
+        instruction.plan = { first: viewPort };
 
-        step.run(navContextWithRouter, state.next);
+        step.run(instruction, state.next);
         expect(state.result).toBe('cancel');
       });
     });
@@ -142,18 +142,16 @@ describe('activation', () => {
     let step;
     let state;
 
-    function getNavigationContext(resultHandler, strategy = activationStrategy.invokeLifecycle) {
+    function getNavigationInstruction(resultHandler, strategy = activationStrategy.invokeLifecycle) {
       return {
         plan: {
           default: {
             strategy: strategy
           }
         },
-        nextInstruction: {
-          viewPortInstructions: {
-            default: {
-              component: { bindingContext: { canActivate: resultHandler } }
-            }
+        viewPortInstructions: {
+          default: {
+            component: { viewModel: { canActivate: resultHandler } }
           }
         }
       };
@@ -165,23 +163,23 @@ describe('activation', () => {
     });
 
     it('should return true for context that canActivate', () => {
-      let singleNavContext = getNavigationContext(() => (true));
+      let instruction = getNavigationInstruction(() => (true));
 
-      step.run(singleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe(true);
     });
 
     it('should return true for context that canActivate with activationStrategy.replace', () => {
-      let singleNavContext = getNavigationContext(() => (true), activationStrategy.replace);
+      let instruction = getNavigationInstruction(() => (true), activationStrategy.replace);
 
-      step.run(singleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe(true);
     });
 
     it('should cancel for context that cannot activate', () => {
-      let singleNavContext = getNavigationContext(() => (false));
+      let instruction = getNavigationInstruction(() => (false));
 
-      step.run(singleNavContext, state.next);
+      step.run(instruction, state.next);
       expect(state.result).toBe('cancel');
     });
   });

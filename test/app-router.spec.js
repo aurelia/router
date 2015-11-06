@@ -14,7 +14,7 @@ class MockHistory extends History {
 class MockLoader extends RouteLoader {
   loadRoute(router, config) {
     return Promise.resolve({
-      bindingContext: {}
+      viewModel: {}
     });
   }
 }
@@ -46,7 +46,7 @@ describe('app-router', () => {
     provider = {
       createPipeline() {
         let p = new Pipeline();
-        p.addStep({ run(ctx, next) { return pipelineStep(ctx, next); } });
+        p.addStep({ run(inst, next) { return pipelineStep(inst, next); } });
         return p;
       }
     };
@@ -134,7 +134,6 @@ describe('app-router', () => {
           expect(result.completed).toBe(true);
           expect(result.status).toBe('completed');
           expect(result.output).toBe(output);
-          expect(result.context).toBeTruthy();
         })
         .catch(expectSuccess)
         .then(done);
@@ -162,7 +161,6 @@ describe('app-router', () => {
           expect(result.completed).toBe(false);
           expect(result.status).toBe('canceled');
           expect(result.output).toBe(output);
-          expect(result.context).toBeTruthy();
         })
         .catch(expectSuccess)
         .then(done);
@@ -190,7 +188,6 @@ describe('app-router', () => {
           expect(result.completed).toBe(false);
           expect(result.status).toBe('rejected');
           expect(result.output).toBe(output);
-          expect(result.context).toBeTruthy();
         })
         .catch(expectSuccess)
         .then(done);

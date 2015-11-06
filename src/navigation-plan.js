@@ -11,36 +11,36 @@ export const activationStrategy = {
 };
 
 export class BuildNavigationPlanStep {
-  run(navigationContext: NavigationContext, next: Function) {
-    return _buildNavigationPlan(navigationContext)
+  run(navigationInstruction: NavigationInstruction, next: Function) {
+    return _buildNavigationPlan(navigationInstruction)
       .then(plan => {
-        navigationContext.plan = plan;
+        navigationInstruction.plan = plan;
         return next();
       }).catch(next.cancel);
   }
 }
 
-export function _buildNavigationPlan(navigationContext: NavigationContext, forceLifecycleMinimum): Promise<Object> {
-  let prev = navigationContext.prevInstruction;
-  let next = navigationContext.nextInstruction;
+export function _buildNavigationPlan(instruction: NavigationInstruction, forceLifecycleMinimum): Promise<Object> {
+  let prev = instruction.previousInstruction;
+  let config = instruction.config;
   let plan = {};
 
-  if ('redirect' in next.config) {
-    let redirectLocation = _resolveUrl(next.config.redirect, getInstructionBaseUrl(next));
-    if (next.queryString) {
-      redirectLocation += '?' + next.queryString;
+  if ('redirect' in config) {
+    let redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
+    if (instruction.queryString) {
+      redirectLocation += '?' + instruction.queryString;
     }
 
     return Promise.reject(new Redirect(redirectLocation));
   }
 
   if (prev) {
-    let newParams = hasDifferentParameterValues(prev, next);
+    let newParams = hasDifferentParameterValues(prev, instruction);
     let pending = [];
 
     for (let viewPortName in prev.viewPortInstructions) {
       let prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
-      let nextViewPortConfig = next.config.viewPorts[viewPortName];
+      let nextViewPortConfig = config.viewPorts[viewPortName];
       let viewPortPlan = plan[viewPortName] = {
         name: viewPortName,
         config: nextViewPortConfig,
@@ -51,10 +51,10 @@ export function _buildNavigationPlan(navigationContext: NavigationContext, force
       if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
         viewPortPlan.strategy = activationStrategy.replace;
       } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
-         //TODO: should we tell them if the parent had a lifecycle min change?
-        viewPortPlan.strategy = prevViewPortInstruction.component.viewModel.determineActivationStrategy(...next.lifecycleArgs);
-      } else if (next.config.activationStrategy) {
-        viewPortPlan.strategy = next.config.activationStrategy;
+        viewPortPlan.strategy = prevViewPortInstruction.component.viewModel
+          .determineActivationStrategy(...instruction.lifecycleArgs);
+      } else if (config.activationStrategy) {
+        viewPortPlan.strategy = config.activationStrategy;
       } else if (newParams || forceLifecycleMinimum) {
         viewPortPlan.strategy = activationStrategy.invokeLifecycle;
       } else {
@@ -62,17 +62,16 @@ export function _buildNavigationPlan(navigationContext: NavigationContext, force
       }
 
       if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
-        let path = next.getWildcardPath();
+        let path = instruction.getWildcardPath();
         let task = prevViewPortInstruction.childRouter
-          ._createNavigationInstruction(path, next).then(childInstruction => { // eslint-disable-line no-loop-func
-            viewPortPlan.childNavigationContext = prevViewPortInstruction.childRouter
-              ._createNavigationContext(childInstruction);
+          ._createNavigationInstruction(path, instruction).then(childInstruction => { // eslint-disable-line no-loop-func
+            viewPortPlan.childNavigationInstruction = childInstruction;
 
             return _buildNavigationPlan(
-              viewPortPlan.childNavigationContext,
+              childInstruction,
               viewPortPlan.strategy === activationStrategy.invokeLifecycle)
               .then(childPlan => {
-                viewPortPlan.childNavigationContext.plan = childPlan;
+                childInstruction.plan = childPlan;
               });
           });
 
@@ -83,11 +82,11 @@ export function _buildNavigationPlan(navigationContext: NavigationContext, force
     return Promise.all(pending).then(() => plan);
   }
 
-  for (let viewPortName in next.config.viewPorts) {
+  for (let viewPortName in config.viewPorts) {
     plan[viewPortName] = {
       name: viewPortName,
       strategy: activationStrategy.replace,
-      config: next.config.viewPorts[viewPortName]
+      config: instruction.config.viewPorts[viewPortName]
     };
   }
 
