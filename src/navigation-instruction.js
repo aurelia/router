@@ -106,6 +106,7 @@ export class NavigationInstruction {
 
   /**
   * Gets an array containing the instruction and all child instructions for the previous navigation.
+  * Previous instructions are no longer available after navigation completes.
   */
   getAllPreviousInstructions(): Array<NavigationInstruction> {
     return this.getAllInstructions().map(c => c.previousInstruction).filter(c => c);
@@ -211,7 +212,7 @@ export class NavigationInstruction {
 
     return Promise.all(loads).then(() => {
       delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
-    });
+    }).then(() => prune(this));
   }
 
   _updateTitle(): void {
@@ -246,4 +247,9 @@ export class NavigationInstruction {
 
     return title;
   }
+}
+
+function prune(instruction) {
+  instruction.previousInstruction = null;
+  instruction.plan = null;
 }
