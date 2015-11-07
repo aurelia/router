@@ -64,14 +64,13 @@ export class NavigationInstruction {
   */
   viewPortInstructions: Object;
 
-  plan: Object;
+  plan: Object = null;
 
   constructor(init: NavigationInstructionInit) {
     Object.assign(this, init);
 
     this.params = this.params || {};
     this.viewPortInstructions = {};
-    this.plan = {};
 
     let ancestorParams = [];
     let current = this;
@@ -95,8 +94,8 @@ export class NavigationInstruction {
   */
   getAllInstructions(): Array<NavigationInstruction> {
     let instructions = [this];
-    for (let key in this.plan) {
-      let childInstruction = this.plan[key].childNavigationInstruction;
+    for (let key in this.viewPortInstructions) {
+      let childInstruction = this.viewPortInstructions[key].childNavigationInstruction;
       if (childInstruction) {
         instructions.push(...childInstruction.getAllInstructions());
       }
