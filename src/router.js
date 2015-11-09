@@ -369,6 +369,7 @@ export class Router {
       queryString,
       config: null,
       parentInstruction,
+      previousInstruction: this.currentInstruction,
       router: this
     };
 
