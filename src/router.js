@@ -331,14 +331,11 @@ export class Router {
     this.isConfigured = false;
   }
 
-  _refreshBaseUrl(): void {
-    if (this.parent) {
-      let baseUrl = this.parent.currentInstruction.getBaseUrl();
-      this.baseUrl = this.parent.baseUrl + baseUrl;
-    }
-  }
-
-  _refreshNavigation(): void {
+  /**
+  * Updates the navigation routes with hrefs relative to the current location.
+  * Note: This method will likely move to a plugin in a future release.
+  */
+  refreshNavigation(): void {
     let nav = this.navigation;
 
     for (let i = 0, length = nav.length; i < length; i++) {
@@ -346,6 +343,13 @@ export class Router {
       if (!current.href) {
         current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
       }
+    }
+  }
+
+  _refreshBaseUrl(): void {
+    if (this.parent) {
+      let baseUrl = this.parent.currentInstruction.getBaseUrl();
+      this.baseUrl = this.parent.baseUrl + baseUrl;
     }
   }
 

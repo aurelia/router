@@ -180,7 +180,7 @@ export class NavigationInstruction {
     this.config.navModel.isActive = true;
 
     router._refreshBaseUrl();
-    router._refreshNavigation();
+    router.refreshNavigation();
 
     let loads = [];
     let delaySwaps = [];
