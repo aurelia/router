@@ -15,6 +15,8 @@ const logger = LogManager.getLogger('app-router');
 export class AppRouter extends Router {
   static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
 
+  _queue = [];
+
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
     super(container, history);
     this.pipelineProvider = pipelineProvider;
@@ -86,19 +88,10 @@ export class AppRouter extends Router {
     this.history.deactivate();
   }
 
-  /**
-  * Resets the router to its initial state.
-  */
-  reset(): void {
-    super.reset();
-    this.queue = [];
-    this.options = null;
-  }
-
   _queueInstruction(instruction: NavigationInstruction): Promise<any> {
     return new Promise((resolve) => {
       instruction.resolve = resolve;
-      this.queue.unshift(instruction);
+      this._queue.unshift(instruction);
       this._dequeueInstruction();
     });
   }
@@ -109,8 +102,8 @@ export class AppRouter extends Router {
         return undefined;
       }
 
-      let instruction = this.queue.shift();
-      this.queue = [];
+      let instruction = this._queue.shift();
+      this._queue = [];
 
       if (!instruction) {
         return undefined;

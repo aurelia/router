@@ -105,7 +105,7 @@ describe('app-router', () => {
     let completedResult;
 
     beforeEach(() => {
-      router.queue.push(instruction);
+      router._queue.push(instruction);
 
       spyOn(ea, 'publish');
       processingResult = jasmine.objectContaining({ instruction });

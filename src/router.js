@@ -63,7 +63,10 @@ export class Router {
   constructor(container: Container, history: History) {
     this.container = container;
     this.history = history;
-    this.reset();
+
+    this._configuredPromise = new Promise(resolve => {
+      this._resolveConfiguredPromise = resolve;
+    });
   }
 
   /**
@@ -309,26 +312,6 @@ export class Router {
     }
 
     this.currentInstruction.updateTitle();
-  }
-
-  /**
-  * Resets the Router to its original unconfigured state.
-  */
-  reset(): void {
-    this._fallbackOrder = 100;
-    this._recognizer = new RouteRecognizer();
-    this._childRecognizer = new RouteRecognizer();
-    this.routes = [];
-    this.isNavigating = false;
-    this.navigation = [];
-
-    if (this.isConfigured || !this._configuredPromise) {
-      this._configuredPromise = new Promise(resolve => {
-        this._resolveConfiguredPromise = resolve;
-      });
-    }
-
-    this.isConfigured = false;
   }
 
   /**
