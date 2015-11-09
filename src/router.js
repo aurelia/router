@@ -2,7 +2,6 @@ import 'core-js';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
-import {NavigationContext} from './navigation-context';
 import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
@@ -309,7 +308,7 @@ export class Router {
       return this.parent.updateTitle();
     }
 
-    this.currentInstruction.navigationContext.updateTitle();
+    this.currentInstruction.updateTitle();
   }
 
   /**
@@ -365,28 +364,21 @@ export class Router {
       results = this._childRecognizer.recognize(url);
     }
 
-    if ((!results || !results.length) && this.catchAllHandler) {
-      let params = { path: fragment };
-      let instruction = new NavigationInstruction(
-        fragment,
-        queryString,
-        params,
-        results && results.queryParams,
-        null, // config will be created by the catchAllHandler
-        parentInstruction);
-
-      return evaluateNavigationStrategy(instruction, this.catchAllHandler);
-    }
+    let instructionInit = {
+      fragment,
+      queryString,
+      config: null,
+      parentInstruction,
+      router: this
+    };
 
     if (results && results.length) {
       let first = results[0];
-      let instruction = new NavigationInstruction(
-        fragment,
-        queryString,
-        first.params,
-        first.queryParams || results.queryParams,
-        first.config || first.handler,
-        parentInstruction);
+      let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
+        params: first.params,
+        queryParams: first.queryParams || results.queryParams,
+        config: first.config || first.handler
+      }));
 
       if (typeof first.handler === 'function') {
         return evaluateNavigationStrategy(instruction, first.handler, first);
@@ -395,14 +387,17 @@ export class Router {
       }
 
       return Promise.resolve(instruction);
+    } else if (this.catchAllHandler) {
+      let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
+        params: { path: fragment },
+        queryParams: results && results.queryParams,
+        config: null // config will be created by the catchAllHandler
+      }));
+
+      return evaluateNavigationStrategy(instruction, this.catchAllHandler);
     }
 
     return Promise.reject(new Error(`Route not found: ${url}`));
-  }
-
-  _createNavigationContext(instruction: NavigationInstruction): NavigationContext {
-    instruction.navigationContext = new NavigationContext(this, instruction);
-    return instruction.navigationContext;
   }
 
   _createRouteConfig(config, instruction) {

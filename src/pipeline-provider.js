@@ -2,7 +2,7 @@ import {Container} from 'aurelia-dependency-injection';
 import {Pipeline} from './pipeline';
 import {BuildNavigationPlanStep} from './navigation-plan';
 import {LoadRouteStep} from './route-loading';
-import {CommitChangesStep} from './navigation-context';
+import {CommitChangesStep} from './navigation-instruction';
 import {
   CanDeactivatePreviousStep,
   CanActivateNextStep,

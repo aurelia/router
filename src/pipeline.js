@@ -18,10 +18,10 @@ interface PipelineStep {
    * Execute the pipeline step. The step should invoke next(), next.complete(),
    * next.cancel(), or next.reject() to allow the pipeline to continue.
    *
-   * @param context The navigation context.
+   * @param instruction The navigation instruction.
    * @param next The next step in the pipeline.
    */
-  run(context: NavigationContext, next: Function): void;
+  run(instruction: NavigationInstruction, next: Function): void;
 }
 
 /**
@@ -29,7 +29,7 @@ interface PipelineStep {
 */
 interface PipelineResult {
   status: string;
-  context: NavigationContext;
+  instruction: NavigationInstruction;
   output: any;
   completed: boolean;
 }
@@ -72,9 +72,9 @@ export class Pipeline {
   /**
   * Runs the pipeline.
   *
-  * @param context The navigation context to process.
+  * @param instruction The navigation instruction to process.
   */
-  run(context: NavigationContext): Promise<PipelineResult> {
+  run(instruction: NavigationInstruction): Promise<PipelineResult> {
     let index = -1;
     let steps = this.steps;
 
@@ -85,7 +85,7 @@ export class Pipeline {
         let currentStep = steps[index];
 
         try {
-          return currentStep(context, next);
+          return currentStep(instruction, next);
         } catch (e) {
           return next.reject(e);
         }
@@ -94,35 +94,16 @@ export class Pipeline {
       }
     }
 
-    next.complete = (output) => {
-      next.status = pipelineStatus.completed;
-      next.output = output;
-      return Promise.resolve(createResult(context, next));
-    };
-
-    next.cancel = (reason) => {
-      next.status = pipelineStatus.canceled;
-      next.output = reason;
-      return Promise.resolve(createResult(context, next));
-    };
-
-    next.reject = (error) => {
-      next.status = pipelineStatus.rejected;
-      next.output = error;
-      return Promise.resolve(createResult(context, next));
-    };
-
-    next.status = pipelineStatus.running;
+    next.complete = createCompletionHandler(next, pipelineStatus.completed);
+    next.cancel = createCompletionHandler(next, pipelineStatus.canceled);
+    next.reject = createCompletionHandler(next, pipelineStatus.rejected);
 
     return next();
   }
 }
 
-function createResult(context, next) {
-  return {
-    status: next.status,
-    context: context,
-    output: next.output,
-    completed: next.status === pipelineStatus.completed
+function createCompletionHandler(next, status) {
+  return (output) => {
+    return Promise.resolve({ status, output, completed: status === pipelineStatus.completed });
   };
 }

@@ -117,6 +117,7 @@ export class AppRouter extends Router {
       }
 
       this.isNavigating = true;
+      instruction.previousInstruction = this.currentInstruction;
 
       if (!instructionCount) {
         this.events.publish('router:navigation:processing', { instruction });
@@ -128,11 +129,10 @@ export class AppRouter extends Router {
         throw new Error(`Maximum navigation attempts exceeded. Giving up.`);
       }
 
-      let context = this._createNavigationContext(instruction);
       let pipeline = this.pipelineProvider.createPipeline();
 
       return pipeline
-        .run(context)
+        .run(instruction)
         .then(result => processResult(instruction, result, instructionCount, this))
         .catch(error => {
           return { output: error instanceof Error ? error : new Error(error) };
