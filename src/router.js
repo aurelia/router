@@ -311,7 +311,7 @@ export class Router {
       return this.parent.updateTitle();
     }
 
-    this.currentInstruction.updateTitle();
+    this.currentInstruction._updateTitle();
   }
 
   /**
