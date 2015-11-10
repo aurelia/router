@@ -24,23 +24,23 @@
       "lib": "dist/amd"
     },
     "dependencies": {
-      "aurelia-dependency-injection": "github:aurelia/dependency-injection@^0.11.0",
-      "aurelia-event-aggregator": "github:aurelia/event-aggregator@^0.9.0",
-      "aurelia-history": "github:aurelia/history@^0.8.0",
-      "aurelia-logging": "github:aurelia/logging@^0.8.0",
-      "aurelia-path": "github:aurelia/path@^0.10.0",
-      "aurelia-route-recognizer": "github:aurelia/route-recognizer@^0.8.0",
-      "core-js": "npm:core-js@^0.9.5"
+      "aurelia-dependency-injection": "github:aurelia/dependency-injection@^0.12.0",
+      "aurelia-event-aggregator": "github:aurelia/event-aggregator@^0.10.0",
+      "aurelia-history": "github:aurelia/history@^0.9.0",
+      "aurelia-logging": "github:aurelia/logging@^0.9.0",
+      "aurelia-path": "github:aurelia/path@^0.11.0",
+      "aurelia-route-recognizer": "github:aurelia/route-recognizer@^0.9.0",
+      "core-js": "npm:core-js@^1.2.6"
     },
     "devDependencies": {
       "babel": "npm:babel-core@^5.1.13",
       "babel-runtime": "npm:babel-runtime@^5.1.13",
-      "core-js": "npm:core-js@^0.9.5"
+      "core-js": "npm:core-js@^1.2.6"
     }
   },
   "devDependencies": {
     "aurelia-tools": "^0.1.14",
-    "babel-dts-generator": "^0.2.11",
+    "babel-dts-generator": "^0.2.16",
     "babel-eslint": "^4.1.1",
     "conventional-changelog": "0.0.11",
     "del": "^1.1.0",

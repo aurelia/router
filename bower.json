@@ -16,13 +16,12 @@
     "url": "http://github.com/aurelia/router"
   },
   "dependencies": {
-    "aurelia-dependency-injection": "^0.11.0",
-    "aurelia-event-aggregator": "^0.9.0",
-    "aurelia-history": "^0.8.0",
-    "aurelia-logging": "^0.8.0",
-    "aurelia-pal": "^0.2.0",
-    "aurelia-path": "^0.10.0",
-    "aurelia-route-recognizer": "^0.8.0",
+    "aurelia-dependency-injection": "^0.12.0",
+    "aurelia-event-aggregator": "^0.10.0",
+    "aurelia-history": "^0.9.0",
+    "aurelia-logging": "^0.9.0",
+    "aurelia-path": "^0.11.0",
+    "aurelia-route-recognizer": "^0.9.0",
     "core-js": "zloirock/core-js"
   }
 }
