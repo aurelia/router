@@ -1,3 +1,45 @@
+## 0.14.0 (2015-11-10)
+
+
+#### Bug Fixes
+
+* **all:** update to use viewModel terminology internally ([f01282b6](http://github.com/aurelia/router/commit/f01282b6be7e0a96f9731caebb90f97ee7918bac))
+* **navigation-instruction:** remove references to previous instructions after navigation is committed ([7fa6e0b9](http://github.com/aurelia/router/commit/7fa6e0b97370f08a4e3b1c08bad2ea1eded330f4), closes [#207](http://github.com/aurelia/router/issues/207))
+* **router:**
+  * make `router.refreshNavigation()` public ([331bd514](http://github.com/aurelia/router/commit/331bd514a6377a65f6c4ada6bb1c142af5c09d96))
+  * Fix bug where previous nav models were not deactivated in child routers ([ef0aa0e6](http://github.com/aurelia/router/commit/ef0aa0e6521fd183d7fb886f858b9aaeacdff42a))
+  * fix typo in doc comment ([c13abf5d](http://github.com/aurelia/router/commit/c13abf5d47e6cccc273ae3f7bdd41b1f8f827cdc))
+  * fix up type annotations and private properties ([a96ed779](http://github.com/aurelia/router/commit/a96ed779404cca7c35c7d4364652f9084334470a))
+  * make configure slightly more resilient ([fff97eb2](http://github.com/aurelia/router/commit/fff97eb2ee5b03f3341243e03468591b46dbfdea))
+* **updateTitle:** use private method name ([9ea95ac7](http://github.com/aurelia/router/commit/9ea95ac780acd9880b61c1c4c8ee43752fcd89c1))
+
+
+#### Features
+
+* **all:** fill in doc comments and rename private APIs ([57257adf](http://github.com/aurelia/router/commit/57257adfe85b8a7818271164e4bcb6fcce4a28f0))
+* **router:**
+  * remove `router.reset()` ([fa4e412b](http://github.com/aurelia/router/commit/fa4e412b2d3c6665380d77473895839cb08a059b))
+  * improve support for unknown route handlers ([4aa9bc9e](http://github.com/aurelia/router/commit/4aa9bc9ed57e9655db6d37d5a52dd16577bf2b33), closes [#234](http://github.com/aurelia/router/issues/234))
+  * don't automatically use conventional routing when no unknown handler is specifie ([5a80996a](http://github.com/aurelia/router/commit/5a80996a6a7fe878b488bac2362688c504bf8f03))
+
+
+#### Breaking Changes
+
+* * Pipeline steps now receive the NavigationInstruction instead of the NavigationContext. Pipeline steps should use `instruction.getAllInstructions()` and `instruction.getAllPreviousInstructions()` instead of `context.nextInstructions` and `context.currentInstructions`, respectively, to inspect current and previous instructions.
+
+*Semantics have changed in names such as "prevInstruction" such that "current" refers to the current navigation, and "previous" refers to the previous navigation. Currently, "next" referred to the current navigation, and "current" and "previous" both referred to the previous navigation.
+
+ ([a6f47887](http://github.com/aurelia/router/commit/a6f4788735059da2682205c059d53e1c9c83c34f))
+* Unknown route handlers must now return the moduleId or route config instead of mutating `instruction.config`.
+
+Fixes #234
+
+ ([4aa9bc9e](http://github.com/aurelia/router/commit/4aa9bc9ed57e9655db6d37d5a52dd16577bf2b33))
+* calling `router.handleUnknownRoutes()` with no arguments will no longer cause the router to apply conventional routing. This logic must now be provided by the application.
+
+ ([5a80996a](http://github.com/aurelia/router/commit/5a80996a6a7fe878b488bac2362688c504bf8f03))
+
+
 ## 0.13.0 (2015-10-13)
 
 

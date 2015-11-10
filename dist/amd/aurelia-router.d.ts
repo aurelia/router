@@ -2,12 +2,35 @@ declare module 'aurelia-router' {
   import 'core-js';
   import * as LogManager from 'aurelia-logging';
   import { Container }  from 'aurelia-dependency-injection';
-  import { DOM }  from 'aurelia-pal';
   import { RouteRecognizer }  from 'aurelia-route-recognizer';
   import { History }  from 'aurelia-history';
   import { EventAggregator }  from 'aurelia-event-aggregator';
+  
+  /**
+  * A step to be run during processing of the pipeline.
+  */
   export interface PipelineStep {
-    run(context: Object, next: Function): void;
+    run(instruction: NavigationInstruction, next: Function): void;
+  }
+  
+  /**
+  * The result of a pipeline run.
+  */
+  export interface PipelineResult {
+    status: string;
+    instruction: NavigationInstruction;
+    output: any;
+    completed: boolean;
+  }
+  export interface NavigationInstructionInit {
+    fragment: string;
+    queryString: string;
+    params: Object;
+    queryParams: Object;
+    config: RouteConfig;
+    parentInstruction: NavigationInstruction;
+    previousInstruction: NavigationInstruction;
+    router: Router;
   }
   
   /**
@@ -88,31 +111,122 @@ declare module 'aurelia-router' {
     constructor(name: string, routeFilterContainer: RouteFilterContainer);
     getSteps(): any;
   }
+  
+  /**
+  * The status of a Pipeline.
+  */
   export const pipelineStatus: any;
+  
+  /**
+  * The class responsible for managing and processing the navigation pipeline.
+  */
   export class Pipeline {
+    
+    /**
+      * The pipeline steps.
+      */
     steps: Array<Function | PipelineStep>;
-    withStep(step: any): any;
-    run(ctx: any): any;
+    
+    /**
+      * Adds a step to the pipeline.
+      *
+      * @param step The pipeline step.
+      */
+    addStep(step: PipelineStep): Pipeline;
+    
+    /**
+      * Runs the pipeline.
+      *
+      * @param instruction The navigation instruction to process.
+      */
+    run(instruction: NavigationInstruction): Promise<PipelineResult>;
   }
+  export class CommitChangesStep {
+    run(navigationInstruction: NavigationInstruction, next: Function): any;
+  }
+  
+  /**
+  * Class used to represent an instruction during a navigation.
+  */
   export class NavigationInstruction {
+    
+    /**
+      * The URL fragment.
+      */
     fragment: string;
+    
+    /**
+      * The query string.
+      */
     queryString: string;
-    params: any;
-    queryParams: any;
-    config: any;
+    
+    /**
+      * Parameters extracted from the route pattern.
+      */
+    params: Object;
+    
+    /**
+      * Parameters extracted from the query string.
+      */
+    queryParams: Object;
+    
+    /**
+      * The route config for the route matching this instruction.
+      */
+    config: Object;
+    
+    /**
+      * The parent instruction, if this instruction was created by a child router.
+      */
     parentInstruction: NavigationInstruction;
-    constructor(fragment: string, queryString?: string, params?: any, queryParams?: any, config?: any, parentInstruction?: NavigationInstruction);
-    addViewPortInstruction(viewPortName: any, strategy: any, moduleId: any, component: any): any;
+    
+    /**
+      * The instruction being replaced by this instruction in the current router.
+      */
+    previousInstruction: NavigationInstruction;
+    
+    /**
+      * viewPort instructions to used activation.
+      */
+    viewPortInstructions: Object;
+    plan: Object;
+    constructor(init: NavigationInstructionInit);
+    
+    /**
+      * Gets an array containing this instruction and all child instructions for the current navigation.
+      */
+    getAllInstructions(): Array<NavigationInstruction>;
+    
+    /**
+      * Gets an array containing the instruction and all child instructions for the previous navigation.
+      * Previous instructions are no longer available after navigation completes.
+      */
+    getAllPreviousInstructions(): Array<NavigationInstruction>;
+    
+    /**
+      * Adds a viewPort instruction.
+      */
+    addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): Object;
+    
+    /**
+      * Gets the name of the route pattern's wildcard parameter, if applicable.
+      */
     getWildCardName(): string;
+    
+    /**
+      * Gets the path and query string created by filling the route
+      * pattern's wildcard parameter with the matching param.
+      */
     getWildcardPath(): string;
+    
+    /**
+      * Gets the instruction's base URL, accounting for wildcard route parameters.
+      */
     getBaseUrl(): string;
   }
   
   /**
   * Class for storing and interacting with a route's navigation settings.
-  *
-  * @class NavModel
-  * @constructor
   */
   export class NavModel {
     
@@ -152,30 +266,21 @@ declare module 'aurelia-router' {
       *  If the a navigation is in progress, the change will be applied
       *  to document.title when the navigation completes.
       *
-      * @method setTitle
       * @param title The new title.
       */
     setTitle(title: string): void;
   }
-  export function processPotential(obj: any, resolve: any, reject: any): any;
-  export function normalizeAbsolutePath(path: any, hasPushState: any): any;
-  export function createRootedPath(fragment: any, baseUrl: any, hasPushState: any): any;
-  export function resolveUrl(fragment: any, baseUrl: any, hasPushState: any): any;
   
   /**
-   * Determines if the provided object is a navigation command.
-   * A navigation command is anything with a navigate method.
-   * @param {object} obj The item to check.
-   * @return {boolean}
-   */
+  * Determines if the provided object is a navigation command.
+  * A navigation command is anything with a navigate method.
+  *
+  * @param obj The object to check.
+  */
   export function isNavigationCommand(obj: any): boolean;
   
   /**
   * Used during the activation lifecycle to cause a redirect.
-  *
-  * @class Redirect
-  * @constructor
-  * @param {String} url The url to redirect to.
   */
   export class Redirect {
     constructor(url: string, options?: Object);
@@ -183,16 +288,14 @@ declare module 'aurelia-router' {
     /**
       * Called by the activation system to set the child router.
       *
-      * @method setRouter
-      * @param {Router} router
+      * @param router The router.
       */
     setRouter(router: Router): void;
     
     /**
       * Called by the navigation pipeline to navigate.
       *
-      * @method navigate
-      * @param {Router} appRouter - a router which should redirect
+      * @param appRouter The router to be redirected.
       */
     navigate(appRouter: Router): void;
   }
@@ -250,45 +353,14 @@ declare module 'aurelia-router' {
       */
     exportToRouter(router: Router): void;
   }
+  
+  /**
+  * The strategy to use when activating modules during navigation.
+  */
   export const activationStrategy: any;
-  export function buildNavigationPlan(navigationContext: NavigationContext, forceLifecycleMinimum: any): Promise<Object>;
   export class BuildNavigationPlanStep {
-    run(navigationContext: NavigationContext, next: Function): any;
+    run(navigationInstruction: NavigationInstruction, next: Function): any;
   }
-  export class CanDeactivatePreviousStep {
-    run(navigationContext: NavigationContext, next: Function): any;
-  }
-  export class CanActivateNextStep {
-    run(navigationContext: NavigationContext, next: Function): any;
-  }
-  export class DeactivatePreviousStep {
-    run(navigationContext: NavigationContext, next: Function): any;
-  }
-  export class ActivateNextStep {
-    run(navigationContext: NavigationContext, next: Function): any;
-  }
-  export class NavigationContext {
-    constructor(router: Router, nextInstruction: NavigationInstruction);
-    getAllContexts(acc?: Array<NavigationContext>): Array<NavigationContext>;
-    nextInstructions: Array<NavigationInstruction>;
-    currentInstructions: Array<NavigationInstruction>;
-    prevInstructions: Array<NavigationInstruction>;
-    commitChanges(waitToSwap: boolean): any;
-    updateTitle(): void;
-    buildTitle(separator?: string): string;
-  }
-  export class CommitChangesStep {
-    run(navigationContext: NavigationContext, next: Function): any;
-  }
-  export class RouteLoader {
-    loadRoute(router: any, config: any, navigationContext: any): any;
-  }
-  export class LoadRouteStep {
-    static inject(): any;
-    constructor(routeLoader: RouteLoader);
-    run(navigationContext: NavigationContext, next: Function): any;
-  }
-  export function loadNewRoute(routeLoader: RouteLoader, navigationContext: NavigationContext): any;
   
   /**
   * The primary class responsible for handling routing and navigation.
@@ -300,9 +372,6 @@ declare module 'aurelia-router' {
     container: Container;
     history: History;
     viewPorts: Object;
-    fallbackOrder: number;
-    recognizer: RouteRecognizer;
-    childRecognizer: RouteRecognizer;
     routes: RouteConfig[];
     
     /**
@@ -331,13 +400,18 @@ declare module 'aurelia-router' {
     currentInstruction: NavigationInstruction;
     
     /**
+      * The parent router, or null if this instance is not a child router.
+      */
+    parent: Router;
+    
+    /**
       * @param container The [[Container]] to use when child routers.
       * @param history The [[History]] implementation to delegate navigation requests to.
       */
     constructor(container: Container, history: History);
     
     /**
-      * Gets a valid indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
+      * Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
       */
     isRoot: boolean;
     
@@ -382,7 +456,7 @@ declare module 'aurelia-router' {
     /**
       * Navigates back to the most recent location in history.
       */
-    navigateBack(): any;
+    navigateBack(): void;
     
     /**
        * Creates a child router of the current router.
@@ -420,7 +494,6 @@ declare module 'aurelia-router' {
       * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
       *
       * @param name The name of the route to check.
-      * @returns {boolean}
       */
     hasRoute(name: string): boolean;
     
@@ -428,7 +501,6 @@ declare module 'aurelia-router' {
       * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
       *
       * @param name The name of the route to check.
-      * @returns {boolean}
       */
     hasOwnRoute(name: string): boolean;
     
@@ -445,29 +517,77 @@ declare module 'aurelia-router' {
     updateTitle(): void;
     
     /**
-      * Resets the Router to its original unconfigured state.
+      * Updates the navigation routes with hrefs relative to the current location.
+      * Note: This method will likely move to a plugin in a future release.
       */
-    reset(): void;
-    refreshBaseUrl(): void;
     refreshNavigation(): void;
-    createNavigationInstruction(url?: string, parentInstruction?: NavigationInstruction): Promise<NavigationInstruction>;
-    createNavigationContext(instruction: NavigationInstruction): NavigationContext;
   }
+  export class CanDeactivatePreviousStep {
+    run(navigationInstruction: NavigationInstruction, next: Function): any;
+  }
+  export class CanActivateNextStep {
+    run(navigationInstruction: NavigationInstruction, next: Function): any;
+  }
+  export class DeactivatePreviousStep {
+    run(navigationInstruction: NavigationInstruction, next: Function): any;
+  }
+  export class ActivateNextStep {
+    run(navigationInstruction: NavigationInstruction, next: Function): any;
+  }
+  export class RouteLoader {
+    loadRoute(router: any, config: any, navigationInstruction: any): any;
+  }
+  export class LoadRouteStep {
+    static inject(): any;
+    constructor(routeLoader: RouteLoader);
+    run(navigationInstruction: NavigationInstruction, next: Function): any;
+  }
+  
+  /**
+  * Class responsible for creating the navigation pipeline.
+  */
   export class PipelineProvider {
     static inject(): any;
     constructor(container: Container);
-    createPipeline(navigationContext: NavigationContext): Pipeline;
+    
+    /**
+      * Create the navigation pipeline.
+      */
+    createPipeline(): Pipeline;
   }
+  
+  /**
+  * The main application router.
+  */
   export class AppRouter extends Router {
     static inject(): any;
     constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator);
-    isRoot: boolean;
+    
+    /**
+      * Loads the specified URL.
+      *
+      * @param url The URL fragment to load.
+      */
     loadUrl(url: any): Promise<NavigationInstruction>;
-    queueInstruction(instruction: NavigationInstruction): Promise<any>;
-    dequeueInstruction(instructionCount?: number): Promise<any>;
-    registerViewPort(viewPort: Object, name: string): void;
+    
+    /**
+      * Registers a viewPort to be used as a rendering target for activated routes.
+      *
+      * @param viewPort The viewPort.
+      * @param name The name of the viewPort. 'default' if unspecified.
+      */
+    registerViewPort(viewPort: Object, name: string): Promise<any>;
+    
+    /**
+      * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
+      *
+      * @params options The set of options to activate the router with.
+      */
     activate(options: Object): void;
+    
+    /**
+      * Deactivates the router.
+      */
     deactivate(): void;
-    reset(): void;
   }
 }
