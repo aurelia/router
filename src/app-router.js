@@ -44,7 +44,7 @@ export class AppRouter extends Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: Object, name: string): Promise<any> {
+  registerViewPort(viewPort: any, name: string): Promise<any> {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {

@@ -9,7 +9,7 @@ import {RouteConfig} from './interfaces';
 export class RouterConfiguration {
   instructions = [];
   options = {};
-  pipelineSteps: Array<Object> = [];
+  pipelineSteps: Array<Function|PipelineStep> = [];
   title: string;
   unknownRouteConfig: any;
 
@@ -20,7 +20,7 @@ export class RouterConfiguration {
   * @param step The pipeline step.
   * @chainable
   */
-  addPipelineStep(name: string, step: Object|Function): RouterConfiguration {
+  addPipelineStep(name: string, step: Function|PipelineStep): RouterConfiguration {
     this.pipelineSteps.push({name, step});
     return this;
   }
@@ -82,7 +82,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => void|Promise<void>) : RouterConfiguration {
+  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>) : RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }

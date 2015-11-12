@@ -37,17 +37,17 @@ export class NavigationInstruction {
   /**
   * Parameters extracted from the route pattern.
   */
-  params: Object;
+  params: any;
 
   /**
   * Parameters extracted from the query string.
   */
-  queryParams: Object;
+  queryParams: any;
 
   /**
   * The route config for the route matching this instruction.
   */
-  config: Object;
+  config: RouteConfig;
 
   /**
   * The parent instruction, if this instruction was created by a child router.
@@ -62,7 +62,7 @@ export class NavigationInstruction {
   /**
   * viewPort instructions to used activation.
   */
-  viewPortInstructions: Object;
+  viewPortInstructions: any;
 
   plan: Object = null;
 
@@ -115,7 +115,7 @@ export class NavigationInstruction {
   /**
   * Adds a viewPort instruction.
   */
-  addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): Object {
+  addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): any {
     let viewportInstruction = this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
       strategy: strategy,

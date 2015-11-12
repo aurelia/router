@@ -29,7 +29,7 @@ interface RouteConfig {
   * The function is passed the current [[NavigationInstruction]], and should configure
   * instruction.config with the desired moduleId, viewPorts, or redirect.
   */
-  //navigationStrategy?: (instruction:NavigationInstruction) => Promise<void>|void;
+  navigationStrategy?: (instruction: NavigationInstruction) => Promise<void>|void;
 
   /**
   * The view ports to target when activating this route. If unspecified, the target moduleId is loaded
@@ -37,7 +37,7 @@ interface RouteConfig {
   * whose property names correspond to names used by <router-view> elements. The values should be objects
   * specifying the moduleId to load into that viewPort.
   */
-  viewPorts?: Object;
+  viewPorts?: any;
 
   /**
   * When specified, this route will be included in the [[Router.navigation]] nav model. Useful for

@@ -6,7 +6,7 @@ import 'core-js';
 *
 * @param obj The object to check.
 */
-export function isNavigationCommand(obj): boolean {
+export function isNavigationCommand(obj: any): boolean {
   return obj && typeof obj.navigate === 'function';
 }
 
@@ -14,7 +14,7 @@ export function isNavigationCommand(obj): boolean {
 * Used during the activation lifecycle to cause a redirect.
 */
 export class Redirect {
-  constructor(url: string, options: Object = {}) {
+  constructor(url: string, options: any = {}) {
     this.url = url;
     this.options = Object.assign({ trigger: true, replace: true }, options);
     this.shouldContinueProcessing = false;

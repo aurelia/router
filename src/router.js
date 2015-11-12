@@ -82,7 +82,7 @@ export class Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: Object, name?: string): void {
+  registerViewPort(viewPort: any, name?: string): void {
     name = name || 'default';
     this.viewPorts[name] = viewPort;
   }
@@ -126,7 +126,7 @@ export class Router {
   * @param fragment The URL fragment to use as the navigation destination.
   * @param options The navigation options.
   */
-  navigate(fragment: string, options?: Object): boolean {
+  navigate(fragment: string, options?: any): boolean {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -142,7 +142,7 @@ export class Router {
   * @param params The route parameters to be used when populating the route pattern.
   * @param options The navigation options.
   */
-  navigateToRoute(route: string, params?: Object, options?: Object): boolean {
+  navigateToRoute(route: string, params?: any, options?: any): boolean {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
@@ -173,7 +173,7 @@ export class Router {
   * @param params The route params to be used to populate the route pattern.
   * @returns {string} A string containing the generated URL fragment.
   */
-  generate(name: string, params?: Object): string {
+  generate(name: string, params?: any): string {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params);
@@ -413,7 +413,7 @@ export class Router {
   }
 }
 
-function validateRouteConfig(config: Object): void {
+function validateRouteConfig(config: RouteConfig): void {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }
@@ -427,7 +427,7 @@ function validateRouteConfig(config: Object): void {
   }
 }
 
-function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluator: Function, context: Object): Promise<NavigationInstruction> {
+function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluator: Function, context: any): Promise<NavigationInstruction> {
   return Promise.resolve(evaluator.call(context, instruction)).then(() => {
     if (!('viewPorts' in instruction.config)) {
       instruction.config.viewPorts = {
