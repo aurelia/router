@@ -1,3 +1,11 @@
+### 0.14.1 (2015-11-15)
+
+
+#### Bug Fixes
+
+* **all:** improve type annotations ([167a4eaf](http://github.com/aurelia/router/commit/167a4eaf9c751e0f0be0793a137fb81fc470b425), closes [#248](http://github.com/aurelia/router/issues/248))
+
+
 ## 0.14.0 (2015-11-10)
 
 

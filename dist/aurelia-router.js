@@ -265,17 +265,17 @@ export class NavigationInstruction {
   /**
   * Parameters extracted from the route pattern.
   */
-  params: Object;
+  params: any;
 
   /**
   * Parameters extracted from the query string.
   */
-  queryParams: Object;
+  queryParams: any;
 
   /**
   * The route config for the route matching this instruction.
   */
-  config: Object;
+  config: RouteConfig;
 
   /**
   * The parent instruction, if this instruction was created by a child router.
@@ -290,7 +290,7 @@ export class NavigationInstruction {
   /**
   * viewPort instructions to used activation.
   */
-  viewPortInstructions: Object;
+  viewPortInstructions: any;
 
   plan: Object = null;
 
@@ -343,7 +343,7 @@ export class NavigationInstruction {
   /**
   * Adds a viewPort instruction.
   */
-  addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): Object {
+  addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): any {
     let viewportInstruction = this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
       strategy: strategy,
@@ -515,9 +515,9 @@ export class NavModel {
   /**
   * The route config.
   */
-  config: Object = null;
+  config: RouteConfig = null;
 
-  constructor(router, relativeHref) {
+  constructor(router: Router, relativeHref: string) {
     this.router = router;
     this.relativeHref = relativeHref;
   }
@@ -569,7 +569,7 @@ interface RouteConfig {
   * The function is passed the current [[NavigationInstruction]], and should configure
   * instruction.config with the desired moduleId, viewPorts, or redirect.
   */
-  //navigationStrategy?: (instruction:NavigationInstruction) => Promise<void>|void;
+  navigationStrategy?: (instruction: NavigationInstruction) => Promise<void>|void;
 
   /**
   * The view ports to target when activating this route. If unspecified, the target moduleId is loaded
@@ -577,7 +577,7 @@ interface RouteConfig {
   * whose property names correspond to names used by <router-view> elements. The values should be objects
   * specifying the moduleId to load into that viewPort.
   */
-  viewPorts?: Object;
+  viewPorts?: any;
 
   /**
   * When specified, this route will be included in the [[Router.navigation]] nav model. Useful for
@@ -612,7 +612,7 @@ interface RouteConfig {
 *
 * @param obj The object to check.
 */
-export function isNavigationCommand(obj): boolean {
+export function isNavigationCommand(obj: any): boolean {
   return obj && typeof obj.navigate === 'function';
 }
 
@@ -620,7 +620,7 @@ export function isNavigationCommand(obj): boolean {
 * Used during the activation lifecycle to cause a redirect.
 */
 export class Redirect {
-  constructor(url: string, options: Object = {}) {
+  constructor(url: string, options: any = {}) {
     this.url = url;
     this.options = Object.assign({ trigger: true, replace: true }, options);
     this.shouldContinueProcessing = false;
@@ -654,7 +654,7 @@ export class Redirect {
 export class RouterConfiguration {
   instructions = [];
   options = {};
-  pipelineSteps: Array<Object> = [];
+  pipelineSteps: Array<Function|PipelineStep> = [];
   title: string;
   unknownRouteConfig: any;
 
@@ -665,7 +665,7 @@ export class RouterConfiguration {
   * @param step The pipeline step.
   * @chainable
   */
-  addPipelineStep(name: string, step: Object|Function): RouterConfiguration {
+  addPipelineStep(name: string, step: Function|PipelineStep): RouterConfiguration {
     this.pipelineSteps.push({name, step});
     return this;
   }
@@ -727,7 +727,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => void|Promise<void>) : RouterConfiguration {
+  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>) : RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
@@ -973,7 +973,7 @@ export class Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: Object, name?: string): void {
+  registerViewPort(viewPort: any, name?: string): void {
     name = name || 'default';
     this.viewPorts[name] = viewPort;
   }
@@ -1017,7 +1017,7 @@ export class Router {
   * @param fragment The URL fragment to use as the navigation destination.
   * @param options The navigation options.
   */
-  navigate(fragment: string, options?: Object): boolean {
+  navigate(fragment: string, options?: any): boolean {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -1033,7 +1033,7 @@ export class Router {
   * @param params The route parameters to be used when populating the route pattern.
   * @param options The navigation options.
   */
-  navigateToRoute(route: string, params?: Object, options?: Object): boolean {
+  navigateToRoute(route: string, params?: any, options?: any): boolean {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
@@ -1064,7 +1064,7 @@ export class Router {
   * @param params The route params to be used to populate the route pattern.
   * @returns {string} A string containing the generated URL fragment.
   */
-  generate(name: string, params?: Object): string {
+  generate(name: string, params?: any): string {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params);
@@ -1304,7 +1304,7 @@ export class Router {
   }
 }
 
-function validateRouteConfig(config: Object): void {
+function validateRouteConfig(config: RouteConfig): void {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }
@@ -1318,7 +1318,7 @@ function validateRouteConfig(config: Object): void {
   }
 }
 
-function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluator: Function, context: Object): Promise<NavigationInstruction> {
+function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluator: Function, context: any): Promise<NavigationInstruction> {
   return Promise.resolve(evaluator.call(context, instruction)).then(() => {
     if (!('viewPorts' in instruction.config)) {
       instruction.config.viewPorts = {
@@ -1706,7 +1706,7 @@ export class AppRouter extends Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: Object, name: string): Promise<any> {
+  registerViewPort(viewPort: any, name: string): Promise<any> {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
