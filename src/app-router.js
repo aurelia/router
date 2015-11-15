@@ -51,8 +51,13 @@ export class AppRouter extends Router {
       let viewModel = this._findViewModel(viewPort);
       if ('configureRouter' in viewModel) {
         if (!this.isConfigured) {
+          let resolveConfiguredPromise = this._resolveConfiguredPromise;
+          this._resolveConfiguredPromise = () => {};
           return this.configure(config => viewModel.configureRouter(config, this))
-            .then(() => { this.activate(); });
+            .then(() => {
+              this.activate();
+              resolveConfiguredPromise();
+            });
         }
       } else {
         this.activate();
