@@ -1,3 +1,11 @@
+### 1.0.0-beta.1 (2015-11-16)
+
+
+#### Bug Fixes
+
+* **router:** delay ensureConfigured() promise resolution until after the root router ha activ ([7efcb81a](http://github.com/aurelia/router/commit/7efcb81a510889662975260aea113b293fed2e33), closes [#251](http://github.com/aurelia/router/issues/251))
+
+
 ### 0.14.1 (2015-11-15)
 
 

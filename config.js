@@ -14,32 +14,15 @@ System.config({
   },
 
   map: {
-    "aurelia-dependency-injection": "github:aurelia/dependency-injection@0.12.0",
-    "aurelia-event-aggregator": "github:aurelia/event-aggregator@0.10.0",
-    "aurelia-history": "github:aurelia/history@0.9.0",
-    "aurelia-logging": "github:aurelia/logging@0.9.0",
-    "aurelia-path": "github:aurelia/path@0.11.0",
-    "aurelia-route-recognizer": "github:aurelia/route-recognizer@0.9.0",
+    "aurelia-dependency-injection": "npm:aurelia-dependency-injection@1.0.0-beta.1",
+    "aurelia-event-aggregator": "npm:aurelia-event-aggregator@1.0.0-beta.1",
+    "aurelia-history": "npm:aurelia-history@1.0.0-beta.1",
+    "aurelia-logging": "npm:aurelia-logging@1.0.0-beta.1",
+    "aurelia-path": "npm:aurelia-path@1.0.0-beta.1",
+    "aurelia-route-recognizer": "npm:aurelia-route-recognizer@1.0.0-beta.1",
     "babel": "npm:babel-core@5.2.2",
     "babel-runtime": "npm:babel-runtime@5.2.2",
     "core-js": "npm:core-js@1.2.6",
-    "github:aurelia/dependency-injection@0.12.0": {
-      "aurelia-logging": "github:aurelia/logging@0.9.0",
-      "aurelia-metadata": "github:aurelia/metadata@0.10.0",
-      "aurelia-pal": "github:aurelia/pal@0.3.0",
-      "core-js": "npm:core-js@1.2.6"
-    },
-    "github:aurelia/event-aggregator@0.10.0": {
-      "aurelia-logging": "github:aurelia/logging@0.9.0"
-    },
-    "github:aurelia/metadata@0.10.0": {
-      "aurelia-pal": "github:aurelia/pal@0.3.0",
-      "core-js": "npm:core-js@1.2.6"
-    },
-    "github:aurelia/route-recognizer@0.9.0": {
-      "aurelia-path": "github:aurelia/path@0.11.0",
-      "core-js": "npm:core-js@1.2.6"
-    },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
     },
@@ -54,6 +37,23 @@ System.config({
     },
     "npm:assert@1.3.0": {
       "util": "npm:util@0.10.3"
+    },
+    "npm:aurelia-dependency-injection@1.0.0-beta.1": {
+      "aurelia-logging": "npm:aurelia-logging@1.0.0-beta.1",
+      "aurelia-metadata": "npm:aurelia-metadata@1.0.0-beta.1",
+      "aurelia-pal": "npm:aurelia-pal@1.0.0-beta.1",
+      "core-js": "npm:core-js@1.2.6"
+    },
+    "npm:aurelia-event-aggregator@1.0.0-beta.1": {
+      "aurelia-logging": "npm:aurelia-logging@1.0.0-beta.1"
+    },
+    "npm:aurelia-metadata@1.0.0-beta.1": {
+      "aurelia-pal": "npm:aurelia-pal@1.0.0-beta.1",
+      "core-js": "npm:core-js@1.2.6"
+    },
+    "npm:aurelia-route-recognizer@1.0.0-beta.1": {
+      "aurelia-path": "npm:aurelia-path@1.0.0-beta.1",
+      "core-js": "npm:core-js@1.2.6"
     },
     "npm:core-js@1.2.6": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",

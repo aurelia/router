@@ -10,6 +10,14 @@ declare module 'aurelia-router' {
   * A step to be run during processing of the pipeline.
   */
   export interface PipelineStep {
+    
+    /**
+       * Execute the pipeline step. The step should invoke next(), next.complete(),
+       * next.cancel(), or next.reject() to allow the pipeline to continue.
+       *
+       * @param instruction The navigation instruction.
+       * @param next The next step in the pipeline.
+       */
     run(instruction: NavigationInstruction, next: Function): void;
   }
   
@@ -59,7 +67,13 @@ declare module 'aurelia-router' {
       * A URL fragment to redirect to when this route is matched.
       */
     redirect?: string;
-    navigationStrategy(instruction: NavigationInstruction): Promise<void> | void;
+    
+    /**
+      * A function that can be used to dynamically select the module or modules to activate.
+      * The function is passed the current [[NavigationInstruction]], and should configure
+      * instruction.config with the desired moduleId, viewPorts, or redirect.
+      */
+    navigationStrategy?: (instruction: NavigationInstruction) => Promise<void> | void;
     
     /**
       * The view ports to target when activating this route. If unspecified, the target moduleId is loaded

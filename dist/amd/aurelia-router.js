@@ -1476,13 +1476,22 @@ define(['exports', 'core-js', 'aurelia-logging', 'aurelia-dependency-injection',
           var viewModel = _this8._findViewModel(viewPort);
           if ('configureRouter' in viewModel) {
             if (!_this8.isConfigured) {
-              return {
-                v: _this8.configure(function (config) {
-                  return viewModel.configureRouter(config, _this8);
-                }).then(function () {
-                  _this8.activate();
-                })
-              };
+              var _ret6 = (function () {
+                var resolveConfiguredPromise = _this8._resolveConfiguredPromise;
+                _this8._resolveConfiguredPromise = function () {};
+                return {
+                  v: {
+                    v: _this8.configure(function (config) {
+                      return viewModel.configureRouter(config, _this8);
+                    }).then(function () {
+                      _this8.activate();
+                      resolveConfiguredPromise();
+                    })
+                  }
+                };
+              })();
+
+              if (typeof _ret6 === 'object') return _ret6.v;
             }
           } else {
             _this8.activate();
