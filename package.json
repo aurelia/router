@@ -18,7 +18,6 @@
     "url": "http://github.com/aurelia/router"
   },
   "scripts": {
-    "postinstall": "jspm install",
     "test": "gulp test",
     "ci": "gulp ci"
   },
