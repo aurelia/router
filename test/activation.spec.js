@@ -3,6 +3,7 @@ import {
   CanActivateNextStep
 } from '../src/activation';
 import {activationStrategy} from '../src/navigation-plan';
+import {createPipelineState} from './test-util';
 
 describe('activation', () => {
   describe('CanDeactivatePreviousStep', () => {
@@ -18,7 +19,7 @@ describe('activation', () => {
 
     beforeEach(() => {
       step = new CanDeactivatePreviousStep();
-      state = getState();
+      state = createPipelineState();
     });
 
     it('should return true for context that canDeactivate', () => {
@@ -39,7 +40,7 @@ describe('activation', () => {
       let instruction = { plan: { first: viewPortFactory(() => (false)) } };
 
       step.run(instruction, state.next);
-      expect(state.result).toBe('cancel');
+      expect(state.rejection).toBeTruthy();
     });
 
     it('should return true for context that cannot Deactivate with unknown strategy', () => {
@@ -63,7 +64,7 @@ describe('activation', () => {
       let instruction = { plan: {first: viewPortFactory(() => (Promise.resolve(false))) } };
 
       step.run(instruction, state.next).then(() => {
-        expect(state.result).toBe('cancel');
+        expect(state.rejection).toBeTruthy();
         done();
       });
     });
@@ -72,7 +73,7 @@ describe('activation', () => {
       let instruction = { plan: {first: viewPortFactory(() => { throw new Error('oops'); }) } };
 
       step.run(instruction, state.next).then(() => {
-        expect(state.result).toBe('cancel');
+        expect(state.rejection).toBeTruthy();
         done();
       });
     });
@@ -88,7 +89,7 @@ describe('activation', () => {
       let instruction = { plan: {first: viewPortFactory(() => (true)), second: viewPortFactory(() => (false))} };
 
       step.run(instruction, state.next);
-      expect(state.result).toBe('cancel');
+      expect(state.rejection).toBeTruthy();
     });
 
     describe('with a childNavigationInstruction', () => {
@@ -109,7 +110,7 @@ describe('activation', () => {
         viewPort.childNavigationInstruction = { plan: { first: viewPortFactory(() => (false)) } };
 
         step.run(instruction, state.next);
-        expect(state.result).toBe('cancel');
+        expect(state.rejection).toBeTruthy();
       });
     });
 
@@ -133,7 +134,7 @@ describe('activation', () => {
         instruction.plan = { first: viewPort };
 
         step.run(instruction, state.next);
-        expect(state.result).toBe('cancel');
+        expect(state.rejection).toBeTruthy();
       });
     });
   });
@@ -159,7 +160,7 @@ describe('activation', () => {
 
     beforeEach(() => {
       step = new CanActivateNextStep();
-      state = getState();
+      state = createPipelineState();
     });
 
     it('should return true for context that canActivate', () => {
@@ -180,25 +181,7 @@ describe('activation', () => {
       let instruction = getNavigationInstruction(() => (false));
 
       step.run(instruction, state.next);
-      expect(state.result).toBe('cancel');
+      expect(state.rejection).toBeTruthy();
     });
   });
 });
-
-function getState() {
-  let nextResult = null;
-  let next = () => {
-    nextResult = true;
-    return Promise.resolve(nextResult);
-  };
-
-  next.cancel = () => {
-    nextResult = 'cancel';
-    return Promise.resolve(nextResult);
-  };
-
-  return {
-    next,
-    get result() { return nextResult; }
-  };
-}
