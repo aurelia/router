@@ -19,28 +19,28 @@ import {RouteConfig} from './interfaces';
 export class Router {
   container: Container;
   history: History;
-  viewPorts: Object = {};
-  routes: RouteConfig[] = [];
+  viewPorts: Object;
+  routes: RouteConfig[];
 
   /**
   * The [[Router]]'s current base URL, typically based on the [[Router.currentInstruction]].
   */
-  baseUrl: string = '';
+  baseUrl: string;
 
   /**
   * True if the [[Router]] has been configured.
   */
-  isConfigured: boolean = false;
+  isConfigured: boolean;
 
   /**
   * True if the [[Router]] is currently processing a navigation.
   */
-  isNavigating: boolean = false;
+  isNavigating: boolean;
 
   /**
   * The navigation models for routes that specified [[RouteConfig.nav]].
   */
-  navigation: NavModel[] = [];
+  navigation: NavModel[];
 
   /**
   * The currently active navigation instruction.
@@ -50,11 +50,7 @@ export class Router {
   /**
   * The parent router, or null if this instance is not a child router.
   */
-  parent: Router;
-
-  _fallbackOrder: number = 100;
-  _recognizer: RouteRecognizer = new RouteRecognizer();
-  _childRecognizer: RouteRecognizer = new RouteRecognizer();
+  parent: Router = null;
 
   /**
   * @param container The [[Container]] to use when child routers.
@@ -63,7 +59,24 @@ export class Router {
   constructor(container: Container, history: History) {
     this.container = container;
     this.history = history;
+    this.reset();
+  }
 
+  /**
+  * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+  * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+  */
+  reset() {
+    this.viewPorts = {};
+    this.routes = [];
+    this.baseUrl = '';
+    this.isConfigured = false;
+    this.isNavigating = false;
+    this.navigation = [];
+    this.currentInstruction = null;
+    this._fallbackOrder = 100;
+    this._recognizer = new RouteRecognizer();
+    this._childRecognizer = new RouteRecognizer();
     this._configuredPromise = new Promise(resolve => {
       this._resolveConfiguredPromise = resolve;
     });

@@ -15,13 +15,20 @@ const logger = LogManager.getLogger('app-router');
 export class AppRouter extends Router {
   static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
 
-  _queue = [];
-
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
-    super(container, history);
+    super(container, history); //Note the super will call reset internally.
     this.pipelineProvider = pipelineProvider;
     this.events = events;
+  }
+
+  /**
+  * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+  * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+  */
+  reset() {
+    super.reset();
     this.maxInstructionCount = 10;
+    this._queue = [];
   }
 
   /**
