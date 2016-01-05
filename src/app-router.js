@@ -28,7 +28,11 @@ export class AppRouter extends Router {
   reset() {
     super.reset();
     this.maxInstructionCount = 10;
-    this._queue = [];
+    if (!this._queue) {
+      this._queue = [];
+    } else {
+      this._queue.length = 0;
+    }
   }
 
   /**
@@ -115,7 +119,7 @@ export class AppRouter extends Router {
       }
 
       let instruction = this._queue.shift();
-      this._queue = [];
+      this._queue.length = 0;
 
       if (!instruction) {
         return undefined;
