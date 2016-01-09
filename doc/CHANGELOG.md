@@ -1,3 +1,17 @@
+### 1.0.0-beta.2 (2016-01-08)
+
+
+#### Bug Fixes
+
+* **app-router:** restore _queue object reference ([9f48f6be](http://github.com/aurelia/router/commit/9f48f6bedbab867f9865c2bd6d41d84323efa8e9))
+* **pipeline:** Fix type annotations on pipeline next parameter ([b47a0dcf](http://github.com/aurelia/router/commit/b47a0dcff567d4926d6b8fe1a9e7032ab88dac6c), closes [#265](http://github.com/aurelia/router/issues/265))
+
+
+#### Features
+
+* **router:** add rest method ([dbce60c3](http://github.com/aurelia/router/commit/dbce60c37bc94e74ff7e279ae28b3b770b5ff764))
+
+
 ### 1.0.0-beta.1 (2015-11-16)
 
 

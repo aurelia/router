@@ -739,9 +739,17 @@ function getInstructionBaseUrl(instruction) {
 
 var Router = (function () {
   function Router(container, history) {
-    var _this2 = this;
-
     _classCallCheck(this, Router);
+
+    this.parent = null;
+
+    this.container = container;
+    this.history = history;
+    this.reset();
+  }
+
+  Router.prototype.reset = function reset() {
+    var _this2 = this;
 
     this.viewPorts = {};
     this.routes = [];
@@ -749,17 +757,14 @@ var Router = (function () {
     this.isConfigured = false;
     this.isNavigating = false;
     this.navigation = [];
+    this.currentInstruction = null;
     this._fallbackOrder = 100;
     this._recognizer = new _aureliaRouteRecognizer.RouteRecognizer();
     this._childRecognizer = new _aureliaRouteRecognizer.RouteRecognizer();
-
-    this.container = container;
-    this.history = history;
-
     this._configuredPromise = new Promise(function (resolve) {
       _this2._resolveConfiguredPromise = resolve;
     });
-  }
+  };
 
   Router.prototype.registerViewPort = function registerViewPort(viewPort, name) {
     name = name || 'default';
@@ -1140,8 +1145,8 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
     if (i--) {
       try {
         var viewModel = infos[i];
-        var result = viewModel[callbackName]();
-        return processPotential(result, inspect, next.cancel);
+        var _result = viewModel[callbackName]();
+        return processPotential(_result, inspect, next.cancel);
       } catch (error) {
         return next.cancel(error);
       }
@@ -1464,11 +1469,19 @@ var AppRouter = (function (_Router) {
     _classCallCheck(this, AppRouter);
 
     _Router.call(this, container, history);
-    this._queue = [];
     this.pipelineProvider = pipelineProvider;
     this.events = events;
-    this.maxInstructionCount = 10;
   }
+
+  AppRouter.prototype.reset = function reset() {
+    _Router.prototype.reset.call(this);
+    this.maxInstructionCount = 10;
+    if (!this._queue) {
+      this._queue = [];
+    } else {
+      this._queue.length = 0;
+    }
+  };
 
   AppRouter.prototype.loadUrl = function loadUrl(url) {
     var _this7 = this;
@@ -1558,7 +1571,7 @@ var AppRouter = (function (_Router) {
       }
 
       var instruction = _this10._queue.shift();
-      _this10._queue = [];
+      _this10._queue.length = 0;
 
       if (!instruction) {
         return undefined;

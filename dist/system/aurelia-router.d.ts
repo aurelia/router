@@ -7,6 +7,29 @@ declare module 'aurelia-router' {
   import { EventAggregator }  from 'aurelia-event-aggregator';
   
   /**
+  * A callback to indicate when pipeline processing should advance to the next step
+  * or be aborted.
+  */
+  export interface Next {
+    
+    /**
+      * Indicates the successful completion of the entire pipeline.
+      */
+    complete(result: any): Promise<any>;
+    
+    /**
+      * Indicates that the pipeline should cancel processing.
+      */
+    cancel(result: any): Promise<any>;
+    
+    /**
+      * Indicates that pipeline processing has failed and should be stopped.
+      */
+    reject(result: any): Promise<any>;
+    (): Promise<any>;
+  }
+  
+  /**
   * A step to be run during processing of the pipeline.
   */
   export interface PipelineStep {
@@ -18,7 +41,7 @@ declare module 'aurelia-router' {
        * @param instruction The navigation instruction.
        * @param next The next step in the pipeline.
        */
-    run(instruction: NavigationInstruction, next: Function): void;
+    run(instruction: NavigationInstruction, next: Next): void;
   }
   
   /**
@@ -420,6 +443,12 @@ declare module 'aurelia-router' {
     constructor(container: Container, history: History);
     
     /**
+      * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+      * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+      */
+    reset(): any;
+    
+    /**
       * Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
       */
     isRoot: boolean;
@@ -571,6 +600,12 @@ declare module 'aurelia-router' {
   export class AppRouter extends Router {
     static inject(): any;
     constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator);
+    
+    /**
+      * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+      * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+      */
+    reset(): any;
     
     /**
       * Loads the specified URL.

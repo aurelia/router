@@ -131,6 +131,32 @@ export const pipelineStatus = {
 };
 
 /**
+* A callback to indicate when pipeline processing should advance to the next step
+* or be aborted.
+*/
+interface Next {
+  /**
+  * Indicates the successful completion of the pipeline step.
+  */
+  (): Promise<any>,
+
+  /**
+  * Indicates the successful completion of the entire pipeline.
+  */
+  complete: (result: any) => Promise<any>,
+
+  /**
+  * Indicates that the pipeline should cancel processing.
+  */
+  cancel: (result: any) => Promise<any>,
+
+  /**
+  * Indicates that pipeline processing has failed and should be stopped.
+  */
+  reject: (result: any) => Promise<any>
+}
+
+/**
 * A step to be run during processing of the pipeline.
 */
 interface PipelineStep {
@@ -141,7 +167,7 @@ interface PipelineStep {
    * @param instruction The navigation instruction.
    * @param next The next step in the pipeline.
    */
-  run(instruction: NavigationInstruction, next: Function): void;
+  run(instruction: NavigationInstruction, next: Next): void;
 }
 
 /**
@@ -910,28 +936,28 @@ function getInstructionBaseUrl(instruction: NavigationInstruction): string {
 export class Router {
   container: Container;
   history: History;
-  viewPorts: Object = {};
-  routes: RouteConfig[] = [];
+  viewPorts: Object;
+  routes: RouteConfig[];
 
   /**
   * The [[Router]]'s current base URL, typically based on the [[Router.currentInstruction]].
   */
-  baseUrl: string = '';
+  baseUrl: string;
 
   /**
   * True if the [[Router]] has been configured.
   */
-  isConfigured: boolean = false;
+  isConfigured: boolean;
 
   /**
   * True if the [[Router]] is currently processing a navigation.
   */
-  isNavigating: boolean = false;
+  isNavigating: boolean;
 
   /**
   * The navigation models for routes that specified [[RouteConfig.nav]].
   */
-  navigation: NavModel[] = [];
+  navigation: NavModel[];
 
   /**
   * The currently active navigation instruction.
@@ -941,11 +967,7 @@ export class Router {
   /**
   * The parent router, or null if this instance is not a child router.
   */
-  parent: Router;
-
-  _fallbackOrder: number = 100;
-  _recognizer: RouteRecognizer = new RouteRecognizer();
-  _childRecognizer: RouteRecognizer = new RouteRecognizer();
+  parent: Router = null;
 
   /**
   * @param container The [[Container]] to use when child routers.
@@ -954,7 +976,24 @@ export class Router {
   constructor(container: Container, history: History) {
     this.container = container;
     this.history = history;
+    this.reset();
+  }
 
+  /**
+  * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+  * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+  */
+  reset() {
+    this.viewPorts = {};
+    this.routes = [];
+    this.baseUrl = '';
+    this.isConfigured = false;
+    this.isNavigating = false;
+    this.navigation = [];
+    this.currentInstruction = null;
+    this._fallbackOrder = 100;
+    this._recognizer = new RouteRecognizer();
+    this._childRecognizer = new RouteRecognizer();
     this._configuredPromise = new Promise(resolve => {
       this._resolveConfiguredPromise = resolve;
     });
@@ -1677,13 +1716,24 @@ const logger = LogManager.getLogger('app-router');
 export class AppRouter extends Router {
   static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
 
-  _queue = [];
-
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
-    super(container, history);
+    super(container, history); //Note the super will call reset internally.
     this.pipelineProvider = pipelineProvider;
     this.events = events;
+  }
+
+  /**
+  * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+  * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+  */
+  reset() {
+    super.reset();
     this.maxInstructionCount = 10;
+    if (!this._queue) {
+      this._queue = [];
+    } else {
+      this._queue.length = 0;
+    }
   }
 
   /**
@@ -1770,7 +1820,7 @@ export class AppRouter extends Router {
       }
 
       let instruction = this._queue.shift();
-      this._queue = [];
+      this._queue.length = 0;
 
       if (!instruction) {
         return undefined;
