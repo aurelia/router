@@ -1,3 +1,11 @@
+### 1.0.0-beta.1.1.0 (2016-01-29)
+
+
+#### Features
+
+* **all:** update jspm meta; core-js; aurelia deps ([b473fec1](http://github.com/aurelia/router/commit/b473fec110d27e5572c1e094f20755fd5eeb7fd6))
+
+
 ### 1.0.0-beta.2 (2016-01-08)
 
 
