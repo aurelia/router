@@ -212,6 +212,7 @@ export class NavigationInstruction {
 
     return Promise.all(loads).then(() => {
       delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
+      return null;
     }).then(() => prune(this));
   }
 
