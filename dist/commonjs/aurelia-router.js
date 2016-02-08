@@ -394,6 +394,7 @@ var NavigationInstruction = (function () {
       delaySwaps.forEach(function (x) {
         return x.viewPort.swap(x.viewPortInstruction);
       });
+      return null;
     }).then(function () {
       return prune(_this);
     });
