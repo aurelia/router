@@ -63,5 +63,10 @@ interface RouteConfig {
   */
   settings?: any;
 
+  /**
+  * The navigation model for storing and interacting with the route's navigation settings.
+  */
+  navModel?: NavModel;
+
   [x: string]: any;
 }
