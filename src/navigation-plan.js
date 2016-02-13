@@ -41,6 +41,9 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
     for (let viewPortName in prev.viewPortInstructions) {
       let prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
       let nextViewPortConfig = config.viewPorts[viewPortName];
+
+      if (!nextViewPortConfig) throw new Error(`Invalid Route Config: Configuration for viewPort "${viewPortName}" was not found for route: "${instruction.config.route}."`);
+
       let viewPortPlan = plan[viewPortName] = {
         name: viewPortName,
         config: nextViewPortConfig,
