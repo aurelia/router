@@ -187,7 +187,7 @@ export class Router {
   * @param params The route params to be used to populate the route pattern.
   * @returns {string} A string containing the generated URL fragment.
   */
-  generate(name: string, params?: any): string {
+  generate(name: string, params?: any, options?: any = {}): string {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params);
@@ -198,7 +198,8 @@ export class Router {
     }
 
     let path = this._recognizer.generate(name, params);
-    return _createRootedPath(path, this.baseUrl, this.history._hasPushState);
+    let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
+    return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
   }
 
   /**

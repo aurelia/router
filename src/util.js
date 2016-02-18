@@ -1,12 +1,16 @@
-export function _normalizeAbsolutePath(path, hasPushState) {
+export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
+  }
+
+  if (hasPushState && absolute) {
+    path = path.substring(1, path.length);
   }
 
   return path;
 }
 
-export function _createRootedPath(fragment, baseUrl, hasPushState) {
+export function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
   if (isAbsoluteUrl.test(fragment)) {
     return fragment;
   }
@@ -27,7 +31,7 @@ export function _createRootedPath(fragment, baseUrl, hasPushState) {
     path = path.substring(0, path.length - 1);
   }
 
-  return _normalizeAbsolutePath(path + fragment, hasPushState);
+  return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
 }
 
 export function _resolveUrl(fragment, baseUrl, hasPushState) {

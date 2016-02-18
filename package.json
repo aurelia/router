@@ -46,6 +46,7 @@
       "aurelia-route-recognizer": "^1.0.0-beta.1.1.0"
     },
     "devDependencies": {
+      "aurelia-pal-browser": "^1.0.0-beta.1.1.3",
       "babel": "babel-core@^5.8.24",
       "babel-runtime": "^5.8.24",
       "core-js": "^2.0.3"

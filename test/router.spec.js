@@ -3,11 +3,16 @@ import {Container} from 'aurelia-dependency-injection';
 import {AppRouter} from '../src/app-router';
 import {PipelineProvider} from '../src/pipeline-provider';
 
+let absoluteRoot = 'http://aurelia.io/docs/';
+
 class MockHistory extends History {
   activate() {}
   deactivate() {}
   navigate() {}
   navigateBack() {}
+  getAbsoluteRoot() {
+    return absoluteRoot;
+  }
 }
 
 describe('the router', () => {
@@ -108,6 +113,22 @@ describe('the router', () => {
         expect(child.generate('parent', { id: 1 })).toBe('#/parent/1');
         done();
       });
+    });
+
+    it('should return a fully-qualified URL when options.absolute is true', (done) => {
+      const child = router.createChild(new Container());
+      let options = { absolute: true };
+
+      child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(() => {
+          expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}#/test/1`);
+
+          router.history._hasPushState = true;
+
+          expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}test/1`);
+
+          done();
+        });
     });
   });
 
