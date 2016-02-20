@@ -23,15 +23,15 @@ export class PipelineProvider {
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, //optional
       LoadRouteStep,
-      createRouteFilterStep('authorize'),
-      createRouteFilterStep('modelbind'),
+      createRouteFilterStep(pipelineSlot.authorize),
       CanActivateNextStep, //optional
+      createRouteFilterStep(pipelineSlot.preActivate, { aliases: ['modelbind']}),
       //NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, //optional
       ActivateNextStep, //optional
-      createRouteFilterStep('precommit'),
+      createRouteFilterStep(pipelineSlot.preRender, { aliases: ['precommit']}),
       CommitChangesStep,
-      createRouteFilterStep('postcomplete')
+      createRouteFilterStep(pipelineSlot.postRender, { aliases: ['postcomplete']})
     ];
   }
 
@@ -44,3 +44,10 @@ export class PipelineProvider {
     return pipeline;
   }
 }
+
+const pipelineSlot = {
+  authorize: 'authorize',
+  preActivate: 'preActivate',
+  preRender: 'preRender',
+  postRender: 'postRender'
+};
