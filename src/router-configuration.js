@@ -26,6 +26,46 @@ export class RouterConfiguration {
   }
 
   /**
+  * Adds a step to be run during the [[Router]]'s authorize pipeline slot.
+  *
+  * @param step The pipeline step.
+  * @chainable
+  */
+  addAuthorizeStep(step: Function|PipelineStep): RouterConfiguration {
+    return this.addPipelineStep('authorize', step);
+  }
+
+  /**
+  * Adds a step to be run during the [[Router]]'s preActivate pipeline slot.
+  *
+  * @param step The pipeline step.
+  * @chainable
+  */
+  addPreActivateStep(step: Function|PipelineStep): RouterConfiguration {
+    return this.addPipelineStep('preActivate', step);
+  }
+
+  /**
+  * Adds a step to be run during the [[Router]]'s preRender pipeline slot.
+  *
+  * @param step The pipeline step.
+  * @chainable
+  */
+  addPreRenderStep(step: Function|PipelineStep): RouterConfiguration {
+    return this.addPipelineStep('preRender', step);
+  }
+
+  /**
+  * Adds a step to be run during the [[Router]]'s postRender pipeline slot.
+  *
+  * @param step The pipeline step.
+  * @chainable
+  */
+  addPostRenderStep(step: Function|PipelineStep): RouterConfiguration {
+    return this.addPipelineStep('postRender', step);
+  }
+
+  /**
   * Maps one or more routes to be registered with the router.
   *
   * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.

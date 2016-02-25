@@ -5,14 +5,22 @@ export class RouteFilterContainer {
 
   constructor(container: Container) {
     this.container = container;
+    this.lookup = { };
     this.filters = { };
     this.filterCache = { };
   }
 
+  register(key: string, aliases: string[]) {
+    aliases.forEach((alias) => {
+      this.lookup[alias] = key;
+    });
+  }
+
   addStep(name: string, step: any, index: number = -1): void {
-    let filter = this.filters[name];
+    let key = this.lookup[name];
+    let filter = this.filters[key];
     if (!filter) {
-      filter = this.filters[name] = [];
+      filter = this.filters[key] = [];
     }
 
     if (index === -1) {
@@ -23,33 +31,36 @@ export class RouteFilterContainer {
     this.filterCache = {};
   }
 
-  getFilterSteps(name: string) {
-    if (this.filterCache[name]) {
-      return this.filterCache[name];
+  getFilterSteps(key: string) {
+    if (this.filterCache[key]) {
+      return this.filterCache[key];
     }
 
     let steps = [];
-    let filter = this.filters[name];
+    let filter = this.filters[key];
     if (!filter) {
       return steps;
     }
 
     for (let i = 0, l = filter.length; i < l; i++) {
       if (typeof filter[i] === 'string') {
-        steps.push(...this.getFilterSteps(filter[i]));
+        steps.push(...this.getFilterSteps(this.lookup[filter[i]]));
       } else {
         steps.push(this.container.get(filter[i]));
       }
     }
 
-    this.filterCache[name] = steps;
+    this.filterCache[key] = steps;
     return steps;
   }
 }
 
-export function createRouteFilterStep(name: string): Function {
+export function createRouteFilterStep(name: string, options?: any = {}): Function {
+  options = Object.assign({}, { aliases: [] }, options);
   function create(routeFilterContainer) {
-    return new RouteFilterStep(name, routeFilterContainer);
+    let key = name;
+    routeFilterContainer.register(key, [name, ...options.aliases]);
+    return new RouteFilterStep(key, routeFilterContainer);
   }
 
   create.inject = function() {
@@ -62,12 +73,12 @@ export function createRouteFilterStep(name: string): Function {
 class RouteFilterStep {
   isMultiStep: boolean = true;
 
-  constructor(name: string, routeFilterContainer: RouteFilterContainer) {
-    this.name = name;
+  constructor(key: string, routeFilterContainer: RouteFilterContainer) {
+    this.key = key;
     this.routeFilterContainer = routeFilterContainer;
   }
 
   getSteps() {
-    return this.routeFilterContainer.getFilterSteps(this.name);
+    return this.routeFilterContainer.getFilterSteps(this.key);
   }
 }
