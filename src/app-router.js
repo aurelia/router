@@ -1,4 +1,3 @@
-import 'core-js';
 import * as LogManager from 'aurelia-logging';
 import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';

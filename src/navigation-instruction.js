@@ -1,5 +1,3 @@
-import 'core-js';
-
 interface NavigationInstructionInit {
   fragment: string,
   queryString: string,

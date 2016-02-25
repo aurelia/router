@@ -1,5 +1,3 @@
-import 'core-js';
-
 /**
 * Determines if the provided object is a navigation command.
 * A navigation command is anything with a navigate method.

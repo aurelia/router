@@ -1,5 +1,3 @@
-import 'core-js';
-
 /**
 * The status of a Pipeline.
 */

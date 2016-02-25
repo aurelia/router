@@ -1,4 +1,3 @@
-import 'core-js';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
