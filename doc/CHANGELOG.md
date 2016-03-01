@@ -1,3 +1,15 @@
+### 1.0.0-beta.1.1.2 (2016-03-01)
+
+
+#### Bug Fixes
+
+* **all:** remove core-js ([44c5e848](http://github.com/aurelia/router/commit/44c5e848e2ffe233930de0b852fbe8663bc67cbb))
+* **bower:** remove core-js ([52fe3fef](http://github.com/aurelia/router/commit/52fe3fef588e36044cfc8097d3e8a90cdac61df9))
+* **router:**
+  * log helpful error on missing viewport ([224f5ace](http://github.com/aurelia/router/commit/224f5ace08b9359d1c035b42f1ae0a9e6f74652b), closes [#241](http://github.com/aurelia/router/issues/241))
+  * add NavModel to RouteConfig interface ([064fbca5](http://github.com/aurelia/router/commit/064fbca58f6654daa866075fa7a6157c6e13467e), closes [#285](http://github.com/aurelia/router/issues/285))
+
+
 ### 1.0.0-beta.1.1.1 (2016-02-08)
 
 

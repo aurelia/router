@@ -1,5 +1,4 @@
 declare module 'aurelia-router' {
-  import 'core-js';
   import * as LogManager from 'aurelia-logging';
   import { Container }  from 'aurelia-dependency-injection';
   import { RouteRecognizer }  from 'aurelia-route-recognizer';
@@ -129,18 +128,24 @@ declare module 'aurelia-router' {
       * like pipeline steps and activated modules.
       */
     settings?: any;
+    
+    /**
+      * The navigation model for storing and interacting with the route's navigation settings.
+      */
+    navModel?: NavModel;
     [x: string]: any;
   }
   export class RouteFilterContainer {
     static inject(): any;
     constructor(container: Container);
+    register(key: string, aliases: string[]): any;
     addStep(name: string, step: any, index?: number): void;
-    getFilterSteps(name: string): any;
+    getFilterSteps(key: string): any;
   }
-  export function createRouteFilterStep(name: string): Function;
+  export function createRouteFilterStep(name: string, options?: any): Function;
   class RouteFilterStep {
     isMultiStep: boolean;
-    constructor(name: string, routeFilterContainer: RouteFilterContainer);
+    constructor(key: string, routeFilterContainer: RouteFilterContainer);
     getSteps(): any;
   }
   
@@ -352,6 +357,38 @@ declare module 'aurelia-router' {
       * @chainable
       */
     addPipelineStep(name: string, step: Function | PipelineStep): RouterConfiguration;
+    
+    /**
+      * Adds a step to be run during the [[Router]]'s authorize pipeline slot.
+      *
+      * @param step The pipeline step.
+      * @chainable
+      */
+    addAuthorizeStep(step: Function | PipelineStep): RouterConfiguration;
+    
+    /**
+      * Adds a step to be run during the [[Router]]'s preActivate pipeline slot.
+      *
+      * @param step The pipeline step.
+      * @chainable
+      */
+    addPreActivateStep(step: Function | PipelineStep): RouterConfiguration;
+    
+    /**
+      * Adds a step to be run during the [[Router]]'s preRender pipeline slot.
+      *
+      * @param step The pipeline step.
+      * @chainable
+      */
+    addPreRenderStep(step: Function | PipelineStep): RouterConfiguration;
+    
+    /**
+      * Adds a step to be run during the [[Router]]'s postRender pipeline slot.
+      *
+      * @param step The pipeline step.
+      * @chainable
+      */
+    addPostRenderStep(step: Function | PipelineStep): RouterConfiguration;
     
     /**
       * Maps one or more routes to be registered with the router.
