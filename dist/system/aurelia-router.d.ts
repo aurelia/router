@@ -1,7 +1,7 @@
 declare module 'aurelia-router' {
   import * as LogManager from 'aurelia-logging';
-  import { Container }  from 'aurelia-dependency-injection';
   import { RouteRecognizer }  from 'aurelia-route-recognizer';
+  import { Container }  from 'aurelia-dependency-injection';
   import { History }  from 'aurelia-history';
   import { EventAggregator }  from 'aurelia-event-aggregator';
   
@@ -134,19 +134,6 @@ declare module 'aurelia-router' {
       */
     navModel?: NavModel;
     [x: string]: any;
-  }
-  export class RouteFilterContainer {
-    static inject(): any;
-    constructor(container: Container);
-    register(key: string, aliases: string[]): any;
-    addStep(name: string, step: any, index?: number): void;
-    getFilterSteps(key: string): any;
-  }
-  export function createRouteFilterStep(name: string, options?: any): Function;
-  class RouteFilterStep {
-    isMultiStep: boolean;
-    constructor(key: string, routeFilterContainer: RouteFilterContainer);
-    getSteps(): any;
   }
   
   /**
@@ -629,6 +616,11 @@ declare module 'aurelia-router' {
       * Create the navigation pipeline.
       */
     createPipeline(): Pipeline;
+    
+    /**
+      * Adds a step into the pipeline at a known slot location.
+      */
+    addStep(name: string, step: PipelineStep): void;
   }
   
   /**

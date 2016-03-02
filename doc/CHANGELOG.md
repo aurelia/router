@@ -1,3 +1,12 @@
+### 1.0.0-beta.1.1.3 (2016-03-01)
+
+
+#### Bug Fixes
+
+* **pipeline-provider:** enable custom pipeline steps with ease ([99b4f599](http://github.com/aurelia/router/commit/99b4f5992af5af7b5930ebbe6cca8ad7e6c9e3f7))
+* **router:** fix regression in route pipelines ([c6262616](http://github.com/aurelia/router/commit/c626261688fc5ed39ee03b51a11d029f25330cc9))
+
+
 ### 1.0.0-beta.1.1.2 (2016-03-01)
 
 

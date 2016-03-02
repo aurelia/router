@@ -1,6 +1,6 @@
 import * as LogManager from 'aurelia-logging';
-import {Container} from 'aurelia-dependency-injection';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
+import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
 import {EventAggregator} from 'aurelia-event-aggregator';
 
@@ -46,89 +46,6 @@ export function _resolveUrl(fragment, baseUrl, hasPushState) {
 
 const isRootedPath = /^#?\//;
 const isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
-
-export class RouteFilterContainer {
-  static inject() { return [Container]; }
-
-  constructor(container: Container) {
-    this.container = container;
-    this.lookup = { };
-    this.filters = { };
-    this.filterCache = { };
-  }
-
-  register(key: string, aliases: string[]) {
-    aliases.forEach((alias) => {
-      this.lookup[alias] = key;
-    });
-  }
-
-  addStep(name: string, step: any, index: number = -1): void {
-    let key = this.lookup[name];
-    let filter = this.filters[key];
-    if (!filter) {
-      filter = this.filters[key] = [];
-    }
-
-    if (index === -1) {
-      index = filter.length;
-    }
-
-    filter.splice(index, 0, step);
-    this.filterCache = {};
-  }
-
-  getFilterSteps(key: string) {
-    if (this.filterCache[key]) {
-      return this.filterCache[key];
-    }
-
-    let steps = [];
-    let filter = this.filters[key];
-    if (!filter) {
-      return steps;
-    }
-
-    for (let i = 0, l = filter.length; i < l; i++) {
-      if (typeof filter[i] === 'string') {
-        steps.push(...this.getFilterSteps(this.lookup[filter[i]]));
-      } else {
-        steps.push(this.container.get(filter[i]));
-      }
-    }
-
-    this.filterCache[key] = steps;
-    return steps;
-  }
-}
-
-export function createRouteFilterStep(name: string, options?: any = {}): Function {
-  options = Object.assign({}, { aliases: [] }, options);
-  function create(routeFilterContainer) {
-    let key = name;
-    routeFilterContainer.register(key, [name, ...options.aliases]);
-    return new RouteFilterStep(key, routeFilterContainer);
-  }
-
-  create.inject = function() {
-    return [RouteFilterContainer];
-  };
-
-  return create;
-}
-
-class RouteFilterStep {
-  isMultiStep: boolean = true;
-
-  constructor(key: string, routeFilterContainer: RouteFilterContainer) {
-    this.key = key;
-    this.routeFilterContainer = routeFilterContainer;
-  }
-
-  getSteps() {
-    return this.routeFilterContainer.getFilterSteps(this.key);
-  }
-}
 
 /**
 * The status of a Pipeline.
@@ -209,7 +126,7 @@ export class Pipeline {
 
     if (typeof step === 'function') {
       run = step;
-    } else if (step.isMultiStep) {
+    } else if (typeof step.getSteps === 'function') {
       let steps = step.getSteps();
       for (let i = 0, l = steps.length; i < l; i++) {
         this.addStep(steps[i]);
@@ -841,10 +758,10 @@ export class RouterConfiguration {
         throw new Error('Pipeline steps can only be added to the root router');
       }
 
-      let filterContainer = router.container.get(RouteFilterContainer);
+      let pipelineProvider = router.pipelineProvider;
       for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
         let {name, step} = pipelineSteps[i];
-        filterContainer.addStep(name, step);
+        pipelineProvider.addStep(name, step);
       }
     }
   }
@@ -1745,15 +1662,15 @@ export class PipelineProvider {
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, //optional
       LoadRouteStep,
-      createRouteFilterStep(pipelineSlot.authorize),
+      this._createPipelineSlot('authorize'),
       CanActivateNextStep, //optional
-      createRouteFilterStep(pipelineSlot.preActivate, { aliases: ['modelbind']}),
+      this._createPipelineSlot('preActivate', 'modelbind'),
       //NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, //optional
       ActivateNextStep, //optional
-      createRouteFilterStep(pipelineSlot.preRender, { aliases: ['precommit']}),
+      this._createPipelineSlot('preRender', 'precommit'),
       CommitChangesStep,
-      createRouteFilterStep(pipelineSlot.postRender, { aliases: ['postcomplete']})
+      this._createPipelineSlot('postRender', 'postcomplete')
     ];
   }
 
@@ -1765,14 +1682,38 @@ export class PipelineProvider {
     this.steps.forEach(step => pipeline.addStep(this.container.get(step)));
     return pipeline;
   }
-}
 
-const pipelineSlot = {
-  authorize: 'authorize',
-  preActivate: 'preActivate',
-  preRender: 'preRender',
-  postRender: 'postRender'
-};
+  /**
+  * Adds a step into the pipeline at a known slot location.
+  */
+  addStep(name: string, step: PipelineStep): void {
+    let found = this.steps.find(x => x.slotName === name || x.slotAlias === name);
+    if (found) {
+      found.steps.push(step);
+    } else {
+      throw new Error(`Invalid pipeline slot name: ${name}.`);
+    }
+  }
+
+  _createPipelineSlot(name, alias) {
+    class PipelineSlot {
+      static inject = [Container];
+      static slotName = name;
+      static slotAlias = alias;
+      static steps = [];
+
+      constructor(container) {
+        this.container = container;
+      }
+
+      getSteps() {
+        return PipelineSlot.steps.map(x => this.container.get(x));
+      }
+    }
+
+    return PipelineSlot;
+  }
+}
 
 const logger = LogManager.getLogger('app-router');
 

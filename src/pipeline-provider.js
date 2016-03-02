@@ -42,7 +42,7 @@ export class PipelineProvider {
     this.steps.forEach(step => pipeline.addStep(this.container.get(step)));
     return pipeline;
   }
-  
+
   /**
   * Adds a step into the pipeline at a known slot location.
   */
@@ -54,7 +54,7 @@ export class PipelineProvider {
       throw new Error(`Invalid pipeline slot name: ${name}.`);
     }
   }
-  
+
   _createPipelineSlot(name, alias) {
     class PipelineSlot {
       static inject = [Container];
@@ -70,7 +70,7 @@ export class PipelineProvider {
         return PipelineSlot.steps.map(x => this.container.get(x));
       }
     }
-  
+
     return PipelineSlot;
   }
 }

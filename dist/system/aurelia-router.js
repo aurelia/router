@@ -1,7 +1,7 @@
-System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-route-recognizer', 'aurelia-history', 'aurelia-event-aggregator'], function (_export) {
+System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (_export) {
   'use strict';
 
-  var LogManager, Container, RouteRecognizer, History, EventAggregator, isRootedPath, isAbsoluteUrl, RouteFilterContainer, RouteFilterStep, pipelineStatus, Pipeline, CommitChangesStep, NavigationInstruction, NavModel, Redirect, RouterConfiguration, activationStrategy, BuildNavigationPlanStep, Router, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, RouteLoader, LoadRouteStep, PipelineProvider, pipelineSlot, logger, AppRouter;
+  var LogManager, RouteRecognizer, Container, History, EventAggregator, isRootedPath, isAbsoluteUrl, pipelineStatus, Pipeline, CommitChangesStep, NavigationInstruction, NavModel, Redirect, RouterConfiguration, activationStrategy, BuildNavigationPlanStep, Router, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, RouteLoader, LoadRouteStep, PipelineProvider, logger, AppRouter;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -10,8 +10,6 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
   _export('_createRootedPath', _createRootedPath);
 
   _export('_resolveUrl', _resolveUrl);
-
-  _export('createRouteFilterStep', createRouteFilterStep);
 
   _export('isNavigationCommand', isNavigationCommand);
 
@@ -59,23 +57,6 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
     }
 
     return _createRootedPath(fragment, baseUrl, hasPushState);
-  }
-
-  function createRouteFilterStep(name) {
-    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-    options = Object.assign({}, { aliases: [] }, options);
-    function create(routeFilterContainer) {
-      var key = name;
-      routeFilterContainer.register(key, [name].concat(options.aliases));
-      return new RouteFilterStep(key, routeFilterContainer);
-    }
-
-    create.inject = function () {
-      return [RouteFilterContainer];
-    };
-
-    return create;
   }
 
   function createCompletionHandler(next, status) {
@@ -569,10 +550,10 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
   return {
     setters: [function (_aureliaLogging) {
       LogManager = _aureliaLogging;
-    }, function (_aureliaDependencyInjection) {
-      Container = _aureliaDependencyInjection.Container;
     }, function (_aureliaRouteRecognizer) {
       RouteRecognizer = _aureliaRouteRecognizer.RouteRecognizer;
+    }, function (_aureliaDependencyInjection) {
+      Container = _aureliaDependencyInjection.Container;
     }, function (_aureliaHistory) {
       History = _aureliaHistory.History;
     }, function (_aureliaEventAggregator) {
@@ -581,91 +562,6 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
     execute: function () {
       isRootedPath = /^#?\//;
       isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
-
-      RouteFilterContainer = (function () {
-        RouteFilterContainer.inject = function inject() {
-          return [Container];
-        };
-
-        function RouteFilterContainer(container) {
-          _classCallCheck(this, RouteFilterContainer);
-
-          this.container = container;
-          this.lookup = {};
-          this.filters = {};
-          this.filterCache = {};
-        }
-
-        RouteFilterContainer.prototype.register = function register(key, aliases) {
-          var _this = this;
-
-          aliases.forEach(function (alias) {
-            _this.lookup[alias] = key;
-          });
-        };
-
-        RouteFilterContainer.prototype.addStep = function addStep(name, step) {
-          var index = arguments.length <= 2 || arguments[2] === undefined ? -1 : arguments[2];
-
-          var key = this.lookup[name];
-          var filter = this.filters[key];
-          if (!filter) {
-            filter = this.filters[key] = [];
-          }
-
-          if (index === -1) {
-            index = filter.length;
-          }
-
-          filter.splice(index, 0, step);
-          this.filterCache = {};
-        };
-
-        RouteFilterContainer.prototype.getFilterSteps = function getFilterSteps(key) {
-          if (this.filterCache[key]) {
-            return this.filterCache[key];
-          }
-
-          var steps = [];
-          var filter = this.filters[key];
-          if (!filter) {
-            return steps;
-          }
-
-          for (var i = 0, l = filter.length; i < l; i++) {
-            if (typeof filter[i] === 'string') {
-              steps.push.apply(steps, this.getFilterSteps(this.lookup[filter[i]]));
-            } else {
-              steps.push(this.container.get(filter[i]));
-            }
-          }
-
-          this.filterCache[key] = steps;
-          return steps;
-        };
-
-        return RouteFilterContainer;
-      })();
-
-      _export('RouteFilterContainer', RouteFilterContainer);
-
-      RouteFilterStep = (function () {
-        function RouteFilterStep(key, routeFilterContainer) {
-          _classCallCheck(this, RouteFilterStep);
-
-          this.isMultiStep = true;
-
-          this.key = key;
-          this.routeFilterContainer = routeFilterContainer;
-        }
-
-        RouteFilterStep.prototype.getSteps = function getSteps() {
-          return this.routeFilterContainer.getFilterSteps(this.key);
-        };
-
-        return RouteFilterStep;
-      })();
-
       pipelineStatus = {
         completed: 'completed',
         canceled: 'canceled',
@@ -687,7 +583,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
 
           if (typeof step === 'function') {
             run = step;
-          } else if (step.isMultiStep) {
+          } else if (typeof step.getSteps === 'function') {
             var steps = step.getSteps();
             for (var i = 0, l = steps.length; i < l; i++) {
               this.addStep(steps[i]);
@@ -844,7 +740,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
         };
 
         NavigationInstruction.prototype._commitChanges = function _commitChanges(waitToSwap) {
-          var _this2 = this;
+          var _this = this;
 
           var router = this.router;
           router.currentInstruction = this;
@@ -862,7 +758,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
           var delaySwaps = [];
 
           var _loop = function (viewPortName) {
-            var viewPortInstruction = _this2.viewPortInstructions[viewPortName];
+            var viewPortInstruction = _this.viewPortInstructions[viewPortName];
             var viewPort = router.viewPorts[viewPortName];
 
             if (!viewPort) {
@@ -896,7 +792,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
             });
             return null;
           }).then(function () {
-            return prune(_this2);
+            return prune(_this);
           });
         };
 
@@ -1088,13 +984,13 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
               throw new Error('Pipeline steps can only be added to the root router');
             }
 
-            var filterContainer = router.container.get(RouteFilterContainer);
+            var pipelineProvider = router.pipelineProvider;
             for (var i = 0, ii = pipelineSteps.length; i < ii; ++i) {
               var _pipelineSteps$i = pipelineSteps[i];
               var _name = _pipelineSteps$i.name;
               var step = _pipelineSteps$i.step;
 
-              filterContainer.addStep(_name, step);
+              pipelineProvider.addStep(_name, step);
             }
           }
         };
@@ -1141,7 +1037,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
         }
 
         Router.prototype.reset = function reset() {
-          var _this3 = this;
+          var _this2 = this;
 
           this.viewPorts = {};
           this.routes = [];
@@ -1154,7 +1050,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
           this._recognizer = new RouteRecognizer();
           this._childRecognizer = new RouteRecognizer();
           this._configuredPromise = new Promise(function (resolve) {
-            _this3._resolveConfiguredPromise = resolve;
+            _this2._resolveConfiguredPromise = resolve;
           });
         };
 
@@ -1168,7 +1064,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
         };
 
         Router.prototype.configure = function configure(callbackOrConfig) {
-          var _this4 = this;
+          var _this3 = this;
 
           this.isConfigured = true;
 
@@ -1184,9 +1080,9 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
               config = c;
             }
 
-            config.exportToRouter(_this4);
-            _this4.isConfigured = true;
-            _this4._resolveConfiguredPromise();
+            config.exportToRouter(_this3);
+            _this3.isConfigured = true;
+            _this3._resolveConfiguredPromise();
           });
         };
 
@@ -1306,14 +1202,14 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
         };
 
         Router.prototype.handleUnknownRoutes = function handleUnknownRoutes(config) {
-          var _this5 = this;
+          var _this4 = this;
 
           if (!config) {
             throw new Error('Invalid unknown route handler');
           }
 
           this.catchAllHandler = function (instruction) {
-            return _this5._createRouteConfig(config, instruction).then(function (c) {
+            return _this4._createRouteConfig(config, instruction).then(function (c) {
               instruction.config = c;
               return instruction;
             });
@@ -1401,7 +1297,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
         };
 
         Router.prototype._createRouteConfig = function _createRouteConfig(config, instruction) {
-          var _this6 = this;
+          var _this5 = this;
 
           return Promise.resolve(config).then(function (c) {
             if (typeof c === 'string') {
@@ -1418,7 +1314,7 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
             validateRouteConfig(c);
 
             if (!c.navModel) {
-              c.navModel = _this6.createNavModel(c);
+              c.navModel = _this5.createNavModel(c);
             }
 
             return c;
@@ -1536,17 +1432,68 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
           _classCallCheck(this, PipelineProvider);
 
           this.container = container;
-          this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, createRouteFilterStep(pipelineSlot.authorize), CanActivateNextStep, createRouteFilterStep(pipelineSlot.preActivate, { aliases: ['modelbind'] }), DeactivatePreviousStep, ActivateNextStep, createRouteFilterStep(pipelineSlot.preRender, { aliases: ['precommit'] }), CommitChangesStep, createRouteFilterStep(pipelineSlot.postRender, { aliases: ['postcomplete'] })];
+          this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, this._createPipelineSlot('authorize'), CanActivateNextStep, this._createPipelineSlot('preActivate', 'modelbind'), DeactivatePreviousStep, ActivateNextStep, this._createPipelineSlot('preRender', 'precommit'), CommitChangesStep, this._createPipelineSlot('postRender', 'postcomplete')];
         }
 
         PipelineProvider.prototype.createPipeline = function createPipeline() {
-          var _this7 = this;
+          var _this6 = this;
 
           var pipeline = new Pipeline();
           this.steps.forEach(function (step) {
-            return pipeline.addStep(_this7.container.get(step));
+            return pipeline.addStep(_this6.container.get(step));
           });
           return pipeline;
+        };
+
+        PipelineProvider.prototype.addStep = function addStep(name, step) {
+          var found = this.steps.find(function (x) {
+            return x.slotName === name || x.slotAlias === name;
+          });
+          if (found) {
+            found.steps.push(step);
+          } else {
+            throw new Error('Invalid pipeline slot name: ' + name + '.');
+          }
+        };
+
+        PipelineProvider.prototype._createPipelineSlot = function _createPipelineSlot(name, alias) {
+          var PipelineSlot = (function () {
+            _createClass(PipelineSlot, null, [{
+              key: 'inject',
+              value: [Container],
+              enumerable: true
+            }, {
+              key: 'slotName',
+              value: name,
+              enumerable: true
+            }, {
+              key: 'slotAlias',
+              value: alias,
+              enumerable: true
+            }, {
+              key: 'steps',
+              value: [],
+              enumerable: true
+            }]);
+
+            function PipelineSlot(container) {
+              _classCallCheck(this, PipelineSlot);
+
+              this.container = container;
+            }
+
+            PipelineSlot.prototype.getSteps = function getSteps() {
+              var _this7 = this;
+
+              return PipelineSlot.steps.map(function (x) {
+                return _this7.container.get(x);
+              });
+            };
+
+            return PipelineSlot;
+          })();
+
+          return PipelineSlot;
         };
 
         return PipelineProvider;
@@ -1554,12 +1501,6 @@ System.register(['aurelia-logging', 'aurelia-dependency-injection', 'aurelia-rou
 
       _export('PipelineProvider', PipelineProvider);
 
-      pipelineSlot = {
-        authorize: 'authorize',
-        preActivate: 'preActivate',
-        preRender: 'preRender',
-        postRender: 'postRender'
-      };
       logger = LogManager.getLogger('app-router');
 
       AppRouter = (function (_Router) {
