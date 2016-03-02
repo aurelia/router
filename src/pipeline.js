@@ -77,7 +77,7 @@ export class Pipeline {
 
     if (typeof step === 'function') {
       run = step;
-    } else if (step.isMultiStep) {
+    } else if (typeof step.getSteps === 'function') {
       let steps = step.getSteps();
       for (let i = 0, l = steps.length; i < l; i++) {
         this.addStep(steps[i]);

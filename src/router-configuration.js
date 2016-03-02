@@ -1,4 +1,3 @@
-import {RouteFilterContainer} from './route-filters';
 import {RouteConfig} from './interfaces';
 
 /**
@@ -154,10 +153,10 @@ export class RouterConfiguration {
         throw new Error('Pipeline steps can only be added to the root router');
       }
 
-      let filterContainer = router.container.get(RouteFilterContainer);
+      let pipelineProvider = router.pipelineProvider;
       for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
         let {name, step} = pipelineSteps[i];
-        filterContainer.addStep(name, step);
+        pipelineProvider.addStep(name, step);
       }
     }
   }

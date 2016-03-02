@@ -9,7 +9,6 @@ import {
   DeactivatePreviousStep,
   ActivateNextStep
 } from './activation';
-import {createRouteFilterStep} from './route-filters';
 
 /**
 * Class responsible for creating the navigation pipeline.
@@ -23,15 +22,15 @@ export class PipelineProvider {
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, //optional
       LoadRouteStep,
-      createRouteFilterStep(pipelineSlot.authorize),
+      this._createPipelineSlot('authorize'),
       CanActivateNextStep, //optional
-      createRouteFilterStep(pipelineSlot.preActivate, { aliases: ['modelbind']}),
+      this._createPipelineSlot('preActivate', 'modelbind'),
       //NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, //optional
       ActivateNextStep, //optional
-      createRouteFilterStep(pipelineSlot.preRender, { aliases: ['precommit']}),
+      this._createPipelineSlot('preRender', 'precommit'),
       CommitChangesStep,
-      createRouteFilterStep(pipelineSlot.postRender, { aliases: ['postcomplete']})
+      this._createPipelineSlot('postRender', 'postcomplete')
     ];
   }
 
@@ -43,11 +42,35 @@ export class PipelineProvider {
     this.steps.forEach(step => pipeline.addStep(this.container.get(step)));
     return pipeline;
   }
-}
+  
+  /**
+  * Adds a step into the pipeline at a known slot location.
+  */
+  addStep(name: string, step: PipelineStep): void {
+    let found = this.steps.find(x => x.slotName === name || x.slotAlias === name);
+    if (found) {
+      found.steps.push(step);
+    } else {
+      throw new Error(`Invalid pipeline slot name: ${name}.`);
+    }
+  }
+  
+  _createPipelineSlot(name, alias) {
+    class PipelineSlot {
+      static inject = [Container];
+      static slotName = name;
+      static slotAlias = alias;
+      static steps = [];
 
-const pipelineSlot = {
-  authorize: 'authorize',
-  preActivate: 'preActivate',
-  preRender: 'preRender',
-  postRender: 'postRender'
-};
+      constructor(container) {
+        this.container = container;
+      }
+
+      getSteps() {
+        return PipelineSlot.steps.map(x => this.container.get(x));
+      }
+    }
+  
+    return PipelineSlot;
+  }
+}
