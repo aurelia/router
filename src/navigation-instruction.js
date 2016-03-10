@@ -6,7 +6,8 @@ interface NavigationInstructionInit {
   config: RouteConfig,
   parentInstruction: NavigationInstruction,
   previousInstruction: NavigationInstruction,
-  router: Router
+  router: Router,
+  options: Object
 }
 
 export class CommitChangesStep {
@@ -63,6 +64,8 @@ export class NavigationInstruction {
   viewPortInstructions: any;
 
   plan: Object = null;
+
+  options: Object = {};
 
   constructor(init: NavigationInstructionInit) {
     Object.assign(this, init);

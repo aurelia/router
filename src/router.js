@@ -51,6 +51,8 @@ export class Router {
   */
   parent: Router = null;
 
+  options: Object = {};
+
   /**
   * @param container The [[Container]] to use when child routers.
   * @param history The [[History]] implementation to delegate navigation requests to.
@@ -369,7 +371,10 @@ export class Router {
       config: null,
       parentInstruction,
       previousInstruction: this.currentInstruction,
-      router: this
+      router: this,
+      options: {
+        compareQueryParams: this.options.compareQueryParams
+      }
     };
 
     if (results && results.length) {

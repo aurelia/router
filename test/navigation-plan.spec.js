@@ -141,5 +141,19 @@ describe('NavigationPlanStep', () => {
         done();
       });
     });
+
+    it('is invoke-lifecycle when query params change and ignoreQueryParams is false', (done) => {
+      firstInstruction.queryParams = { param: 'foo' };
+      sameAsFirstInstruction.queryParams = { param: 'bar' };
+      sameAsFirstInstruction.options.compareQueryParams = true;
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
+
+      step.run(sameAsFirstInstruction, state.next)
+      .then(() => {
+        expect(state.result).toBe(true);
+        expect(sameAsFirstInstruction.plan.default.strategy).toBe('invoke-lifecycle');
+        done();
+      });
+    });
   });
 });

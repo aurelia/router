@@ -121,6 +121,24 @@ function hasDifferentParameterValues(prev: NavigationInstruction, next: Navigati
     }
   }
 
+  if (!next.options.compareQueryParams) {
+    return false;
+  }
+
+  let prevQueryParams = prev.queryParams;
+  let nextQueryParams = next.queryParams;
+  for (let key in nextQueryParams) {
+    if (prevQueryParams[key] !== nextQueryParams[key]) {
+      return true;
+    }
+  }
+
+  for (let key in prevQueryParams) {
+    if (prevQueryParams[key] !== nextQueryParams[key]) {
+      return true;
+    }
+  }
+
   return false;
 }
 
