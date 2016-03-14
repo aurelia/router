@@ -19,12 +19,15 @@ module.exports = function(config) {
       [paths.source]: ['babel', 'sourcemap', 'coverage']
     },
 
-    babelPreprocessor: {
+    'babelPreprocessor': {
       options: {
-        loose: babelOptions.loose,
-        stage: babelOptions.stage,
-        optional: babelOptions.optional,
-        sourceMap: 'inline'
+        sourceMap: 'inline',
+        presets: [ 'es2015-loose', 'stage-1'],
+        plugins: [
+          'syntax-flow',
+          'transform-decorators-legacy',
+          'transform-flow-strip-types'
+        ]
       }
     },
 
