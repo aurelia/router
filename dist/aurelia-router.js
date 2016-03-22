@@ -189,7 +189,8 @@ interface NavigationInstructionInit {
   config: RouteConfig,
   parentInstruction: NavigationInstruction,
   previousInstruction: NavigationInstruction,
-  router: Router
+  router: Router,
+  options: Object
 }
 
 export class CommitChangesStep {
@@ -246,6 +247,8 @@ export class NavigationInstruction {
   viewPortInstructions: any;
 
   plan: Object = null;
+
+  options: Object = {};
 
   constructor(init: NavigationInstructionInit) {
     Object.assign(this, init);
@@ -887,6 +890,24 @@ function hasDifferentParameterValues(prev: NavigationInstruction, next: Navigati
     }
   }
 
+  if (!next.options.compareQueryParams) {
+    return false;
+  }
+
+  let prevQueryParams = prev.queryParams;
+  let nextQueryParams = next.queryParams;
+  for (let key in nextQueryParams) {
+    if (prevQueryParams[key] !== nextQueryParams[key]) {
+      return true;
+    }
+  }
+
+  for (let key in prevQueryParams) {
+    if (prevQueryParams[key] !== nextQueryParams[key]) {
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -944,6 +965,8 @@ export class Router {
   * The parent router, or null if this instance is not a child router.
   */
   parent: Router = null;
+
+  options: Object = {};
 
   /**
   * @param container The [[Container]] to use when child routers.
@@ -1263,7 +1286,10 @@ export class Router {
       config: null,
       parentInstruction,
       previousInstruction: this.currentInstruction,
-      router: this
+      router: this,
+      options: {
+        compareQueryParams: this.options.compareQueryParams
+      }
     };
 
     if (results && results.length) {

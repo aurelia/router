@@ -1,9 +1,17 @@
 declare module 'aurelia-router' {
   import * as LogManager from 'aurelia-logging';
-  import { RouteRecognizer }  from 'aurelia-route-recognizer';
-  import { Container }  from 'aurelia-dependency-injection';
-  import { History }  from 'aurelia-history';
-  import { EventAggregator }  from 'aurelia-event-aggregator';
+  import {
+    RouteRecognizer
+  } from 'aurelia-route-recognizer';
+  import {
+    Container
+  } from 'aurelia-dependency-injection';
+  import {
+    History
+  } from 'aurelia-history';
+  import {
+    EventAggregator
+  } from 'aurelia-event-aggregator';
   
   /**
   * A callback to indicate when pipeline processing should advance to the next step
@@ -25,9 +33,16 @@ declare module 'aurelia-router' {
       * Indicates that pipeline processing has failed and should be stopped.
       */
     reject(result: any): Promise<any>;
+    
+    /**
+      * Indicates the successful completion of the pipeline step.
+      */
     (): Promise<any>;
   }
   
+  /**
+  * A step to be run during processing of the pipeline.
+  */
   /**
   * A step to be run during processing of the pipeline.
   */
@@ -46,6 +61,9 @@ declare module 'aurelia-router' {
   /**
   * The result of a pipeline run.
   */
+  /**
+  * The result of a pipeline run.
+  */
   export interface PipelineResult {
     status: string;
     instruction: NavigationInstruction;
@@ -61,6 +79,7 @@ declare module 'aurelia-router' {
     parentInstruction: NavigationInstruction;
     previousInstruction: NavigationInstruction;
     router: Router;
+    options: Object;
   }
   
   /**
@@ -144,6 +163,9 @@ declare module 'aurelia-router' {
   /**
   * The class responsible for managing and processing the navigation pipeline.
   */
+  /**
+  * The class responsible for managing and processing the navigation pipeline.
+  */
   export class Pipeline {
     
     /**
@@ -214,6 +236,7 @@ declare module 'aurelia-router' {
       */
     viewPortInstructions: any;
     plan: Object;
+    options: Object;
     constructor(init: NavigationInstructionInit);
     
     /**
@@ -295,6 +318,12 @@ declare module 'aurelia-router' {
     setTitle(title: string): void;
   }
   
+  /**
+  * Determines if the provided object is a navigation command.
+  * A navigation command is anything with a navigate method.
+  *
+  * @param obj The object to check.
+  */
   /**
   * Determines if the provided object is a navigation command.
   * A navigation command is anything with a navigate method.
@@ -459,6 +488,7 @@ declare module 'aurelia-router' {
       * The parent router, or null if this instance is not a child router.
       */
     parent: Router;
+    options: Object;
     
     /**
       * @param container The [[Container]] to use when child routers.

@@ -1,3 +1,11 @@
+### 1.0.0-beta.1.2.0 (2016-03-22)
+
+
+#### Features
+
+* **router:** add option to compare query params ([37ab9fad](http://github.com/aurelia/router/commit/37ab9fadc16c884335e4531bb0c934621926d795), closes [#268](http://github.com/aurelia/router/issues/268))
+
+
 ### 1.0.0-beta.1.1.3 (2016-03-01)
 
 
