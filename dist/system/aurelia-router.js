@@ -1,7 +1,7 @@
 'use strict';
 
 System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (_export, _context) {
-  var LogManager, RouteRecognizer, Container, History, EventAggregator, _typeof, _createClass, isRootedPath, isAbsoluteUrl, pipelineStatus, Pipeline, CommitChangesStep, NavigationInstruction, NavModel, Redirect, RouterConfiguration, activationStrategy, BuildNavigationPlanStep, Router, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, RouteLoader, LoadRouteStep, PipelineProvider, logger, AppRouter;
+  var LogManager, RouteRecognizer, Container, History, EventAggregator, _typeof, _createClass, isRootedPath, isAbsoluteUrl, pipelineStatus, Pipeline, CommitChangesStep, NavigationInstruction, NavModel, Redirect, RedirectToRoute, RouterConfiguration, activationStrategy, BuildNavigationPlanStep, Router, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, RouteLoader, LoadRouteStep, PipelineProvider, logger, AppRouter;
 
   function _possibleConstructorReturn(self, call) {
     if (!self) {
@@ -876,6 +876,33 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
       }());
 
       _export('Redirect', Redirect);
+
+      _export('RedirectToRoute', RedirectToRoute = function () {
+        function RedirectToRoute(route) {
+          var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+          var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+          _classCallCheck(this, RedirectToRoute);
+
+          this.route = route;
+          this.params = params;
+          this.options = Object.assign({ trigger: true, replace: true }, options);
+          this.shouldContinueProcessing = false;
+        }
+
+        RedirectToRoute.prototype.setRouter = function setRouter(router) {
+          this.router = router;
+        };
+
+        RedirectToRoute.prototype.navigate = function navigate(appRouter) {
+          var navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
+          navigatingRouter.navigateToRoute(this.route, this.params, this.options);
+        };
+
+        return RedirectToRoute;
+      }());
+
+      _export('RedirectToRoute', RedirectToRoute);
 
       _export('RouterConfiguration', RouterConfiguration = function () {
         function RouterConfiguration() {

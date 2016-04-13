@@ -354,6 +354,30 @@ declare module 'aurelia-router' {
   }
   
   /**
+  * Used during the activation lifecycle to cause a redirect to a named route.
+    * @param route The name of the route.
+    * @param params The parameters to be sent to the activation method.
+    * @param options The options to use for navigation.
+  */
+  export class RedirectToRoute {
+    constructor(route: string, params?: any, options?: any);
+    
+    /**
+      * Called by the activation system to set the child router.
+      *
+      * @param router The router.
+      */
+    setRouter(router: Router): void;
+    
+    /**
+      * Called by the navigation pipeline to navigate.
+      *
+      * @param appRouter The router to be redirected.
+      */
+    navigate(appRouter: Router): void;
+  }
+  
+  /**
    * Class used to configure a [[Router]] instance.
    *
    * @constructor

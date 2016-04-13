@@ -6,7 +6,7 @@
   "flags": {},
   "children": [
     {
-      "id": 245,
+      "id": 257,
       "name": "ActivateNextStep",
       "kind": 128,
       "kindString": "Class",
@@ -15,7 +15,7 @@
       },
       "children": [
         {
-          "id": 246,
+          "id": 258,
           "name": "run",
           "kind": 2048,
           "kindString": "Method",
@@ -24,14 +24,14 @@
           },
           "signatures": [
             {
-              "id": 247,
+              "id": 259,
               "name": "run",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 248,
+                  "id": 260,
                   "name": "navigationInstruction",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -44,7 +44,7 @@
                   }
                 },
                 {
-                  "id": 249,
+                  "id": 261,
                   "name": "next",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -68,13 +68,13 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            246
+            258
           ]
         }
       ]
     },
     {
-      "id": 278,
+      "id": 290,
       "name": "AppRouter",
       "kind": 128,
       "kindString": "Class",
@@ -86,7 +86,7 @@
       },
       "children": [
         {
-          "id": 281,
+          "id": 293,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -95,14 +95,14 @@
           },
           "signatures": [
             {
-              "id": 282,
+              "id": 294,
               "name": "new AppRouter",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 283,
+                  "id": 295,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -110,12 +110,12 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 493,
+                    "id": 505,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 },
                 {
-                  "id": 284,
+                  "id": 296,
                   "name": "history",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -123,12 +123,12 @@
                   "type": {
                     "type": "reference",
                     "name": "History",
-                    "id": 625,
+                    "id": 637,
                     "moduleName": "\"aurelia-history\""
                   }
                 },
                 {
-                  "id": 285,
+                  "id": 297,
                   "name": "pipelineProvider",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -136,12 +136,12 @@
                   "type": {
                     "type": "reference",
                     "name": "PipelineProvider",
-                    "id": 266,
+                    "id": 278,
                     "moduleName": "\"aurelia-router\""
                   }
                 },
                 {
-                  "id": 286,
+                  "id": 298,
                   "name": "events",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -149,7 +149,7 @@
                   "type": {
                     "type": "reference",
                     "name": "EventAggregator",
-                    "id": 599,
+                    "id": 611,
                     "moduleName": "\"aurelia-event-aggregator\""
                   }
                 }
@@ -157,24 +157,24 @@
               "type": {
                 "type": "reference",
                 "name": "AppRouter",
-                "id": 278,
+                "id": 290,
                 "moduleName": "\"aurelia-router\""
               },
               "overwrites": {
                 "type": "reference",
                 "name": "Router.__constructor",
-                "id": 173
+                "id": 185
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Router.__constructor",
-            "id": 173
+            "id": 185
           }
         },
         {
-          "id": 305,
+          "id": 317,
           "name": "baseUrl",
           "kind": 1024,
           "kindString": "Property",
@@ -191,11 +191,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.baseUrl",
-            "id": 166
+            "id": 178
           }
         },
         {
-          "id": 301,
+          "id": 313,
           "name": "container",
           "kind": 1024,
           "kindString": "Property",
@@ -205,17 +205,17 @@
           "type": {
             "type": "reference",
             "name": "Container",
-            "id": 493,
+            "id": 505,
             "moduleName": "\"aurelia-dependency-injection\""
           },
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.container",
-            "id": 162
+            "id": 174
           }
         },
         {
-          "id": 309,
+          "id": 321,
           "name": "currentInstruction",
           "kind": 1024,
           "kindString": "Property",
@@ -234,11 +234,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.currentInstruction",
-            "id": 170
+            "id": 182
           }
         },
         {
-          "id": 302,
+          "id": 314,
           "name": "history",
           "kind": 1024,
           "kindString": "Property",
@@ -248,17 +248,17 @@
           "type": {
             "type": "reference",
             "name": "History",
-            "id": 625,
+            "id": 637,
             "moduleName": "\"aurelia-history\""
           },
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.history",
-            "id": 163
+            "id": 175
           }
         },
         {
-          "id": 306,
+          "id": 318,
           "name": "isConfigured",
           "kind": 1024,
           "kindString": "Property",
@@ -275,11 +275,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.isConfigured",
-            "id": 167
+            "id": 179
           }
         },
         {
-          "id": 307,
+          "id": 319,
           "name": "isNavigating",
           "kind": 1024,
           "kindString": "Property",
@@ -296,11 +296,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.isNavigating",
-            "id": 168
+            "id": 180
           }
         },
         {
-          "id": 312,
+          "id": 324,
           "name": "isRoot",
           "kind": 1024,
           "kindString": "Property",
@@ -317,11 +317,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.isRoot",
-            "id": 179
+            "id": 191
           }
         },
         {
-          "id": 308,
+          "id": 320,
           "name": "navigation",
           "kind": 1024,
           "kindString": "Property",
@@ -341,11 +341,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.navigation",
-            "id": 169
+            "id": 181
           }
         },
         {
-          "id": 311,
+          "id": 323,
           "name": "options",
           "kind": 1024,
           "kindString": "Property",
@@ -359,11 +359,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.options",
-            "id": 172
+            "id": 184
           }
         },
         {
-          "id": 310,
+          "id": 322,
           "name": "parent",
           "kind": 1024,
           "kindString": "Property",
@@ -376,17 +376,17 @@
           "type": {
             "type": "reference",
             "name": "Router",
-            "id": 161,
+            "id": 173,
             "moduleName": "\"aurelia-router\""
           },
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.parent",
-            "id": 171
+            "id": 183
           }
         },
         {
-          "id": 304,
+          "id": 316,
           "name": "routes",
           "kind": 1024,
           "kindString": "Property",
@@ -403,11 +403,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.routes",
-            "id": 165
+            "id": 177
           }
         },
         {
-          "id": 303,
+          "id": 315,
           "name": "viewPorts",
           "kind": 1024,
           "kindString": "Property",
@@ -421,11 +421,11 @@
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.viewPorts",
-            "id": 164
+            "id": 176
           }
         },
         {
-          "id": 296,
+          "id": 308,
           "name": "activate",
           "kind": 2048,
           "kindString": "Method",
@@ -434,7 +434,7 @@
           },
           "signatures": [
             {
-              "id": 297,
+              "id": 309,
               "name": "activate",
               "kind": 4096,
               "kindString": "Call signature",
@@ -450,7 +450,7 @@
               },
               "parameters": [
                 {
-                  "id": 298,
+                  "id": 310,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -469,7 +469,7 @@
           ]
         },
         {
-          "id": 342,
+          "id": 354,
           "name": "addRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -478,7 +478,7 @@
           },
           "signatures": [
             {
-              "id": 343,
+              "id": 355,
               "name": "addRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -488,7 +488,7 @@
               },
               "parameters": [
                 {
-                  "id": 344,
+                  "id": 356,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -504,7 +504,7 @@
                   }
                 },
                 {
-                  "id": 345,
+                  "id": 357,
                   "name": "navModel",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -529,18 +529,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.addRoute",
-                "id": 213
+                "id": 225
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.addRoute",
-            "id": 213
+            "id": 225
           }
         },
         {
-          "id": 315,
+          "id": 327,
           "name": "configure",
           "kind": 2048,
           "kindString": "Method",
@@ -549,7 +549,7 @@
           },
           "signatures": [
             {
-              "id": 316,
+              "id": 328,
               "name": "configure",
               "kind": 4096,
               "kindString": "Call signature",
@@ -559,7 +559,7 @@
               },
               "parameters": [
                 {
-                  "id": 317,
+                  "id": 329,
                   "name": "callbackOrConfig",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -573,26 +573,26 @@
                       {
                         "type": "reference",
                         "name": "RouterConfiguration",
-                        "id": 119
+                        "id": 131
                       },
                       {
                         "type": "reflection",
                         "declaration": {
-                          "id": 318,
+                          "id": 330,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "signatures": [
                             {
-                              "id": 319,
+                              "id": 331,
                               "name": "__call",
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
                               "parameters": [
                                 {
-                                  "id": 320,
+                                  "id": 332,
                                   "name": "config",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -600,14 +600,14 @@
                                   "type": {
                                     "type": "reference",
                                     "name": "RouterConfiguration",
-                                    "id": 119
+                                    "id": 131
                                   }
                                 }
                               ],
                               "type": {
                                 "type": "reference",
                                 "name": "RouterConfiguration",
-                                "id": 119
+                                "id": 131
                               }
                             }
                           ]
@@ -630,18 +630,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.configure",
-                "id": 186
+                "id": 198
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.configure",
-            "id": 186
+            "id": 198
           }
         },
         {
-          "id": 332,
+          "id": 344,
           "name": "createChild",
           "kind": 2048,
           "kindString": "Method",
@@ -650,7 +650,7 @@
           },
           "signatures": [
             {
-              "id": 333,
+              "id": 345,
               "name": "createChild",
               "kind": 4096,
               "kindString": "Call signature",
@@ -661,7 +661,7 @@
               },
               "parameters": [
                 {
-                  "id": 334,
+                  "id": 346,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -674,7 +674,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 493,
+                    "id": 505,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 }
@@ -682,24 +682,24 @@
               "type": {
                 "type": "reference",
                 "name": "Router",
-                "id": 161,
+                "id": 173,
                 "moduleName": "\"aurelia-router\""
               },
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.createChild",
-                "id": 203
+                "id": 215
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.createChild",
-            "id": 203
+            "id": 215
           }
         },
         {
-          "id": 339,
+          "id": 351,
           "name": "createNavModel",
           "kind": 2048,
           "kindString": "Method",
@@ -708,7 +708,7 @@
           },
           "signatures": [
             {
-              "id": 340,
+              "id": 352,
               "name": "createNavModel",
               "kind": 4096,
               "kindString": "Call signature",
@@ -718,7 +718,7 @@
               },
               "parameters": [
                 {
-                  "id": 341,
+                  "id": 353,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -743,18 +743,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.createNavModel",
-                "id": 210
+                "id": 222
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.createNavModel",
-            "id": 210
+            "id": 222
           }
         },
         {
-          "id": 299,
+          "id": 311,
           "name": "deactivate",
           "kind": 2048,
           "kindString": "Method",
@@ -763,7 +763,7 @@
           },
           "signatures": [
             {
-              "id": 300,
+              "id": 312,
               "name": "deactivate",
               "kind": 4096,
               "kindString": "Call signature",
@@ -779,7 +779,7 @@
           ]
         },
         {
-          "id": 313,
+          "id": 325,
           "name": "ensureConfigured",
           "kind": 2048,
           "kindString": "Method",
@@ -788,7 +788,7 @@
           },
           "signatures": [
             {
-              "id": 314,
+              "id": 326,
               "name": "ensureConfigured",
               "kind": 4096,
               "kindString": "Call signature",
@@ -809,18 +809,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.ensureConfigured",
-                "id": 184
+                "id": 196
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.ensureConfigured",
-            "id": 184
+            "id": 196
           }
         },
         {
-          "id": 335,
+          "id": 347,
           "name": "generate",
           "kind": 2048,
           "kindString": "Method",
@@ -829,7 +829,7 @@
           },
           "signatures": [
             {
-              "id": 336,
+              "id": 348,
               "name": "generate",
               "kind": 4096,
               "kindString": "Call signature",
@@ -840,7 +840,7 @@
               },
               "parameters": [
                 {
-                  "id": 337,
+                  "id": 349,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -854,7 +854,7 @@
                   }
                 },
                 {
-                  "id": 338,
+                  "id": 350,
                   "name": "params",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -877,18 +877,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.generate",
-                "id": 206
+                "id": 218
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.generate",
-            "id": 206
+            "id": 218
           }
         },
         {
-          "id": 352,
+          "id": 364,
           "name": "handleUnknownRoutes",
           "kind": 2048,
           "kindString": "Method",
@@ -897,7 +897,7 @@
           },
           "signatures": [
             {
-              "id": 353,
+              "id": 365,
               "name": "handleUnknownRoutes",
               "kind": 4096,
               "kindString": "Call signature",
@@ -907,7 +907,7 @@
               },
               "parameters": [
                 {
-                  "id": 354,
+                  "id": 366,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -944,18 +944,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.handleUnknownRoutes",
-                "id": 223
+                "id": 235
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.handleUnknownRoutes",
-            "id": 223
+            "id": 235
           }
         },
         {
-          "id": 349,
+          "id": 361,
           "name": "hasOwnRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -964,7 +964,7 @@
           },
           "signatures": [
             {
-              "id": 350,
+              "id": 362,
               "name": "hasOwnRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -974,7 +974,7 @@
               },
               "parameters": [
                 {
-                  "id": 351,
+                  "id": 363,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -995,18 +995,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.hasOwnRoute",
-                "id": 220
+                "id": 232
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.hasOwnRoute",
-            "id": 220
+            "id": 232
           }
         },
         {
-          "id": 346,
+          "id": 358,
           "name": "hasRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -1015,7 +1015,7 @@
           },
           "signatures": [
             {
-              "id": 347,
+              "id": 359,
               "name": "hasRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1025,7 +1025,7 @@
               },
               "parameters": [
                 {
-                  "id": 348,
+                  "id": 360,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1046,18 +1046,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.hasRoute",
-                "id": 217
+                "id": 229
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.hasRoute",
-            "id": 217
+            "id": 229
           }
         },
         {
-          "id": 289,
+          "id": 301,
           "name": "loadUrl",
           "kind": 2048,
           "kindString": "Method",
@@ -1066,7 +1066,7 @@
           },
           "signatures": [
             {
-              "id": 290,
+              "id": 302,
               "name": "loadUrl",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1076,7 +1076,7 @@
               },
               "parameters": [
                 {
-                  "id": 291,
+                  "id": 303,
                   "name": "url",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1105,7 +1105,7 @@
           ]
         },
         {
-          "id": 321,
+          "id": 333,
           "name": "navigate",
           "kind": 2048,
           "kindString": "Method",
@@ -1114,7 +1114,7 @@
           },
           "signatures": [
             {
-              "id": 322,
+              "id": 334,
               "name": "navigate",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1124,7 +1124,7 @@
               },
               "parameters": [
                 {
-                  "id": 323,
+                  "id": 335,
                   "name": "fragment",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1138,7 +1138,7 @@
                   }
                 },
                 {
-                  "id": 324,
+                  "id": 336,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1161,18 +1161,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.navigate",
-                "id": 192
+                "id": 204
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.navigate",
-            "id": 192
+            "id": 204
           }
         },
         {
-          "id": 330,
+          "id": 342,
           "name": "navigateBack",
           "kind": 2048,
           "kindString": "Method",
@@ -1181,7 +1181,7 @@
           },
           "signatures": [
             {
-              "id": 331,
+              "id": 343,
               "name": "navigateBack",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1196,18 +1196,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.navigateBack",
-                "id": 201
+                "id": 213
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.navigateBack",
-            "id": 201
+            "id": 213
           }
         },
         {
-          "id": 325,
+          "id": 337,
           "name": "navigateToRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -1216,7 +1216,7 @@
           },
           "signatures": [
             {
-              "id": 326,
+              "id": 338,
               "name": "navigateToRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1226,7 +1226,7 @@
               },
               "parameters": [
                 {
-                  "id": 327,
+                  "id": 339,
                   "name": "route",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1240,7 +1240,7 @@
                   }
                 },
                 {
-                  "id": 328,
+                  "id": 340,
                   "name": "params",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1256,7 +1256,7 @@
                   }
                 },
                 {
-                  "id": 329,
+                  "id": 341,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1279,18 +1279,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.navigateToRoute",
-                "id": 196
+                "id": 208
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.navigateToRoute",
-            "id": 196
+            "id": 208
           }
         },
         {
-          "id": 357,
+          "id": 369,
           "name": "refreshNavigation",
           "kind": 2048,
           "kindString": "Method",
@@ -1299,7 +1299,7 @@
           },
           "signatures": [
             {
-              "id": 358,
+              "id": 370,
               "name": "refreshNavigation",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1314,18 +1314,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.refreshNavigation",
-                "id": 228
+                "id": 240
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.refreshNavigation",
-            "id": 228
+            "id": 240
           }
         },
         {
-          "id": 292,
+          "id": 304,
           "name": "registerViewPort",
           "kind": 2048,
           "kindString": "Method",
@@ -1334,7 +1334,7 @@
           },
           "signatures": [
             {
-              "id": 293,
+              "id": 305,
               "name": "registerViewPort",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1344,7 +1344,7 @@
               },
               "parameters": [
                 {
-                  "id": 294,
+                  "id": 306,
                   "name": "viewPort",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1358,7 +1358,7 @@
                   }
                 },
                 {
-                  "id": 295,
+                  "id": 307,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1385,18 +1385,18 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Router.registerViewPort",
-                "id": 180
+                "id": 192
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Router.registerViewPort",
-            "id": 180
+            "id": 192
           }
         },
         {
-          "id": 287,
+          "id": 299,
           "name": "reset",
           "kind": 2048,
           "kindString": "Method",
@@ -1405,7 +1405,7 @@
           },
           "signatures": [
             {
-              "id": 288,
+              "id": 300,
               "name": "reset",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1420,18 +1420,18 @@
               "overwrites": {
                 "type": "reference",
                 "name": "Router.reset",
-                "id": 177
+                "id": 189
               }
             }
           ],
           "overwrites": {
             "type": "reference",
             "name": "Router.reset",
-            "id": 177
+            "id": 189
           }
         },
         {
-          "id": 355,
+          "id": 367,
           "name": "updateTitle",
           "kind": 2048,
           "kindString": "Method",
@@ -1440,7 +1440,7 @@
           },
           "signatures": [
             {
-              "id": 356,
+              "id": 368,
               "name": "updateTitle",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1455,18 +1455,18 @@
               "inheritedFrom": {
                 "type": "reference",
                 "name": "Router.updateTitle",
-                "id": 226
+                "id": 238
               }
             }
           ],
           "inheritedFrom": {
             "type": "reference",
             "name": "Router.updateTitle",
-            "id": 226
+            "id": 238
           }
         },
         {
-          "id": 279,
+          "id": 291,
           "name": "inject",
           "kind": 2048,
           "kindString": "Method",
@@ -1476,7 +1476,7 @@
           },
           "signatures": [
             {
-              "id": 280,
+              "id": 292,
               "name": "inject",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1494,51 +1494,51 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            281
+            293
           ]
         },
         {
           "title": "Properties",
           "kind": 1024,
           "children": [
-            305,
-            301,
-            309,
-            302,
-            306,
-            307,
-            312,
-            308,
-            311,
-            310,
-            304,
-            303
+            317,
+            313,
+            321,
+            314,
+            318,
+            319,
+            324,
+            320,
+            323,
+            322,
+            316,
+            315
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            296,
-            342,
-            315,
-            332,
-            339,
-            299,
-            313,
-            335,
-            352,
-            349,
-            346,
-            289,
-            321,
-            330,
+            308,
+            354,
+            327,
+            344,
+            351,
+            311,
             325,
-            357,
-            292,
-            287,
-            355,
-            279
+            347,
+            364,
+            361,
+            358,
+            301,
+            333,
+            342,
+            337,
+            369,
+            304,
+            299,
+            367,
+            291
           ]
         }
       ],
@@ -1546,12 +1546,12 @@
         {
           "type": "reference",
           "name": "Router",
-          "id": 161
+          "id": 173
         }
       ]
     },
     {
-      "id": 156,
+      "id": 168,
       "name": "BuildNavigationPlanStep",
       "kind": 128,
       "kindString": "Class",
@@ -1560,7 +1560,7 @@
       },
       "children": [
         {
-          "id": 157,
+          "id": 169,
           "name": "run",
           "kind": 2048,
           "kindString": "Method",
@@ -1569,14 +1569,14 @@
           },
           "signatures": [
             {
-              "id": 158,
+              "id": 170,
               "name": "run",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 159,
+                  "id": 171,
                   "name": "navigationInstruction",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1589,7 +1589,7 @@
                   }
                 },
                 {
-                  "id": 160,
+                  "id": 172,
                   "name": "next",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1613,13 +1613,13 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            157
+            169
           ]
         }
       ]
     },
     {
-      "id": 235,
+      "id": 247,
       "name": "CanActivateNextStep",
       "kind": 128,
       "kindString": "Class",
@@ -1628,7 +1628,7 @@
       },
       "children": [
         {
-          "id": 236,
+          "id": 248,
           "name": "run",
           "kind": 2048,
           "kindString": "Method",
@@ -1637,14 +1637,14 @@
           },
           "signatures": [
             {
-              "id": 237,
+              "id": 249,
               "name": "run",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 238,
+                  "id": 250,
                   "name": "navigationInstruction",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1657,7 +1657,7 @@
                   }
                 },
                 {
-                  "id": 239,
+                  "id": 251,
                   "name": "next",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1681,13 +1681,13 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            236
+            248
           ]
         }
       ]
     },
     {
-      "id": 230,
+      "id": 242,
       "name": "CanDeactivatePreviousStep",
       "kind": 128,
       "kindString": "Class",
@@ -1696,7 +1696,7 @@
       },
       "children": [
         {
-          "id": 231,
+          "id": 243,
           "name": "run",
           "kind": 2048,
           "kindString": "Method",
@@ -1705,14 +1705,14 @@
           },
           "signatures": [
             {
-              "id": 232,
+              "id": 244,
               "name": "run",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 233,
+                  "id": 245,
                   "name": "navigationInstruction",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1725,7 +1725,7 @@
                   }
                 },
                 {
-                  "id": 234,
+                  "id": 246,
                   "name": "next",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1749,7 +1749,7 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            231
+            243
           ]
         }
       ]
@@ -1823,7 +1823,7 @@
       ]
     },
     {
-      "id": 240,
+      "id": 252,
       "name": "DeactivatePreviousStep",
       "kind": 128,
       "kindString": "Class",
@@ -1832,7 +1832,7 @@
       },
       "children": [
         {
-          "id": 241,
+          "id": 253,
           "name": "run",
           "kind": 2048,
           "kindString": "Method",
@@ -1841,14 +1841,14 @@
           },
           "signatures": [
             {
-              "id": 242,
+              "id": 254,
               "name": "run",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 243,
+                  "id": 255,
                   "name": "navigationInstruction",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1861,7 +1861,7 @@
                   }
                 },
                 {
-                  "id": 244,
+                  "id": 256,
                   "name": "next",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1885,13 +1885,13 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            241
+            253
           ]
         }
       ]
     },
     {
-      "id": 256,
+      "id": 268,
       "name": "LoadRouteStep",
       "kind": 128,
       "kindString": "Class",
@@ -1900,7 +1900,7 @@
       },
       "children": [
         {
-          "id": 259,
+          "id": 271,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -1909,14 +1909,14 @@
           },
           "signatures": [
             {
-              "id": 260,
+              "id": 272,
               "name": "new LoadRouteStep",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 261,
+                  "id": 273,
                   "name": "routeLoader",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1924,7 +1924,7 @@
                   "type": {
                     "type": "reference",
                     "name": "RouteLoader",
-                    "id": 250,
+                    "id": 262,
                     "moduleName": "\"aurelia-router\""
                   }
                 }
@@ -1932,14 +1932,14 @@
               "type": {
                 "type": "reference",
                 "name": "LoadRouteStep",
-                "id": 256,
+                "id": 268,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 262,
+          "id": 274,
           "name": "run",
           "kind": 2048,
           "kindString": "Method",
@@ -1948,14 +1948,14 @@
           },
           "signatures": [
             {
-              "id": 263,
+              "id": 275,
               "name": "run",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 264,
+                  "id": 276,
                   "name": "navigationInstruction",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1968,7 +1968,7 @@
                   }
                 },
                 {
-                  "id": 265,
+                  "id": 277,
                   "name": "next",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1987,7 +1987,7 @@
           ]
         },
         {
-          "id": 257,
+          "id": 269,
           "name": "inject",
           "kind": 2048,
           "kindString": "Method",
@@ -1997,7 +1997,7 @@
           },
           "signatures": [
             {
-              "id": 258,
+              "id": 270,
               "name": "inject",
               "kind": 4096,
               "kindString": "Call signature",
@@ -2015,15 +2015,15 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            259
+            271
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            262,
-            257
+            274,
+            269
           ]
         }
       ]
@@ -2065,7 +2065,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Router",
-                    "id": 161,
+                    "id": 173,
                     "moduleName": "\"aurelia-router\""
                   }
                 },
@@ -2878,7 +2878,7 @@
       ]
     },
     {
-      "id": 266,
+      "id": 278,
       "name": "PipelineProvider",
       "kind": 128,
       "kindString": "Class",
@@ -2890,7 +2890,7 @@
       },
       "children": [
         {
-          "id": 269,
+          "id": 281,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -2899,14 +2899,14 @@
           },
           "signatures": [
             {
-              "id": 270,
+              "id": 282,
               "name": "new PipelineProvider",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 271,
+                  "id": 283,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2914,7 +2914,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 493,
+                    "id": 505,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 }
@@ -2922,14 +2922,14 @@
               "type": {
                 "type": "reference",
                 "name": "PipelineProvider",
-                "id": 266,
+                "id": 278,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 274,
+          "id": 286,
           "name": "addStep",
           "kind": 2048,
           "kindString": "Method",
@@ -2938,7 +2938,7 @@
           },
           "signatures": [
             {
-              "id": 275,
+              "id": 287,
               "name": "addStep",
               "kind": 4096,
               "kindString": "Call signature",
@@ -2948,7 +2948,7 @@
               },
               "parameters": [
                 {
-                  "id": 276,
+                  "id": 288,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2959,7 +2959,7 @@
                   }
                 },
                 {
-                  "id": 277,
+                  "id": 289,
                   "name": "step",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2980,7 +2980,7 @@
           ]
         },
         {
-          "id": 272,
+          "id": 284,
           "name": "createPipeline",
           "kind": 2048,
           "kindString": "Method",
@@ -2989,7 +2989,7 @@
           },
           "signatures": [
             {
-              "id": 273,
+              "id": 285,
               "name": "createPipeline",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3007,7 +3007,7 @@
           ]
         },
         {
-          "id": 267,
+          "id": 279,
           "name": "inject",
           "kind": 2048,
           "kindString": "Method",
@@ -3017,7 +3017,7 @@
           },
           "signatures": [
             {
-              "id": 268,
+              "id": 280,
               "name": "inject",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3035,16 +3035,16 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            269
+            281
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            274,
-            272,
-            267
+            286,
+            284,
+            279
           ]
         }
       ]
@@ -3142,7 +3142,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Router",
-                    "id": 161,
+                    "id": 173,
                     "moduleName": "\"aurelia-router\""
                   }
                 }
@@ -3185,7 +3185,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Router",
-                    "id": 161,
+                    "id": 173,
                     "moduleName": "\"aurelia-router\""
                   }
                 }
@@ -3217,7 +3217,204 @@
       ]
     },
     {
-      "id": 250,
+      "id": 119,
+      "name": "RedirectToRoute",
+      "kind": 128,
+      "kindString": "Class",
+      "flags": {
+        "isExported": true
+      },
+      "comment": {
+        "shortText": "Used during the activation lifecycle to cause a redirect to a named route.",
+        "tags": [
+          {
+            "tag": "param",
+            "text": "The name of the route.",
+            "param": "route"
+          },
+          {
+            "tag": "param",
+            "text": "The parameters to be sent to the activation method.",
+            "param": "params"
+          },
+          {
+            "tag": "param",
+            "text": "The options to use for navigation.\n",
+            "param": "options"
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": 120,
+          "name": "constructor",
+          "kind": 512,
+          "kindString": "Constructor",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 121,
+              "name": "new RedirectToRoute",
+              "kind": 16384,
+              "kindString": "Constructor signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 122,
+                  "name": "route",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "instrinct",
+                    "name": "string"
+                  }
+                },
+                {
+                  "id": 123,
+                  "name": "params",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                },
+                {
+                  "id": 124,
+                  "name": "options",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "type": {
+                    "type": "instrinct",
+                    "name": "any"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "RedirectToRoute",
+                "id": 119,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 128,
+          "name": "navigate",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 129,
+              "name": "navigate",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Called by the navigation pipeline to navigate."
+              },
+              "parameters": [
+                {
+                  "id": 130,
+                  "name": "appRouter",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The router to be redirected.\n"
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Router",
+                    "id": 173,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "void"
+              }
+            }
+          ]
+        },
+        {
+          "id": 125,
+          "name": "setRouter",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 126,
+              "name": "setRouter",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Called by the activation system to set the child router."
+              },
+              "parameters": [
+                {
+                  "id": 127,
+                  "name": "router",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The router.\n"
+                  },
+                  "type": {
+                    "type": "reference",
+                    "name": "Router",
+                    "id": 173,
+                    "moduleName": "\"aurelia-router\""
+                  }
+                }
+              ],
+              "type": {
+                "type": "instrinct",
+                "name": "void"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "kind": 512,
+          "children": [
+            120
+          ]
+        },
+        {
+          "title": "Methods",
+          "kind": 2048,
+          "children": [
+            128,
+            125
+          ]
+        }
+      ]
+    },
+    {
+      "id": 262,
       "name": "RouteLoader",
       "kind": 128,
       "kindString": "Class",
@@ -3226,7 +3423,7 @@
       },
       "children": [
         {
-          "id": 251,
+          "id": 263,
           "name": "loadRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -3235,14 +3432,14 @@
           },
           "signatures": [
             {
-              "id": 252,
+              "id": 264,
               "name": "loadRoute",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 253,
+                  "id": 265,
                   "name": "router",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3253,7 +3450,7 @@
                   }
                 },
                 {
-                  "id": 254,
+                  "id": 266,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3264,7 +3461,7 @@
                   }
                 },
                 {
-                  "id": 255,
+                  "id": 267,
                   "name": "navigationInstruction",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3288,13 +3485,13 @@
           "title": "Methods",
           "kind": 2048,
           "children": [
-            251
+            263
           ]
         }
       ]
     },
     {
-      "id": 161,
+      "id": 173,
       "name": "Router",
       "kind": 128,
       "kindString": "Class",
@@ -3316,7 +3513,7 @@
       },
       "children": [
         {
-          "id": 173,
+          "id": 185,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -3326,7 +3523,7 @@
           "comment": {},
           "signatures": [
             {
-              "id": 174,
+              "id": 186,
               "name": "new Router",
               "kind": 16384,
               "kindString": "Constructor signature",
@@ -3334,7 +3531,7 @@
               "comment": {},
               "parameters": [
                 {
-                  "id": 175,
+                  "id": 187,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3345,12 +3542,12 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 493,
+                    "id": 505,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 },
                 {
-                  "id": 176,
+                  "id": 188,
                   "name": "history",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3361,7 +3558,7 @@
                   "type": {
                     "type": "reference",
                     "name": "History",
-                    "id": 625,
+                    "id": 637,
                     "moduleName": "\"aurelia-history\""
                   }
                 }
@@ -3369,14 +3566,14 @@
               "type": {
                 "type": "reference",
                 "name": "Router",
-                "id": 161,
+                "id": 173,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 166,
+          "id": 178,
           "name": "baseUrl",
           "kind": 1024,
           "kindString": "Property",
@@ -3392,7 +3589,7 @@
           }
         },
         {
-          "id": 162,
+          "id": 174,
           "name": "container",
           "kind": 1024,
           "kindString": "Property",
@@ -3402,12 +3599,12 @@
           "type": {
             "type": "reference",
             "name": "Container",
-            "id": 493,
+            "id": 505,
             "moduleName": "\"aurelia-dependency-injection\""
           }
         },
         {
-          "id": 170,
+          "id": 182,
           "name": "currentInstruction",
           "kind": 1024,
           "kindString": "Property",
@@ -3425,7 +3622,7 @@
           }
         },
         {
-          "id": 163,
+          "id": 175,
           "name": "history",
           "kind": 1024,
           "kindString": "Property",
@@ -3435,12 +3632,12 @@
           "type": {
             "type": "reference",
             "name": "History",
-            "id": 625,
+            "id": 637,
             "moduleName": "\"aurelia-history\""
           }
         },
         {
-          "id": 167,
+          "id": 179,
           "name": "isConfigured",
           "kind": 1024,
           "kindString": "Property",
@@ -3456,7 +3653,7 @@
           }
         },
         {
-          "id": 168,
+          "id": 180,
           "name": "isNavigating",
           "kind": 1024,
           "kindString": "Property",
@@ -3472,7 +3669,7 @@
           }
         },
         {
-          "id": 179,
+          "id": 191,
           "name": "isRoot",
           "kind": 1024,
           "kindString": "Property",
@@ -3488,7 +3685,7 @@
           }
         },
         {
-          "id": 169,
+          "id": 181,
           "name": "navigation",
           "kind": 1024,
           "kindString": "Property",
@@ -3507,7 +3704,7 @@
           }
         },
         {
-          "id": 172,
+          "id": 184,
           "name": "options",
           "kind": 1024,
           "kindString": "Property",
@@ -3520,7 +3717,7 @@
           }
         },
         {
-          "id": 171,
+          "id": 183,
           "name": "parent",
           "kind": 1024,
           "kindString": "Property",
@@ -3533,12 +3730,12 @@
           "type": {
             "type": "reference",
             "name": "Router",
-            "id": 161,
+            "id": 173,
             "moduleName": "\"aurelia-router\""
           }
         },
         {
-          "id": 165,
+          "id": 177,
           "name": "routes",
           "kind": 1024,
           "kindString": "Property",
@@ -3554,7 +3751,7 @@
           }
         },
         {
-          "id": 164,
+          "id": 176,
           "name": "viewPorts",
           "kind": 1024,
           "kindString": "Property",
@@ -3567,7 +3764,7 @@
           }
         },
         {
-          "id": 213,
+          "id": 225,
           "name": "addRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -3576,7 +3773,7 @@
           },
           "signatures": [
             {
-              "id": 214,
+              "id": 226,
               "name": "addRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3586,7 +3783,7 @@
               },
               "parameters": [
                 {
-                  "id": 215,
+                  "id": 227,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3602,7 +3799,7 @@
                   }
                 },
                 {
-                  "id": 216,
+                  "id": 228,
                   "name": "navModel",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3628,7 +3825,7 @@
           ]
         },
         {
-          "id": 186,
+          "id": 198,
           "name": "configure",
           "kind": 2048,
           "kindString": "Method",
@@ -3637,7 +3834,7 @@
           },
           "signatures": [
             {
-              "id": 187,
+              "id": 199,
               "name": "configure",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3647,7 +3844,7 @@
               },
               "parameters": [
                 {
-                  "id": 188,
+                  "id": 200,
                   "name": "callbackOrConfig",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3661,26 +3858,26 @@
                       {
                         "type": "reference",
                         "name": "RouterConfiguration",
-                        "id": 119
+                        "id": 131
                       },
                       {
                         "type": "reflection",
                         "declaration": {
-                          "id": 189,
+                          "id": 201,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "signatures": [
                             {
-                              "id": 190,
+                              "id": 202,
                               "name": "__call",
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
                               "parameters": [
                                 {
-                                  "id": 191,
+                                  "id": 203,
                                   "name": "config",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -3688,14 +3885,14 @@
                                   "type": {
                                     "type": "reference",
                                     "name": "RouterConfiguration",
-                                    "id": 119
+                                    "id": 131
                                   }
                                 }
                               ],
                               "type": {
                                 "type": "reference",
                                 "name": "RouterConfiguration",
-                                "id": 119
+                                "id": 131
                               }
                             }
                           ]
@@ -3719,7 +3916,7 @@
           ]
         },
         {
-          "id": 203,
+          "id": 215,
           "name": "createChild",
           "kind": 2048,
           "kindString": "Method",
@@ -3728,7 +3925,7 @@
           },
           "signatures": [
             {
-              "id": 204,
+              "id": 216,
               "name": "createChild",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3739,7 +3936,7 @@
               },
               "parameters": [
                 {
-                  "id": 205,
+                  "id": 217,
                   "name": "container",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3752,7 +3949,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Container",
-                    "id": 493,
+                    "id": 505,
                     "moduleName": "\"aurelia-dependency-injection\""
                   }
                 }
@@ -3760,14 +3957,14 @@
               "type": {
                 "type": "reference",
                 "name": "Router",
-                "id": 161,
+                "id": 173,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 210,
+          "id": 222,
           "name": "createNavModel",
           "kind": 2048,
           "kindString": "Method",
@@ -3776,7 +3973,7 @@
           },
           "signatures": [
             {
-              "id": 211,
+              "id": 223,
               "name": "createNavModel",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3786,7 +3983,7 @@
               },
               "parameters": [
                 {
-                  "id": 212,
+                  "id": 224,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3812,7 +4009,7 @@
           ]
         },
         {
-          "id": 184,
+          "id": 196,
           "name": "ensureConfigured",
           "kind": 2048,
           "kindString": "Method",
@@ -3821,7 +4018,7 @@
           },
           "signatures": [
             {
-              "id": 185,
+              "id": 197,
               "name": "ensureConfigured",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3843,7 +4040,7 @@
           ]
         },
         {
-          "id": 206,
+          "id": 218,
           "name": "generate",
           "kind": 2048,
           "kindString": "Method",
@@ -3852,7 +4049,7 @@
           },
           "signatures": [
             {
-              "id": 207,
+              "id": 219,
               "name": "generate",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3863,7 +4060,7 @@
               },
               "parameters": [
                 {
-                  "id": 208,
+                  "id": 220,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3877,7 +4074,7 @@
                   }
                 },
                 {
-                  "id": 209,
+                  "id": 221,
                   "name": "params",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3901,7 +4098,7 @@
           ]
         },
         {
-          "id": 223,
+          "id": 235,
           "name": "handleUnknownRoutes",
           "kind": 2048,
           "kindString": "Method",
@@ -3910,7 +4107,7 @@
           },
           "signatures": [
             {
-              "id": 224,
+              "id": 236,
               "name": "handleUnknownRoutes",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3920,7 +4117,7 @@
               },
               "parameters": [
                 {
-                  "id": 225,
+                  "id": 237,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3958,7 +4155,7 @@
           ]
         },
         {
-          "id": 220,
+          "id": 232,
           "name": "hasOwnRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -3967,7 +4164,7 @@
           },
           "signatures": [
             {
-              "id": 221,
+              "id": 233,
               "name": "hasOwnRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -3977,7 +4174,7 @@
               },
               "parameters": [
                 {
-                  "id": 222,
+                  "id": 234,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3999,7 +4196,7 @@
           ]
         },
         {
-          "id": 217,
+          "id": 229,
           "name": "hasRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -4008,7 +4205,7 @@
           },
           "signatures": [
             {
-              "id": 218,
+              "id": 230,
               "name": "hasRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4018,7 +4215,7 @@
               },
               "parameters": [
                 {
-                  "id": 219,
+                  "id": 231,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4040,7 +4237,7 @@
           ]
         },
         {
-          "id": 192,
+          "id": 204,
           "name": "navigate",
           "kind": 2048,
           "kindString": "Method",
@@ -4049,7 +4246,7 @@
           },
           "signatures": [
             {
-              "id": 193,
+              "id": 205,
               "name": "navigate",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4059,7 +4256,7 @@
               },
               "parameters": [
                 {
-                  "id": 194,
+                  "id": 206,
                   "name": "fragment",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4073,7 +4270,7 @@
                   }
                 },
                 {
-                  "id": 195,
+                  "id": 207,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4097,7 +4294,7 @@
           ]
         },
         {
-          "id": 201,
+          "id": 213,
           "name": "navigateBack",
           "kind": 2048,
           "kindString": "Method",
@@ -4106,7 +4303,7 @@
           },
           "signatures": [
             {
-              "id": 202,
+              "id": 214,
               "name": "navigateBack",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4122,7 +4319,7 @@
           ]
         },
         {
-          "id": 196,
+          "id": 208,
           "name": "navigateToRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -4131,7 +4328,7 @@
           },
           "signatures": [
             {
-              "id": 197,
+              "id": 209,
               "name": "navigateToRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4141,7 +4338,7 @@
               },
               "parameters": [
                 {
-                  "id": 198,
+                  "id": 210,
                   "name": "route",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4155,7 +4352,7 @@
                   }
                 },
                 {
-                  "id": 199,
+                  "id": 211,
                   "name": "params",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4171,7 +4368,7 @@
                   }
                 },
                 {
-                  "id": 200,
+                  "id": 212,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4195,7 +4392,7 @@
           ]
         },
         {
-          "id": 228,
+          "id": 240,
           "name": "refreshNavigation",
           "kind": 2048,
           "kindString": "Method",
@@ -4204,7 +4401,7 @@
           },
           "signatures": [
             {
-              "id": 229,
+              "id": 241,
               "name": "refreshNavigation",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4220,7 +4417,7 @@
           ]
         },
         {
-          "id": 180,
+          "id": 192,
           "name": "registerViewPort",
           "kind": 2048,
           "kindString": "Method",
@@ -4229,7 +4426,7 @@
           },
           "signatures": [
             {
-              "id": 181,
+              "id": 193,
               "name": "registerViewPort",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4239,7 +4436,7 @@
               },
               "parameters": [
                 {
-                  "id": 182,
+                  "id": 194,
                   "name": "viewPort",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4253,7 +4450,7 @@
                   }
                 },
                 {
-                  "id": 183,
+                  "id": 195,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4277,7 +4474,7 @@
           ]
         },
         {
-          "id": 177,
+          "id": 189,
           "name": "reset",
           "kind": 2048,
           "kindString": "Method",
@@ -4286,7 +4483,7 @@
           },
           "signatures": [
             {
-              "id": 178,
+              "id": 190,
               "name": "reset",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4302,7 +4499,7 @@
           ]
         },
         {
-          "id": 226,
+          "id": 238,
           "name": "updateTitle",
           "kind": 2048,
           "kindString": "Method",
@@ -4311,7 +4508,7 @@
           },
           "signatures": [
             {
-              "id": 227,
+              "id": 239,
               "name": "updateTitle",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4332,47 +4529,47 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            173
+            185
           ]
         },
         {
           "title": "Properties",
           "kind": 1024,
           "children": [
-            166,
-            162,
-            170,
-            163,
-            167,
-            168,
+            178,
+            174,
+            182,
+            175,
             179,
-            169,
-            172,
-            171,
-            165,
-            164
+            180,
+            191,
+            181,
+            184,
+            183,
+            177,
+            176
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            213,
-            186,
-            203,
-            210,
-            184,
-            206,
-            223,
-            220,
-            217,
-            192,
-            201,
+            225,
+            198,
+            215,
+            222,
             196,
-            228,
-            180,
-            177,
-            226
+            218,
+            235,
+            232,
+            229,
+            204,
+            213,
+            208,
+            240,
+            192,
+            189,
+            238
           ]
         }
       ],
@@ -4380,12 +4577,12 @@
         {
           "type": "reference",
           "name": "AppRouter",
-          "id": 278
+          "id": 290
         }
       ]
     },
     {
-      "id": 119,
+      "id": 131,
       "name": "RouterConfiguration",
       "kind": 128,
       "kindString": "Class",
@@ -4403,7 +4600,7 @@
       },
       "children": [
         {
-          "id": 120,
+          "id": 132,
           "name": "instructions",
           "kind": 1024,
           "kindString": "Property",
@@ -4416,7 +4613,7 @@
           }
         },
         {
-          "id": 121,
+          "id": 133,
           "name": "options",
           "kind": 1024,
           "kindString": "Property",
@@ -4429,7 +4626,7 @@
           }
         },
         {
-          "id": 122,
+          "id": 134,
           "name": "pipelineSteps",
           "kind": 1024,
           "kindString": "Property",
@@ -4458,7 +4655,7 @@
           }
         },
         {
-          "id": 123,
+          "id": 135,
           "name": "title",
           "kind": 1024,
           "kindString": "Property",
@@ -4471,7 +4668,7 @@
           }
         },
         {
-          "id": 124,
+          "id": 136,
           "name": "unknownRouteConfig",
           "kind": 1024,
           "kindString": "Property",
@@ -4484,7 +4681,7 @@
           }
         },
         {
-          "id": 129,
+          "id": 141,
           "name": "addAuthorizeStep",
           "kind": 2048,
           "kindString": "Method",
@@ -4493,7 +4690,7 @@
           },
           "signatures": [
             {
-              "id": 130,
+              "id": 142,
               "name": "addAuthorizeStep",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4509,7 +4706,7 @@
               },
               "parameters": [
                 {
-                  "id": 131,
+                  "id": 143,
                   "name": "step",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4536,14 +4733,14 @@
               "type": {
                 "type": "reference",
                 "name": "RouterConfiguration",
-                "id": 119,
+                "id": 131,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 125,
+          "id": 137,
           "name": "addPipelineStep",
           "kind": 2048,
           "kindString": "Method",
@@ -4552,7 +4749,7 @@
           },
           "signatures": [
             {
-              "id": 126,
+              "id": 138,
               "name": "addPipelineStep",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4568,7 +4765,7 @@
               },
               "parameters": [
                 {
-                  "id": 127,
+                  "id": 139,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4581,65 +4778,6 @@
                     "name": "string"
                   }
                 },
-                {
-                  "id": 128,
-                  "name": "step",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "comment": {
-                    "text": "The pipeline step."
-                  },
-                  "type": {
-                    "type": "union",
-                    "types": [
-                      {
-                        "type": "reference",
-                        "name": "Function"
-                      },
-                      {
-                        "type": "reference",
-                        "name": "PipelineStep",
-                        "id": 14
-                      }
-                    ]
-                  }
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "name": "RouterConfiguration",
-                "id": 119,
-                "moduleName": "\"aurelia-router\""
-              }
-            }
-          ]
-        },
-        {
-          "id": 138,
-          "name": "addPostRenderStep",
-          "kind": 2048,
-          "kindString": "Method",
-          "flags": {
-            "isExported": true
-          },
-          "signatures": [
-            {
-              "id": 139,
-              "name": "addPostRenderStep",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "comment": {
-                "shortText": "Adds a step to be run during the [[Router]]'s postRender pipeline slot.",
-                "tags": [
-                  {
-                    "tag": "chainable",
-                    "text": "\n"
-                  }
-                ]
-              },
-              "parameters": [
                 {
                   "id": 140,
                   "name": "step",
@@ -4668,14 +4806,73 @@
               "type": {
                 "type": "reference",
                 "name": "RouterConfiguration",
-                "id": 119,
+                "id": 131,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 132,
+          "id": 150,
+          "name": "addPostRenderStep",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isExported": true
+          },
+          "signatures": [
+            {
+              "id": 151,
+              "name": "addPostRenderStep",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Adds a step to be run during the [[Router]]'s postRender pipeline slot.",
+                "tags": [
+                  {
+                    "tag": "chainable",
+                    "text": "\n"
+                  }
+                ]
+              },
+              "parameters": [
+                {
+                  "id": 152,
+                  "name": "step",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "comment": {
+                    "text": "The pipeline step."
+                  },
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "reference",
+                        "name": "Function"
+                      },
+                      {
+                        "type": "reference",
+                        "name": "PipelineStep",
+                        "id": 14
+                      }
+                    ]
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "name": "RouterConfiguration",
+                "id": 131,
+                "moduleName": "\"aurelia-router\""
+              }
+            }
+          ]
+        },
+        {
+          "id": 144,
           "name": "addPreActivateStep",
           "kind": 2048,
           "kindString": "Method",
@@ -4684,7 +4881,7 @@
           },
           "signatures": [
             {
-              "id": 133,
+              "id": 145,
               "name": "addPreActivateStep",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4700,7 +4897,7 @@
               },
               "parameters": [
                 {
-                  "id": 134,
+                  "id": 146,
                   "name": "step",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4727,14 +4924,14 @@
               "type": {
                 "type": "reference",
                 "name": "RouterConfiguration",
-                "id": 119,
+                "id": 131,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 135,
+          "id": 147,
           "name": "addPreRenderStep",
           "kind": 2048,
           "kindString": "Method",
@@ -4743,7 +4940,7 @@
           },
           "signatures": [
             {
-              "id": 136,
+              "id": 148,
               "name": "addPreRenderStep",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4759,7 +4956,7 @@
               },
               "parameters": [
                 {
-                  "id": 137,
+                  "id": 149,
                   "name": "step",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4786,14 +4983,14 @@
               "type": {
                 "type": "reference",
                 "name": "RouterConfiguration",
-                "id": 119,
+                "id": 131,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 153,
+          "id": 165,
           "name": "exportToRouter",
           "kind": 2048,
           "kindString": "Method",
@@ -4802,7 +4999,7 @@
           },
           "signatures": [
             {
-              "id": 154,
+              "id": 166,
               "name": "exportToRouter",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4812,7 +5009,7 @@
               },
               "parameters": [
                 {
-                  "id": 155,
+                  "id": 167,
                   "name": "router",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4823,7 +5020,7 @@
                   "type": {
                     "type": "reference",
                     "name": "Router",
-                    "id": 161,
+                    "id": 173,
                     "moduleName": "\"aurelia-router\""
                   }
                 }
@@ -4836,7 +5033,7 @@
           ]
         },
         {
-          "id": 141,
+          "id": 153,
           "name": "map",
           "kind": 2048,
           "kindString": "Method",
@@ -4845,7 +5042,7 @@
           },
           "signatures": [
             {
-              "id": 142,
+              "id": 154,
               "name": "map",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4861,7 +5058,7 @@
               },
               "parameters": [
                 {
-                  "id": 143,
+                  "id": 155,
                   "name": "route",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4890,14 +5087,14 @@
               "type": {
                 "type": "reference",
                 "name": "RouterConfiguration",
-                "id": 119,
+                "id": 131,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 144,
+          "id": 156,
           "name": "mapRoute",
           "kind": 2048,
           "kindString": "Method",
@@ -4906,7 +5103,7 @@
           },
           "signatures": [
             {
-              "id": 145,
+              "id": 157,
               "name": "mapRoute",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4922,7 +5119,7 @@
               },
               "parameters": [
                 {
-                  "id": 146,
+                  "id": 158,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4938,14 +5135,14 @@
               "type": {
                 "type": "reference",
                 "name": "RouterConfiguration",
-                "id": 119,
+                "id": 131,
                 "moduleName": "\"aurelia-router\""
               }
             }
           ]
         },
         {
-          "id": 147,
+          "id": 159,
           "name": "mapUnknownRoutes",
           "kind": 2048,
           "kindString": "Method",
@@ -4954,7 +5151,7 @@
           },
           "signatures": [
             {
-              "id": 148,
+              "id": 160,
               "name": "mapUnknownRoutes",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4970,7 +5167,7 @@
               },
               "parameters": [
                 {
-                  "id": 149,
+                  "id": 161,
                   "name": "config",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4993,21 +5190,21 @@
                       {
                         "type": "reflection",
                         "declaration": {
-                          "id": 150,
+                          "id": 162,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "signatures": [
                             {
-                              "id": 151,
+                              "id": 163,
                               "name": "__call",
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
                               "parameters": [
                                 {
-                                  "id": 152,
+                                  "id": 164,
                                   "name": "instruction",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -5064,7 +5261,7 @@
               "type": {
                 "type": "reference",
                 "name": "RouterConfiguration",
-                "id": 119,
+                "id": 131,
                 "moduleName": "\"aurelia-router\""
               }
             }
@@ -5076,26 +5273,26 @@
           "title": "Properties",
           "kind": 1024,
           "children": [
-            120,
-            121,
-            122,
-            123,
-            124
+            132,
+            133,
+            134,
+            135,
+            136
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            129,
-            125,
-            138,
-            132,
-            135,
-            153,
             141,
+            137,
+            150,
             144,
-            147
+            147,
+            165,
+            153,
+            156,
+            159
           ]
         }
       ]
@@ -5227,7 +5424,7 @@
           "type": {
             "type": "reference",
             "name": "Router",
-            "id": 161
+            "id": 173
           }
         }
       ],
@@ -5904,7 +6101,7 @@
       ]
     },
     {
-      "id": 363,
+      "id": 375,
       "name": "activationStrategy",
       "kind": 32,
       "kindString": "Variable",
@@ -5920,7 +6117,7 @@
       }
     },
     {
-      "id": 359,
+      "id": 371,
       "name": "pipelineStatus",
       "kind": 32,
       "kindString": "Variable",
@@ -5936,7 +6133,7 @@
       }
     },
     {
-      "id": 360,
+      "id": 372,
       "name": "isNavigationCommand",
       "kind": 64,
       "kindString": "Function",
@@ -5945,7 +6142,7 @@
       },
       "signatures": [
         {
-          "id": 361,
+          "id": 373,
           "name": "isNavigationCommand",
           "kind": 4096,
           "kindString": "Call signature",
@@ -5955,7 +6152,7 @@
           },
           "parameters": [
             {
-              "id": 362,
+              "id": 374,
               "name": "obj",
               "kind": 32768,
               "kindString": "Parameter",
@@ -5982,22 +6179,23 @@
       "title": "Classes",
       "kind": 128,
       "children": [
-        245,
-        278,
-        156,
-        235,
-        230,
+        257,
+        290,
+        168,
+        247,
+        242,
         59,
-        240,
-        256,
+        252,
+        268,
         94,
         64,
         51,
-        266,
+        278,
         108,
-        250,
-        161,
-        119
+        119,
+        262,
+        173,
+        131
       ]
     },
     {
@@ -6015,15 +6213,15 @@
       "title": "Variables",
       "kind": 32,
       "children": [
-        363,
-        359
+        375,
+        371
       ]
     },
     {
       "title": "Functions",
       "kind": 64,
       "children": [
-        360
+        372
       ]
     }
   ]

@@ -340,6 +340,24 @@ export let Redirect = class Redirect {
   }
 };
 
+export let RedirectToRoute = class RedirectToRoute {
+  constructor(route, params = {}, options = {}) {
+    this.route = route;
+    this.params = params;
+    this.options = Object.assign({ trigger: true, replace: true }, options);
+    this.shouldContinueProcessing = false;
+  }
+
+  setRouter(router) {
+    this.router = router;
+  }
+
+  navigate(appRouter) {
+    let navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
+    navigatingRouter.navigateToRoute(this.route, this.params, this.options);
+  }
+};
+
 export let RouterConfiguration = class RouterConfiguration {
   constructor() {
     this.instructions = [];

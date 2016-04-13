@@ -1,3 +1,11 @@
+### 1.0.0-beta.1.2.1 (2016-04-13)
+
+
+#### Features
+
+* add support for RedirectToRoute ([778fbc81](http://github.com/aurelia/router/commit/778fbc8146afe81f37fd7aff79d1c9c8e519df3f))
+
+
 ### 1.0.0-beta.1.2.0 (2016-03-22)
 
 
