@@ -218,6 +218,22 @@ describe('the router', () => {
         .then(done);
     });
 
+    it('should be case insensitive by default', (done) => {
+      router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(() => router._createNavigationInstruction('TeSt/123?foo=456'))
+        .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'TeSt/123', queryString: 'foo=456' })))
+        .catch(reason => expect(true).toBeFalsy('should have succeeded'))
+        .then(done);
+    });
+
+    it('should reject when route is case sensitive', (done) => {
+      router.configure(config => config.map({ name: 'test', route: 'Test/:id', moduleId: './test', caseSensitive: true }))
+        .then(() => router._createNavigationInstruction('test/123'))
+        .then(() => expect(true).toBeFalsy('should have rejected'))
+        .catch(reason => expect(reason).toBeTruthy())
+        .then(done);
+    });
+
     describe('catchAllHandler', () => {
       let expectedInstructionShape = jasmine.objectContaining({ config: jasmine.objectContaining({ moduleId: 'test' }) });
 

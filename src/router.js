@@ -245,8 +245,8 @@ export class Router {
     if (path.charAt(0) === '/') {
       path = path.substr(1);
     }
-
-    let state = this._recognizer.add({path: path, handler: config});
+    let caseSensitive = config.caseSensitive === true;
+    let state = this._recognizer.add({path: path, handler: config, caseSensitive: caseSensitive});
 
     if (path) {
       let settings = config.settings;
@@ -257,7 +257,8 @@ export class Router {
       withChild.hasChildRouter = true;
       this._childRecognizer.add({
         path: withChild.route,
-        handler: withChild
+        handler: withChild,
+        caseSensitive: caseSensitive
       });
 
       withChild.navModel = navModel;
