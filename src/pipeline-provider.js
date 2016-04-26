@@ -10,6 +10,21 @@ import {
   ActivateNextStep
 } from './activation';
 
+
+class PipelineSlot {
+  steps = [];
+
+  constructor(container, name, alias) {
+    this.container = container;
+    this.slotName = name;
+    this.slotAlias = alias;
+  }
+
+  getSteps() {
+    return this.steps.map(x => this.container.get(x));
+  }
+}
+
 /**
 * Class responsible for creating the navigation pipeline.
 */
@@ -43,34 +58,55 @@ export class PipelineProvider {
     return pipeline;
   }
 
+  _findStep(name: string) {
+    return this.steps.find(x => x.slotName === name || x.slotAlias === name);
+  }
+
   /**
   * Adds a step into the pipeline at a known slot location.
   */
   addStep(name: string, step: PipelineStep): void {
-    let found = this.steps.find(x => x.slotName === name || x.slotAlias === name);
+    let found = this._findStep(name);
     if (found) {
-      found.steps.push(step);
+      if (!found.steps.includes(step)) { // prevent duplicates
+        found.steps.push(step);
+      }
     } else {
       throw new Error(`Invalid pipeline slot name: ${name}.`);
     }
   }
 
-  _createPipelineSlot(name, alias) {
-    class PipelineSlot {
-      static inject = [Container];
-      static slotName = name;
-      static slotAlias = alias;
-      static steps = [];
-
-      constructor(container) {
-        this.container = container;
-      }
-
-      getSteps() {
-        return PipelineSlot.steps.map(x => this.container.get(x));
-      }
+  /**
+   * Removes a step from a slot in the pipeline
+   */
+  removeStep(name: string, step: PipelineStep) {
+    let slot = this._findStep(name);
+    if (slot) {
+      slot.steps.splice(slot.steps.indexOf(step), 1);
     }
+  }
 
-    return PipelineSlot;
+  /**
+   * Clears all steps from a slot in the pipeline
+   */
+  _clearSteps(name: string = '') {
+    let slot = this._findStep(name);
+    if (slot) {
+      slot.steps = [];
+    }
+  }
+
+  /**
+   * Resets all pipeline slots
+   */
+  reset() {
+    this._clearSteps('authorize');
+    this._clearSteps('preActivate');
+    this._clearSteps('preRender');
+    this._clearSteps('postRender');
+  }
+
+  _createPipelineSlot(name, alias) {
+    return new PipelineSlot(this.container, name, alias);
   }
 }
