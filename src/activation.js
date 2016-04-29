@@ -180,9 +180,39 @@ function shouldContinue(output, router: Router) {
   return output;
 }
 
+class SafeSubscription {
+  //if this were TypeScript, subscriptionFunc would be of type 
+  //(sub: SafeSubscription) => Subscription
+  constructor(subscriptionFunc) {
+    this._subscribed = true;
+    this._subscription = subscriptionFunc(this);
+    
+    if(!this._subscribed) this.unsubscribe()
+  }
+  
+  unsubscribe() {
+    if(this._subscription) this._subscription.unsubscribe();
+    
+    this._subscribed = false;
+  }
+}
+
 function processPotential(obj, resolve, reject) {
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
+  }
+  
+  if(obj && typeof obj.subscribe === 'function') {
+    //an object with a subscribe function should be assumed to be an observable
+    new SafeSubscription(sub => obj.subscribe({
+      next() {
+        sub.unsubscribe();
+        resolve(obj);
+      },
+      error(err) {
+        reject(err);
+      }
+    }));
   }
 
   try {
