@@ -8,24 +8,7 @@
 
 This library is part of the [Aurelia](http://www.aurelia.io/) platform and contains a powerful client-side router.
 
-> To keep up to date on [Aurelia](http://www.aurelia.io/), please visit and subscribe to [the official blog](http://blog.durandal.io/). If you have questions, we invite you to [join us on Gitter](https://gitter.im/aurelia/discuss). If you would like to have deeper insight into our development process, please install the [ZenHub](https://zenhub.io) Chrome Extension and visit any of our repository's boards. You can get an overview of all Aurelia work by visiting [the framework board](https://github.com/aurelia/framework#boards).
-
-## Polyfills
-
-* Depending on target browser(s), [core-js](https://github.com/zloirock/core-js) may be required for `Promise` support.
-
-## Dependencies
-
-* [aurelia-dependency-injection](https://github.com/aurelia/dependency-injection)
-* [aurelia-history](https://github.com/aurelia/history)
-* [aurelia-route-recognizer](https://github.com/aurelia/route-recognizer)
-* [aurelia-path](https://github.com/aurelia/path)
-* [aurelia-event-aggregator](https://github.com/aurelia/event-aggregator)
-
-## Used By
-
-* [aurelia-bootstrapper](https://github.com/aurelia/bootstrapper)
-* [aurelia-templating-router](https://github.com/aurelia/templating-router)
+> To keep up to date on [Aurelia](http://www.aurelia.io/), please visit and subscribe to [the official blog](http://blog.durandal.io/) and [our email list](http://durandal.us10.list-manage1.com/subscribe?u=dae7661a3872ee02b519f6f29&id=3de6801ccc). We also invite you to [follow us on twitter](https://twitter.com/aureliaeffect). If you have questions, please [join our community on Gitter](https://gitter.im/aurelia/discuss). If you would like to have deeper insight into our development process, please install the [ZenHub](https://zenhub.io) Chrome or Firefox Extension and visit any of our repository's boards. You can get an overview of all Aurelia work by visiting [the framework board](https://github.com/aurelia/framework#boards).
 
 ## Platform Support
 
