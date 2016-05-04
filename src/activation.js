@@ -190,6 +190,10 @@ class SafeSubscription {
     if(!this._subscribed) this.unsubscribe()
   }
   
+  get subscribed() {
+    return this._subscribed;
+  }
+  
   unsubscribe() {
     if(this._subscribed && this._subscription) this._subscription.unsubscribe();
     
@@ -206,11 +210,22 @@ function processPotential(obj, resolve, reject) {
     //an object with a subscribe function should be assumed to be an observable
     return new SafeSubscription(sub => obj.subscribe({
       next() {
-        sub.unsubscribe();
-        resolve(obj);
+        if(sub.subscribed) {
+          sub.unsubscribe();
+          resolve(obj);
+        }
       },
       error(error) {
-        reject(error);
+        if(sub.subscribed) {
+          sub.unsubscribe();
+          reject(error);
+        }
+      },
+      complete() {
+        if(sub.subscribed) {
+          sub.unsubscribe();
+          resolve(obj);
+        }
       }
     }));
   }
