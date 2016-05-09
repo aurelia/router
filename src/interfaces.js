@@ -68,5 +68,10 @@ interface RouteConfig {
   */
   navModel?: NavModel;
 
+  /**
+  * When true is specified, this route will be case sensitive.
+  */
+  caseSensitive?: boolean;
+
   [x: string]: any;
 }
