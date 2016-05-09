@@ -6,6 +6,8 @@
     "aurelia",
     "router"
   ],
+  "main": "dist/commonjs/aurelia-router.js",
+  "moduleType": "node",
   "homepage": "http://aurelia.io",
   "license": "MIT",
   "authors": [
