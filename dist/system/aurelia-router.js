@@ -495,8 +495,14 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
       }();
 
       function _normalizeAbsolutePath(path, hasPushState) {
+        var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
         if (!hasPushState && path[0] !== '#') {
           path = '#' + path;
+        }
+
+        if (hasPushState && absolute) {
+          path = path.substring(1, path.length);
         }
 
         return path;
@@ -504,7 +510,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('_normalizeAbsolutePath', _normalizeAbsolutePath);
 
-      function _createRootedPath(fragment, baseUrl, hasPushState) {
+      function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
         if (isAbsoluteUrl.test(fragment)) {
           return fragment;
         }
@@ -525,7 +531,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
           path = path.substring(0, path.length - 1);
         }
 
-        return _normalizeAbsolutePath(path + fragment, hasPushState);
+        return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
       }
 
       _export('_createRootedPath', _createRootedPath);
@@ -1206,6 +1212,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         Router.prototype.generate = function generate(name, params) {
+          var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
           var hasRoute = this._recognizer.hasRoute(name);
           if ((!this.isConfigured || !hasRoute) && this.parent) {
             return this.parent.generate(name, params);
@@ -1216,7 +1224,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
           }
 
           var path = this._recognizer.generate(name, params);
-          return _createRootedPath(path, this.baseUrl, this.history._hasPushState);
+          var rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
+          return options.absolute ? '' + this.history.getAbsoluteRoot() + rootedPath : rootedPath;
         };
 
         Router.prototype.createNavModel = function createNavModel(config) {
@@ -1252,8 +1261,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
           if (path.charAt(0) === '/') {
             path = path.substr(1);
           }
-
-          var state = this._recognizer.add({ path: path, handler: config });
+          var caseSensitive = config.caseSensitive === true;
+          var state = this._recognizer.add({ path: path, handler: config, caseSensitive: caseSensitive });
 
           if (path) {
             var _settings = config.settings;
@@ -1264,7 +1273,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
             withChild.hasChildRouter = true;
             this._childRecognizer.add({
               path: withChild.route,
-              handler: withChild
+              handler: withChild,
+              caseSensitive: caseSensitive
             });
 
             withChild.navModel = navModel;

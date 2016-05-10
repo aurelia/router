@@ -4,15 +4,19 @@ import {Container} from 'aurelia-dependency-injection';
 import {History} from 'aurelia-history';
 import {EventAggregator} from 'aurelia-event-aggregator';
 
-export function _normalizeAbsolutePath(path, hasPushState) {
+export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
+  }
+
+  if (hasPushState && absolute) {
+    path = path.substring(1, path.length);
   }
 
   return path;
 }
 
-export function _createRootedPath(fragment, baseUrl, hasPushState) {
+export function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
   if (isAbsoluteUrl.test(fragment)) {
     return fragment;
   }
@@ -33,7 +37,7 @@ export function _createRootedPath(fragment, baseUrl, hasPushState) {
     path = path.substring(0, path.length - 1);
   }
 
-  return _normalizeAbsolutePath(path + fragment, hasPushState);
+  return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
 }
 
 export function _resolveUrl(fragment, baseUrl, hasPushState) {
@@ -564,6 +568,11 @@ interface RouteConfig {
   * The navigation model for storing and interacting with the route's navigation settings.
   */
   navModel?: NavModel;
+
+  /**
+  * When true is specified, this route will be case sensitive.
+  */
+  caseSensitive?: boolean;
 
   [x: string]: any;
 }
@@ -1136,7 +1145,7 @@ export class Router {
   * @param params The route params to be used to populate the route pattern.
   * @returns {string} A string containing the generated URL fragment.
   */
-  generate(name: string, params?: any): string {
+  generate(name: string, params?: any, options?: any = {}): string {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params);
@@ -1147,7 +1156,8 @@ export class Router {
     }
 
     let path = this._recognizer.generate(name, params);
-    return _createRootedPath(path, this.baseUrl, this.history._hasPushState);
+    let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
+    return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
   }
 
   /**
@@ -1194,8 +1204,8 @@ export class Router {
     if (path.charAt(0) === '/') {
       path = path.substr(1);
     }
-
-    let state = this._recognizer.add({path: path, handler: config});
+    let caseSensitive = config.caseSensitive === true;
+    let state = this._recognizer.add({path: path, handler: config, caseSensitive: caseSensitive});
 
     if (path) {
       let settings = config.settings;
@@ -1206,7 +1216,8 @@ export class Router {
       withChild.hasChildRouter = true;
       this._childRecognizer.add({
         path: withChild.route,
-        handler: withChild
+        handler: withChild,
+        caseSensitive: caseSensitive
       });
 
       withChild.navModel = navModel;

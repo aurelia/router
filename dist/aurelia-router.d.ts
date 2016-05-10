@@ -152,6 +152,11 @@ declare module 'aurelia-router' {
       * The navigation model for storing and interacting with the route's navigation settings.
       */
     navModel?: NavModel;
+    
+    /**
+      * When true is specified, this route will be case sensitive.
+      */
+    caseSensitive?: boolean;
     [x: string]: any;
   }
   
@@ -589,7 +594,7 @@ declare module 'aurelia-router' {
       * @param params The route params to be used to populate the route pattern.
       * @returns {string} A string containing the generated URL fragment.
       */
-    generate(name: string, params?: any): string;
+    generate(name: string, params?: any, options?: any): string;
     
     /**
       * Creates a [[NavModel]] for the specified route config.

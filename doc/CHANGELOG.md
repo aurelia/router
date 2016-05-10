@@ -1,3 +1,16 @@
+### 1.0.0-beta.1.2.2 (2016-05-10)
+
+
+#### Bug Fixes
+
+* **router:** router is case sensitive by default ([b7cd6f05](http://github.com/aurelia/router/commit/b7cd6f05512457dcff90264b4cdd611ab9741e80))
+
+
+#### Features
+
+* **router:** generate absolute URI from router ([6c468265](http://github.com/aurelia/router/commit/6c46826524e8cabd70c9828daa243b5b9eb5bc81), closes [#88](http://github.com/aurelia/router/issues/88))
+
+
 ### 1.0.0-beta.1.2.1 (2016-04-13)
 
 

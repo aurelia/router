@@ -4,15 +4,19 @@ import { Container } from 'aurelia-dependency-injection';
 import { History } from 'aurelia-history';
 import { EventAggregator } from 'aurelia-event-aggregator';
 
-export function _normalizeAbsolutePath(path, hasPushState) {
+export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
+  }
+
+  if (hasPushState && absolute) {
+    path = path.substring(1, path.length);
   }
 
   return path;
 }
 
-export function _createRootedPath(fragment, baseUrl, hasPushState) {
+export function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
   if (isAbsoluteUrl.test(fragment)) {
     return fragment;
   }
@@ -33,7 +37,7 @@ export function _createRootedPath(fragment, baseUrl, hasPushState) {
     path = path.substring(0, path.length - 1);
   }
 
-  return _normalizeAbsolutePath(path + fragment, hasPushState);
+  return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
 }
 
 export function _resolveUrl(fragment, baseUrl, hasPushState) {
@@ -688,7 +692,7 @@ export let Router = class Router {
     return childRouter;
   }
 
-  generate(name, params) {
+  generate(name, params, options = {}) {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params);
@@ -699,7 +703,8 @@ export let Router = class Router {
     }
 
     let path = this._recognizer.generate(name, params);
-    return _createRootedPath(path, this.baseUrl, this.history._hasPushState);
+    let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
+    return options.absolute ? `${ this.history.getAbsoluteRoot() }${ rootedPath }` : rootedPath;
   }
 
   createNavModel(config) {
@@ -735,8 +740,8 @@ export let Router = class Router {
     if (path.charAt(0) === '/') {
       path = path.substr(1);
     }
-
-    let state = this._recognizer.add({ path: path, handler: config });
+    let caseSensitive = config.caseSensitive === true;
+    let state = this._recognizer.add({ path: path, handler: config, caseSensitive: caseSensitive });
 
     if (path) {
       let settings = config.settings;
@@ -747,7 +752,8 @@ export let Router = class Router {
       withChild.hasChildRouter = true;
       this._childRecognizer.add({
         path: withChild.route,
-        handler: withChild
+        handler: withChild,
+        caseSensitive: caseSensitive
       });
 
       withChild.navModel = navModel;

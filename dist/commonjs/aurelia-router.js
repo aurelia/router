@@ -36,14 +36,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _normalizeAbsolutePath(path, hasPushState) {
+  var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
+  }
+
+  if (hasPushState && absolute) {
+    path = path.substring(1, path.length);
   }
 
   return path;
 }
 
-function _createRootedPath(fragment, baseUrl, hasPushState) {
+function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
   if (isAbsoluteUrl.test(fragment)) {
     return fragment;
   }
@@ -64,7 +70,7 @@ function _createRootedPath(fragment, baseUrl, hasPushState) {
     path = path.substring(0, path.length - 1);
   }
 
-  return _normalizeAbsolutePath(path + fragment, hasPushState);
+  return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
 }
 
 function _resolveUrl(fragment, baseUrl, hasPushState) {
@@ -788,6 +794,8 @@ var Router = exports.Router = function () {
   };
 
   Router.prototype.generate = function generate(name, params) {
+    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
     var hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params);
@@ -798,7 +806,8 @@ var Router = exports.Router = function () {
     }
 
     var path = this._recognizer.generate(name, params);
-    return _createRootedPath(path, this.baseUrl, this.history._hasPushState);
+    var rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
+    return options.absolute ? '' + this.history.getAbsoluteRoot() + rootedPath : rootedPath;
   };
 
   Router.prototype.createNavModel = function createNavModel(config) {
@@ -834,8 +843,8 @@ var Router = exports.Router = function () {
     if (path.charAt(0) === '/') {
       path = path.substr(1);
     }
-
-    var state = this._recognizer.add({ path: path, handler: config });
+    var caseSensitive = config.caseSensitive === true;
+    var state = this._recognizer.add({ path: path, handler: config, caseSensitive: caseSensitive });
 
     if (path) {
       var _settings = config.settings;
@@ -846,7 +855,8 @@ var Router = exports.Router = function () {
       withChild.hasChildRouter = true;
       this._childRecognizer.add({
         path: withChild.route,
-        handler: withChild
+        handler: withChild,
+        caseSensitive: caseSensitive
       });
 
       withChild.navModel = navModel;
