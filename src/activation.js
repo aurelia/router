@@ -180,6 +180,8 @@ function shouldContinue(output, router: Router) {
   return output;
 }
 
+//wraps a subscription, allowing unsubscribe calls even if
+//the first value comes synchronously
 class SafeSubscription {
   //if this were TypeScript, subscriptionFunc would be of type
   //(sub: SafeSubscription) => Subscription
