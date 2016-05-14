@@ -189,7 +189,7 @@ class SafeSubscription {
     this._subscribed = true;
     this._subscription = subscriptionFunc(this);
 
-    if (!this._subscribed) this.unsubscribe()
+    if (!this._subscribed) this.unsubscribe();
   }
 
   get subscribed() {
