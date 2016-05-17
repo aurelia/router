@@ -1444,6 +1444,28 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     });
   }
 
+  var PipelineSlot = function () {
+    function PipelineSlot(container, name, alias) {
+      _classCallCheck(this, PipelineSlot);
+
+      this.steps = [];
+
+      this.container = container;
+      this.slotName = name;
+      this.slotAlias = alias;
+    }
+
+    PipelineSlot.prototype.getSteps = function getSteps() {
+      var _this6 = this;
+
+      return this.steps.map(function (x) {
+        return _this6.container.get(x);
+      });
+    };
+
+    return PipelineSlot;
+  }();
+
   var PipelineProvider = exports.PipelineProvider = function () {
     PipelineProvider.inject = function inject() {
       return [_aureliaDependencyInjection.Container];
@@ -1457,49 +1479,57 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     }
 
     PipelineProvider.prototype.createPipeline = function createPipeline() {
-      var _this6 = this;
+      var _this7 = this;
 
       var pipeline = new Pipeline();
       this.steps.forEach(function (step) {
-        return pipeline.addStep(_this6.container.get(step));
+        return pipeline.addStep(_this7.container.get(step));
       });
       return pipeline;
     };
 
-    PipelineProvider.prototype.addStep = function addStep(name, step) {
-      var found = this.steps.find(function (x) {
+    PipelineProvider.prototype._findStep = function _findStep(name) {
+      return this.steps.find(function (x) {
         return x.slotName === name || x.slotAlias === name;
       });
+    };
+
+    PipelineProvider.prototype.addStep = function addStep(name, step) {
+      var found = this._findStep(name);
       if (found) {
-        found.steps.push(step);
+        if (!found.steps.includes(step)) {
+          found.steps.push(step);
+        }
       } else {
         throw new Error('Invalid pipeline slot name: ' + name + '.');
       }
     };
 
+    PipelineProvider.prototype.removeStep = function removeStep(name, step) {
+      var slot = this._findStep(name);
+      if (slot) {
+        slot.steps.splice(slot.steps.indexOf(step), 1);
+      }
+    };
+
+    PipelineProvider.prototype._clearSteps = function _clearSteps() {
+      var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+      var slot = this._findStep(name);
+      if (slot) {
+        slot.steps = [];
+      }
+    };
+
+    PipelineProvider.prototype.reset = function reset() {
+      this._clearSteps('authorize');
+      this._clearSteps('preActivate');
+      this._clearSteps('preRender');
+      this._clearSteps('postRender');
+    };
+
     PipelineProvider.prototype._createPipelineSlot = function _createPipelineSlot(name, alias) {
-      var _class6, _temp;
-
-      var PipelineSlot = (_temp = _class6 = function () {
-        function PipelineSlot(container) {
-          _classCallCheck(this, PipelineSlot);
-
-          this.container = container;
-        }
-
-        PipelineSlot.prototype.getSteps = function getSteps() {
-          var _this7 = this;
-
-          return PipelineSlot.steps.map(function (x) {
-            return _this7.container.get(x);
-          });
-        };
-
-        return PipelineSlot;
-      }(), _class6.inject = [_aureliaDependencyInjection.Container], _class6.slotName = name, _class6.slotAlias = alias, _class6.steps = [], _temp);
-
-
-      return PipelineSlot;
+      return new PipelineSlot(this.container, name, alias);
     };
 
     return PipelineProvider;

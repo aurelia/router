@@ -1207,6 +1207,21 @@ function loadComponent(routeLoader, navigationInstruction, config) {
   });
 }
 
+let PipelineSlot = class PipelineSlot {
+
+  constructor(container, name, alias) {
+    this.steps = [];
+
+    this.container = container;
+    this.slotName = name;
+    this.slotAlias = alias;
+  }
+
+  getSteps() {
+    return this.steps.map(x => this.container.get(x));
+  }
+};
+
 export let PipelineProvider = class PipelineProvider {
   static inject() {
     return [Container];
@@ -1223,31 +1238,44 @@ export let PipelineProvider = class PipelineProvider {
     return pipeline;
   }
 
+  _findStep(name) {
+    return this.steps.find(x => x.slotName === name || x.slotAlias === name);
+  }
+
   addStep(name, step) {
-    let found = this.steps.find(x => x.slotName === name || x.slotAlias === name);
+    let found = this._findStep(name);
     if (found) {
-      found.steps.push(step);
+      if (!found.steps.includes(step)) {
+        found.steps.push(step);
+      }
     } else {
       throw new Error(`Invalid pipeline slot name: ${ name }.`);
     }
   }
 
+  removeStep(name, step) {
+    let slot = this._findStep(name);
+    if (slot) {
+      slot.steps.splice(slot.steps.indexOf(step), 1);
+    }
+  }
+
+  _clearSteps(name = '') {
+    let slot = this._findStep(name);
+    if (slot) {
+      slot.steps = [];
+    }
+  }
+
+  reset() {
+    this._clearSteps('authorize');
+    this._clearSteps('preActivate');
+    this._clearSteps('preRender');
+    this._clearSteps('postRender');
+  }
+
   _createPipelineSlot(name, alias) {
-    var _class6, _temp;
-
-    let PipelineSlot = (_temp = _class6 = class PipelineSlot {
-
-      constructor(container) {
-        this.container = container;
-      }
-
-      getSteps() {
-        return PipelineSlot.steps.map(x => this.container.get(x));
-      }
-    }, _class6.inject = [Container], _class6.slotName = name, _class6.slotAlias = alias, _class6.steps = [], _temp);
-
-
-    return PipelineSlot;
+    return new PipelineSlot(this.container, name, alias);
   }
 };
 

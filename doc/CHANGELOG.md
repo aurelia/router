@@ -1,3 +1,11 @@
+### 1.0.0-beta.1.2.3 (2016-05-17)
+
+
+#### Features
+
+* **PipelineProvider:** add methods for removing pipeline steps ([e7cb7f5a](http://github.com/aurelia/router/commit/e7cb7f5a556aa1d5d29e3dfd285efe29207039b3))
+
+
 ### 1.0.0-beta.1.2.2 (2016-05-10)
 
 

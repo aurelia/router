@@ -680,6 +680,16 @@ declare module 'aurelia-router' {
       * Adds a step into the pipeline at a known slot location.
       */
     addStep(name: string, step: PipelineStep): void;
+    
+    /**
+       * Removes a step from a slot in the pipeline
+       */
+    removeStep(name: string, step: PipelineStep): any;
+    
+    /**
+       * Resets all pipeline slots
+       */
+    reset(): any;
   }
   
   /**
