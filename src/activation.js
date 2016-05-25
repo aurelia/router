@@ -180,23 +180,39 @@ function shouldContinue(output, router: Router) {
   return output;
 }
 
-//wraps a subscription, allowing unsubscribe calls even if
-//the first value comes synchronously
+/**
+ * A basic interface for an Observable type
+ */
+interface IObservable {
+  subscribe(): ISubscription;
+}
+
+/**
+ * A basic interface for a Subscription to an Observable
+ */
+interface ISubscription {
+  unsubscribe(): void;
+}
+
+type SafeSubscriptionFunc = (sub: SafeSubscription) => ISubscription;
+
+/**
+ * wraps a subscription, allowing unsubscribe calls even if
+ * the first value comes synchronously
+ */
 class SafeSubscription {
-  //if this were TypeScript, subscriptionFunc would be of type
-  //(sub: SafeSubscription) => Subscription
-  constructor(subscriptionFunc) {
+  constructor(subscriptionFunc: SafeSubscriptionFunc) {
     this._subscribed = true;
     this._subscription = subscriptionFunc(this);
 
     if (!this._subscribed) this.unsubscribe();
   }
 
-  get subscribed() {
+  get subscribed(): boolean {
     return this._subscribed;
   }
 
-  unsubscribe() {
+  unsubscribe(): void {
     if (this._subscribed && this._subscription) this._subscription.unsubscribe();
 
     this._subscribed = false;
@@ -209,8 +225,8 @@ function processPotential(obj, resolve, reject) {
   }
 
   if (obj && typeof obj.subscribe === 'function') {
-    //an object with a subscribe function should be assumed to be an observable
-    return new SafeSubscription(sub => obj.subscribe({
+    let obs: IObservable = obj;
+    return new SafeSubscription(sub => obs.subscribe({
       next() {
         if (sub.subscribed) {
           sub.unsubscribe();
