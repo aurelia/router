@@ -383,4 +383,34 @@ describe('the router', () => {
       resolve();
     });
   });
+
+  describe('refreshNavigation', () => {
+    let staticHref;
+
+    beforeEach((done) => {
+      staticHref = '#/a/static/href';
+      router.baseUrl = 'initial-root';
+
+      router.configure(config => config.map([
+        { name: 'dynamic', route: 'dynamic', moduleId: 'dynamic', nav: true },
+        { name: 'static', route: 'static', moduleId: 'static', href: staticHref, nav: true }])).then(() => {
+        router.refreshNavigation();
+        done();
+      });
+    })
+
+    it('updates a dynamic href ', () => {
+      router.baseUrl = 'updated-root';
+      router.refreshNavigation();
+
+      expect(router.navigation[0].href).toEqual('#/updated-root/dynamic');
+    });
+
+    it('updates a dynamic href ', () => {
+      router.baseUrl = 'updated-root';
+      router.refreshNavigation();
+
+      expect(router.navigation[1].href).toEqual(staticHref);
+    });
+  });
 });
