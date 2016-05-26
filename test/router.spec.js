@@ -394,10 +394,10 @@ describe('the router', () => {
       router.configure(config => config.map([
         { name: 'dynamic', route: 'dynamic', moduleId: 'dynamic', nav: true },
         { name: 'static', route: 'static', moduleId: 'static', href: staticHref, nav: true }])).then(() => {
-        router.refreshNavigation();
-        done();
-      });
-    })
+          router.refreshNavigation();
+          done();
+        });
+    });
 
     it('updates a dynamic href ', () => {
       router.baseUrl = 'updated-root';
