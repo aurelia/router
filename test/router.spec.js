@@ -406,7 +406,7 @@ describe('the router', () => {
       expect(router.navigation[0].href).toEqual('#/updated-root/dynamic');
     });
 
-    it('updates a dynamic href ', () => {
+    it('respects a static href ', () => {
       router.baseUrl = 'updated-root';
       router.refreshNavigation();
 
