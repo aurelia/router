@@ -339,7 +339,7 @@ export class Router {
 
     for (let i = 0, length = nav.length; i < length; i++) {
       let current = nav[i];
-      if (!current.href) {
+      if (!current.config.href) {
         current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
       }
     }
