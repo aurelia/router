@@ -1297,7 +1297,7 @@ export class Router {
 
     for (let i = 0, length = nav.length; i < length; i++) {
       let current = nav[i];
-      if (!current.href) {
+      if (!current.config.href) {
         current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
       }
     }
@@ -1597,9 +1597,72 @@ function shouldContinue(output, router: Router) {
   return output;
 }
 
+/**
+ * A basic interface for an Observable type
+ */
+interface IObservable {
+  subscribe(): ISubscription;
+}
+
+/**
+ * A basic interface for a Subscription to an Observable
+ */
+interface ISubscription {
+  unsubscribe(): void;
+}
+
+type SafeSubscriptionFunc = (sub: SafeSubscription) => ISubscription;
+
+/**
+ * wraps a subscription, allowing unsubscribe calls even if
+ * the first value comes synchronously
+ */
+class SafeSubscription {
+  constructor(subscriptionFunc: SafeSubscriptionFunc) {
+    this._subscribed = true;
+    this._subscription = subscriptionFunc(this);
+
+    if (!this._subscribed) this.unsubscribe();
+  }
+
+  get subscribed(): boolean {
+    return this._subscribed;
+  }
+
+  unsubscribe(): void {
+    if (this._subscribed && this._subscription) this._subscription.unsubscribe();
+
+    this._subscribed = false;
+  }
+}
+
 function processPotential(obj, resolve, reject) {
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
+  }
+
+  if (obj && typeof obj.subscribe === 'function') {
+    let obs: IObservable = obj;
+    return new SafeSubscription(sub => obs.subscribe({
+      next() {
+        if (sub.subscribed) {
+          sub.unsubscribe();
+          resolve(obj);
+        }
+      },
+      error(error) {
+        if (sub.subscribed) {
+          sub.unsubscribe();
+          reject(error);
+        }
+      },
+      complete() {
+        if (sub.subscribed) {
+          sub.unsubscribe();
+          resolve(obj);
+        }
+      }
+    }));
   }
 
   try {

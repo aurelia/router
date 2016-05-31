@@ -810,7 +810,7 @@ export let Router = class Router {
 
     for (let i = 0, length = nav.length; i < length; i++) {
       let current = nav[i];
-      if (!current.href) {
+      if (!current.config.href) {
         current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
       }
     }
@@ -1099,9 +1099,53 @@ function shouldContinue(output, router) {
   return output;
 }
 
+let SafeSubscription = class SafeSubscription {
+  constructor(subscriptionFunc) {
+    this._subscribed = true;
+    this._subscription = subscriptionFunc(this);
+
+    if (!this._subscribed) this.unsubscribe();
+  }
+
+  get subscribed() {
+    return this._subscribed;
+  }
+
+  unsubscribe() {
+    if (this._subscribed && this._subscription) this._subscription.unsubscribe();
+
+    this._subscribed = false;
+  }
+};
+
+
 function processPotential(obj, resolve, reject) {
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
+  }
+
+  if (obj && typeof obj.subscribe === 'function') {
+    let obs = obj;
+    return new SafeSubscription(sub => obs.subscribe({
+      next() {
+        if (sub.subscribed) {
+          sub.unsubscribe();
+          resolve(obj);
+        }
+      },
+      error(error) {
+        if (sub.subscribed) {
+          sub.unsubscribe();
+          reject(error);
+        }
+      },
+      complete() {
+        if (sub.subscribed) {
+          sub.unsubscribe();
+          resolve(obj);
+        }
+      }
+    }));
   }
 
   try {

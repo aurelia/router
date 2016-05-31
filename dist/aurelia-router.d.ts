@@ -161,6 +161,23 @@ declare module 'aurelia-router' {
   }
   
   /**
+   * A basic interface for an Observable type
+   */
+  export interface IObservable {
+    subscribe(): ISubscription;
+  }
+  
+  /**
+   * A basic interface for a Subscription to an Observable
+   */
+  /**
+   * A basic interface for a Subscription to an Observable
+   */
+  export interface ISubscription {
+    unsubscribe(): void;
+  }
+  
+  /**
   * The status of a Pipeline.
   */
   export const pipelineStatus: any;

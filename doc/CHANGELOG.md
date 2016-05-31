@@ -1,3 +1,25 @@
+### 1.0.0-beta.1.2.4 (2016-05-31)
+
+
+#### Bug Fixes
+
+* **router:**
+  * change refresh navigation to check config for static href not nav model href ([24de2927](http://github.com/aurelia/router/commit/24de29274bed6521741856ed32932a410ad61897))
+  * change refresh navigation to check config for static href not nav model href ([ba75d4f6](http://github.com/aurelia/router/commit/ba75d4f6c800e801cda5819bf8676a4e53b9bd52))
+  * change refresh navigation to check config for static href not nav model href ([5a13d19f](http://github.com/aurelia/router/commit/5a13d19f8d7661e77566d72637dc8d6b8ab22568))
+
+
+#### Features
+
+* **router:**
+  * observables in lifecycle ([337d95ab](http://github.com/aurelia/router/commit/337d95abcdde9dd9275486269c11dfff1ec76380))
+  * observables in lifecycle ([8798043a](http://github.com/aurelia/router/commit/8798043a6985ddd298991a6568d65c2ac99cc248))
+  * observables in lifecycle ([9b969ad8](http://github.com/aurelia/router/commit/9b969ad8db787f1920a5ee4dcd6c17786c9e4103))
+  * observables in lifecycle ([31a801a6](http://github.com/aurelia/router/commit/31a801a692f327f3c1fcce9cefb859734fd98590))
+  * observables in lifecycle ([deed114e](http://github.com/aurelia/router/commit/deed114ed222f95e8324e3090abec565530eaaef))
+  * observables in lifecycle ([38bcad5f](http://github.com/aurelia/router/commit/38bcad5f2797a18b581c6e7c99526180b5f8dde9))
+
+
 ### 1.0.0-beta.1.2.3 (2016-05-17)
 
 
