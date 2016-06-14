@@ -1,7 +1,5 @@
 # aurelia-router
 
-[![Build Status](https://travis-ci.org/aurelia/router.svg?branch=master)](https://travis-ci.org/aurelia/router)
-[![Coverage Status](https://coveralls.io/repos/aurelia/router/badge.svg?branch=master&service=github)](https://coveralls.io/github/aurelia/router?branch=master)
 [![npm Version](https://img.shields.io/npm/v/aurelia-router.svg)](https://www.npmjs.com/package/aurelia-router)
 [![ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.io)
 [![Join the chat at https://gitter.im/aurelia/discuss](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/aurelia/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
