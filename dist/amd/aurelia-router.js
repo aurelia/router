@@ -78,11 +78,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     };
   }();
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
+  
 
   function _normalizeAbsolutePath(path, hasPushState) {
     var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
@@ -142,7 +138,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var Pipeline = exports.Pipeline = function () {
     function Pipeline() {
-      _classCallCheck(this, Pipeline);
+      
 
       this.steps = [];
     }
@@ -206,7 +202,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var CommitChangesStep = exports.CommitChangesStep = function () {
     function CommitChangesStep() {
-      _classCallCheck(this, CommitChangesStep);
+      
     }
 
     CommitChangesStep.prototype.run = function run(navigationInstruction, next) {
@@ -221,7 +217,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var NavigationInstruction = exports.NavigationInstruction = function () {
     function NavigationInstruction(init) {
-      _classCallCheck(this, NavigationInstruction);
+      
 
       this.plan = null;
       this.options = {};
@@ -346,6 +342,8 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
             if (viewPortInstruction.childNavigationInstruction) {
               return viewPortInstruction.childNavigationInstruction._commitChanges();
             }
+
+            return undefined;
           }));
         } else {
           if (viewPortInstruction.childNavigationInstruction) {
@@ -413,7 +411,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var NavModel = exports.NavModel = function () {
     function NavModel(router, relativeHref) {
-      _classCallCheck(this, NavModel);
+      
 
       this.isActive = false;
       this.title = null;
@@ -445,7 +443,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     function Redirect(url) {
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-      _classCallCheck(this, Redirect);
+      
 
       this.url = url;
       this.options = Object.assign({ trigger: true, replace: true }, options);
@@ -469,7 +467,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
       var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
       var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-      _classCallCheck(this, RedirectToRoute);
+      
 
       this.route = route;
       this.params = params;
@@ -491,7 +489,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var RouterConfiguration = exports.RouterConfiguration = function () {
     function RouterConfiguration() {
-      _classCallCheck(this, RouterConfiguration);
+      
 
       this.instructions = [];
       this.options = {};
@@ -534,9 +532,9 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
         if (Array.isArray(config.route)) {
           for (var i = 0, ii = config.route.length; i < ii; ++i) {
-            var _current = Object.assign({}, config);
-            _current.route = config.route[i];
-            routeConfigs.push(_current);
+            var current = Object.assign({}, config);
+            current.route = config.route[i];
+            routeConfigs.push(current);
           }
         } else {
           routeConfigs.push(Object.assign({}, config));
@@ -606,7 +604,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = function () {
     function BuildNavigationPlanStep() {
-      _classCallCheck(this, BuildNavigationPlanStep);
+      
     }
 
     BuildNavigationPlanStep.prototype.run = function run(navigationInstruction, next) {
@@ -759,7 +757,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var Router = exports.Router = function () {
     function Router(container, history) {
-      _classCallCheck(this, Router);
+      
 
       this.parent = null;
       this.options = {};
@@ -959,15 +957,16 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
       }
 
       this.currentInstruction._updateTitle();
+      return undefined;
     };
 
     Router.prototype.refreshNavigation = function refreshNavigation() {
       var nav = this.navigation;
 
       for (var i = 0, length = nav.length; i < length; i++) {
-        var _current2 = nav[i];
-        if (!_current2.config.href) {
-          _current2.href = _createRootedPath(_current2.relativeHref, this.baseUrl, this.history._hasPushState);
+        var current = nav[i];
+        if (!current.config.href) {
+          current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
         }
       }
     };
@@ -1101,7 +1100,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = function () {
     function CanDeactivatePreviousStep() {
-      _classCallCheck(this, CanDeactivatePreviousStep);
+      
     }
 
     CanDeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
@@ -1113,7 +1112,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var CanActivateNextStep = exports.CanActivateNextStep = function () {
     function CanActivateNextStep() {
-      _classCallCheck(this, CanActivateNextStep);
+      
     }
 
     CanActivateNextStep.prototype.run = function run(navigationInstruction, next) {
@@ -1125,7 +1124,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var DeactivatePreviousStep = exports.DeactivatePreviousStep = function () {
     function DeactivatePreviousStep() {
-      _classCallCheck(this, DeactivatePreviousStep);
+      
     }
 
     DeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
@@ -1137,7 +1136,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var ActivateNextStep = exports.ActivateNextStep = function () {
     function ActivateNextStep() {
-      _classCallCheck(this, ActivateNextStep);
+      
     }
 
     ActivateNextStep.prototype.run = function run(navigationInstruction, next) {
@@ -1312,7 +1311,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var SafeSubscription = function () {
     function SafeSubscription(subscriptionFunc) {
-      _classCallCheck(this, SafeSubscription);
+      
 
       this._subscribed = true;
       this._subscription = subscriptionFunc(this);
@@ -1382,7 +1381,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var RouteLoader = exports.RouteLoader = function () {
     function RouteLoader() {
-      _classCallCheck(this, RouteLoader);
+      
     }
 
     RouteLoader.prototype.loadRoute = function loadRoute(router, config, navigationInstruction) {
@@ -1398,7 +1397,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     };
 
     function LoadRouteStep(routeLoader) {
-      _classCallCheck(this, LoadRouteStep);
+      
 
       this.routeLoader = routeLoader;
     }
@@ -1467,6 +1466,8 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
           });
         });
       }
+
+      return undefined;
     });
   }
 
@@ -1504,7 +1505,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
   var PipelineSlot = function () {
     function PipelineSlot(container, name, alias) {
-      _classCallCheck(this, PipelineSlot);
+      
 
       this.steps = [];
 
@@ -1530,7 +1531,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     };
 
     function PipelineProvider(container) {
-      _classCallCheck(this, PipelineProvider);
+      
 
       this.container = container;
       this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, this._createPipelineSlot('authorize'), CanActivateNextStep, this._createPipelineSlot('preActivate', 'modelbind'), DeactivatePreviousStep, ActivateNextStep, this._createPipelineSlot('preRender', 'precommit'), CommitChangesStep, this._createPipelineSlot('postRender', 'postcomplete')];
@@ -1603,7 +1604,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     };
 
     function AppRouter(container, history, pipelineProvider, events) {
-      _classCallCheck(this, AppRouter);
+      
 
       var _this8 = _possibleConstructorReturn(this, _Router.call(this, container, history));
 
@@ -1758,6 +1759,8 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
           container = container.parent;
         }
       }
+
+      return undefined;
     };
 
     return AppRouter;

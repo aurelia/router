@@ -390,6 +390,8 @@ export class NavigationInstruction {
           if (viewPortInstruction.childNavigationInstruction) {
             return viewPortInstruction.childNavigationInstruction._commitChanges();
           }
+
+          return undefined;
         }));
       } else {
         if (viewPortInstruction.childNavigationInstruction) {
@@ -1286,6 +1288,7 @@ export class Router {
     }
 
     this.currentInstruction._updateTitle();
+    return undefined;
   }
 
   /**
@@ -1760,6 +1763,8 @@ function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationIn
             });
         });
     }
+
+    return undefined;
   });
 }
 
@@ -2012,7 +2017,7 @@ export class AppRouter extends Router {
         restorePreviousLocation(this);
         return this._dequeueInstruction(instructionCount + 1);
       } else if (instructionCount > this.maxInstructionCount) {
-        throw new Error(`Maximum navigation attempts exceeded. Giving up.`);
+        throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 
       let pipeline = this.pipelineProvider.createPipeline();
@@ -2044,6 +2049,8 @@ export class AppRouter extends Router {
         container = container.parent;
       }
     }
+
+    return undefined;
   }
 }
 

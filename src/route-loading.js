@@ -88,6 +88,8 @@ function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationIn
             });
         });
     }
+
+    return undefined;
   });
 }
 

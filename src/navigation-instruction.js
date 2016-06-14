@@ -203,6 +203,8 @@ export class NavigationInstruction {
           if (viewPortInstruction.childNavigationInstruction) {
             return viewPortInstruction.childNavigationInstruction._commitChanges();
           }
+
+          return undefined;
         }));
       } else {
         if (viewPortInstruction.childNavigationInstruction) {

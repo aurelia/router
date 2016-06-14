@@ -1,6 +1,8 @@
 'use strict';
 
 System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (_export, _context) {
+  "use strict";
+
   var LogManager, RouteRecognizer, Container, History, EventAggregator, _typeof, _createClass, isRootedPath, isAbsoluteUrl, pipelineStatus, Pipeline, CommitChangesStep, NavigationInstruction, NavModel, Redirect, RedirectToRoute, RouterConfiguration, activationStrategy, BuildNavigationPlanStep, Router, CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep, SafeSubscription, RouteLoader, LoadRouteStep, PipelineSlot, PipelineProvider, logger, AppRouter;
 
   function _possibleConstructorReturn(self, call) {
@@ -27,11 +29,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
+  
 
   function createCompletionHandler(next, status) {
     return function (output) {
@@ -395,6 +393,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
           });
         });
       }
+
+      return undefined;
     });
   }
 
@@ -592,7 +592,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('Pipeline', Pipeline = function () {
         function Pipeline() {
-          _classCallCheck(this, Pipeline);
+          
 
           this.steps = [];
         }
@@ -652,7 +652,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('CommitChangesStep', CommitChangesStep = function () {
         function CommitChangesStep() {
-          _classCallCheck(this, CommitChangesStep);
+          
         }
 
         CommitChangesStep.prototype.run = function run(navigationInstruction, next) {
@@ -669,7 +669,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('NavigationInstruction', NavigationInstruction = function () {
         function NavigationInstruction(init) {
-          _classCallCheck(this, NavigationInstruction);
+          
 
           this.plan = null;
           this.options = {};
@@ -794,6 +794,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
                 if (viewPortInstruction.childNavigationInstruction) {
                   return viewPortInstruction.childNavigationInstruction._commitChanges();
                 }
+
+                return undefined;
               }));
             } else {
               if (viewPortInstruction.childNavigationInstruction) {
@@ -858,7 +860,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('NavModel', NavModel = function () {
         function NavModel(router, relativeHref) {
-          _classCallCheck(this, NavModel);
+          
 
           this.isActive = false;
           this.title = null;
@@ -894,7 +896,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         function Redirect(url) {
           var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-          _classCallCheck(this, Redirect);
+          
 
           this.url = url;
           this.options = Object.assign({ trigger: true, replace: true }, options);
@@ -920,7 +922,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
           var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
           var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-          _classCallCheck(this, RedirectToRoute);
+          
 
           this.route = route;
           this.params = params;
@@ -944,7 +946,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('RouterConfiguration', RouterConfiguration = function () {
         function RouterConfiguration() {
-          _classCallCheck(this, RouterConfiguration);
+          
 
           this.instructions = [];
           this.options = {};
@@ -987,9 +989,9 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
             if (Array.isArray(config.route)) {
               for (var i = 0, ii = config.route.length; i < ii; ++i) {
-                var _current = Object.assign({}, config);
-                _current.route = config.route[i];
-                routeConfigs.push(_current);
+                var current = Object.assign({}, config);
+                current.route = config.route[i];
+                routeConfigs.push(current);
               }
             } else {
               routeConfigs.push(Object.assign({}, config));
@@ -1063,7 +1065,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('BuildNavigationPlanStep', BuildNavigationPlanStep = function () {
         function BuildNavigationPlanStep() {
-          _classCallCheck(this, BuildNavigationPlanStep);
+          
         }
 
         BuildNavigationPlanStep.prototype.run = function run(navigationInstruction, next) {
@@ -1160,7 +1162,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('Router', Router = function () {
         function Router(container, history) {
-          _classCallCheck(this, Router);
+          
 
           this.parent = null;
           this.options = {};
@@ -1360,15 +1362,16 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
           }
 
           this.currentInstruction._updateTitle();
+          return undefined;
         };
 
         Router.prototype.refreshNavigation = function refreshNavigation() {
           var nav = this.navigation;
 
           for (var i = 0, length = nav.length; i < length; i++) {
-            var _current2 = nav[i];
-            if (!_current2.config.href) {
-              _current2.href = _createRootedPath(_current2.relativeHref, this.baseUrl, this.history._hasPushState);
+            var current = nav[i];
+            if (!current.config.href) {
+              current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
             }
           }
         };
@@ -1476,7 +1479,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('CanDeactivatePreviousStep', CanDeactivatePreviousStep = function () {
         function CanDeactivatePreviousStep() {
-          _classCallCheck(this, CanDeactivatePreviousStep);
+          
         }
 
         CanDeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
@@ -1490,7 +1493,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('CanActivateNextStep', CanActivateNextStep = function () {
         function CanActivateNextStep() {
-          _classCallCheck(this, CanActivateNextStep);
+          
         }
 
         CanActivateNextStep.prototype.run = function run(navigationInstruction, next) {
@@ -1504,7 +1507,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('DeactivatePreviousStep', DeactivatePreviousStep = function () {
         function DeactivatePreviousStep() {
-          _classCallCheck(this, DeactivatePreviousStep);
+          
         }
 
         DeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
@@ -1518,7 +1521,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('ActivateNextStep', ActivateNextStep = function () {
         function ActivateNextStep() {
-          _classCallCheck(this, ActivateNextStep);
+          
         }
 
         ActivateNextStep.prototype.run = function run(navigationInstruction, next) {
@@ -1532,7 +1535,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       SafeSubscription = function () {
         function SafeSubscription(subscriptionFunc) {
-          _classCallCheck(this, SafeSubscription);
+          
 
           this._subscribed = true;
           this._subscription = subscriptionFunc(this);
@@ -1558,7 +1561,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('RouteLoader', RouteLoader = function () {
         function RouteLoader() {
-          _classCallCheck(this, RouteLoader);
+          
         }
 
         RouteLoader.prototype.loadRoute = function loadRoute(router, config, navigationInstruction) {
@@ -1576,7 +1579,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         function LoadRouteStep(routeLoader) {
-          _classCallCheck(this, LoadRouteStep);
+          
 
           this.routeLoader = routeLoader;
         }
@@ -1592,7 +1595,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       PipelineSlot = function () {
         function PipelineSlot(container, name, alias) {
-          _classCallCheck(this, PipelineSlot);
+          
 
           this.steps = [];
 
@@ -1618,7 +1621,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         function PipelineProvider(container) {
-          _classCallCheck(this, PipelineProvider);
+          
 
           this.container = container;
           this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, this._createPipelineSlot('authorize'), CanActivateNextStep, this._createPipelineSlot('preActivate', 'modelbind'), DeactivatePreviousStep, ActivateNextStep, this._createPipelineSlot('preRender', 'precommit'), CommitChangesStep, this._createPipelineSlot('postRender', 'postcomplete')];
@@ -1693,7 +1696,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         function AppRouter(container, history, pipelineProvider, events) {
-          _classCallCheck(this, AppRouter);
+          
 
           var _this8 = _possibleConstructorReturn(this, _Router.call(this, container, history));
 
@@ -1848,6 +1851,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
               container = container.parent;
             }
           }
+
+          return undefined;
         };
 
         return AppRouter;

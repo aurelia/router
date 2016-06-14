@@ -247,6 +247,8 @@ export let NavigationInstruction = class NavigationInstruction {
           if (viewPortInstruction.childNavigationInstruction) {
             return viewPortInstruction.childNavigationInstruction._commitChanges();
           }
+
+          return undefined;
         }));
       } else {
         if (viewPortInstruction.childNavigationInstruction) {
@@ -803,6 +805,7 @@ export let Router = class Router {
     }
 
     this.currentInstruction._updateTitle();
+    return undefined;
   }
 
   refreshNavigation() {
@@ -1228,6 +1231,8 @@ function loadRoute(routeLoader, navigationInstruction, viewPortPlan) {
         });
       });
     }
+
+    return undefined;
   });
 }
 
@@ -1424,7 +1429,7 @@ export let AppRouter = class AppRouter extends Router {
         restorePreviousLocation(this);
         return this._dequeueInstruction(instructionCount + 1);
       } else if (instructionCount > this.maxInstructionCount) {
-        throw new Error(`Maximum navigation attempts exceeded. Giving up.`);
+        throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 
       let pipeline = this.pipelineProvider.createPipeline();
@@ -1452,6 +1457,8 @@ export let AppRouter = class AppRouter extends Router {
         container = container.parent;
       }
     }
+
+    return undefined;
   }
 };
 

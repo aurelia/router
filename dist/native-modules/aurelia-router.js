@@ -1,33 +1,6 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.AppRouter = exports.PipelineProvider = exports.LoadRouteStep = exports.RouteLoader = exports.ActivateNextStep = exports.DeactivatePreviousStep = exports.CanActivateNextStep = exports.CanDeactivatePreviousStep = exports.Router = exports.BuildNavigationPlanStep = exports.activationStrategy = exports.RouterConfiguration = exports.RedirectToRoute = exports.Redirect = exports.NavModel = exports.NavigationInstruction = exports.CommitChangesStep = exports.Pipeline = exports.pipelineStatus = undefined;
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-exports._normalizeAbsolutePath = _normalizeAbsolutePath;
-exports._createRootedPath = _createRootedPath;
-exports._resolveUrl = _resolveUrl;
-exports.isNavigationCommand = isNavigationCommand;
-exports._buildNavigationPlan = _buildNavigationPlan;
-
-var _aureliaLogging = require('aurelia-logging');
-
-var LogManager = _interopRequireWildcard(_aureliaLogging);
-
-var _aureliaRouteRecognizer = require('aurelia-route-recognizer');
-
-var _aureliaDependencyInjection = require('aurelia-dependency-injection');
-
-var _aureliaHistory = require('aurelia-history');
-
-var _aureliaEventAggregator = require('aurelia-event-aggregator');
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
@@ -35,7 +8,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 
-function _normalizeAbsolutePath(path, hasPushState) {
+import * as LogManager from 'aurelia-logging';
+import { RouteRecognizer } from 'aurelia-route-recognizer';
+import { Container } from 'aurelia-dependency-injection';
+import { History } from 'aurelia-history';
+import { EventAggregator } from 'aurelia-event-aggregator';
+
+export function _normalizeAbsolutePath(path, hasPushState) {
   var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
   if (!hasPushState && path[0] !== '#') {
@@ -49,7 +28,7 @@ function _normalizeAbsolutePath(path, hasPushState) {
   return path;
 }
 
-function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
+export function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
   if (isAbsoluteUrl.test(fragment)) {
     return fragment;
   }
@@ -73,7 +52,7 @@ function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
   return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
 }
 
-function _resolveUrl(fragment, baseUrl, hasPushState) {
+export function _resolveUrl(fragment, baseUrl, hasPushState) {
   if (isRootedPath.test(fragment)) {
     return _normalizeAbsolutePath(fragment, hasPushState);
   }
@@ -84,14 +63,14 @@ function _resolveUrl(fragment, baseUrl, hasPushState) {
 var isRootedPath = /^#?\//;
 var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
 
-var pipelineStatus = exports.pipelineStatus = {
+export var pipelineStatus = {
   completed: 'completed',
   canceled: 'canceled',
   rejected: 'rejected',
   running: 'running'
 };
 
-var Pipeline = exports.Pipeline = function () {
+export var Pipeline = function () {
   function Pipeline() {
     
 
@@ -155,7 +134,7 @@ function createCompletionHandler(next, status) {
   };
 }
 
-var CommitChangesStep = exports.CommitChangesStep = function () {
+export var CommitChangesStep = function () {
   function CommitChangesStep() {
     
   }
@@ -170,7 +149,7 @@ var CommitChangesStep = exports.CommitChangesStep = function () {
   return CommitChangesStep;
 }();
 
-var NavigationInstruction = exports.NavigationInstruction = function () {
+export var NavigationInstruction = function () {
   function NavigationInstruction(init) {
     
 
@@ -364,7 +343,7 @@ function prune(instruction) {
   instruction.plan = null;
 }
 
-var NavModel = exports.NavModel = function () {
+export var NavModel = function () {
   function NavModel(router, relativeHref) {
     
 
@@ -390,11 +369,11 @@ var NavModel = exports.NavModel = function () {
   return NavModel;
 }();
 
-function isNavigationCommand(obj) {
+export function isNavigationCommand(obj) {
   return obj && typeof obj.navigate === 'function';
 }
 
-var Redirect = exports.Redirect = function () {
+export var Redirect = function () {
   function Redirect(url) {
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -417,7 +396,7 @@ var Redirect = exports.Redirect = function () {
   return Redirect;
 }();
 
-var RedirectToRoute = exports.RedirectToRoute = function () {
+export var RedirectToRoute = function () {
   function RedirectToRoute(route) {
     var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
     var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
@@ -442,7 +421,7 @@ var RedirectToRoute = exports.RedirectToRoute = function () {
   return RedirectToRoute;
 }();
 
-var RouterConfiguration = exports.RouterConfiguration = function () {
+export var RouterConfiguration = function () {
   function RouterConfiguration() {
     
 
@@ -551,13 +530,13 @@ var RouterConfiguration = exports.RouterConfiguration = function () {
   return RouterConfiguration;
 }();
 
-var activationStrategy = exports.activationStrategy = {
+export var activationStrategy = {
   noChange: 'no-change',
   invokeLifecycle: 'invoke-lifecycle',
   replace: 'replace'
 };
 
-var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = function () {
+export var BuildNavigationPlanStep = function () {
   function BuildNavigationPlanStep() {
     
   }
@@ -572,7 +551,7 @@ var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = function () {
   return BuildNavigationPlanStep;
 }();
 
-function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
+export function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
   var prev = instruction.previousInstruction;
   var config = instruction.config;
   var plan = {};
@@ -710,7 +689,7 @@ function getInstructionBaseUrl(instruction) {
   return instructionBaseUrlParts.join('');
 }
 
-var Router = exports.Router = function () {
+export var Router = function () {
   function Router(container, history) {
     
 
@@ -733,8 +712,8 @@ var Router = exports.Router = function () {
     this.navigation = [];
     this.currentInstruction = null;
     this._fallbackOrder = 100;
-    this._recognizer = new _aureliaRouteRecognizer.RouteRecognizer();
-    this._childRecognizer = new _aureliaRouteRecognizer.RouteRecognizer();
+    this._recognizer = new RouteRecognizer();
+    this._childRecognizer = new RouteRecognizer();
     this._configuredPromise = new Promise(function (resolve) {
       _this2._resolveConfiguredPromise = resolve;
     });
@@ -1053,7 +1032,7 @@ function evaluateNavigationStrategy(instruction, evaluator, context) {
   });
 }
 
-var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = function () {
+export var CanDeactivatePreviousStep = function () {
   function CanDeactivatePreviousStep() {
     
   }
@@ -1065,7 +1044,7 @@ var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = function () 
   return CanDeactivatePreviousStep;
 }();
 
-var CanActivateNextStep = exports.CanActivateNextStep = function () {
+export var CanActivateNextStep = function () {
   function CanActivateNextStep() {
     
   }
@@ -1077,7 +1056,7 @@ var CanActivateNextStep = exports.CanActivateNextStep = function () {
   return CanActivateNextStep;
 }();
 
-var DeactivatePreviousStep = exports.DeactivatePreviousStep = function () {
+export var DeactivatePreviousStep = function () {
   function DeactivatePreviousStep() {
     
   }
@@ -1089,7 +1068,7 @@ var DeactivatePreviousStep = exports.DeactivatePreviousStep = function () {
   return DeactivatePreviousStep;
 }();
 
-var ActivateNextStep = exports.ActivateNextStep = function () {
+export var ActivateNextStep = function () {
   function ActivateNextStep() {
     
   }
@@ -1334,7 +1313,7 @@ function processPotential(obj, resolve, reject) {
   }
 }
 
-var RouteLoader = exports.RouteLoader = function () {
+export var RouteLoader = function () {
   function RouteLoader() {
     
   }
@@ -1346,7 +1325,7 @@ var RouteLoader = exports.RouteLoader = function () {
   return RouteLoader;
 }();
 
-var LoadRouteStep = exports.LoadRouteStep = function () {
+export var LoadRouteStep = function () {
   LoadRouteStep.inject = function inject() {
     return [RouteLoader];
   };
@@ -1480,9 +1459,9 @@ var PipelineSlot = function () {
   return PipelineSlot;
 }();
 
-var PipelineProvider = exports.PipelineProvider = function () {
+export var PipelineProvider = function () {
   PipelineProvider.inject = function inject() {
-    return [_aureliaDependencyInjection.Container];
+    return [Container];
   };
 
   function PipelineProvider(container) {
@@ -1551,11 +1530,11 @@ var PipelineProvider = exports.PipelineProvider = function () {
 
 var logger = LogManager.getLogger('app-router');
 
-var AppRouter = exports.AppRouter = function (_Router) {
+export var AppRouter = function (_Router) {
   _inherits(AppRouter, _Router);
 
   AppRouter.inject = function inject() {
-    return [_aureliaDependencyInjection.Container, _aureliaHistory.History, PipelineProvider, _aureliaEventAggregator.EventAggregator];
+    return [Container, History, PipelineProvider, EventAggregator];
   };
 
   function AppRouter(container, history, pipelineProvider, events) {

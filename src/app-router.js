@@ -134,7 +134,7 @@ export class AppRouter extends Router {
         restorePreviousLocation(this);
         return this._dequeueInstruction(instructionCount + 1);
       } else if (instructionCount > this.maxInstructionCount) {
-        throw new Error(`Maximum navigation attempts exceeded. Giving up.`);
+        throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 
       let pipeline = this.pipelineProvider.createPipeline();
@@ -166,6 +166,8 @@ export class AppRouter extends Router {
         container = container.parent;
       }
     }
+
+    return undefined;
   }
 }
 

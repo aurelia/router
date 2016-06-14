@@ -328,6 +328,7 @@ export class Router {
     }
 
     this.currentInstruction._updateTitle();
+    return undefined;
   }
 
   /**

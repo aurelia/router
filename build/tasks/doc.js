@@ -9,6 +9,7 @@ gulp.task('doc-generate', function(){
     .pipe(typedoc({
       target: 'es6',
       includeDeclarations: true,
+      moduleResolution: 'node',
       json: paths.doc + '/api.json',
       name: paths.packageName + '-docs', 
       mode: 'modules',
