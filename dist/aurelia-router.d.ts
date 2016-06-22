@@ -175,9 +175,6 @@ export declare interface IObservable {
 export declare interface ISubscription {
   unsubscribe(): void;
 }
-export declare function _normalizeAbsolutePath(path?: any, hasPushState?: any, absolute?: any): any;
-export declare function _createRootedPath(fragment?: any, baseUrl?: any, hasPushState?: any, absolute?: any): any;
-export declare function _resolveUrl(fragment?: any, baseUrl?: any, hasPushState?: any): any;
 
 /**
 * The status of a Pipeline.
@@ -294,9 +291,6 @@ export declare class NavigationInstruction {
     * Gets the instruction's base URL, accounting for wildcard route parameters.
     */
   getBaseUrl(): string;
-  _commitChanges(waitToSwap: boolean): any;
-  _updateTitle(): void;
-  _buildTitle(separator?: string): string;
 }
 
 /**
@@ -497,7 +491,6 @@ export declare const activationStrategy: any;
 export declare class BuildNavigationPlanStep {
   run(navigationInstruction: NavigationInstruction, next: Function): any;
 }
-export declare function _buildNavigationPlan(instruction: NavigationInstruction, forceLifecycleMinimum?: any): Promise<Object>;
 
 /**
 * The primary class responsible for handling routing and navigation.
@@ -665,9 +658,6 @@ export declare class Router {
     * Note: This method will likely move to a plugin in a future release.
     */
   refreshNavigation(): void;
-  _refreshBaseUrl(): void;
-  _createNavigationInstruction(url?: string, parentInstruction?: NavigationInstruction): Promise<NavigationInstruction>;
-  _createRouteConfig(config?: any, instruction?: any): any;
 }
 export declare class CanDeactivatePreviousStep {
   run(navigationInstruction: NavigationInstruction, next: Function): any;
@@ -701,7 +691,6 @@ export declare class PipelineProvider {
     * Create the navigation pipeline.
     */
   createPipeline(): Pipeline;
-  _findStep(name: string): any;
   
   /**
     * Adds a step into the pipeline at a known slot location.
@@ -714,15 +703,9 @@ export declare class PipelineProvider {
   removeStep(name: string, step: PipelineStep): any;
   
   /**
-     * Clears all steps from a slot in the pipeline
-     */
-  _clearSteps(name?: string): any;
-  
-  /**
      * Resets all pipeline slots
      */
   reset(): any;
-  _createPipelineSlot(name?: any, alias?: any): any;
 }
 
 /**
@@ -764,7 +747,4 @@ export declare class AppRouter extends Router {
     * Deactivates the router.
     */
   deactivate(): void;
-  _queueInstruction(instruction: NavigationInstruction): Promise<any>;
-  _dequeueInstruction(instructionCount?: number): Promise<any>;
-  _findViewModel(viewPort: Object): Object;
 }
