@@ -21,17 +21,17 @@ interface Next {
   /**
   * Indicates the successful completion of the entire pipeline.
   */
-  complete: (result: any) => Promise<any>,
+  complete: (result?: any) => Promise<any>,
 
   /**
   * Indicates that the pipeline should cancel processing.
   */
-  cancel: (result: any) => Promise<any>,
+  cancel: (result?: any) => Promise<any>,
 
   /**
   * Indicates that pipeline processing has failed and should be stopped.
   */
-  reject: (result: any) => Promise<any>
+  reject: (result?: any) => Promise<any>
 }
 
 /**
