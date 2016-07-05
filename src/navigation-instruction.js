@@ -167,6 +167,7 @@ export class NavigationInstruction {
       return this.fragment;
     }
 
+    path = encodeURI(path);
     return this.fragment.substr(0, this.fragment.lastIndexOf(path));
   }
 
