@@ -5,6 +5,7 @@ import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
 import {
+  _normalizeAbsolutePath,
   _createRootedPath,
   _resolveUrl} from './util';
 import {RouteConfig} from './interfaces';
@@ -342,6 +343,8 @@ export class Router {
       let current = nav[i];
       if (!current.config.href) {
         current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+      } else {
+        current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
       }
     }
   }
