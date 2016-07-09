@@ -33,6 +33,11 @@ export class NavModel {
   */
   config: RouteConfig = null;
 
+  /**
+  * The router associated with this navitation model.
+  */
+  router: Router;
+
   constructor(router: Router, relativeHref: string) {
     this.router = router;
     this.relativeHref = relativeHref;
