@@ -756,6 +756,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
             return this.fragment;
           }
 
+          path = encodeURI(path);
           return this.fragment.substr(0, this.fragment.lastIndexOf(path));
         };
 
@@ -1372,6 +1373,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
             var current = nav[i];
             if (!current.config.href) {
               current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+            } else {
+              current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
             }
           }
         };

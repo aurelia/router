@@ -238,6 +238,7 @@ export var NavigationInstruction = function () {
       return this.fragment;
     }
 
+    path = encodeURI(path);
     return this.fragment.substr(0, this.fragment.lastIndexOf(path));
   };
 
@@ -901,6 +902,8 @@ export var Router = function () {
       var current = nav[i];
       if (!current.config.href) {
         current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+      } else {
+        current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
       }
     }
   };

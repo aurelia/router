@@ -74,17 +74,17 @@ interface Next {
   /**
   * Indicates the successful completion of the entire pipeline.
   */
-  complete: (result: any) => Promise<any>,
+  complete: (result?: any) => Promise<any>,
 
   /**
   * Indicates that the pipeline should cancel processing.
   */
-  cancel: (result: any) => Promise<any>,
+  cancel: (result?: any) => Promise<any>,
 
   /**
   * Indicates that pipeline processing has failed and should be stopped.
   */
-  reject: (result: any) => Promise<any>
+  reject: (result?: any) => Promise<any>
 }
 
 /**
@@ -354,6 +354,7 @@ export class NavigationInstruction {
       return this.fragment;
     }
 
+    path = encodeURI(path);
     return this.fragment.substr(0, this.fragment.lastIndexOf(path));
   }
 
@@ -479,6 +480,11 @@ export class NavModel {
   * The route config.
   */
   config: RouteConfig = null;
+
+  /**
+  * The router associated with this navitation model.
+  */
+  router: Router;
 
   constructor(router: Router, relativeHref: string) {
     this.router = router;
@@ -1302,6 +1308,8 @@ export class Router {
       let current = nav[i];
       if (!current.config.href) {
         current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+      } else {
+        current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
       }
     }
   }

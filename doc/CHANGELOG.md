@@ -1,3 +1,19 @@
+<a name="1.0.0-rc.1.0.1"></a>
+# [1.0.0-rc.1.0.1](https://github.com/aurelia/router/compare/1.0.0-rc.1.0.0...v1.0.0-rc.1.0.1) (2016-07-12)
+
+
+### Bug Fixes
+
+* **navigation-instruction:** incorrect base url extraction ([b8036e4](https://github.com/aurelia/router/commit/b8036e4)), closes [#309](https://github.com/aurelia/router/issues/309)
+* **router:** navigation model explicit href normalization ([e80a16c](https://github.com/aurelia/router/commit/e80a16c))
+
+
+### Features
+
+* **nav-model:** add router property to dts ([fe0070c](https://github.com/aurelia/router/commit/fe0070c)), closes [#359](https://github.com/aurelia/router/issues/359)
+
+
+
 <a name="1.0.0-rc.1.0.0"></a>
 # [1.0.0-rc.1.0.0](https://github.com/aurelia/router/compare/1.0.0-beta.2.0.1...v1.0.0-rc.1.0.0) (2016-06-22)
 
