@@ -266,7 +266,10 @@ In the above example, our route will only match URL fragment of '/users' and not
 
 ## [Handling Unknown Routes](aurelia-doc://section/6/version/1.0.0)
 
-Aurelia allows you to map any unknown routes. With the `mapUnknownRoutes()` function we can use a string to a moduleId string, or a routeConfig object, or a NavigationInstruction object to handle any routes which do not match what we have mapped.
+Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRoutes()` can be:
+* A string to a moduleId
+* A routeConfig object
+* A function which is passed the NavigationInstruction object
 
 ### Using a ModuleId for Unknown routes
 <code-listing heading="Basic Route Configuration">
@@ -308,7 +311,7 @@ Aurelia allows you to map any unknown routes. With the `mapUnknownRoutes()` func
 
 The above example will redirect any unmatched routes to the notfound component page.
 
-### Using A NavigationInstruction For Unknown Routes
+### Using A Function For Unknown Routes
 
 <code-listing>
   <source-code lang="ES 2015/2016">
@@ -654,6 +657,8 @@ Aurelia also allows creation of a pipeline slot where you can add steps. You wil
 
     export class App {
       configureRouter(config, router) {
+        config.title = 'Aurelia';
+
         function step() {
           return step.run
         }
@@ -673,6 +678,7 @@ Aurelia also allows creation of a pipeline slot where you can add steps. You wil
         ]);
       }
     }
+
   </source-code>
   <source-code lang="TypeScript">
 
@@ -680,6 +686,7 @@ Aurelia also allows creation of a pipeline slot where you can add steps. You wil
 
     export class App {
       configureRouter(config: RouterConfiguration, router: Router): void {
+        config.title = 'Aurelia';
 
         function step() {
           return step.run
@@ -687,9 +694,13 @@ Aurelia also allows creation of a pipeline slot where you can add steps. You wil
         step.run = (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
           return next()
         }
+        let pipelineSlot = router.pipelineProvider._createPipelineSlot('customStep')
+        let index = 1
+        router.pipelineProvider.steps.splice(index, 1, pipelineSlot)
 
-        config.title = 'Aurelia';
-        config.addPostRenderStep(step);
+        config.addPipelineStep('customStep', step)
+
+
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
@@ -698,10 +709,13 @@ Aurelia also allows creation of a pipeline slot where you can add steps. You wil
         ]);
       }
     }
+
   </source-code>
 </code-listing>
 
 ## [Rendering View Ports](aurelia-doc://section/9/version/1.0.0)
+> Info
+> If you don't name a router-view, it will be available under the name 'default'.
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
@@ -725,13 +739,11 @@ Aurelia also allows creation of a pipeline slot where you can add steps. You wil
       configureRouter(config, router) {
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'users', name: 'users', viewports: { left: { moduleId: 'user/list' }, right: { moduleId: 'user/detail' } } }
         ]);
       }
     }
+
   </source-code>
   <source-code lang="TypeScript">
 
@@ -745,49 +757,6 @@ Aurelia also allows creation of a pipeline slot where you can add steps. You wil
         ]);
       }
     }
-  </source-code>
-</code-listing>
-
-<code-listing heading="Multi-ViewPort View-Model">
-  <source-code lang="ES 2015/2016">
-
-    export class App {
-      configureRouter(config){
-        config.map([{
-          route: 'edit',
-            viewPorts: {
-              left: {
-                moduleId: 'editor'
-              },
-              right: {
-                moduleId: 'preview'
-              }
-            }
-          }]);
-      }
-    }
-
-  </source-code>
-  <source-code lang="TypeScript">
-
-    import {RouterConfiguration} from 'aurelia-router';
-
-    export class App {
-      configureRouter(config: RouterConfiguration): void {
-        config.map([{
-          route: 'edit',
-            viewPorts: {
-              left: {
-                moduleId: 'editor'
-              },
-              right: {
-                moduleId: 'preview'
-              }
-            }
-          }]);
-      }
-    }
-
   </source-code>
 </code-listing>
 
