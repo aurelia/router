@@ -87,28 +87,28 @@ interface RoutableComponent {
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
   * Return a boolean value, a promise for a boolean value, or a navigation command.
   */
-  canActivate?: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|NavigationCommand;
+  canActivate?: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
 
   /**
   * Implement this hook if you want to perform custom logic just before your view-model is displayed.
   * You can optionally return a promise to tell the router to wait to bind and attach the view until
   * after you finish your work.
   */
-  activate?: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<any>|IObservable|void;
+  activate?: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<any>|PromiseLike<any>|IObservable|void;
 
   /**
   * Implement this hook if you want to control whether or not the router can navigate away from your
   * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
   * or a navigation command.
   */
-  canDeactivate?: () => boolean|Promise<boolean>|NavigationCommand;
+  canDeactivate?: () => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
 
   /**
   * Implement this hook if you want to perform custom logic when your view-model is being
   * navigated away from. You can optionally return a promise to tell the router to wait until
   * after you finish your work.
   */
-  deactivate?: () => Promise<any>|IObservable|void;
+  deactivate?: () => Promise<any>|PromiseLike<any>|IObservable|void;
 
   /**
   * Implement this hook if you'd like to give hints to the router about the activation when reusing
