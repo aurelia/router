@@ -58,7 +58,7 @@
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: 0 }
         ]);
       }
     }
@@ -74,8 +74,8 @@
 * `route` - is the pattern to match against incoming URL fragments. It can be a string, array of strings. The route can contain parameterized routes or wildcards.
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route's viewmodel activate() function.
   * Wildcard routes are used to match the "rest" of a path (ie: files*path matches files/new/doc or files/temp). An object with the rest of the URL after the segment is set as the `path` property and passes as a parameter to activate() as well.
-* `href` - is a conditionally optional parameter. If it is not defined then route is used. If route has segments then href is required as in the case of files.
-* `nav` - is a boolean parameter, when set to true it will be included in the routes navModel. This makes it easier to create a dynamic menu or similar elements.
+* `href` - is a conditionally optional property. If it is not defined then route is used. If route has segments then href is required as in the case of files.
+* `nav` - is a boolean or number property, when set to true it will be included in the routes navModel, this makes it easier to create a dynamic menu or similar elements. When specified as number, the value will be used in sorting the routes.
 
 ## [Options](aurelia-doc://section/2/version/1.0.0)
 
