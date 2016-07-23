@@ -132,5 +132,5 @@ interface ConfigureRouter {
   /**
   * Implement this hook if you want to add sub-routes to your view.
   */
-  configureRouter(config: RouterConfiguration, router: Router);
+  configureRouter(config: RouterConfiguration, router: Router): any;
 }
