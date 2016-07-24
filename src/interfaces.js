@@ -83,7 +83,7 @@ interface RouteConfig {
 }
 
 type ShouldContinue = boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
-type Potential = Promise<any>|PromiseLike<any>|IObservable;
+type Potential = Promise<void>|PromiseLike<void>|IObservable;
 
 interface CanActivateRoutableComponent {
   /**
@@ -128,9 +128,10 @@ interface DetermineActivationStrategyRoutableComponent {
   determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => string;
 }
 
+
 interface ConfigureRouter {
   /**
   * Implement this hook if you want to add sub-routes to your view.
   */
-  configureRouter(config: RouterConfiguration, router: Router): any;
+  configureRouter(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
 }
