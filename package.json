@@ -113,7 +113,12 @@
   },
   "aurelia": {
     "documentation": {
-      "articles": []
+      "articles": [
+        {
+          "title": "Router Configuration",
+          "href": "doc/article/en-US/router-configuration.md"
+        }
+      ]
     }
   }
 }
