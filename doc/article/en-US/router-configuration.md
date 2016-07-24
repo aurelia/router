@@ -13,26 +13,21 @@
   "keywords": ["JavaScript", "Router"]
 }
 ---
-
 ## [Basic Configuration](aurelia-doc://section/1/version/1.0.0)
 
 > Info
-> To use Aurelia's router your component view must have a `<router-view></router-view>` element. In order to configure the router, the component's view-model requires a configureRouter() function.
+> To use Aurelia's router your component view must have a `<router-view></router-view>` element. In order to configure the router, the component's view-model requires a `configureRouter()` function.
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
-
     <template>
       <router-view></router-view>
     </template>
-
   </source-code>
-</code-listing >
-
+</code-listing>
 
 <code-listing heading="Basic Route Configuration">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -45,10 +40,8 @@
         ]);
       }
     }
-
   </source-code>
   <source-code lang="TypeScript">
-
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
@@ -63,15 +56,13 @@
         ]);
       }
     }
-
   </source-code>
 </code-listing>
-
 
 > Info
 > You can also call `mapRoute()` on a single route configuration.
 
-* `config.map()` adds route(s) to the router.  Although only route, name, moduleId, href and nav are shown above there are other properties that can be included in a route. The class name for each routes is `RouteConfig`.
+* `config.map()` adds route(s) to the router.  Although only route, name, moduleId, href and nav are shown above there are other properties that can be included in a route. The class name for each route is `RouteConfig`.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route view-model's `activate()` function.
   * Wildcard routes are used to match the "rest" of a path (ie: files*path matches files/new/doc or files/temp). An object with the rest of the URL after the segment is set as the `path` property and passed as a parameter to `activate()` as well.
@@ -124,11 +115,10 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
 
 ## [Dynamically Specify Route Components](aurelia-doc://section/3/version/1.0.0)
 
-You can add a `navigationStrategy` to a route to allow dynamic routes. Within the navigationStrategy Aurelia requires you to configure instruction.config with the desired moduleId, viewPorts or redirect.
+You can add a `navigationStrategy` to a route to allow dynamic routes. Within the navigation strategy Aurelia requires you to configure `instruction.config` with the desired `moduleId`, viewPorts or redirect.
 
-<code-listing>
+<code-listing heading="Using a Route Navigation Strategy">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -146,10 +136,8 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
         ]);
       }
     }
-
   </source-code>
   <source-code lang="TypeScript">
-
     import {RouterConfiguration, Router, NavigationInstruction} from 'aurelia-router';
 
     export class App {
@@ -174,9 +162,9 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
 
 ## [Adding Additional Data To A Route](aurelia-doc://section/4/version/1.0.0)
 
-Although Aurelia does allow to pass any additional property to a route's configuration object, `settings` is the default parameter to which you should add arbitrary data that you want to pass to the route.
+Although Aurelia does allow you to pass any additional property to a route's configuration object, `settings` is the default parameter to which you should add arbitrary data that you want to pass to the route.
 
-<code-listing>
+<code-listing heading="Using Route Settings">
   <source-code lang="ES 2015/2016">
 
     export class App {
@@ -192,10 +180,8 @@ Although Aurelia does allow to pass any additional property to a route's configu
         ]);
       }
     }
-
   </source-code>
   <source-code lang="TypeScript">
-
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
@@ -218,9 +204,8 @@ Although Aurelia does allow to pass any additional property to a route's configu
 
 You can set a route to be case sensitive, should you wish:
 
-<code-listing>
+<code-listing heading="Making a Route Case Sensitive">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -232,10 +217,8 @@ You can set a route to be case sensitive, should you wish:
         ]);
       }
     }
-
   </source-code>
   <source-code lang="TypeScript">
-
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
@@ -257,13 +240,14 @@ In the above example, our route will only match URL fragment of '/users' and not
 ## [Handling Unknown Routes](aurelia-doc://section/6/version/1.0.0)
 
 Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRoutes()` can be:
+
 * A string to a moduleId. This module will be navigated to any time a route is not found.
 * A routeConfig object. This configuration object will be used any time a route is not found.
 * A function which is passed the NavigationInstruction object and can decide the route dynamically.
 
-### Using a ModuleId for Unknown routes
+### Using a ModuleId for Unknown Routes
 
-<code-listing heading="Basic Route Configuration">
+<code-listing heading="Basic Unknown Route Configuration">
   <source-code>
   <source-code lang="ES 2015/2016">
 
@@ -280,10 +264,8 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
         config.mapUnknownRoutes('not-found');
       }
     }
-
   </source-code>
   <source-code lang="TypeScript">
-
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
@@ -306,9 +288,8 @@ The above example will redirect any unmatched routes to the `not-found` componen
 
 ### Using A Function For Unknown Routes
 
-<code-listing>
+<code-listing heading="Dynamic Unknown Routes">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -338,7 +319,6 @@ The above example will redirect any unmatched routes to the `not-found` componen
 
   </source-code>
   <source-code lang="TypeScript">
-
     import {RouterConfiguration, NavigationInstruction, Router} from 'aurelia-router';
 
     export class App {
@@ -369,62 +349,16 @@ The above example will redirect any unmatched routes to the `not-found` componen
   </source-code>
 </code-listing>
 
-### Using A Route Config For Unknown Routes.
-
-<code-listing>
-  <source-code lang="ES 2015/2016">
-
-    export class App {
-      configureRouter(config, router) {
-        this.router = router;
-        config.title = 'Aurelia';
-        config.mapUnknownRoutes({route: 'not-found', moduleId: 'not-found'});
-        config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
-        ]);
-      }
-    }
-
-  </source-code>
-  <source-code lang="TypeScript">
-
-    import {RouterConfiguration, RouteConfig, Router} from 'aurelia-router';
-
-    export class App {
-      configureRouter(config: RouterConfiguration, router: Router): void {
-        this.router = router;
-        config.title = 'Aurelia';
-        let route: RouteConfig = {
-          route: 'not-found',
-          moduleId: 'not-found'
-        }
-        config.mapUnknownRoutes(route);
-        config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
-        ]);
-      }
-    }
-  </source-code>
-</code-listing>
-
 ## [Redirecting Routes](aurelia-doc://section/7/version/1.0.0)
 
 Aurelia allows redirecting of routes to URL fragments by specifying redirect with a string consisting of a URL fragment.
 
-<code-listing>
-  <source-code>
-
+<code-listing heading="Route Config Redirects">
+  <source-code lang="ES 2015/ES 2016/TypeScript">
     config.map([
       { route: '',           redirect: 'home' },
       { route: 'home',       name: 'home',       moduleId: 'home/index' }
     ]);
-
   </source-code>
 </code-listing>
 
@@ -433,9 +367,9 @@ Aurelia allows redirecting of routes to URL fragments by specifying redirect wit
 
 ## [Pipelines](aurelia-doc://section/8/version/1.0.0)
 
-Aurelia has two router classes, `AppRouter` and `Router`. `AppRouter` extends the `R`outer` class and is the main application router. `Router` is used for any child routers including nested child routers. One of the main differences between the two is pipelines are only allowed on the `AppRouter` and not any child routers.
+Aurelia has two router classes, `AppRouter` and `Router`. `AppRouter` extends the `Router` class and is the main application router. `Router` is used for any child routers including nested child routers. One of the main differences between the two is pipelines are only allowed on the `AppRouter` and not any child routers.
 
-You can create your own pipeline steps using `addPipelineStep`, but the step's name must match one of the pipeline's slots, the default slots in order are `authorize`, `preActive`, `preRender`, and `postRender`. Aurelia also has functions for creating a pipeline step for these slots.
+You can create your own pipeline steps using `addPipelineStep`, but the step's name must match one of the pipeline's slots, the default slots in order are `authorize`, `preActivate`, `preRender`, and `postRender`. Aurelia also has functions for creating a pipeline step for these slots.
 
 * `authorize` is called between loading the route's step and calling the route view-model' `canActivate` function if defined.
 * `preActivate` is called between the route view-model' `canActivate` function and the previous route view-model's `deactivate` function if defined.
@@ -446,9 +380,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
 ### Authorize Pipeline
 
-<code-listing>
+<code-listing heading="An Authorize Step">
   <source-code lang="ES 2015/2016">
-
     import {Redirect} from 'aurelia-router';
 
     export class App {
@@ -475,10 +408,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         return next();
       }
     }
-
   </source-code>
   <source-code lang="TypeScript">
-
     import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
@@ -506,15 +437,13 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         return next();
       }
     }
-
   </source-code>
 </code-listing>
 
 ### Create A PreActivate Pipeline
 
-<code-listing>
+<code-listing heading="A PreActivate Step">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         function step() {
@@ -534,7 +463,6 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-
     import {Redirect, NavigationInstruction, RouterConfiguration} from 'aurelia-router';
 
     export class App {
@@ -561,9 +489,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
 ### Create A Pre Render Pipeline
 
-<code-listing>
+<code-listing heading="A PreRender Step">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         var step = {
@@ -582,7 +509,6 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-
     import {Redirect, NavigationInstruction, RouterConfiguration} from 'aurelia-router';
 
     export class App {
@@ -608,9 +534,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
 ### Create a Post Render Pipeline
 
-<code-listing>
+<code-listing heading="A PostRender Step">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         var step = {
@@ -629,7 +554,6 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-
     import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
@@ -661,7 +585,6 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
-
     <template>
       <div class="page-host">
         <router-view name="left"></router-view>
@@ -670,13 +593,11 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         <router-view name="right"></router-view>
       </div>
     </template>
-
   </source-code>
 </code-listing>
 
-<code-listing>
+<code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         config.title = 'Aurelia';
@@ -685,10 +606,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         ]);
       }
     }
-
   </source-code>
   <source-code lang="TypeScript">
-
     import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
@@ -715,19 +634,16 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
-
     <template>
       <div class="page-host">
         <router-view layout="views/layout-default.html"></router-view>
       </div>
     </template>
-
   </source-code>
 </code-listing>
 
 <code-listing heading="layout.html">
   <source-code lang="HTML">
-
     <template>
       <div class="left-content">
         <slot name="aside-content"></slot>
@@ -736,13 +652,11 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
         <slot name="main-content"></slot>
       </div>
     </template>
-
   </source-code>
 </code-listing>
 
 <code-listing heading="module.html">
   <source-code lang="HTML">
-
     <template>
       <div slot="main-content">
         <p>I'm content that will show up on the right.</p>
@@ -751,13 +665,11 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
         <p>I'm content that will show up on the left.</p>
       </div>
     </template>
-
   </source-code>
 </code-listing>
 
-<code-listing>
+<code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         config.title = 'Aurelia';
@@ -771,10 +683,8 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
         ]);
       }
     }
-
   </source-code>
   <source-code lang="TypeScript">
-
     import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
@@ -790,6 +700,5 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
         ]);
       }
     }
-
   </source-code>
 </code-listing>
