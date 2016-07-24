@@ -219,7 +219,7 @@ class SafeSubscription {
   }
 }
 
-function processPotential(obj, resolve, reject) {
+function processPotential(obj: Potential|any, resolve, reject) {
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
   }
