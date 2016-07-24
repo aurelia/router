@@ -442,7 +442,7 @@ function validateRouteConfig(config: RouteConfig): void {
   }
 
   if (typeof config.route !== 'string') {
-    var name = config.name || '(no name)';
+    let name = config.name || '(no name)';
     throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
   }
 

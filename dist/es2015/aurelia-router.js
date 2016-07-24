@@ -767,7 +767,7 @@ export let Router = class Router {
 
     if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
       if (!navModel.href && navModel.href !== '' && (state.types.dynamics || state.types.stars)) {
-        throw new Error('Invalid route config: dynamic routes must specify an href to be included in the navigation model.');
+        throw new Error('Invalid route config for "' + config.route + '" : dynamic routes must specify an "href:" to be included in the navigation model.');
       }
 
       if (typeof navModel.order !== 'number') {
@@ -911,11 +911,12 @@ function validateRouteConfig(config) {
   }
 
   if (typeof config.route !== 'string') {
-    throw new Error('Invalid Route Config: You must specify a route pattern.');
+    let name = config.name || '(no name)';
+    throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
   }
 
   if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
-    throw new Error('Invalid Route Config: You must specify a moduleId, redirect, navigationStrategy, or viewPorts.');
+    throw new Error('Invalid Route Config for "' + config.route + '": You must specify a "moduleId:", "redirect:", "navigationStrategy:", or "viewPorts:".');
   }
 }
 
