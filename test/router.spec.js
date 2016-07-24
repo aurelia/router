@@ -67,6 +67,18 @@ describe('the router', () => {
         'number2': { moduleId: 'test2' }
       }})).not.toThrow();
     });
+
+    it('throws an error if routes do not have distinct names', () => {
+      const configs = [
+        { route: '', moduleId: './test', name: 'name1' },
+        { route: '/test1', moduleId: './test1', name: 'name1' }
+      ];
+
+      router.addRoute(configs[0]);
+      expect(router.hasRoute('name1'));
+      expect(() => router.addRoute(configs[0])).toThrow();
+      expect(router.routes.length).toBe(1);
+    });
   });
 
   describe('generate', () => {

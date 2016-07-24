@@ -226,7 +226,7 @@ export class Router {
   * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
   */
   addRoute(config: RouteConfig, navModel?: NavModel): void {
-    validateRouteConfig(config);
+    validateRouteConfig(config, this.routes);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
       config.viewPorts = {
@@ -425,7 +425,7 @@ export class Router {
       .then(c => typeof c === 'string' ? { moduleId: c } : c)
       .then(c => {
         c.route = instruction.params.path;
-        validateRouteConfig(c);
+        validateRouteConfig(c, this.routes);
 
         if (!c.navModel) {
           c.navModel = this.createNavModel(c);
@@ -436,7 +436,7 @@ export class Router {
   }
 }
 
-function validateRouteConfig(config: RouteConfig): void {
+function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }
@@ -444,6 +444,13 @@ function validateRouteConfig(config: RouteConfig): void {
   if (typeof config.route !== 'string') {
     let name = config.name || '(no name)';
     throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
+  }
+
+  for (let i = 0, ii = routes.length; i < ii; ++i) {
+    let route = routes[i];
+    if (route.name === config.name) {
+      throw new Error('Routes must contain distinct names');
+    }
   }
 
   if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
