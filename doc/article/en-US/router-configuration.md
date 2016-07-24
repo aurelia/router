@@ -1,6 +1,6 @@
 ---
 {
-  "name": "Router: Configuration",
+  "name": "Router Configuration",
   "culture": "en-US",
   "description": "This article covers Aurelia's router configuration.",
   "engines" : { "aurelia-doc" : "^1.0.0" },
@@ -15,8 +15,7 @@
 ---
 ## [Basic Configuration](aurelia-doc://section/1/version/1.0.0)
 
-> Info
-> To use Aurelia's router your component view must have a `<router-view></router-view>` element. In order to configure the router, the component's view-model requires a `configureRouter()` function.
+To use Aurelia's router, your component view must have a `<router-view></router-view>` element. In order to configure the router, the component's view-model requires a `configureRouter()` function.
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
@@ -59,8 +58,7 @@
   </source-code>
 </code-listing>
 
-> Info
-> You can also call `mapRoute()` on a single route configuration.
+You can also call `mapRoute()` on a single route configuration.
 
 * `config.map()` adds route(s) to the router.  Although only route, name, moduleId, href and nav are shown above there are other properties that can be included in a route. The class name for each route is `RouteConfig`.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
@@ -204,7 +202,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
 
 You can set a route to be case sensitive, should you wish:
 
-<code-listing heading="Making a Route Case Sensitive">
+<code-listing heading="Making a Route Case-Sensitive">
   <source-code lang="ES 2015/2016">
     export class App {
       configureRouter(config, router) {
@@ -247,7 +245,7 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
 
 ### Using a ModuleId for Unknown Routes
 
-<code-listing heading="Basic Unknown Route Configuration">
+<code-listing heading="Static Unknown Routes">
   <source-code>
   <source-code lang="ES 2015/2016">
 
@@ -378,8 +376,6 @@ You can create your own pipeline steps using `addPipelineStep`, but the step's n
 
 A pipeline step must be an object that contains a `run(navigationInstruction, next)` function.
 
-### Authorize Pipeline
-
 <code-listing heading="An Authorize Step">
   <source-code lang="ES 2015/2016">
     import {Redirect} from 'aurelia-router';
@@ -440,8 +436,6 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
   </source-code>
 </code-listing>
 
-### Create A PreActivate Pipeline
-
 <code-listing heading="A PreActivate Step">
   <source-code lang="ES 2015/2016">
     export class App {
@@ -487,8 +481,6 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
   </source-code>
 </code-listing>
 
-### Create A Pre Render Pipeline
-
 <code-listing heading="A PreRender Step">
   <source-code lang="ES 2015/2016">
     export class App {
@@ -531,8 +523,6 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
 </code-listing>
-
-### Create a Post Render Pipeline
 
 <code-listing heading="A PostRender Step">
   <source-code lang="ES 2015/2016">
@@ -624,7 +614,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 ## [Layouts](aurelia-doc://section/10/version/1.0.0)
 
 > Info
-> Specifying layout on the <router-view> element will set the default layout for all routes.
+> Specifying layout on the `<router-view>` element will set the default layout for all routes.
 
 Similar to MVC-style master/layout pages, Aurelia allows configuration of multiple layouts. Here are the properties for creating layouts:
 
