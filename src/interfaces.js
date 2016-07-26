@@ -82,15 +82,12 @@ interface RouteConfig {
   [x: string]: any;
 }
 
-type ShouldContinue = boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
-type Potential = Promise<void>|PromiseLike<void>|IObservable;
-
 interface RoutableComponentCanActivate {
   /**
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
   * Return a boolean value, a promise for a boolean value, or a navigation command.
   */
-  canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => ShouldContinue;
+  canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
 }
 
 interface RoutableComponentActivate {
@@ -99,7 +96,7 @@ interface RoutableComponentActivate {
   * You can optionally return a promise to tell the router to wait to bind and attach the view until
   * after you finish your work.
   */
-  activate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Potential|void;
+  activate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<void>|PromiseLike<void>|IObservable|void;
 }
 
 interface RoutableComponentCanDeactivate {
@@ -108,7 +105,7 @@ interface RoutableComponentCanDeactivate {
   * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
   * or a navigation command.
   */
-  canDeactivate: () => ShouldContinue;
+  canDeactivate: () => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
 }
 
 interface RoutableComponentDeactivate {
@@ -117,7 +114,7 @@ interface RoutableComponentDeactivate {
   * navigated away from. You can optionally return a promise to tell the router to wait until
   * after you finish your work.
   */
-  deactivate: () => Potential|void;
+  deactivate: () => Promise<void>|PromiseLike<void>|IObservable|void;
 }
 
 interface RoutableComponentDetermineActivationStrategy {
