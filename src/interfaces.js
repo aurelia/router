@@ -85,7 +85,7 @@ interface RouteConfig {
 type ShouldContinue = boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
 type Potential = Promise<void>|PromiseLike<void>|IObservable;
 
-interface CanActivateRoutableComponent {
+interface RoutableComponentCanActivate {
   /**
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
   * Return a boolean value, a promise for a boolean value, or a navigation command.
@@ -93,7 +93,7 @@ interface CanActivateRoutableComponent {
   canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => ShouldContinue;
 }
 
-interface ActivateRoutableComponent {
+interface RoutableComponentActivate {
   /**
   * Implement this hook if you want to perform custom logic just before your view-model is displayed.
   * You can optionally return a promise to tell the router to wait to bind and attach the view until
@@ -102,7 +102,7 @@ interface ActivateRoutableComponent {
   activate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Potential|void;
 }
 
-interface CanDeactivateRoutableComponent {
+interface RoutableComponentCanDeactivate {
   /**
   * Implement this hook if you want to control whether or not the router can navigate away from your
   * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
@@ -111,7 +111,7 @@ interface CanDeactivateRoutableComponent {
   canDeactivate: () => ShouldContinue;
 }
 
-interface DectivateRoutableComponent {
+interface RoutableComponentDeactivate {
   /**
   * Implement this hook if you want to perform custom logic when your view-model is being
   * navigated away from. You can optionally return a promise to tell the router to wait until
@@ -120,7 +120,7 @@ interface DectivateRoutableComponent {
   deactivate: () => Potential|void;
 }
 
-interface DetermineActivationStrategyRoutableComponent {
+interface RoutableComponentDetermineActivationStrategy {
   /**
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
   * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
