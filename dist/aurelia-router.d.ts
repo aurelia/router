@@ -137,6 +137,11 @@ export declare interface RouteConfig {
   href?: string;
   
   /**
+    * Indicates that when route generation is done for this route, it should just take the literal value of the href property.
+    */
+  generationUsesHref?: boolean;
+  
+  /**
     * The document title to set when this route is active.
     */
   title?: string;
@@ -156,7 +161,119 @@ export declare interface RouteConfig {
     * When true is specified, this route will be case sensitive.
     */
   caseSensitive?: boolean;
+  
+  /**
+    * Add to specify an activation strategy if it is always the same and you do not want that
+    * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
+    */
+  activationStrategy?: string;
   [x: string]: any;
+}
+
+/**
+* An optional interface describing the canActivate convention.
+*/
+/**
+* An optional interface describing the canActivate convention.
+*/
+export declare interface RoutableComponentCanActivate {
+  
+  /**
+    * Implement this hook if you want to control whether or not your view-model can be navigated to.
+    * Return a boolean value, a promise for a boolean value, or a navigation command.
+    */
+  canActivate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): boolean | Promise<boolean> | PromiseLike<boolean> | NavigationCommand;
+}
+
+/**
+* An optional interface describing the activate convention.
+*/
+/**
+* An optional interface describing the activate convention.
+*/
+export declare interface RoutableComponentActivate {
+  
+  /**
+    * Implement this hook if you want to perform custom logic just before your view-model is displayed.
+    * You can optionally return a promise to tell the router to wait to bind and attach the view until
+    * after you finish your work.
+    */
+  activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): Promise<void> | PromiseLike<void> | IObservable | void;
+}
+
+/**
+* An optional interface describing the canDeactivate convention.
+*/
+/**
+* An optional interface describing the canDeactivate convention.
+*/
+export declare interface RoutableComponentCanDeactivate {
+  
+  /**
+    * Implement this hook if you want to control whether or not the router can navigate away from your
+    * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
+    * or a navigation command.
+    */
+  canDeactivate(): boolean | Promise<boolean> | PromiseLike<boolean> | NavigationCommand;
+}
+
+/**
+* An optional interface describing the deactivate convention.
+*/
+/**
+* An optional interface describing the deactivate convention.
+*/
+export declare interface RoutableComponentDeactivate {
+  
+  /**
+    * Implement this hook if you want to perform custom logic when your view-model is being
+    * navigated away from. You can optionally return a promise to tell the router to wait until
+    * after you finish your work.
+    */
+  deactivate(): Promise<void> | PromiseLike<void> | IObservable | void;
+}
+
+/**
+* An optional interface describing the determineActivationStrategy convention.
+*/
+/**
+* An optional interface describing the determineActivationStrategy convention.
+*/
+export declare interface RoutableComponentDetermineActivationStrategy {
+  
+  /**
+    * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
+    * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
+    */
+  determineActivationStrategy(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): string;
+}
+
+/**
+* An optional interface describing the router configuration convention.
+*/
+/**
+* An optional interface describing the router configuration convention.
+*/
+export declare interface ConfiguresRouter {
+  
+  /**
+    * Implement this hook if you want to configure a router.
+    */
+  configureRouter(config: RouterConfiguration, router: Router): Promise<void> | PromiseLike<void> | void;
+}
+
+/**
+* When a navigation command is encountered, the current navigation
+* will be cancelled and control will be passed to the navigation
+* command so it can determine the correct action.
+*/
+/**
+* When a navigation command is encountered, the current navigation
+* will be cancelled and control will be passed to the navigation
+* command so it can determine the correct action.
+*/
+export declare interface NavigationCommand {
+  navigate(router: Router): void;
 }
 
 /**

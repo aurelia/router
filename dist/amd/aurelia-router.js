@@ -543,13 +543,13 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
         var navModel = void 0;
         for (var _i = 0, _ii = routeConfigs.length; _i < _ii; ++_i) {
-          var routeConfig = routeConfigs[_i];
-          routeConfig.settings = routeConfig.settings || {};
+          var _routeConfig = routeConfigs[_i];
+          _routeConfig.settings = _routeConfig.settings || {};
           if (!navModel) {
-            navModel = router.createNavModel(routeConfig);
+            navModel = router.createNavModel(_routeConfig);
           }
 
-          router.addRoute(routeConfig, navModel);
+          router.addRoute(_routeConfig, navModel);
         }
       });
 
@@ -870,7 +870,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     };
 
     Router.prototype.addRoute = function addRoute(config, navModel) {
-      validateRouteConfig(config);
+      validateRouteConfig(config, this.routes);
 
       if (!('viewPorts' in config) && !config.navigationStrategy) {
         config.viewPorts = {
@@ -1053,7 +1053,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
         return typeof c === 'string' ? { moduleId: c } : c;
       }).then(function (c) {
         c.route = instruction.params.path;
-        validateRouteConfig(c);
+        validateRouteConfig(c, _this5.routes);
 
         if (!c.navModel) {
           c.navModel = _this5.createNavModel(c);
@@ -1073,7 +1073,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     return Router;
   }();
 
-  function validateRouteConfig(config) {
+  function validateRouteConfig(config, routes) {
     if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) !== 'object') {
       throw new Error('Invalid Route Config');
     }
@@ -1081,6 +1081,13 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     if (typeof config.route !== 'string') {
       var _name2 = config.name || '(no name)';
       throw new Error('Invalid Route Config for "' + _name2 + '": You must specify a "route:" pattern.');
+    }
+
+    for (var i = 0, ii = routes.length; i < ii; ++i) {
+      var _route = routes[i];
+      if (_route.name === config.name) {
+        throw new Error('Routes must contain distinct names');
+      }
     }
 
     if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {

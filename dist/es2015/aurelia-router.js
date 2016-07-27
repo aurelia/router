@@ -722,7 +722,7 @@ export let Router = class Router {
   }
 
   addRoute(config, navModel) {
-    validateRouteConfig(config);
+    validateRouteConfig(config, this.routes);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
       config.viewPorts = {
@@ -894,7 +894,7 @@ export let Router = class Router {
       return c;
     }).then(c => typeof c === 'string' ? { moduleId: c } : c).then(c => {
       c.route = instruction.params.path;
-      validateRouteConfig(c);
+      validateRouteConfig(c, this.routes);
 
       if (!c.navModel) {
         c.navModel = this.createNavModel(c);
@@ -905,7 +905,7 @@ export let Router = class Router {
   }
 };
 
-function validateRouteConfig(config) {
+function validateRouteConfig(config, routes) {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }
@@ -913,6 +913,13 @@ function validateRouteConfig(config) {
   if (typeof config.route !== 'string') {
     let name = config.name || '(no name)';
     throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
+  }
+
+  for (let i = 0, ii = routes.length; i < ii; ++i) {
+    let route = routes[i];
+    if (route.name === config.name) {
+      throw new Error('Routes must contain distinct names');
+    }
   }
 
   if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {

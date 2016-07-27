@@ -562,6 +562,11 @@ interface RouteConfig {
   href?: string;
 
   /**
+  * Indicates that when route generation is done for this route, it should just take the literal value of the href property.
+  */
+  generationUsesHref?: boolean;
+
+  /**
   * The document title to set when this route is active.
   */
   title?: string;
@@ -582,7 +587,90 @@ interface RouteConfig {
   */
   caseSensitive?: boolean;
 
+  /**
+  * Add to specify an activation strategy if it is always the same and you do not want that
+  * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
+  */
+  activationStrategy?: string;
+
   [x: string]: any;
+}
+
+/**
+* An optional interface describing the canActivate convention.
+*/
+interface RoutableComponentCanActivate {
+  /**
+  * Implement this hook if you want to control whether or not your view-model can be navigated to.
+  * Return a boolean value, a promise for a boolean value, or a navigation command.
+  */
+  canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
+}
+
+/**
+* An optional interface describing the activate convention.
+*/
+interface RoutableComponentActivate {
+  /**
+  * Implement this hook if you want to perform custom logic just before your view-model is displayed.
+  * You can optionally return a promise to tell the router to wait to bind and attach the view until
+  * after you finish your work.
+  */
+  activate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<void>|PromiseLike<void>|IObservable|void;
+}
+
+/**
+* An optional interface describing the canDeactivate convention.
+*/
+interface RoutableComponentCanDeactivate {
+  /**
+  * Implement this hook if you want to control whether or not the router can navigate away from your
+  * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
+  * or a navigation command.
+  */
+  canDeactivate: () => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
+}
+
+/**
+* An optional interface describing the deactivate convention.
+*/
+interface RoutableComponentDeactivate {
+  /**
+  * Implement this hook if you want to perform custom logic when your view-model is being
+  * navigated away from. You can optionally return a promise to tell the router to wait until
+  * after you finish your work.
+  */
+  deactivate: () => Promise<void>|PromiseLike<void>|IObservable|void;
+}
+
+/**
+* An optional interface describing the determineActivationStrategy convention.
+*/
+interface RoutableComponentDetermineActivationStrategy {
+  /**
+  * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
+  * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
+  */
+  determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => string;
+}
+
+/**
+* An optional interface describing the router configuration convention.
+*/
+interface ConfiguresRouter {
+  /**
+  * Implement this hook if you want to configure a router.
+  */
+  configureRouter(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
+}
+
+/**
+* When a navigation command is encountered, the current navigation
+* will be cancelled and control will be passed to the navigation
+* command so it can determine the correct action.
+*/
+interface NavigationCommand {
+  navigate: (router: Router) => void;
 }
 
 /**
@@ -1191,7 +1279,7 @@ export class Router {
   * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
   */
   addRoute(config: RouteConfig, navModel?: NavModel): void {
-    validateRouteConfig(config);
+    validateRouteConfig(config, this.routes);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
       config.viewPorts = {
@@ -1390,7 +1478,7 @@ export class Router {
       .then(c => typeof c === 'string' ? { moduleId: c } : c)
       .then(c => {
         c.route = instruction.params.path;
-        validateRouteConfig(c);
+        validateRouteConfig(c, this.routes);
 
         if (!c.navModel) {
           c.navModel = this.createNavModel(c);
@@ -1401,7 +1489,7 @@ export class Router {
   }
 }
 
-function validateRouteConfig(config: RouteConfig): void {
+function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }
@@ -1409,6 +1497,13 @@ function validateRouteConfig(config: RouteConfig): void {
   if (typeof config.route !== 'string') {
     let name = config.name || '(no name)';
     throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
+  }
+
+  for (let i = 0, ii = routes.length; i < ii; ++i) {
+    let route = routes[i];
+    if (route.name === config.name) {
+      throw new Error('Routes must contain distinct names');
+    }
   }
 
   if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {

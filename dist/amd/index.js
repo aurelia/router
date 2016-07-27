@@ -5,7 +5,7 @@ define(['exports', './aurelia-router'], function (exports, _aureliaRouter) {
     value: true
   });
   Object.keys(_aureliaRouter).forEach(function (key) {
-    if (key === "default") return;
+    if (key === "default" || key === "__esModule") return;
     Object.defineProperty(exports, key, {
       enumerable: true,
       get: function () {

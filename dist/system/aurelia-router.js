@@ -31,6 +31,58 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
   
 
+  function _normalizeAbsolutePath(path, hasPushState) {
+    var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
+    if (!hasPushState && path[0] !== '#') {
+      path = '#' + path;
+    }
+
+    if (hasPushState && absolute) {
+      path = path.substring(1, path.length);
+    }
+
+    return path;
+  }
+
+  _export('_normalizeAbsolutePath', _normalizeAbsolutePath);
+
+  function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
+    if (isAbsoluteUrl.test(fragment)) {
+      return fragment;
+    }
+
+    var path = '';
+
+    if (baseUrl.length && baseUrl[0] !== '/') {
+      path += '/';
+    }
+
+    path += baseUrl;
+
+    if ((!path.length || path[path.length - 1] !== '/') && fragment[0] !== '/') {
+      path += '/';
+    }
+
+    if (path.length && path[path.length - 1] === '/' && fragment[0] === '/') {
+      path = path.substring(0, path.length - 1);
+    }
+
+    return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
+  }
+
+  _export('_createRootedPath', _createRootedPath);
+
+  function _resolveUrl(fragment, baseUrl, hasPushState) {
+    if (isRootedPath.test(fragment)) {
+      return _normalizeAbsolutePath(fragment, hasPushState);
+    }
+
+    return _createRootedPath(fragment, baseUrl, hasPushState);
+  }
+
+  _export('_resolveUrl', _resolveUrl);
+
   function createCompletionHandler(next, status) {
     return function (output) {
       return Promise.resolve({ status: status, output: output, completed: status === pipelineStatus.completed });
@@ -41,6 +93,93 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
     instruction.previousInstruction = null;
     instruction.plan = null;
   }
+
+  function isNavigationCommand(obj) {
+    return obj && typeof obj.navigate === 'function';
+  }
+
+  _export('isNavigationCommand', isNavigationCommand);
+
+  function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
+    var prev = instruction.previousInstruction;
+    var config = instruction.config;
+    var plan = {};
+
+    if ('redirect' in config) {
+      var redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
+      if (instruction.queryString) {
+        redirectLocation += '?' + instruction.queryString;
+      }
+
+      return Promise.reject(new Redirect(redirectLocation));
+    }
+
+    if (prev) {
+      var newParams = hasDifferentParameterValues(prev, instruction);
+      var pending = [];
+
+      var _loop2 = function _loop2(viewPortName) {
+        var prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
+        var nextViewPortConfig = config.viewPorts[viewPortName];
+
+        if (!nextViewPortConfig) throw new Error('Invalid Route Config: Configuration for viewPort "' + viewPortName + '" was not found for route: "' + instruction.config.route + '."');
+
+        var viewPortPlan = plan[viewPortName] = {
+          name: viewPortName,
+          config: nextViewPortConfig,
+          prevComponent: prevViewPortInstruction.component,
+          prevModuleId: prevViewPortInstruction.moduleId
+        };
+
+        if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
+          viewPortPlan.strategy = activationStrategy.replace;
+        } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
+          var _prevViewPortInstruct;
+
+          viewPortPlan.strategy = (_prevViewPortInstruct = prevViewPortInstruction.component.viewModel).determineActivationStrategy.apply(_prevViewPortInstruct, instruction.lifecycleArgs);
+        } else if (config.activationStrategy) {
+          viewPortPlan.strategy = config.activationStrategy;
+        } else if (newParams || forceLifecycleMinimum) {
+          viewPortPlan.strategy = activationStrategy.invokeLifecycle;
+        } else {
+          viewPortPlan.strategy = activationStrategy.noChange;
+        }
+
+        if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
+          var path = instruction.getWildcardPath();
+          var task = prevViewPortInstruction.childRouter._createNavigationInstruction(path, instruction).then(function (childInstruction) {
+            viewPortPlan.childNavigationInstruction = childInstruction;
+
+            return _buildNavigationPlan(childInstruction, viewPortPlan.strategy === activationStrategy.invokeLifecycle).then(function (childPlan) {
+              childInstruction.plan = childPlan;
+            });
+          });
+
+          pending.push(task);
+        }
+      };
+
+      for (var viewPortName in prev.viewPortInstructions) {
+        _loop2(viewPortName);
+      }
+
+      return Promise.all(pending).then(function () {
+        return plan;
+      });
+    }
+
+    for (var _viewPortName in config.viewPorts) {
+      plan[_viewPortName] = {
+        name: _viewPortName,
+        strategy: activationStrategy.replace,
+        config: instruction.config.viewPorts[_viewPortName]
+      };
+    }
+
+    return Promise.resolve(plan);
+  }
+
+  _export('_buildNavigationPlan', _buildNavigationPlan);
 
   function hasDifferentParameterValues(prev, next) {
     var prevParams = prev.params;
@@ -101,7 +240,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
     return instructionBaseUrlParts.join('');
   }
 
-  function validateRouteConfig(config) {
+  function validateRouteConfig(config, routes) {
     if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) !== 'object') {
       throw new Error('Invalid Route Config');
     }
@@ -109,6 +248,13 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
     if (typeof config.route !== 'string') {
       var _name2 = config.name || '(no name)';
       throw new Error('Invalid Route Config for "' + _name2 + '": You must specify a "route:" pattern.');
+    }
+
+    for (var i = 0, ii = routes.length; i < ii; ++i) {
+      var _route = routes[i];
+      if (_route.name === config.name) {
+        throw new Error('Routes must contain distinct names');
+      }
     }
 
     if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
@@ -527,58 +673,6 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
       }();
 
-      function _normalizeAbsolutePath(path, hasPushState) {
-        var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-
-        if (!hasPushState && path[0] !== '#') {
-          path = '#' + path;
-        }
-
-        if (hasPushState && absolute) {
-          path = path.substring(1, path.length);
-        }
-
-        return path;
-      }
-
-      _export('_normalizeAbsolutePath', _normalizeAbsolutePath);
-
-      function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
-        if (isAbsoluteUrl.test(fragment)) {
-          return fragment;
-        }
-
-        var path = '';
-
-        if (baseUrl.length && baseUrl[0] !== '/') {
-          path += '/';
-        }
-
-        path += baseUrl;
-
-        if ((!path.length || path[path.length - 1] !== '/') && fragment[0] !== '/') {
-          path += '/';
-        }
-
-        if (path.length && path[path.length - 1] === '/' && fragment[0] === '/') {
-          path = path.substring(0, path.length - 1);
-        }
-
-        return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
-      }
-
-      _export('_createRootedPath', _createRootedPath);
-
-      function _resolveUrl(fragment, baseUrl, hasPushState) {
-        if (isRootedPath.test(fragment)) {
-          return _normalizeAbsolutePath(fragment, hasPushState);
-        }
-
-        return _createRootedPath(fragment, baseUrl, hasPushState);
-      }
-
-      _export('_resolveUrl', _resolveUrl);
-
       isRootedPath = /^#?\//;
       isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
 
@@ -888,12 +982,6 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('NavModel', NavModel);
 
-      function isNavigationCommand(obj) {
-        return obj && typeof obj.navigate === 'function';
-      }
-
-      _export('isNavigationCommand', isNavigationCommand);
-
       _export('Redirect', Redirect = function () {
         function Redirect(url) {
           var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
@@ -1001,13 +1089,13 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
             var navModel = void 0;
             for (var _i = 0, _ii = routeConfigs.length; _i < _ii; ++_i) {
-              var routeConfig = routeConfigs[_i];
-              routeConfig.settings = routeConfig.settings || {};
+              var _routeConfig = routeConfigs[_i];
+              _routeConfig.settings = _routeConfig.settings || {};
               if (!navModel) {
-                navModel = router.createNavModel(routeConfig);
+                navModel = router.createNavModel(_routeConfig);
               }
 
-              router.addRoute(routeConfig, navModel);
+              router.addRoute(_routeConfig, navModel);
             }
           });
 
@@ -1081,86 +1169,6 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
       }());
 
       _export('BuildNavigationPlanStep', BuildNavigationPlanStep);
-
-      function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
-        var prev = instruction.previousInstruction;
-        var config = instruction.config;
-        var plan = {};
-
-        if ('redirect' in config) {
-          var redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
-          if (instruction.queryString) {
-            redirectLocation += '?' + instruction.queryString;
-          }
-
-          return Promise.reject(new Redirect(redirectLocation));
-        }
-
-        if (prev) {
-          var newParams = hasDifferentParameterValues(prev, instruction);
-          var pending = [];
-
-          var _loop2 = function _loop2(viewPortName) {
-            var prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
-            var nextViewPortConfig = config.viewPorts[viewPortName];
-
-            if (!nextViewPortConfig) throw new Error('Invalid Route Config: Configuration for viewPort "' + viewPortName + '" was not found for route: "' + instruction.config.route + '."');
-
-            var viewPortPlan = plan[viewPortName] = {
-              name: viewPortName,
-              config: nextViewPortConfig,
-              prevComponent: prevViewPortInstruction.component,
-              prevModuleId: prevViewPortInstruction.moduleId
-            };
-
-            if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
-              viewPortPlan.strategy = activationStrategy.replace;
-            } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
-              var _prevViewPortInstruct;
-
-              viewPortPlan.strategy = (_prevViewPortInstruct = prevViewPortInstruction.component.viewModel).determineActivationStrategy.apply(_prevViewPortInstruct, instruction.lifecycleArgs);
-            } else if (config.activationStrategy) {
-              viewPortPlan.strategy = config.activationStrategy;
-            } else if (newParams || forceLifecycleMinimum) {
-              viewPortPlan.strategy = activationStrategy.invokeLifecycle;
-            } else {
-              viewPortPlan.strategy = activationStrategy.noChange;
-            }
-
-            if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
-              var path = instruction.getWildcardPath();
-              var task = prevViewPortInstruction.childRouter._createNavigationInstruction(path, instruction).then(function (childInstruction) {
-                viewPortPlan.childNavigationInstruction = childInstruction;
-
-                return _buildNavigationPlan(childInstruction, viewPortPlan.strategy === activationStrategy.invokeLifecycle).then(function (childPlan) {
-                  childInstruction.plan = childPlan;
-                });
-              });
-
-              pending.push(task);
-            }
-          };
-
-          for (var viewPortName in prev.viewPortInstructions) {
-            _loop2(viewPortName);
-          }
-
-          return Promise.all(pending).then(function () {
-            return plan;
-          });
-        }
-
-        for (var _viewPortName in config.viewPorts) {
-          plan[_viewPortName] = {
-            name: _viewPortName,
-            strategy: activationStrategy.replace,
-            config: instruction.config.viewPorts[_viewPortName]
-          };
-        }
-
-        return Promise.resolve(plan);
-      }
-      _export('_buildNavigationPlan', _buildNavigationPlan);
 
       _export('Router', Router = function () {
         function Router(container, history) {
@@ -1276,7 +1284,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         Router.prototype.addRoute = function addRoute(config, navModel) {
-          validateRouteConfig(config);
+          validateRouteConfig(config, this.routes);
 
           if (!('viewPorts' in config) && !config.navigationStrategy) {
             config.viewPorts = {
@@ -1459,7 +1467,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
             return typeof c === 'string' ? { moduleId: c } : c;
           }).then(function (c) {
             c.route = instruction.params.path;
-            validateRouteConfig(c);
+            validateRouteConfig(c, _this5.routes);
 
             if (!c.navModel) {
               c.navModel = _this5.createNavModel(c);
