@@ -1,3 +1,18 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/aurelia/router/compare/1.0.0-rc.1.0.5...v1.0.0) (2016-07-27)
+
+
+### Bug Fixes
+
+* **router:** ensure routes have distinct names ([bbd7939](https://github.com/aurelia/router/commit/bbd7939))
+
+
+### Features
+
+* **interfaces.js:** add RoutableComponent interface ([434ce9a](https://github.com/aurelia/router/commit/434ce9a))
+
+
+
 <a name="1.0.0-rc.1.0.2"></a>
 # [1.0.0-rc.1.0.2](https://github.com/aurelia/router/compare/1.0.0-rc.1.0.1...v1.0.0-rc.1.0.2) (2016-07-24)
 
