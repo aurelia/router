@@ -1499,10 +1499,12 @@ function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
     throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
   }
 
-  for (let i = 0, ii = routes.length; i < ii; ++i) {
-    let route = routes[i];
-    if (route.name === config.name) {
-      throw new Error('Routes must contain distinct names');
+  if (config.name) {
+    for (let i = 0, ii = routes.length; i < ii; ++i) {
+      let route = routes[i];
+      if (route.name === config.name) {
+        throw new Error('Routes must contain distinct names');
+      }
     }
   }
 
