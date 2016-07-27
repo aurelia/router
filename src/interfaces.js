@@ -73,5 +73,62 @@ interface RouteConfig {
   */
   caseSensitive?: boolean;
 
+  /**
+  * Add to specify an activation strategy if it is always the same and you do not want that
+  * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
+  */
+  activationStrategy?: string;
+  
   [x: string]: any;
+}
+
+interface RoutableComponentCanActivate {
+  /**
+  * Implement this hook if you want to control whether or not your view-model can be navigated to.
+  * Return a boolean value, a promise for a boolean value, or a navigation command.
+  */
+  canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
+}
+
+interface RoutableComponentActivate {
+  /**
+  * Implement this hook if you want to perform custom logic just before your view-model is displayed.
+  * You can optionally return a promise to tell the router to wait to bind and attach the view until
+  * after you finish your work.
+  */
+  activate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<void>|PromiseLike<void>|IObservable|void;
+}
+
+interface RoutableComponentCanDeactivate {
+  /**
+  * Implement this hook if you want to control whether or not the router can navigate away from your
+  * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
+  * or a navigation command.
+  */
+  canDeactivate: () => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
+}
+
+interface RoutableComponentDeactivate {
+  /**
+  * Implement this hook if you want to perform custom logic when your view-model is being
+  * navigated away from. You can optionally return a promise to tell the router to wait until
+  * after you finish your work.
+  */
+  deactivate: () => Promise<void>|PromiseLike<void>|IObservable|void;
+}
+
+interface RoutableComponentDetermineActivationStrategy {
+  /**
+  * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
+  * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
+  */
+  determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => string;
+}
+
+
+interface ConfigureRouter {
+  /**
+  * Implement this hook if you want to add sub-routes to your view.
+  */
+  configureRouter(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
 }

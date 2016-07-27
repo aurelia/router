@@ -1,4 +1,13 @@
 /**
+* When a navigation command is encountered, the current navigation
+* will be cancelled and control will be passed to the navigation
+* command so it can determine the correct action.
+*/
+interface NavigationCommand {
+  navigate: (router: Router) => void;
+}
+
+/**
 * Determines if the provided object is a navigation command.
 * A navigation command is anything with a navigate method.
 *
