@@ -250,15 +250,6 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
       throw new Error('Invalid Route Config for "' + _name2 + '": You must specify a "route:" pattern.');
     }
 
-    if (config.name) {
-      for (var i = 0, ii = routes.length; i < ii; ++i) {
-        var _route = routes[i];
-        if (_route.name === config.name) {
-          throw new Error('Routes must contain distinct names');
-        }
-      }
-    }
-
     if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
       throw new Error('Invalid Route Config for "' + config.route + '": You must specify a "moduleId:", "redirect:", "navigationStrategy:", or "viewPorts:".');
     }
