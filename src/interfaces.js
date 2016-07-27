@@ -53,6 +53,11 @@ interface RouteConfig {
   href?: string;
 
   /**
+  * Indicates that when route generation is done for this route, it should just take the literal value of the href property.
+  */
+  generationUsesHref?: boolean;
+
+  /**
   * The document title to set when this route is active.
   */
   title?: string;
@@ -78,10 +83,13 @@ interface RouteConfig {
   * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
   */
   activationStrategy?: string;
-  
+
   [x: string]: any;
 }
 
+/**
+* An optional interface describing the canActivate convention.
+*/
 interface RoutableComponentCanActivate {
   /**
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
@@ -90,6 +98,9 @@ interface RoutableComponentCanActivate {
   canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
 }
 
+/**
+* An optional interface describing the activate convention.
+*/
 interface RoutableComponentActivate {
   /**
   * Implement this hook if you want to perform custom logic just before your view-model is displayed.
@@ -99,6 +110,9 @@ interface RoutableComponentActivate {
   activate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<void>|PromiseLike<void>|IObservable|void;
 }
 
+/**
+* An optional interface describing the canDeactivate convention.
+*/
 interface RoutableComponentCanDeactivate {
   /**
   * Implement this hook if you want to control whether or not the router can navigate away from your
@@ -108,6 +122,9 @@ interface RoutableComponentCanDeactivate {
   canDeactivate: () => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
 }
 
+/**
+* An optional interface describing the deactivate convention.
+*/
 interface RoutableComponentDeactivate {
   /**
   * Implement this hook if you want to perform custom logic when your view-model is being
@@ -117,6 +134,9 @@ interface RoutableComponentDeactivate {
   deactivate: () => Promise<void>|PromiseLike<void>|IObservable|void;
 }
 
+/**
+* An optional interface describing the determineActivationStrategy convention.
+*/
 interface RoutableComponentDetermineActivationStrategy {
   /**
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
@@ -125,10 +145,12 @@ interface RoutableComponentDetermineActivationStrategy {
   determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => string;
 }
 
-
-interface ConfigureRouter {
+/**
+* An optional interface describing the router configuration convention.
+*/
+interface ConfiguresRouter {
   /**
-  * Implement this hook if you want to add sub-routes to your view.
+  * Implement this hook if you want to configure a router.
   */
   configureRouter(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
 }
