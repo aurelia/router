@@ -1,3 +1,13 @@
+<a name="1.0.1"></a>
+## [1.0.1](https://github.com/aurelia/router/compare/1.0.0...v1.0.1) (2016-07-27)
+
+
+### Bug Fixes
+
+* **router:** validation failed for un-named routes ([66b415b](https://github.com/aurelia/router/commit/66b415b))
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/aurelia/router/compare/1.0.0-rc.1.0.5...v1.0.0) (2016-07-27)
 
