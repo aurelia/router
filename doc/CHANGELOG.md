@@ -1,3 +1,13 @@
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/aurelia/router/compare/1.0.1...v1.0.2) (2016-07-27)
+
+
+### Bug Fixes
+
+* **router:** remove name unique checking since it breaks most apps ([35c67bc](https://github.com/aurelia/router/commit/35c67bc))
+
+
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/aurelia/router/compare/1.0.0...v1.0.1) (2016-07-27)
 
