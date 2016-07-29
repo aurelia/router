@@ -9,6 +9,8 @@ import {
   _createRootedPath,
   _resolveUrl} from './util';
 import {RouteConfig} from './interfaces';
+import {relativeToFile} from 'aurelia-path';
+import {Origin} from 'aurelia-metadata';
 
 /**
 * The primary class responsible for handling routing and navigation.
@@ -133,6 +135,21 @@ export class Router {
       this.isConfigured = true;
       this._resolveConfiguredPromise();
     });
+  }
+
+  /**
+  * Finds the locations of a view model.
+  * By default it uses the moduleId as a path relative to the location of the router itself
+  * You can subclass the Router and provide a custom way to resolve view model locations, such
+  * as loading the file from a module in /node_modules
+  *
+  * Used by TemplatingRouteLoader in route-loader
+  *
+  * @param the route configuration
+  * @returns {string} The file location of the view model
+  */
+  viewModelLocation(config) {
+      return relativeToFile(config.moduleId, Origin.get(this.container.viewModel.constructor).moduleId);
   }
 
   /**
