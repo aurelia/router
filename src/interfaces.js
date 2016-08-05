@@ -79,6 +79,11 @@ interface RouteConfig {
   caseSensitive?: boolean;
 
   /**
+  * When true is specified, this route will be authenticated using the optional Auth pipeline.
+  */
+  auth?: boolean;
+
+  /**
   * Add to specify an activation strategy if it is always the same and you do not want that
   * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
   */

@@ -422,7 +422,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
 
     class AuthorizeStep {
-      run(navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+      run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
         if (navigationInstruction.getAllInstructions().some(i => i.config.auth)) {
           var isLoggedIn = //insert magic here;
           if (!isLoggedIn) {
