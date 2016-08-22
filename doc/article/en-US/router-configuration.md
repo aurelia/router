@@ -592,7 +592,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
       configureRouter(config, router) {
         config.title = 'Aurelia';
         config.map([
-          { route: 'users', name: 'users', viewports: { left: { moduleId: 'user/list' }, right: { moduleId: 'user/detail' } } }
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: 'user/detail' } } }
         ]);
       }
     }
@@ -604,7 +604,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
       configureRouter(config: RouterConfiguration, router: Router): void {
         config.title = 'Aurelia';
         config.map([
-          { route: 'users', name: 'users', viewports: { left: { moduleId: 'user/list' }, right: { moduleId: 'user/detail' } } }
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: 'user/detail' } } }
         ]);
       }
     }
