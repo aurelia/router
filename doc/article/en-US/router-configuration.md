@@ -35,7 +35,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -51,7 +51,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: 0 }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: 0 }
         ]);
       }
     }
@@ -63,7 +63,7 @@ You can also call `mapRoute()` on a single route configuration.
 * `config.map()` adds route(s) to the router.  Although only route, name, moduleId, href and nav are shown above there are other properties that can be included in a route. The class name for each route is `RouteConfig`.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route view-model's `activate()` function.
-  * Wildcard routes are used to match the "rest" of a path (ie: files*path matches files/new/doc or files/temp). An object with the rest of the URL after the segment is set as the `path` property and passed as a parameter to `activate()` as well.
+  * Wildcard routes are used to match the "rest" of a path (ie: files/*path matches files/new/doc or files/temp). An object with the rest of the URL after the segment is set as the `path` property and passed as a parameter to `activate()` as well.
 * `href` - is a conditionally optional property. If it is not defined then route is used. If route has segments then href is required as in the case of files because the router does not know how to fill out the parameterized portions of the pattern.
 * `nav` - is a boolean or number property. When set to true the route will be included in the router's navigation model. This makes it easier to create a dynamic menu or similar elements. When specified as number, the value will be used in sorting the routes.
 
@@ -129,7 +129,7 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
           { route: ['', 'admin*path'],   name: 'route',  navigationStrategy: navStrat }
         ]);
       }
@@ -150,7 +150,7 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
           { route: ['', 'admin*path'],   name: 'route',  navigationStrategy: navStrat }
         ]);
       }
@@ -173,7 +173,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} },
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} },
 
         ]);
       }
@@ -190,7 +190,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} },
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} },
 
         ]);
       }
@@ -309,8 +309,8 @@ The above example will redirect any unmatched routes to the `not-found` componen
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
-          {route: ['', 'admin*path'],   name: 'route',  navigationStrategy: navStrat }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
+          {route: ['', 'admin/*path'],   name: 'route',  navigationStrategy: navStrat }
         ]);
       }
     }
@@ -339,8 +339,8 @@ The above example will redirect any unmatched routes to the `not-found` componen
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
-          {route: ['', 'admin*path'],   name: 'route',  navigationStrategy: navStrat }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
+          {route: ['', 'admin/*path'],   name: 'route',  navigationStrategy: navStrat }
         ]);
       }
     }
@@ -387,7 +387,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true,     auth: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail',  auth: true },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files', nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files', nav: true }
         ]);
       }
     }
@@ -416,7 +416,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -451,7 +451,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -474,7 +474,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -495,7 +495,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -517,7 +517,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -538,7 +538,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -561,7 +561,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
