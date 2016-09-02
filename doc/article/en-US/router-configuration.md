@@ -626,7 +626,7 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
   <source-code lang="HTML">
     <template>
       <div class="page-host">
-        <router-view layout="views/layout-default.html"></router-view>
+        <router-view layout-view="views/layout-default.html"></router-view>
       </div>
     </template>
   </source-code>
