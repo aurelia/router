@@ -265,6 +265,7 @@ export class Router {
 
       withChild.navModel = navModel;
       withChild.settings = config.settings;
+      withChild.navigationStrategy = config.navigationStrategy;
     }
 
     config.navModel = navModel;
