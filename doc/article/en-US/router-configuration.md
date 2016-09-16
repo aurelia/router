@@ -82,7 +82,7 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
         config.options.root = '/';
         config.map([
           { route: ['welcome'],    name: 'welcome',     moduleId: 'welcome',      nav: true, title:'Welcome' },
-          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true, auth: true },
+          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true },
           { route: 'child-router', name: 'childRouter', moduleId: 'child-router', nav: true, title:'Child Router' },
           { route: '',             redirect: 'welcome' }
         ]);
@@ -99,7 +99,7 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
         config.options.root = '/';
         config.map([
           { route: ['welcome'],    name: 'welcome',     moduleId: 'welcome',      nav: true, title:'Welcome' },
-          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true, auth: true },
+          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true },
           { route: 'child-router', name: 'childRouter', moduleId: 'child-router', nav: true, title:'Child Router' },
           { route: '',             redirect: 'welcome' }
         ]);
@@ -385,8 +385,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         config.addAuthorizeStep(step)
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true,     auth: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail',  auth: true },
+          { route: 'users',            name: 'users',      moduleId: 'users/index', settings: { auth: true } },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail', settings: { auth: true } },
           { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files', nav: true }
         ]);
       }
@@ -394,7 +394,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
     class AuthorizeStep {
       run(navigationInstruction, next) {
-        if (navigationInstruction.getAllInstructions().some(i => i.config.auth)) {
+        if (navigationInstruction.getAllInstructions().some(i => i.config.settings.auth)) {
           var isLoggedIn = // insert magic here;
           if (!isLoggedIn) {
             return next.cancel(new Redirect('login'));
@@ -422,8 +422,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
 
     class AuthorizeStep {
-      run(navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
-        if (navigationInstruction.getAllInstructions().some(i => i.config.auth)) {
+      run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
+        if (navigationInstruction.getAllInstructions().some(i => i.config.settings.auth)) {
           var isLoggedIn = //insert magic here;
           if (!isLoggedIn) {
             return next.cancel(new Redirect('login'));
