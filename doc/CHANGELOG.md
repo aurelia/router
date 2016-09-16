@@ -1,3 +1,14 @@
+<a name="1.0.3"></a>
+## [1.0.3](https://github.com/aurelia/router/compare/1.0.2...v1.0.3) (2016-09-13)
+
+
+### Bug Fixes
+
+* **router:** add navigationStrategy to cloned route config ([dc3a292](https://github.com/aurelia/router/commit/dc3a292))
+* **router:** safer execution of custom navigation strategies ([fab2d21](https://github.com/aurelia/router/commit/fab2d21))
+
+
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://github.com/aurelia/router/compare/1.0.1...v1.0.2) (2016-07-27)
 

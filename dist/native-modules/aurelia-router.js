@@ -843,6 +843,7 @@ export var Router = function () {
 
       withChild.navModel = navModel;
       withChild.settings = config.settings;
+      withChild.navigationStrategy = config.navigationStrategy;
     }
 
     config.navModel = navModel;
@@ -955,7 +956,7 @@ export var Router = function () {
 
       if (typeof first.handler === 'function') {
         return evaluateNavigationStrategy(_instruction, first.handler, first);
-      } else if (first.handler && 'navigationStrategy' in first.handler) {
+      } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
         return evaluateNavigationStrategy(_instruction, first.handler.navigationStrategy, first.handler);
       }
 
