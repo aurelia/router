@@ -54,6 +54,8 @@ export class Router {
 
   options: Object = {};
 
+  transformTitle: (title: string) => string;
+
   /**
   * @param container The [[Container]] to use when child routers.
   * @param history The [[History]] implementation to delegate navigation requests to.
@@ -331,6 +333,16 @@ export class Router {
 
     this.currentInstruction._updateTitle();
     return undefined;
+  }
+
+  _transformTitle(title: string) {
+    if (this.transformTitle) {
+      return this.transformTitle(title);
+    }
+    if (this.parent) {
+      return parent.transformTitle(title);
+    }
+    return title;
   }
 
   /**
