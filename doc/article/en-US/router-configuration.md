@@ -173,8 +173,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} },
-
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} }
         ]);
       }
     }
@@ -190,8 +189,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} },
-
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} }
         ]);
       }
     }
@@ -211,7 +209,7 @@ You can set a route to be case sensitive, should you wish:
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
         ]);
       }
     }
@@ -226,7 +224,7 @@ You can set a route to be case sensitive, should you wish:
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
         ]);
       }
     }
@@ -256,7 +254,7 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
         ]);
 
         config.mapUnknownRoutes('not-found');
@@ -273,7 +271,7 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
         ]);
 
         config.mapUnknownRoutes('not-found');
@@ -286,6 +284,13 @@ The above example will redirect any unmatched routes to the `not-found` componen
 
 ### Using A Function For Unknown Routes
 
+The function passed to `mapUnknownRoutes()` has to return:
+
+* A string to a moduleId.
+* An object with property `moduleId` of type string.
+* A `RouteConfig` object.
+* A `Promise` that resolves to any of the above.
+
 <code-listing heading="Dynamic Unknown Routes">
   <source-code lang="ES 2015/2016">
     export class App {
@@ -294,23 +299,18 @@ The above example will redirect any unmatched routes to the `not-found` componen
 
         config.title = 'Aurelia';
 
-        var navStrat = (instruction) => {
-          if (instruction.config === null) {
-            return 'not-found';
-          }
-
-          instruction.config.moduleId = instruction.fragment
-          instruction.config.href = instruction.fragment
+        var handleUnknownRoutes = (instruction) => {
+            // return 'not-found';
+            return { moduleId: 'not-found' };
         }
 
-        config.mapUnknownRoutes(navStrat);
+        config.mapUnknownRoutes(handleUnknownRoutes);
 
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
-          {route: ['', 'admin/*path'],   name: 'route',  navigationStrategy: navStrat }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -325,22 +325,18 @@ The above example will redirect any unmatched routes to the `not-found` componen
 
         config.title = 'Aurelia';
 
-        let navStrat = (instruction: NavigationInstruction) => {
-          if (instruction.config === null) {
-            return 'not-found';
-          }
-          instruction.config.moduleId = instruction.fragment
-          instruction.config.href = instruction.fragment
+        let handleUnknownRoutes = (instruction: NavigationInstruction): {moduleId: string} => {
+            // return 'not-found';
+            return { moduleId: 'not-found' };
         }
 
-        config.mapUnknownRoutes(navStrat);
+        config.mapUnknownRoutes(handleUnknownRoutes);
 
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
-          {route: ['', 'admin/*path'],   name: 'route',  navigationStrategy: navStrat }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
