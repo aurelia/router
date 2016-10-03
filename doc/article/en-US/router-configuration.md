@@ -378,6 +378,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
     export class App {
       configureRouter(config, router) {
+        var step = new AuthorizeStep;
         config.addAuthorizeStep(step)
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
