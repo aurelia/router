@@ -459,6 +459,8 @@ function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluato
 
     if (typeof modules === 'string') {
       modules = {'default': modules};
+    } else if (modules === undefined) {
+      modules = {'default': instruction.config.moduleId};
     }
 
     for (let key in modules) {
