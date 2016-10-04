@@ -452,7 +452,7 @@ function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
 }
 
 function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluator: Function, context: any): Promise<NavigationInstruction> {
-  return Promise.resolve(evaluator.call(context, instruction)).then((modules: string | {[viewportname: string]: moduleId}) => {
+  return Promise.resolve(evaluator.call(context, instruction)).then((modules?: string | {[viewportname: string]: moduleId}) => {
     if (!('viewPorts' in instruction.config)) {
       instruction.config.viewPorts = {};
     }
