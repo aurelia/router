@@ -466,6 +466,7 @@ function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluato
     for (let key in modules) {
       let vp = instruction.config.viewPorts[key] || {};
       vp.moduleId = modules[key];
+      instruction.config.viewPorts[key] = vp;
     }
 
     return instruction;
