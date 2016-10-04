@@ -63,6 +63,11 @@ export class NavigationInstruction {
   */
   viewPortInstructions: any;
 
+  /**
+    * The router instance.
+  */
+  router: Router;
+
   plan: Object = null;
 
   options: Object = {};
