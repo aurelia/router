@@ -452,13 +452,18 @@ function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
 }
 
 function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluator: Function, context: any): Promise<NavigationInstruction> {
-  return Promise.resolve(evaluator.call(context, instruction)).then(() => {
+  return Promise.resolve(evaluator.call(context, instruction)).then((modules: string | {[viewportname: string]: moduleId}) => {
     if (!('viewPorts' in instruction.config)) {
-      instruction.config.viewPorts = {
-        'default': {
-          moduleId: instruction.config.moduleId
-        }
-      };
+      instruction.config.viewPorts = {};
+    }
+
+    if (typeof modules === 'string') {
+      modules = {'default': modules};
+    }
+
+    for (let key in modules) {
+      let vp = instruction.config.viewPorts[key] || {};
+      vp.moduleId = modules[key];
     }
 
     return instruction;
