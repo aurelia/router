@@ -131,7 +131,7 @@ export class RouterConfiguration {
   *
   * @param router The [[Router]] to apply the configuration to.
   */
-  exportToRouter(router: Router): void {
+  export ToRouter(router: Router): void {
     let instructions = this.instructions;
     for (let i = 0, ii = instructions.length; i < ii; ++i) {
       instructions[i](router);
