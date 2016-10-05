@@ -52,7 +52,7 @@ export class Router {
   */
   parent: Router = null;
 
-  options: Object = {};
+  options: any = {};
 
   /**
   * @param container The [[Container]] to use when child routers.
