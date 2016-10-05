@@ -7,7 +7,7 @@ import {RouteConfig} from './interfaces';
  */
 export class RouterConfiguration {
   instructions = [];
-  options = {};
+  options: any = {};
   pipelineSteps: Array<Function|PipelineStep> = [];
   title: string;
   unknownRouteConfig: any;
@@ -121,7 +121,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>) : RouterConfiguration {
+  mapUnknownRoutes(config: string|RouteConfig|((instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>)): RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
