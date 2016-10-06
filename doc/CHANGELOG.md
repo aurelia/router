@@ -1,3 +1,13 @@
+<a name="1.0.6"></a>
+## [1.0.6](https://github.com/aurelia/router/compare/1.0.5...v1.0.6) (2016-10-06)
+
+
+### Bug Fixes
+
+* **tsd:** define router property in NavigationInstruction ([bec3a3b](https://github.com/aurelia/router/commit/bec3a3b))
+
+
+
 <a name="1.0.5"></a>
 ## [1.0.5](https://github.com/aurelia/router/compare/1.0.4...v1.0.5) (2016-09-29)
 

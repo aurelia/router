@@ -250,6 +250,11 @@ export class NavigationInstruction {
   */
   viewPortInstructions: any;
 
+  /**
+    * The router instance.
+  */
+  router: Router;
+
   plan: Object = null;
 
   options: Object = {};
@@ -754,7 +759,7 @@ export class RedirectToRoute {
  */
 export class RouterConfiguration {
   instructions = [];
-  options = {};
+  options: any = {};
   pipelineSteps: Array<Function|PipelineStep> = [];
   title: string;
   unknownRouteConfig: any;
@@ -868,7 +873,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>) : RouterConfiguration {
+  mapUnknownRoutes(config: string|RouteConfig|((instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>)): RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
@@ -1105,7 +1110,7 @@ export class Router {
   */
   parent: Router = null;
 
-  options: Object = {};
+  options: any = {};
 
   /**
   * @param container The [[Container]] to use when child routers.
