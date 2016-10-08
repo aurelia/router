@@ -682,8 +682,8 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
         };
         config.map([
           { route: 'home', name: 'home', moduleId: 'home/index' },
-          { route: 'login', name: 'login', moduleId: 'login/index', layoutView = 'views/layout-login.html' },
-          { route: 'users', name: 'users', moduleId: 'users/index', layoutViewModel = 'views/model', layoutModel: model }
+          { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'views/layout-login.html' },
+          { route: 'users', name: 'users', moduleId: 'users/index', layoutViewModel: 'views/model', layoutModel: model }
         ]);
       }
     }
