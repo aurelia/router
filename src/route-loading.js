@@ -63,8 +63,11 @@ function determineWhatToLoad(navigationInstruction: NavigationInstruction, toLoa
 
 function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, viewPortPlan: any) {
   const viewPortName = viewPortPlan.name;
-  const cache = navigationInstruction.router.viewPorts[viewPortName].cache;
-  const controller = cache.get(viewPortName, viewPortPlan.config, navigationInstruction);
+  const viewPort = navigationInstruction.router.viewPorts[viewPortName];
+  let controller;
+  if (viewPort) {
+    controller = viewPort.cache.get(viewPortName, viewPortPlan.config, navigationInstruction);
+  }
   let loadComponentPromise;
   if (controller) {
     loadComponentPromise = Promise.resolve({

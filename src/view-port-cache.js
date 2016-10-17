@@ -15,8 +15,10 @@ export class ViewPortCache {
   set(viewPortName, viewPortConfig, navigationInstruction, controller) {
     if (viewPortConfig.cacheable) {
       const key = this.createKey(viewPortName, navigationInstruction);
-      return this.controllers[key] = controller;
+      this.controllers[key] = controller;
+      return true;
     }
+    return false;
   }
 
   createKey(viewPortName, navigationInstruction): string {
