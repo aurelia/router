@@ -62,9 +62,23 @@ function determineWhatToLoad(navigationInstruction: NavigationInstruction, toLoa
 }
 
 function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, viewPortPlan: any) {
-  let moduleId = viewPortPlan.config.moduleId;
-
-  return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config).then((component) => {
+  const viewPortName = viewPortPlan.name;
+  const cache = navigationInstruction.router.viewPorts[viewPortName].cache;
+  const controller = cache.get(viewPortName, viewPortPlan.config, navigationInstruction);
+  let loadComponentPromise;
+  if (controller) {
+    loadComponentPromise = Promise.resolve({
+      childContainer: controller.container,
+      router: navigationInstruction.router,
+      view: undefined,
+      viewModel: controller.viewModel,
+      viewModelResource: controller.behavior
+    });
+  } else {
+    loadComponentPromise = loadComponent(routeLoader, navigationInstruction, viewPortPlan.config);
+  }
+  return loadComponentPromise.then(component => {
+    let moduleId = viewPortPlan.config.moduleId;
     let viewPortInstruction = navigationInstruction.addViewPortInstruction(
       viewPortPlan.name,
       viewPortPlan.strategy,
