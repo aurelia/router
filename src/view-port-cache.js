@@ -22,7 +22,7 @@ export class ViewPortCache {
   }
 
   clear() {
-    controllers = this.controllers;
+    const controllers = this.controllers;
     this.controllers = Object.create(null);
     for (let key in controllers) {
       if (controllers.hasOwnProperty(key)) {
