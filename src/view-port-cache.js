@@ -2,7 +2,7 @@ import {transient} from 'aurelia-dependency-injection';
 
 @transient()
 export class ViewPortCache {
-  controllers = {};
+  controllers = Object.create(null);
 
   get(viewPortName, viewPortConfig, navigationInstruction) {
     if (viewPortConfig.cacheable) {
@@ -19,6 +19,16 @@ export class ViewPortCache {
       return true;
     }
     return false;
+  }
+
+  clear() {
+    controllers = this.controllers;
+    this.controllers = Object.create(null);
+    for (let key in controllers) {
+      if (controllers.hasOwnProperty(key)) {
+        controllers[key].unbind();
+      }
+    }
   }
 
   createKey(viewPortName, navigationInstruction): string {
