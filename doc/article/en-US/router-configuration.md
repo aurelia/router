@@ -301,8 +301,7 @@ The function passed to `mapUnknownRoutes()` has to return:
         config.title = 'Aurelia';
 
         var handleUnknownRoutes = (instruction) => {
-            // return 'not-found';
-            return { moduleId: 'not-found' };
+            return { route: 'not-found', moduleId: 'not-found' };
         }
 
         config.mapUnknownRoutes(handleUnknownRoutes);
@@ -318,7 +317,7 @@ The function passed to `mapUnknownRoutes()` has to return:
 
   </source-code>
   <source-code lang="TypeScript">
-    import {RouterConfiguration, NavigationInstruction, Router} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Router, RouteConfig} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration, router: Router): void {
@@ -326,9 +325,8 @@ The function passed to `mapUnknownRoutes()` has to return:
 
         config.title = 'Aurelia';
 
-        let handleUnknownRoutes = (instruction: NavigationInstruction): {moduleId: string} => {
-            // return 'not-found';
-            return { moduleId: 'not-found' };
+        let handleUnknownRoutes = (instruction: NavigationInstruction): RouteConfig => {
+            return { route: 'not-found', moduleId: 'not-found' };
         }
 
         config.mapUnknownRoutes(handleUnknownRoutes);
