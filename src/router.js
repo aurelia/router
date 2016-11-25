@@ -52,7 +52,7 @@ export class Router {
   */
   parent: Router = null;
 
-  options: Object = {};
+  options: any = {};
 
   /**
   * Extension point to transform the document title before it is built and displayed.

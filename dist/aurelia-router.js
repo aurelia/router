@@ -250,6 +250,11 @@ export class NavigationInstruction {
   */
   viewPortInstructions: any;
 
+  /**
+    * The router instance.
+  */
+  router: Router;
+
   plan: Object = null;
 
   options: Object = {};
@@ -604,7 +609,7 @@ interface RoutableComponentCanActivate {
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
   * Return a boolean value, a promise for a boolean value, or a navigation command.
   */
-  canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
+  canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand|Promise<NavigationCommand>|PromiseLike<NavigationCommand>;
 }
 
 /**
@@ -754,7 +759,7 @@ export class RedirectToRoute {
  */
 export class RouterConfiguration {
   instructions = [];
-  options = {};
+  options: any = {};
   pipelineSteps: Array<Function|PipelineStep> = [];
   title: string;
   unknownRouteConfig: any;
@@ -868,7 +873,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|(instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>) : RouterConfiguration {
+  mapUnknownRoutes(config: string|RouteConfig|((instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>)): RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
@@ -1105,7 +1110,7 @@ export class Router {
   */
   parent: Router = null;
 
-  options: Object = {};
+  options: any = {};
 
   /**
   * @param container The [[Container]] to use when child routers.

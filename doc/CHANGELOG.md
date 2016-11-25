@@ -1,3 +1,23 @@
+<a name="1.0.6"></a>
+## [1.0.6](https://github.com/aurelia/router/compare/1.0.5...v1.0.6) (2016-10-06)
+
+
+### Bug Fixes
+
+* **tsd:** define router property in NavigationInstruction ([bec3a3b](https://github.com/aurelia/router/commit/bec3a3b))
+
+
+
+<a name="1.0.5"></a>
+## [1.0.5](https://github.com/aurelia/router/compare/1.0.4...v1.0.5) (2016-09-29)
+
+
+### Bug Fixes
+
+* **typings:** RoutableComponentCanActivate.canActivate should accept `Promise<NavigationCommand>` as return type. ([4460100](https://github.com/aurelia/router/commit/4460100)), closes [#401](https://github.com/aurelia/router/issues/401)
+
+
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/aurelia/router/compare/1.0.2...v1.0.3) (2016-09-13)
 

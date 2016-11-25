@@ -35,7 +35,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',      name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -51,7 +51,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: 0 }
+          { route: 'files/*path',      name: 'files',      moduleId: 'files/index',   href:'#files',   nav: 0 }
         ]);
       }
     }
@@ -63,6 +63,7 @@ You can also call `mapRoute()` on a single route configuration.
 * `config.map()` adds route(s) to the router.  Although only route, name, moduleId, href and nav are shown above there are other properties that can be included in a route. The class name for each route is `RouteConfig`.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route view-model's `activate()` function.
+  * A parameter can be made optional by appending a question mark `:token?` (ie: `users/:id?/detail` would match both `users/3/detail` and `users/detail`). When an optional parameter is missing from the url, the property passed to `activate()` is `undefined`.
   * Wildcard routes are used to match the "rest" of a path (ie: files/*path matches files/new/doc or files/temp). An object with the rest of the URL after the segment is set as the `path` property and passed as a parameter to `activate()` as well.
 * `href` - is a conditionally optional property. If it is not defined then route is used. If route has segments then href is required as in the case of files because the router does not know how to fill out the parameterized portions of the pattern.
 * `nav` - is a boolean or number property. When set to true the route will be included in the router's navigation model. This makes it easier to create a dynamic menu or similar elements. When specified as number, the value will be used in sorting the routes.
@@ -173,8 +174,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} },
-
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} }
         ]);
       }
     }
@@ -190,8 +190,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} },
-
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} }
         ]);
       }
     }
@@ -211,7 +210,7 @@ You can set a route to be case sensitive, should you wish:
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
         ]);
       }
     }
@@ -226,7 +225,7 @@ You can set a route to be case sensitive, should you wish:
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
         ]);
       }
     }
@@ -256,7 +255,7 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
         ]);
 
         config.mapUnknownRoutes('not-found');
@@ -273,7 +272,7 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
         ]);
 
         config.mapUnknownRoutes('not-found');
@@ -286,6 +285,13 @@ The above example will redirect any unmatched routes to the `not-found` componen
 
 ### Using A Function For Unknown Routes
 
+The function passed to `mapUnknownRoutes()` has to return:
+
+* A string to a moduleId.
+* An object with property `moduleId` of type string.
+* A `RouteConfig` object.
+* A `Promise` that resolves to any of the above.
+
 <code-listing heading="Dynamic Unknown Routes">
   <source-code lang="ES 2015/2016">
     export class App {
@@ -294,30 +300,24 @@ The above example will redirect any unmatched routes to the `not-found` componen
 
         config.title = 'Aurelia';
 
-        var navStrat = (instruction) => {
-          if (instruction.config === null) {
-            return 'not-found';
-          }
-
-          instruction.config.moduleId = instruction.fragment
-          instruction.config.href = instruction.fragment
+        var handleUnknownRoutes = (instruction) => {
+            return { route: 'not-found', moduleId: 'not-found' };
         }
 
-        config.mapUnknownRoutes(navStrat);
+        config.mapUnknownRoutes(handleUnknownRoutes);
 
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
-          {route: ['', 'admin/*path'],   name: 'route',  navigationStrategy: navStrat }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
 
   </source-code>
   <source-code lang="TypeScript">
-    import {RouterConfiguration, NavigationInstruction, Router} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Router, RouteConfig} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration, router: Router): void {
@@ -325,22 +325,17 @@ The above example will redirect any unmatched routes to the `not-found` componen
 
         config.title = 'Aurelia';
 
-        let navStrat = (instruction: NavigationInstruction) => {
-          if (instruction.config === null) {
-            return 'not-found';
-          }
-          instruction.config.moduleId = instruction.fragment
-          instruction.config.href = instruction.fragment
+        let handleUnknownRoutes = (instruction: NavigationInstruction): RouteConfig => {
+            return { route: 'not-found', moduleId: 'not-found' };
         }
 
-        config.mapUnknownRoutes(navStrat);
+        config.mapUnknownRoutes(handleUnknownRoutes);
 
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
-          {route: ['', 'admin/*path'],   name: 'route',  navigationStrategy: navStrat }
+          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
         ]);
       }
     }
@@ -382,6 +377,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
     export class App {
       configureRouter(config, router) {
+        var step = new AuthorizeStep;
         config.addAuthorizeStep(step)
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
@@ -626,7 +622,7 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
   <source-code lang="HTML">
     <template>
       <div class="page-host">
-        <router-view layout="views/layout-default.html"></router-view>
+        <router-view layout-view="views/layout-default.html"></router-view>
       </div>
     </template>
   </source-code>
@@ -685,8 +681,8 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
         };
         config.map([
           { route: 'home', name: 'home', moduleId: 'home/index' },
-          { route: 'login', name: 'login', moduleId: 'login/index', layoutView = 'views/layout-login.html' },
-          { route: 'users', name: 'users', moduleId: 'users/index', layoutViewModel = 'views/model', layoutModel: model }
+          { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'views/layout-login.html' },
+          { route: 'users', name: 'users', moduleId: 'users/index', layoutViewModel: 'views/model', layoutModel: model }
         ]);
       }
     }
