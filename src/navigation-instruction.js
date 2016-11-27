@@ -246,7 +246,7 @@ export class NavigationInstruction {
       if (viewPortInstruction.childNavigationInstruction) {
         let childTitle = viewPortInstruction.childNavigationInstruction._buildTitle(separator);
         if (childTitle) {
-          childTitles.push(this.router.transformTitle(childTitle));
+          childTitles.push(childTitle);
         }
       }
     }
