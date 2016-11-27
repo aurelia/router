@@ -233,8 +233,12 @@ export class NavigationInstruction {
   }
 
   _buildTitle(separator: string = ' | '): string {
-    let title = this.config.navModel.title || '';
+    let title = '';
     let childTitles = [];
+
+    if (this.config.navModel.title) {
+      title = this.router.transformTitle(this.config.navModel.title);
+    }
 
     for (let viewPortName in this.viewPortInstructions) {
       let viewPortInstruction = this.viewPortInstructions[viewPortName];
@@ -252,7 +256,7 @@ export class NavigationInstruction {
     }
 
     if (this.router.title) {
-      title += (title ? separator : '') + this.router.title;
+      title += (title ? separator : '') + this.router.transformTitle(this.router.title);
     }
 
     return title;
