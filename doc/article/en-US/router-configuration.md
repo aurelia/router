@@ -688,3 +688,44 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
     }
   </source-code>
 </code-listing>
+
+## [Configuring Fallback Route](aurelia-doc://section/11/version/1.0.0)
+
+Whenever navigation is rejected it is redirected to previous location. However in certain cases location doesn't exist, e.g. when it happens as first navigation after startup of application. 
+
+<code-listing heading="app${context.language.fileExtension}">
+  <source-code lang="ES 2015/2016">
+    import {RouterConfiguration, Router} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config, router) {
+        this.router = router;
+        config.title = 'Aurelia';
+        config.map([
+          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
+          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+        ]);
+
+        config.configFallbackRoute('users');
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration, Router} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration, router: Router): void {
+        this.router = router;
+        config.title = 'Aurelia';
+        config.map([
+          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
+          { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+        ]);
+
+        config.configFallbackRoute('users');
+      }
+    }
+  </source-code>
+</code-listing>
