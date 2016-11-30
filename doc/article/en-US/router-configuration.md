@@ -691,13 +691,8 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
 
 ## [Internationalizing Titles](aurelia-doc://section/11/version/1.0.0)
 
-If your application targets multiple cultures or languages, you probably want to translate your route titles.
-The `Router` class has a `transformTitle` property that can be used for this. It is expected to be assigned a 
-function that takes the active route's title as parameter and that returns the translated title.
-
-For example, if your app uses `aurelia-i18n`, its routes' titles would typically be set to some translation keys, 
-and the `AppRouter`'s `transformTitle` would be configure in such a way that the active route's title is translated 
-using the `I18N`'s `tr` method:
+If your application targets multiple cultures or languages, you probably want to translate your route titles. The `Router` class has a `transformTitle` property that can be used for this. It is expected to be assigned a function that takes the active route's title as a parameter and then returns the translated title. For example, if your app uses `aurelia-i18n`, its routes' titles would typically be set to some translation keys
+and the `AppRouter`'s `transformTitle` would be configured in such a way that the active route's title is translated using the `I18N`'s `tr` method:
 
 <code-listing heading="src/main${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
@@ -789,10 +784,49 @@ using the `I18N`'s `tr` method:
 </code-listing>
 
 The default value of the`transformTitle` property does the following:
-* For child `Router`s, it delegates to its parent's `transformTitle` function.
+
+* For the child `Router`, it delegates to its parent's `transformTitle` function.
 * For the `AppRouter`, it returns the title untransformed.
 
-In the previous example, the `AppRouter`'s `transformTitle` is set, so all child `Router`s will
-delegate down to it by default.
-However, this means that the `transformTitle` can be overriden for specific child `Router`s if
-some areas of your app needs custom transformation.
+In the previous example, the `AppRouter`'s `transformTitle` is set, so all child `Router`s will delegate down to it by default. However, this means that the `transformTitle` can be overridden for specific child `Router`s if some areas of your app need custom transformation.
+
+## [Configuring a Fallback Route](aurelia-doc://section/12/version/1.0.0)
+
+Whenever navigation is rejected, it is redirected to a previous location. However in certain cases a previous location doesn't exist, e.g. when it happens as the first navigation after the startup of application. To handle this scenario, you can set up a fallback route.
+
+<code-listing heading="app${context.language.fileExtension}">
+  <source-code lang="ES 2015/2016">
+    import {RouterConfiguration, Router} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config, router) {
+        this.router = router;
+        config.title = 'Aurelia';
+        config.map([
+          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
+          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+        ]);
+
+        config.fallbackRoute('users');
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration, Router} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration, router: Router): void {
+        this.router = router;
+        config.title = 'Aurelia';
+        config.map([
+          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
+          { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+        ]);
+
+        config.fallbackRoute('users');
+      }
+    }
+  </source-code>
+</code-listing>
