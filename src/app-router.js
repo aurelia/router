@@ -225,11 +225,9 @@ function restorePreviousLocation(router) {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
     router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+  } else if (router.fallbackRoute) {
+    router.navigate(router.fallbackRoute, { trigger: true, replace: true });
   } else {
-    if (router.fallbackRoute) {
-      router.navigate(router.fallbackRoute, { trigger: true, replace: true });
-    } else {
-      logger.error('Router navigation failed, and no previous location could be restored.');
-    }
+    logger.error('Router navigation failed, and no previous location or fallbackRoute could be restored.');
   }
 }
