@@ -1,3 +1,15 @@
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/aurelia/router/compare/1.0.7...v1.1.0) (2016-12-03)
+
+
+### Features
+
+* **router:** add extension point to transform titles when the document title is built ([629da8c](https://github.com/aurelia/router/commit/629da8c))
+* **router:** add extension point to transform titles when the document title is built ([2c40ce1](https://github.com/aurelia/router/commit/2c40ce1)), closes [#343](https://github.com/aurelia/router/issues/343)
+* **router:** add extension point to transform titles when the document title is built ([3d42256](https://github.com/aurelia/router/commit/3d42256)), closes [#343](https://github.com/aurelia/router/issues/343)
+
+
+
 <a name="1.0.6"></a>
 ## [1.0.6](https://github.com/aurelia/router/compare/1.0.5...v1.0.6) (2016-10-06)
 
