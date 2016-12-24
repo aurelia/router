@@ -609,85 +609,153 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
 ## [Layouts](aurelia-doc://section/10/version/1.0.0)
 
+
+Similar to MVC-style master/layout pages, Aurelia allows you to use "layout" views. 
+
+A layout in Aurelia is associated with a route configuration, and by implication, all the pages navigable-to within the route configuration.  There are two ways to associate a layout with a route configuration.  The first is via HTML in a view, the second is in view model code where you configure your routes.
+
+We'll look at the HTML way first.  The `router-view` custom element is associated with the route configuration defined in its parent view's view model.  By associating a layout with a `router-view` one can thus associate a layout with the same route configuration with which the `router-view` is associated.  
+
+To specify a layout on the `router-view` custom element, we use the following attributes:
+
+* `layoutView` - specifies the layout view to use.
+* `layoutViewModel` - specifies the view model to use with the layout view.
+* `layoutModel` - specifies the model parameter to pass to the layout view model's `activate` function.
+
 > Info
-> Specifying layout on the `<router-view>` element will set the default layout for all routes.
+> All of these layout attributes are bindable.
 
-Similar to MVC-style master/layout pages, Aurelia allows configuration of multiple layouts. Here are the properties for creating layouts:
-
-* `layoutView` property on a route object - specifies the layout view to use for the route.
-* `layoutViewModel` property on a route object - specifies the view model to use with the layout view.
-* `layoutModel` property on a route object - specifies the model parameter to pass to the layout view-model's activate function.
+Here is an example of the HTML in which we specify that we want all views routed-to under the `router-view` to be "layed-out" in a view named `layout`:
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
     <template>
-      <div class="page-host">
-        <router-view layout-view="views/layout-default.html"></router-view>
+      <div>
+        <router-view layout-view="layout.html"></router-view>
       </div>
     </template>
   </source-code>
 </code-listing>
+
+Here is the layout view itself:
 
 <code-listing heading="layout.html">
   <source-code lang="HTML">
     <template>
       <div class="left-content">
-        <slot name="aside-content"></slot>
+        <slot name="left-content"></slot>
       </div>
       <div class="right-content">
-        <slot name="main-content"></slot>
+        <slot name="right-content"></slot>
       </div>
     </template>
   </source-code>
 </code-listing>
 
-<code-listing heading="module.html">
+And here we define a view that we want to appear within the layout:
+
+<code-listing heading="home.html">
   <source-code lang="HTML">
     <template>
-      <div slot="main-content">
-        <p>I'm content that will show up on the right.</p>
+      <div slot="left-content">
+        <p>${leftMessage}.</p>
       </div>
-      <div slot="aside-content">
-        <p>I'm content that will show up on the left.</p>
+      <div slot="right-content">
+        <p>${rightMessage}.</p>
       </div>
+      <div>This will not be displayed in the layout because it is not contained in a named slot.</div>
     </template>
   </source-code>
 </code-listing>
 
-<code-listing heading="app${context.language.fileExtension}">
+<code-listing heading="home${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
-    export class App {
-      configureRouter(config, router) {
-        config.title = 'Aurelia';
-        var model = {
-          id: 1
-        };
-        config.map([
-          { route: 'home', name: 'home', moduleId: 'home/index' },
-          { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'views/layout-login.html' },
-          { route: 'users', name: 'users', moduleId: 'users/index', layoutViewModel: 'views/model', layoutModel: model }
-        ]);
+    export class Module {
+      constructor() {
+        this.leftMessage = "I'm content that will show up on the left";
+        this.rightMessage = "I'm content that will show up on the right";
       }
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
-
-    export class App {
-      configureRouter(config: RouterConfiguration, router: Router): void {
-        config.title = 'Aurelia';
-        var model = {
-          id: 1
-        };
-        config.map([
-          { route: 'home', name: 'home', moduleId: 'home/index' },
-          { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'views/layout-login.html' },
-          { route: 'users', name: 'users', moduleId: 'users/index', layoutViewModel: 'views/model', layoutModel: model }
-        ]);
+    export class Module {
+      constructor() {
+        this.leftMessage = "I'm content that will show up on the left";
+        this.rightMessage = "I'm content that will show up on the right";
       }
     }
   </source-code>
 </code-listing>
+
+Observe how we use the `slot` mechanism for associating parts of the layout to parts of the views that are to be contained within the layout.  (Happy for developers, this is conveniently the same mechanism and syntax we use in Aurelia when providing content to custom elements.)
+
+Now we just have to define the route configuration that will be associated with the `router-view`:
+
+<code-listing heading="app${context.language.fileExtension}">
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config, router){
+        config.map([
+          { route: '', name: 'home', moduleId: 'home' }
+        ]);
+
+        this.router = router;
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration, Router} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration, router: Router): void {){
+        config.map([
+          { route: '', name: 'home', moduleId: 'home' }
+        ]);
+
+        this.router = router;
+      }
+    }
+  </source-code>
+</code-listing>
+
+Thus when we navigate to "home" we will find that it is layed-out as desired inside the layout view.
+
+So that is how we use HTML to associate a layout view with a route configuration.  
+
+We can also associate layouts with route configurations using more fluent code in our view model.  Suppose we like what we've done above, but we have a couple other views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML.  The following code is an example of how one might do that:
+
+<code-listing heading="app${context.language.fileExtension}">
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config, router){
+        config.map([
+          { route: '', name: 'home', moduleId: 'home' },
+          { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
+          { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: model, layoutViewModel: 'model' }
+        ]);
+
+        this.router = router;
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration, Router} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration, router: Router): void {){
+        config.map([
+          { route: '', name: 'home', moduleId: 'home' },
+          { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
+          { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: model, layoutViewModel: 'model' }
+        ]);
+
+        this.router = router;
+      }
+    }
+  </source-code>
+</code-listing>
+
+The above example will assign different layouts to the "login" and "users" views, leaving "home" to remain as configured in the HTML.
 
 ## [Internationalizing Titles](aurelia-doc://section/11/version/1.0.0)
 
