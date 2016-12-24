@@ -610,22 +610,22 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 ## [Layouts](aurelia-doc://section/10/version/1.0.0)
 
 
-Similar to MVC-style master/layout pages, Aurelia allows you to use "layout" views. 
+Similar to MVC-style master/layout pages, Aurelia allows you to use "layout" views as a "master" template for a set of views. 
 
-A layout in Aurelia is associated with a route configuration, and by implication, all the pages navigable-to within the route configuration.  There are two ways to associate a layout with a route configuration.  The first is via HTML in a view, the second is in view model code where you configure your routes.
+The set of views subject to being part of a layout is defined in Aurelia by a set of views referenced by one or more navigation routes.  There are two ways to associate a layout with routes.  The first is via HTML, the second is via code in a view model code where one can configure routes.
 
-We'll look at the HTML way first.  The `router-view` custom element is associated with the route configuration defined in its parent view's view model.  By associating a layout with a `router-view` one can thus associate a layout with the same route configuration with which the `router-view` is associated.  
+We'll look at the HTML way first.  The `router-view` custom HTML element is always associated with a set of one or more routes defined in its parent view's view model.  By associating a layout with a `router-view` one can thus associate a layout with the same set of routes with which the `router-view` is associated.  
 
 To specify a layout on the `router-view` custom element, we use the following attributes:
 
-* `layoutView` - specifies the layout view to use.
-* `layoutViewModel` - specifies the view model to use with the layout view.
-* `layoutModel` - specifies the model parameter to pass to the layout view model's `activate` function.
+* `layout-view` - specifies the file name (with path) of the layout view to use.
+* `layout-view-model` - specifies the file name (with path) of the view model to use with the layout view.
+* `layout-model` - specifies the model parameter to pass to the layout view model's `activate` function.
 
 > Info
 > All of these layout attributes are bindable.
 
-Here is an example of the HTML in which we specify that we want all views routed-to under the `router-view` to be "layed-out" in a view named `layout`:
+Here is an example of the HTML in which we specify that we want all routed-to views under `router-view` to be laid-out in a view with base file name `layout` located in the same directory as the containing view:
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
@@ -670,7 +670,7 @@ And here we define a view that we want to appear within the layout:
 
 <code-listing heading="home${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
-    export class Module {
+    export class Home {
       constructor() {
         this.leftMessage = "I'm content that will show up on the left";
         this.rightMessage = "I'm content that will show up on the right";
@@ -678,7 +678,7 @@ And here we define a view that we want to appear within the layout:
     }
   </source-code>
   <source-code lang="TypeScript">
-    export class Module {
+    export class Home {
       constructor() {
         this.leftMessage = "I'm content that will show up on the left";
         this.rightMessage = "I'm content that will show up on the right";
@@ -718,11 +718,13 @@ Now we just have to define the route configuration that will be associated with 
   </source-code>
 </code-listing>
 
-Thus when we navigate to "home" we will find that it is layed-out as desired inside the layout view.
+Thus when we navigate to "home" we will find that it is laid-out as desired inside the layout view.
 
-So that is how we use HTML to associate a layout view with a route configuration.  
+Note there is nothing different about the above route configuration with or without the layout.  It may contain any number of routes that would all be included, by default, in the layout. 
 
-We can also associate layouts with route configurations using more fluent code in our view model.  Suppose we like what we've done above, but we have a couple other views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML.  The following code is an example of how one might do that:
+So that is how we use HTML to associate a layout view with a set of routes.  
+
+We can also associate layouts with route configurations using more fluent code in our view model.  Suppose we like what we've done above, but we have a couple views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML.  The following code is an example of how we can do that:
 
 <code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
