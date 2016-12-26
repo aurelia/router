@@ -566,16 +566,20 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
 ## [Rendering View Ports](aurelia-doc://section/9/version/1.0.0)
 
+Every instance of a `router-view` custom element essentially defines a "view port".  When you give a `router-view` a name, you can refer to it in the `viewPorts` property of the route configuration in your javascript.  The value of a `viewPorts` property is an object where each property name is the name of a view port (ie, `router-view`) and each value is the `moduleId` destination of the route.  Thus you can specify any number of view ports on a single route configuration.
+
 > Info
-> If you don't name a router-view, it will be available under the name 'default'.
+> If you don't name a `router-view`, it will be available under the name 'default'.
+
+Following is an example of the use of view ports:
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
     <template>
-      <div class="page-host">
+      <div>
         <router-view name="left"></router-view>
       </div>
-      <div class="page-host">
+      <div>
         <router-view name="right"></router-view>
       </div>
     </template>
@@ -607,25 +611,31 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
   </source-code>
 </code-listing>
 
+> Info
+> In addition to the `moduleId`, you can also specify a "layout" in the configuration of a view port.  See the discussion of Layouts elsewhere in this document.
+
 ## [Layouts](aurelia-doc://section/10/version/1.0.0)
 
+Similar to MVC-style master/layout pages, Aurelia allows you to use a "layout" view like an MVC "master template" for a set of views. 
 
-Similar to MVC-style master/layout pages, Aurelia allows you to use "layout" views as a "master" template for a set of views. 
+The set of views subject to being part of a layout is defined in Aurelia as a set of views referenced by one or more routes in a router configuration.  There are two ways to associate a layout with routes.  The first is via HTML, the second is via view model code.
 
-The set of views subject to being part of a layout is defined in Aurelia by a set of views referenced by one or more navigation routes.  There are two ways to associate a layout with routes.  The first is via HTML, the second is via code in a view model code where one can configure routes.
+> Info
+> We're going to be a little sloppy here in terminology.  Technically, routes refer to "moduleIds", not 
+"views".  Since the router resolves a moduleId to a view, indirectly the router does reference a view.  It is easy to picture a view visually contained within a layout, so in this topic to we'll refer to views referenced by a route, not modules.
 
-We'll look at the HTML way first.  The `router-view` custom HTML element is always associated with a set of one or more routes defined in its parent view's view model.  By associating a layout with a `router-view` one can thus associate a layout with the same set of routes with which the `router-view` is associated.  
+We'll look at using HTML first.  We know that the `router-view` custom HTML element is always associated with a set of one or more views referenced in a router configuration given in its parent view's view model.  By associating a layout with a `router-view` one can thus associate a layout with the same set of views with which the `router-view` is associated.  
 
 To specify a layout on the `router-view` custom element, we use the following attributes:
 
 * `layout-view` - specifies the file name (with path) of the layout view to use.
-* `layout-view-model` - specifies the file name (with path) of the view model to use with the layout view.
+* `layout-view-model` - specifies the moduleId of the view model to use with the layout view.
 * `layout-model` - specifies the model parameter to pass to the layout view model's `activate` function.
 
 > Info
 > All of these layout attributes are bindable.
 
-Here is an example of the HTML in which we specify that we want all routed-to views under `router-view` to be laid-out in a view with base file name `layout` located in the same directory as the containing view:
+Following is an example of HTML in which we specify that we want all destination views reachable under the `router-view` to be laid-out inside a view with file name `layout.html`, located in the same directory as the view contianing the `router-view`:
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
@@ -663,7 +673,7 @@ And here we define a view that we want to appear within the layout:
       <div slot="right-content">
         <p>${rightMessage}.</p>
       </div>
-      <div>This will not be displayed in the layout because it is not contained in a named slot.</div>
+      <div>This will not be displayed in the layout because it is not contained in any named slot referenced by the layout.</div>
     </template>
   </source-code>
 </code-listing>
@@ -718,13 +728,13 @@ Now we just have to define the route configuration that will be associated with 
   </source-code>
 </code-listing>
 
-Thus when we navigate to "home" we will find that it is laid-out as desired inside the layout view.
+Thus when we navigate to the module "home" we find that it is laid-out as desired inside the layout view.
 
-Note there is nothing different about the above route configuration with or without the layout.  It may contain any number of routes that would all be included, by default, in the layout. 
+Note there is nothing different about the above route configuration with or without the layout.  It may reference any number of views that would all be included by default in the layout. 
 
-So that is how we use HTML to associate a layout view with a set of routes.  
+So that is how we use HTML to associate a layout view with a set of views referenced in a router configuration.  
 
-We can also associate layouts with route configurations using more fluent code in our view model.  Suppose we like what we've done above, but we have a couple views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML.  The following code is an example of how we can do that:
+We can also associate layouts with route configurations using code in our view model.  Suppose we like what we've done above, but we have a couple views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML.  The following code is an example of how we can do that:
 
 <code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
@@ -733,7 +743,7 @@ We can also associate layouts with route configurations using more fluent code i
         config.map([
           { route: '', name: 'home', moduleId: 'home' },
           { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
-          { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: model, layoutViewModel: 'model' }
+          { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: 'layout-users', layoutViewModel: { access: "admin" } }
         ]);
 
         this.router = router;
@@ -748,7 +758,7 @@ We can also associate layouts with route configurations using more fluent code i
         config.map([
           { route: '', name: 'home', moduleId: 'home' },
           { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
-          { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: model, layoutViewModel: 'model' }
+          { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: 'layout-users', layoutViewModel: { access: "admin" } }
         ]);
 
         this.router = router;
@@ -757,9 +767,79 @@ We can also associate layouts with route configurations using more fluent code i
   </source-code>
 </code-listing>
 
-The above example will assign different layouts to the "login" and "users" views, leaving "home" to remain as configured in the HTML.
+The above example will assign different layouts to the "login" and "users" views, overriding the HTML while leaving "home" to remain as configured in the HTML.  Noticing we're using camel-cased property names here, unlike in the HTML.  
 
-## [Internationalizing Titles](aurelia-doc://section/11/version/1.0.0)
+You can also specify a layout in the `viewPorts` configuration of a route.  See a simple example, below:
+
+<code-listing heading="app.html">
+  <source-code lang="HTML">
+    <template>
+      <div>
+        <router-view name="myRouterView"></router-view>
+      </div>
+    </template>
+  </source-code>
+</code-listing>
+
+<code-listing heading="app${context.language.fileExtension}">
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config, router){
+        config.map([
+          { route: '', name: 'home', viewPorts: { myRouterView: { moduleId: 'home', layoutView: 'default.html' } } }
+        ]);
+
+        this.router = router;
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration, Router} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration, router: Router): void {){
+        config.map([
+          { route: '', name: 'home', viewPorts: { myRouterView: { moduleId: 'home', layoutView: 'default.html' } } }
+        ]);
+
+        this.router = router;
+      }
+    }
+  </source-code>
+</code-listing>
+
+## [View Swapping and Animation](aurelia-doc://section/11/version/1.0.0)
+
+When the Aurelia router navigates from one view to another, we refer to this as "swapping" one view for another.  Aurelia gives us an optional set of strategies dictating how a swap proceeds, or more specifically, how animation plays out during the swap.  We refer to these strategies more precisely as the "swap order".
+
+> Info
+> If there is no animation defined, then swap-order has no visible impact.
+
+You can apply a swap strategy to one or more routes by applying the `swap-order` attribute to a `router-view` custom HTML element.  The strategy will then be applied in any transition between two views accessible under the `router-view`.  
+
+> Info
+> `swap-order` is bindable.
+
+The following swap order strategies are available:
+
+* before - animate the next view in before removing the current view
+* with - animate the next view at the same time the current view is removed
+* after - animate the next view in after the current view has been removed (the default)
+
+Here is an example of setting the swap order strategy on a `router-view`:
+ 
+<code-listing heading="swap-order">
+  <source-code lang="HTML">
+    <template>
+      <div>
+        <router-view swap-order="before"></router-view>
+      </div>
+    </template>
+  </source-code>
+</code-listing>
+
+
+## [Internationalizing Titles](aurelia-doc://section/12/version/1.0.0)
 
 If your application targets multiple cultures or languages, you probably want to translate your route titles. The `Router` class has a `transformTitle` property that can be used for this. It is expected to be assigned a function that takes the active route's title as a parameter and then returns the translated title. For example, if your app uses `aurelia-i18n`, its routes' titles would typically be set to some translation keys
 and the `AppRouter`'s `transformTitle` would be configured in such a way that the active route's title is translated using the `I18N`'s `tr` method:
