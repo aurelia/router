@@ -88,17 +88,17 @@ interface RouteConfig {
   /**
    * specifies the file name of a layout view to use.
    */
-  layoutView: string;
+  layoutView?: string;
 
   /**
    * specifies the moduleId of the view model to use with the layout view.
    */
-  layoutViewModel: string;
+  layoutViewModel?: string;
 
   /**
    * specifies the model parameter to pass to the layout view model's `activate` function.
    */
-  layoutModel: string; 
+  layoutModel?: string; 
 
   [x: string]: any;
 }
