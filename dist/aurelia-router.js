@@ -1418,7 +1418,9 @@ export class Router {
       return this.parent.updateTitle();
     }
 
-    this.currentInstruction._updateTitle();
+    if (this.currentInstruction) {
+      this.currentInstruction._updateTitle();
+    }
     return undefined;
   }
 

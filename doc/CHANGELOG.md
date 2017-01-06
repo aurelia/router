@@ -1,3 +1,13 @@
+<a name="1.1.1"></a>
+## [1.1.1](https://github.com/aurelia/router/compare/1.1.0...v1.1.1) (2017-01-06)
+
+
+### Bug Fixes
+
+* **Router:** fix an error when updateTitle is called but there is not current instruction ([872fda1](https://github.com/aurelia/router/commit/872fda1))
+
+
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/aurelia/router/compare/1.0.7...v1.1.0) (2016-12-03)
 

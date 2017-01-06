@@ -980,7 +980,9 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
         return this.parent.updateTitle();
       }
 
-      this.currentInstruction._updateTitle();
+      if (this.currentInstruction) {
+        this.currentInstruction._updateTitle();
+      }
       return undefined;
     };
 
