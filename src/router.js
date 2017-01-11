@@ -38,6 +38,16 @@ export class Router {
   isNavigating: boolean;
 
   /**
+  * True if the [[Router]] is navigating due to explicit call to navigate function(s).
+  */
+  isExplicitNavigation: boolean;
+
+  /**
+  * True if the [[Router]] is navigating due to explicit call to navigateBack function.
+  */
+  isExplicitNavigationBack: boolean;
+
+  /**
   * The navigation models for routes that specified [[RouteConfig.nav]].
   */
   navigation: NavModel[];
