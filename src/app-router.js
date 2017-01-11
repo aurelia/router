@@ -201,6 +201,8 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 
   if (!isInnerInstruction) {
     router.isNavigating = false;
+    router.isExplicitNavigation = false;
+    router.isExplicitNavigationBack = false;
     let eventArgs = { instruction, result };
     let eventName;
 
