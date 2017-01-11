@@ -1115,6 +1115,16 @@ export class Router {
   isNavigating: boolean;
 
   /**
+  * True if the [[Router]] is navigating due to explicit call to navigate function(s).
+  */
+  isExplicitNavigation: boolean;
+
+  /**
+  * True if the [[Router]] is navigating due to explicit call to navigateBack function.
+  */
+  isExplicitNavigationBack: boolean;
+
+  /**
   * The navigation models for routes that specified [[RouteConfig.nav]].
   */
   navigation: NavModel[];
@@ -1163,6 +1173,8 @@ export class Router {
     this.baseUrl = '';
     this.isConfigured = false;
     this.isNavigating = false;
+    this.isExplicitNavigation = false;
+    this.isExplicitNavigationBack = false;
     this.navigation = [];
     this.currentInstruction = null;
     this._fallbackOrder = 100;
@@ -1235,6 +1247,7 @@ export class Router {
       return this.parent.navigate(fragment, options);
     }
 
+    this.isExplicitNavigation = true;
     return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
@@ -1255,6 +1268,7 @@ export class Router {
   * Navigates back to the most recent location in history.
   */
   navigateBack(): void {
+    this.isExplicitNavigationBack = true;
     this.history.navigateBack();
   }
 
@@ -2220,6 +2234,8 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 
   if (!isInnerInstruction) {
     router.isNavigating = false;
+    router.isExplicitNavigation = false;
+    router.isExplicitNavigationBack = false;
     let eventArgs = { instruction, result };
     let eventName;
 

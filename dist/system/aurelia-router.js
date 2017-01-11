@@ -32,7 +32,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
   
 
   function _normalizeAbsolutePath(path, hasPushState) {
-    var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+    var absolute = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
     if (!hasPushState && path[0] !== '#') {
       path = '#' + path;
@@ -168,11 +168,11 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
       });
     }
 
-    for (var _viewPortName in config.viewPorts) {
-      plan[_viewPortName] = {
-        name: _viewPortName,
+    for (var viewPortName in config.viewPorts) {
+      plan[viewPortName] = {
+        name: viewPortName,
         strategy: activationStrategy.replace,
-        config: instruction.config.viewPorts[_viewPortName]
+        config: instruction.config.viewPorts[viewPortName]
       };
     }
 
@@ -299,7 +299,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
   }
 
   function findDeactivatable(plan, callbackName) {
-    var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+    var list = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
     for (var viewPortName in plan) {
       var _viewPortPlan = plan[viewPortName];
@@ -386,7 +386,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
   }
 
   function findActivatable(navigationInstruction, callbackName) {
-    var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+    var list = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
     var router = arguments[3];
 
     var plan = navigationInstruction.plan;
@@ -486,7 +486,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
   }
 
   function determineWhatToLoad(navigationInstruction) {
-    var toLoad = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var toLoad = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     var plan = navigationInstruction.plan;
 
@@ -543,8 +543,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
     var lifecycleArgs = navigationInstruction.lifecycleArgs;
 
     return routeLoader.loadRoute(router, config, navigationInstruction).then(function (component) {
-      var viewModel = component.viewModel;
-      var childContainer = component.childContainer;
+      var viewModel = component.viewModel,
+          childContainer = component.childContainer;
 
       component.router = router;
       component.config = config;
@@ -601,6 +601,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
     if (!isInnerInstruction) {
       router.isNavigating = false;
+      router.isExplicitNavigation = false;
+      router.isExplicitNavigationBack = false;
       var eventArgs = { instruction: instruction, result: result };
       var eventName = void 0;
 
@@ -647,7 +649,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
       _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
         return typeof obj;
       } : function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
       };
 
       _createClass = function () {
@@ -917,7 +919,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         NavigationInstruction.prototype._buildTitle = function _buildTitle() {
-          var separator = arguments.length <= 0 || arguments[0] === undefined ? ' | ' : arguments[0];
+          var separator = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ' | ';
 
           var title = '';
           var childTitles = [];
@@ -983,7 +985,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('Redirect', Redirect = function () {
         function Redirect(url) {
-          var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+          var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
           
 
@@ -1008,8 +1010,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       _export('RedirectToRoute', RedirectToRoute = function () {
         function RedirectToRoute(route) {
-          var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-          var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+          var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+          var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
           
 
@@ -1083,9 +1085,9 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
             if (Array.isArray(config.route)) {
               for (var i = 0, ii = config.route.length; i < ii; ++i) {
-                var current = Object.assign({}, config);
-                current.route = config.route[i];
-                routeConfigs.push(current);
+                var _current = Object.assign({}, config);
+                _current.route = config.route[i];
+                routeConfigs.push(_current);
               }
             } else {
               routeConfigs.push(Object.assign({}, config));
@@ -1139,9 +1141,9 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
             var pipelineProvider = router.pipelineProvider;
             for (var _i2 = 0, _ii2 = pipelineSteps.length; _i2 < _ii2; ++_i2) {
-              var _pipelineSteps$_i = pipelineSteps[_i2];
-              var _name = _pipelineSteps$_i.name;
-              var step = _pipelineSteps$_i.step;
+              var _pipelineSteps$_i = pipelineSteps[_i2],
+                  _name = _pipelineSteps$_i.name,
+                  step = _pipelineSteps$_i.step;
 
               pipelineProvider.addStep(_name, step);
             }
@@ -1207,6 +1209,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
           this.baseUrl = '';
           this.isConfigured = false;
           this.isNavigating = false;
+          this.isExplicitNavigation = false;
+          this.isExplicitNavigationBack = false;
           this.navigation = [];
           this.currentInstruction = null;
           this._fallbackOrder = 100;
@@ -1254,6 +1258,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
             return this.parent.navigate(fragment, options);
           }
 
+          this.isExplicitNavigation = true;
           return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
         };
 
@@ -1263,6 +1268,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         Router.prototype.navigateBack = function navigateBack() {
+          this.isExplicitNavigationBack = true;
           this.history.navigateBack();
         };
 
@@ -1273,7 +1279,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         Router.prototype.generate = function generate(name, params) {
-          var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+          var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
           var hasRoute = this._recognizer.hasRoute(name);
           if ((!this.isConfigured || !hasRoute) && this.parent) {
@@ -1399,11 +1405,11 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
           var nav = this.navigation;
 
           for (var i = 0, length = nav.length; i < length; i++) {
-            var current = nav[i];
-            if (!current.config.href) {
-              current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+            var _current2 = nav[i];
+            if (!_current2.config.href) {
+              _current2.href = _createRootedPath(_current2.relativeHref, this.baseUrl, this.history._hasPushState);
             } else {
-              current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
+              _current2.href = _normalizeAbsolutePath(_current2.config.href, this.history._hasPushState);
             }
           }
         };
@@ -1416,8 +1422,8 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         Router.prototype._createNavigationInstruction = function _createNavigationInstruction() {
-          var url = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-          var parentInstruction = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+          var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+          var parentInstruction = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
           var fragment = url;
           var queryString = '';
@@ -1694,7 +1700,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         };
 
         PipelineProvider.prototype._clearSteps = function _clearSteps() {
-          var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+          var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
           var slot = this._findStep(name);
           if (slot) {
@@ -1827,7 +1833,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
         AppRouter.prototype._dequeueInstruction = function _dequeueInstruction() {
           var _this13 = this;
 
-          var instructionCount = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+          var instructionCount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
           return Promise.resolve().then(function () {
             if (_this13.isNavigating && !instructionCount) {
