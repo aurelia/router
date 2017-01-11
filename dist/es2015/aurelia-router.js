@@ -648,6 +648,8 @@ export let Router = class Router {
     this.baseUrl = '';
     this.isConfigured = false;
     this.isNavigating = false;
+    this.isExplicitNavigation = false;
+    this.isExplicitNavigationBack = false;
     this.navigation = [];
     this.currentInstruction = null;
     this._fallbackOrder = 100;
@@ -697,6 +699,7 @@ export let Router = class Router {
       return this.parent.navigate(fragment, options);
     }
 
+    this.isExplicitNavigation = true;
     return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
@@ -706,6 +709,7 @@ export let Router = class Router {
   }
 
   navigateBack() {
+    this.isExplicitNavigationBack = true;
     this.history.navigateBack();
   }
 
@@ -1518,6 +1522,8 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 
   if (!isInnerInstruction) {
     router.isNavigating = false;
+    router.isExplicitNavigation = false;
+    router.isExplicitNavigationBack = false;
     let eventArgs = { instruction, result };
     let eventName;
 

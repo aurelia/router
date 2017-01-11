@@ -1,4 +1,4 @@
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -15,7 +15,7 @@ import { History } from 'aurelia-history';
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 export function _normalizeAbsolutePath(path, hasPushState) {
-  var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+  var absolute = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
@@ -309,7 +309,7 @@ export var NavigationInstruction = function () {
   };
 
   NavigationInstruction.prototype._buildTitle = function _buildTitle() {
-    var separator = arguments.length <= 0 || arguments[0] === undefined ? ' | ' : arguments[0];
+    var separator = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ' | ';
 
     var title = '';
     var childTitles = [];
@@ -380,7 +380,7 @@ export function isNavigationCommand(obj) {
 
 export var Redirect = function () {
   function Redirect(url) {
-    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     
 
@@ -403,8 +403,8 @@ export var Redirect = function () {
 
 export var RedirectToRoute = function () {
   function RedirectToRoute(route) {
-    var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     
 
@@ -476,9 +476,9 @@ export var RouterConfiguration = function () {
 
       if (Array.isArray(config.route)) {
         for (var i = 0, ii = config.route.length; i < ii; ++i) {
-          var current = Object.assign({}, config);
-          current.route = config.route[i];
-          routeConfigs.push(current);
+          var _current = Object.assign({}, config);
+          _current.route = config.route[i];
+          routeConfigs.push(_current);
         }
       } else {
         routeConfigs.push(Object.assign({}, config));
@@ -532,9 +532,9 @@ export var RouterConfiguration = function () {
 
       var pipelineProvider = router.pipelineProvider;
       for (var _i2 = 0, _ii2 = pipelineSteps.length; _i2 < _ii2; ++_i2) {
-        var _pipelineSteps$_i = pipelineSteps[_i2];
-        var _name = _pipelineSteps$_i.name;
-        var step = _pipelineSteps$_i.step;
+        var _pipelineSteps$_i = pipelineSteps[_i2],
+            _name = _pipelineSteps$_i.name,
+            step = _pipelineSteps$_i.step;
 
         pipelineProvider.addStep(_name, step);
       }
@@ -633,11 +633,11 @@ export function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
     });
   }
 
-  for (var _viewPortName in config.viewPorts) {
-    plan[_viewPortName] = {
-      name: _viewPortName,
+  for (var viewPortName in config.viewPorts) {
+    plan[viewPortName] = {
+      name: viewPortName,
       strategy: activationStrategy.replace,
-      config: instruction.config.viewPorts[_viewPortName]
+      config: instruction.config.viewPorts[viewPortName]
     };
   }
 
@@ -732,6 +732,8 @@ export var Router = function () {
     this.baseUrl = '';
     this.isConfigured = false;
     this.isNavigating = false;
+    this.isExplicitNavigation = false;
+    this.isExplicitNavigationBack = false;
     this.navigation = [];
     this.currentInstruction = null;
     this._fallbackOrder = 100;
@@ -779,6 +781,7 @@ export var Router = function () {
       return this.parent.navigate(fragment, options);
     }
 
+    this.isExplicitNavigation = true;
     return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   };
 
@@ -788,6 +791,7 @@ export var Router = function () {
   };
 
   Router.prototype.navigateBack = function navigateBack() {
+    this.isExplicitNavigationBack = true;
     this.history.navigateBack();
   };
 
@@ -798,7 +802,7 @@ export var Router = function () {
   };
 
   Router.prototype.generate = function generate(name, params) {
-    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     var hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
@@ -924,11 +928,11 @@ export var Router = function () {
     var nav = this.navigation;
 
     for (var i = 0, length = nav.length; i < length; i++) {
-      var current = nav[i];
-      if (!current.config.href) {
-        current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+      var _current2 = nav[i];
+      if (!_current2.config.href) {
+        _current2.href = _createRootedPath(_current2.relativeHref, this.baseUrl, this.history._hasPushState);
       } else {
-        current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
+        _current2.href = _normalizeAbsolutePath(_current2.config.href, this.history._hasPushState);
       }
     }
   };
@@ -941,8 +945,8 @@ export var Router = function () {
   };
 
   Router.prototype._createNavigationInstruction = function _createNavigationInstruction() {
-    var url = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-    var parentInstruction = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+    var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    var parentInstruction = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
     var fragment = url;
     var queryString = '';
@@ -1139,7 +1143,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
 }
 
 function findDeactivatable(plan, callbackName) {
-  var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+  var list = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
   for (var viewPortName in plan) {
     var _viewPortPlan = plan[viewPortName];
@@ -1226,7 +1230,7 @@ function processActivatable(navigationInstruction, callbackName, next, ignoreRes
 }
 
 function findActivatable(navigationInstruction, callbackName) {
-  var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+  var list = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
   var router = arguments[3];
 
   var plan = navigationInstruction.plan;
@@ -1382,7 +1386,7 @@ function loadNewRoute(routeLoader, navigationInstruction) {
 }
 
 function determineWhatToLoad(navigationInstruction) {
-  var toLoad = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+  var toLoad = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   var plan = navigationInstruction.plan;
 
@@ -1439,8 +1443,8 @@ function loadComponent(routeLoader, navigationInstruction, config) {
   var lifecycleArgs = navigationInstruction.lifecycleArgs;
 
   return routeLoader.loadRoute(router, config, navigationInstruction).then(function (component) {
-    var viewModel = component.viewModel;
-    var childContainer = component.childContainer;
+    var viewModel = component.viewModel,
+        childContainer = component.childContainer;
 
     component.router = router;
     component.config = config;
@@ -1535,7 +1539,7 @@ export var PipelineProvider = function () {
   };
 
   PipelineProvider.prototype._clearSteps = function _clearSteps() {
-    var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
     var slot = this._findStep(name);
     if (slot) {
@@ -1666,7 +1670,7 @@ export var AppRouter = function (_Router) {
   AppRouter.prototype._dequeueInstruction = function _dequeueInstruction() {
     var _this13 = this;
 
-    var instructionCount = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+    var instructionCount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
     return Promise.resolve().then(function () {
       if (_this13.isNavigating && !instructionCount) {
@@ -1760,6 +1764,8 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 
   if (!isInnerInstruction) {
     router.isNavigating = false;
+    router.isExplicitNavigation = false;
+    router.isExplicitNavigationBack = false;
     var eventArgs = { instruction: instruction, result: result };
     var eventName = void 0;
 
