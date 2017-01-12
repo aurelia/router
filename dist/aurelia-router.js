@@ -420,8 +420,12 @@ export class NavigationInstruction {
   }
 
   _buildTitle(separator: string = ' | '): string {
-    let title = this.config.navModel.title || '';
+    let title = '';
     let childTitles = [];
+
+    if (this.config.navModel.title) {
+      title = this.router.transformTitle(this.config.navModel.title);
+    }
 
     for (let viewPortName in this.viewPortInstructions) {
       let viewPortInstruction = this.viewPortInstructions[viewPortName];
@@ -439,7 +443,7 @@ export class NavigationInstruction {
     }
 
     if (this.router.title) {
-      title += (title ? separator : '') + this.router.title;
+      title += (title ? separator : '') + this.router.transformTitle(this.router.title);
     }
 
     return title;
@@ -817,6 +821,17 @@ export class RouterConfiguration {
   }
 
   /**
+  * Configures a route that will be used if there is no previous location available on navigation cancellation.
+  *
+  * @param fragment The URL fragment to use as the navigation destination.
+  * @chainable
+  */
+  fallbackRoute(fragment: string): RouterConfiguration {
+    this._fallbackRoute = fragment;
+    return this;
+  }
+
+  /**
   * Maps one or more routes to be registered with the router.
   *
   * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
@@ -895,6 +910,10 @@ export class RouterConfiguration {
 
     if (this.unknownRouteConfig) {
       router.handleUnknownRoutes(this.unknownRouteConfig);
+    }
+
+    if (this._fallbackRoute) {
+      router.fallbackRoute = this._fallbackRoute;
     }
 
     router.options = this.options;
@@ -1111,6 +1130,18 @@ export class Router {
   parent: Router = null;
 
   options: any = {};
+
+  /**
+  * Extension point to transform the document title before it is built and displayed.
+  * By default, child routers delegate to the parent router, and the app router
+  * returns the title unchanged.
+  */
+  transformTitle: (title: string) => string = (title: string) => {
+    if (this.parent) {
+      return this.parent.transformTitle(title);
+    }
+    return title;
+  };
 
   /**
   * @param container The [[Container]] to use when child routers.
@@ -1387,7 +1418,9 @@ export class Router {
       return this.parent.updateTitle();
     }
 
-    this.currentInstruction._updateTitle();
+    if (this.currentInstruction) {
+      this.currentInstruction._updateTitle();
+    }
     return undefined;
   }
 
@@ -2211,7 +2244,9 @@ function restorePreviousLocation(router) {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
     router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+  } else if (router.fallbackRoute) {
+    router.navigate(router.fallbackRoute, { trigger: true, replace: true });
   } else {
-    logger.error('Router navigation failed, and no previous location could be restored.');
+    logger.error('Router navigation failed, and no previous location or fallbackRoute could be restored.');
   }
 }

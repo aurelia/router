@@ -55,6 +55,18 @@ export class Router {
   options: any = {};
 
   /**
+  * Extension point to transform the document title before it is built and displayed.
+  * By default, child routers delegate to the parent router, and the app router
+  * returns the title unchanged.
+  */
+  transformTitle: (title: string) => string = (title: string) => {
+    if (this.parent) {
+      return this.parent.transformTitle(title);
+    }
+    return title;
+  };
+
+  /**
   * @param container The [[Container]] to use when child routers.
   * @param history The [[History]] implementation to delegate navigation requests to.
   */
@@ -329,7 +341,9 @@ export class Router {
       return this.parent.updateTitle();
     }
 
-    this.currentInstruction._updateTitle();
+    if (this.currentInstruction) {
+      this.currentInstruction._updateTitle();
+    }
     return undefined;
   }
 

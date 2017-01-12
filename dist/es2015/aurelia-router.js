@@ -272,8 +272,12 @@ export let NavigationInstruction = class NavigationInstruction {
   }
 
   _buildTitle(separator = ' | ') {
-    let title = this.config.navModel.title || '';
+    let title = '';
     let childTitles = [];
+
+    if (this.config.navModel.title) {
+      title = this.router.transformTitle(this.config.navModel.title);
+    }
 
     for (let viewPortName in this.viewPortInstructions) {
       let viewPortInstruction = this.viewPortInstructions[viewPortName];
@@ -291,7 +295,7 @@ export let NavigationInstruction = class NavigationInstruction {
     }
 
     if (this.router.title) {
-      title += (title ? separator : '') + this.router.title;
+      title += (title ? separator : '') + this.router.transformTitle(this.router.title);
     }
 
     return title;
@@ -393,6 +397,11 @@ export let RouterConfiguration = class RouterConfiguration {
     return this.addPipelineStep('postRender', step);
   }
 
+  fallbackRoute(fragment) {
+    this._fallbackRoute = fragment;
+    return this;
+  }
+
   map(route) {
     if (Array.isArray(route)) {
       route.forEach(this.map.bind(this));
@@ -448,6 +457,10 @@ export let RouterConfiguration = class RouterConfiguration {
 
     if (this.unknownRouteConfig) {
       router.handleUnknownRoutes(this.unknownRouteConfig);
+    }
+
+    if (this._fallbackRoute) {
+      router.fallbackRoute = this._fallbackRoute;
     }
 
     router.options = this.options;
@@ -616,6 +629,13 @@ export let Router = class Router {
   constructor(container, history) {
     this.parent = null;
     this.options = {};
+
+    this.transformTitle = title => {
+      if (this.parent) {
+        return this.parent.transformTitle(title);
+      }
+      return title;
+    };
 
     this.container = container;
     this.history = history;
@@ -806,7 +826,9 @@ export let Router = class Router {
       return this.parent.updateTitle();
     }
 
-    this.currentInstruction._updateTitle();
+    if (this.currentInstruction) {
+      this.currentInstruction._updateTitle();
+    }
     return undefined;
   }
 
@@ -1520,7 +1542,9 @@ function restorePreviousLocation(router) {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
     router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+  } else if (router.fallbackRoute) {
+    router.navigate(router.fallbackRoute, { trigger: true, replace: true });
   } else {
-    logger.error('Router navigation failed, and no previous location could be restored.');
+    logger.error('Router navigation failed, and no previous location or fallbackRoute could be restored.');
   }
 }

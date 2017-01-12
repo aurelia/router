@@ -65,13 +65,13 @@ export class RouterConfiguration {
   }
 
   /**
-  * Configures route that will be used if there is no previous location available on navigation cancellation.
+  * Configures a route that will be used if there is no previous location available on navigation cancellation.
   *
   * @param fragment The URL fragment to use as the navigation destination.
   * @chainable
   */
-  configFallbackRoute(fragment: string) {
-    this.fallbackRoute = fragment;
+  fallbackRoute(fragment: string): RouterConfiguration {
+    this._fallbackRoute = fragment;
     return this;
   }
 
@@ -156,8 +156,8 @@ export class RouterConfiguration {
       router.handleUnknownRoutes(this.unknownRouteConfig);
     }
 
-    if (this.fallbackRoute) {
-      router.fallbackRoute = this.fallbackRoute;
+    if (this._fallbackRoute) {
+      router.fallbackRoute = this._fallbackRoute;
     }
 
     router.options = this.options;
