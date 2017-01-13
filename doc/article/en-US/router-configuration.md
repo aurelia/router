@@ -692,12 +692,13 @@ Similar to MVC-style master/layout pages, Aurelia allows configuration of multip
 ## [Internationalizing Titles](aurelia-doc://section/11/version/1.0.0)
 
 If your application targets multiple cultures or languages, you probably want to translate your route titles. The `Router` class has a `transformTitle` property that can be used for this. It is expected to be assigned a function that takes the active route's title as a parameter and then returns the translated title. For example, if your app uses `aurelia-i18n`, its routes' titles would typically be set to some translation keys
-and the `AppRouter`'s `transformTitle` would be configured in such a way that the active route's title is translated using the `I18N`'s `tr` method:
+and the `AppRouter`'s `transformTitle` would be configured in such a way that the active route's title is translated using the `I18N`'s `tr` method. Additionally you can listen to a custom event published by the I18N service to react on locale changes using the EventAggregator:
 
 <code-listing heading="src/main${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
     import Backend from 'i18next-xhr-backend';
     import {AppRouter} from 'aurelia-router';
+    import {EventAggregator} from 'aurelia-event-aggregator';
 
     export function configure(aurelia) {
       aurelia.use
@@ -714,6 +715,11 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
           }).then(() => {
             const router = aurelia.container.get(AppRouter);
             router.transformTitle = title => i18n.tr(title);
+            
+            const eventAggregator = aurelia.container.get(EventAggregator);
+            eventAggregator.subscribe('i18n:locale:changed', () => {
+              router.updateTitle();
+            });
           });
         });
 
@@ -723,6 +729,7 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
   <source-code lang="TypeScript">
     import Backend from 'i18next-xhr-backend';
     import {AppRouter} from 'aurelia-router';
+    import {EventAggregator} from 'aurelia-event-aggregator';
 
     export function configure(aurelia) {
       aurelia.use
@@ -739,6 +746,11 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
           }).then(() => {
             const router = aurelia.container.get(AppRouter);
             router.transformTitle = title => i18n.tr(title);
+            
+            const eventAggregator = aurelia.container.get(EventAggregator);
+            eventAggregator.subscribe('i18n:locale:changed', () => {
+              router.updateTitle();
+            });
           });
         });
 
