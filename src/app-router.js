@@ -199,11 +199,12 @@ function processResult(instruction, result, instructionCount, router) {
 function resolveInstruction(instruction, result, isInnerInstruction, router) {
   instruction.resolve(result);
 
+  let eventArgs = { instruction, result };
   if (!isInnerInstruction) {
     router.isNavigating = false;
     router.isExplicitNavigation = false;
     router.isExplicitNavigationBack = false;
-    let eventArgs = { instruction, result };
+    
     let eventName;
 
     if (result.output instanceof Error) {
@@ -218,6 +219,8 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 
     router.events.publish(`router:navigation:${eventName}`, eventArgs);
     router.events.publish('router:navigation:complete', eventArgs);
+  } else {
+    router.events.publish('router:navigation:child:complete', eventArgs);
   }
 
   return result;
