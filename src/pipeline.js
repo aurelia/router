@@ -45,7 +45,7 @@ interface PipelineStep {
    * @param instruction The navigation instruction.
    * @param next The next step in the pipeline.
    */
-  run(instruction: NavigationInstruction, next: Next): void;
+  run(instruction: NavigationInstruction, next: Next): Promise<any>;
 }
 
 /**
