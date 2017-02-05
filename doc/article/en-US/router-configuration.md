@@ -402,7 +402,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
+    import {Redirect, NavigationInstruction, RouterConfiguration, Router, Next} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration, router: Router): void {
