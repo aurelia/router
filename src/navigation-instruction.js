@@ -161,19 +161,31 @@ export class NavigationInstruction {
   * Gets the instruction's base URL, accounting for wildcard route parameters.
   */
   getBaseUrl(): string {
+    let fragment = this.fragment;
+
+    if (fragment === '') {
+      let nonEmptyRoute = this.router.routes.find(route => {
+        return route.name === this.config.name &&
+          route.route !== '';
+      });
+      if (nonEmptyRoute) {
+        fragment = nonEmptyRoute.route;
+      }
+    }
+
     if (!this.params) {
-      return this.fragment;
+      return fragment;
     }
 
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
 
     if (!path) {
-      return this.fragment;
+      return fragment;
     }
 
     path = encodeURI(path);
-    return this.fragment.substr(0, this.fragment.lastIndexOf(path));
+    return fragment.substr(0, fragment.lastIndexOf(path));
   }
 
   _commitChanges(waitToSwap: boolean) {
