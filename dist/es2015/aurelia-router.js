@@ -200,19 +200,30 @@ export let NavigationInstruction = class NavigationInstruction {
   }
 
   getBaseUrl() {
+    let fragment = this.fragment;
+
+    if (fragment === '') {
+      let nonEmptyRoute = this.router.routes.find(route => {
+        return route.name === this.config.name && route.route !== '';
+      });
+      if (nonEmptyRoute) {
+        fragment = nonEmptyRoute.route;
+      }
+    }
+
     if (!this.params) {
-      return this.fragment;
+      return fragment;
     }
 
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
 
     if (!path) {
-      return this.fragment;
+      return fragment;
     }
 
     path = encodeURI(path);
-    return this.fragment.substr(0, this.fragment.lastIndexOf(path));
+    return fragment.substr(0, fragment.lastIndexOf(path));
   }
 
   _commitChanges(waitToSwap) {
@@ -648,6 +659,8 @@ export let Router = class Router {
     this.baseUrl = '';
     this.isConfigured = false;
     this.isNavigating = false;
+    this.isExplicitNavigation = false;
+    this.isExplicitNavigationBack = false;
     this.navigation = [];
     this.currentInstruction = null;
     this._fallbackOrder = 100;
@@ -697,6 +710,7 @@ export let Router = class Router {
       return this.parent.navigate(fragment, options);
     }
 
+    this.isExplicitNavigation = true;
     return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
@@ -706,6 +720,7 @@ export let Router = class Router {
   }
 
   navigateBack() {
+    this.isExplicitNavigationBack = true;
     this.history.navigateBack();
   }
 
@@ -1025,7 +1040,8 @@ function findDeactivatable(plan, callbackName, list = []) {
 
     if (viewPortPlan.childNavigationInstruction) {
       findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
-    } else if (prevComponent) {
+    }
+    if (prevComponent) {
       addPreviousDeactivatable(prevComponent, callbackName, list);
     }
   }
@@ -1516,9 +1532,12 @@ function processResult(instruction, result, instructionCount, router) {
 function resolveInstruction(instruction, result, isInnerInstruction, router) {
   instruction.resolve(result);
 
+  let eventArgs = { instruction, result };
   if (!isInnerInstruction) {
     router.isNavigating = false;
-    let eventArgs = { instruction, result };
+    router.isExplicitNavigation = false;
+    router.isExplicitNavigationBack = false;
+
     let eventName;
 
     if (result.output instanceof Error) {
@@ -1533,6 +1552,8 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 
     router.events.publish(`router:navigation:${ eventName }`, eventArgs);
     router.events.publish('router:navigation:complete', eventArgs);
+  } else {
+    router.events.publish('router:navigation:child:complete', eventArgs);
   }
 
   return result;

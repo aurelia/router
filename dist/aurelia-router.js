@@ -98,7 +98,7 @@ interface PipelineStep {
    * @param instruction The navigation instruction.
    * @param next The next step in the pipeline.
    */
-  run(instruction: NavigationInstruction, next: Next): void;
+  run(instruction: NavigationInstruction, next: Next): Promise<any>;
 }
 
 /**
@@ -348,19 +348,31 @@ export class NavigationInstruction {
   * Gets the instruction's base URL, accounting for wildcard route parameters.
   */
   getBaseUrl(): string {
+    let fragment = this.fragment;
+
+    if (fragment === '') {
+      let nonEmptyRoute = this.router.routes.find(route => {
+        return route.name === this.config.name &&
+          route.route !== '';
+      });
+      if (nonEmptyRoute) {
+        fragment = nonEmptyRoute.route;
+      }
+    }
+
     if (!this.params) {
-      return this.fragment;
+      return fragment;
     }
 
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
 
     if (!path) {
-      return this.fragment;
+      return fragment;
     }
 
     path = encodeURI(path);
-    return this.fragment.substr(0, this.fragment.lastIndexOf(path));
+    return fragment.substr(0, fragment.lastIndexOf(path));
   }
 
   _commitChanges(waitToSwap: boolean) {
@@ -553,7 +565,8 @@ interface RouteConfig {
   * The view ports to target when activating this route. If unspecified, the target moduleId is loaded
   * into the default viewPort (the viewPort with name 'default'). The viewPorts object should have keys
   * whose property names correspond to names used by <router-view> elements. The values should be objects
-  * specifying the moduleId to load into that viewPort.
+  * specifying the moduleId to load into that viewPort.  The values may optionally include properties related to layout:
+  * `layoutView`, `layoutViewModel` and `layoutModel`.
   */
   viewPorts?: any;
 
@@ -601,6 +614,21 @@ interface RouteConfig {
   * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
   */
   activationStrategy?: string;
+
+  /**
+   * specifies the file name of a layout view to use.
+   */
+  layoutView?: string;
+
+  /**
+   * specifies the moduleId of the view model to use with the layout view.
+   */
+  layoutViewModel?: string;
+
+  /**
+   * specifies the model parameter to pass to the layout view model's `activate` function.
+   */
+  layoutModel?: string;
 
   [x: string]: any;
 }
@@ -1115,6 +1143,16 @@ export class Router {
   isNavigating: boolean;
 
   /**
+  * True if the [[Router]] is navigating due to explicit call to navigate function(s).
+  */
+  isExplicitNavigation: boolean;
+
+  /**
+  * True if the [[Router]] is navigating due to explicit call to navigateBack function.
+  */
+  isExplicitNavigationBack: boolean;
+
+  /**
   * The navigation models for routes that specified [[RouteConfig.nav]].
   */
   navigation: NavModel[];
@@ -1163,6 +1201,8 @@ export class Router {
     this.baseUrl = '';
     this.isConfigured = false;
     this.isNavigating = false;
+    this.isExplicitNavigation = false;
+    this.isExplicitNavigationBack = false;
     this.navigation = [];
     this.currentInstruction = null;
     this._fallbackOrder = 100;
@@ -1235,6 +1275,7 @@ export class Router {
       return this.parent.navigate(fragment, options);
     }
 
+    this.isExplicitNavigation = true;
     return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
   }
 
@@ -1255,6 +1296,7 @@ export class Router {
   * Navigates back to the most recent location in history.
   */
   navigateBack(): void {
+    this.isExplicitNavigationBack = true;
     this.history.navigateBack();
   }
 
@@ -1627,7 +1669,8 @@ function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<
 
     if (viewPortPlan.childNavigationInstruction) {
       findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
-    } else if (prevComponent) {
+    }
+    if (prevComponent) {
       addPreviousDeactivatable(prevComponent, callbackName, list);
     }
   }
@@ -2218,9 +2261,12 @@ function processResult(instruction, result, instructionCount, router) {
 function resolveInstruction(instruction, result, isInnerInstruction, router) {
   instruction.resolve(result);
 
+  let eventArgs = { instruction, result };
   if (!isInnerInstruction) {
     router.isNavigating = false;
-    let eventArgs = { instruction, result };
+    router.isExplicitNavigation = false;
+    router.isExplicitNavigationBack = false;
+
     let eventName;
 
     if (result.output instanceof Error) {
@@ -2235,6 +2281,8 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 
     router.events.publish(`router:navigation:${eventName}`, eventArgs);
     router.events.publish('router:navigation:complete', eventArgs);
+  } else {
+    router.events.publish('router:navigation:child:complete', eventArgs);
   }
 
   return result;
