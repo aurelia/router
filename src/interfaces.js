@@ -35,7 +35,7 @@ interface RouteConfig {
   * The view ports to target when activating this route. If unspecified, the target moduleId is loaded
   * into the default viewPort (the viewPort with name 'default'). The viewPorts object should have keys
   * whose property names correspond to names used by <router-view> elements. The values should be objects
-  * specifying the moduleId to load into that viewPort.  The values may optionally include properties related to layout:  
+  * specifying the moduleId to load into that viewPort.  The values may optionally include properties related to layout:
   * `layoutView`, `layoutViewModel` and `layoutModel`.
   */
   viewPorts?: any;
@@ -98,7 +98,7 @@ interface RouteConfig {
   /**
    * specifies the model parameter to pass to the layout view model's `activate` function.
    */
-  layoutModel?: string; 
+  layoutModel?: string;
 
   [x: string]: any;
 }

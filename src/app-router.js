@@ -204,7 +204,7 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
     router.isNavigating = false;
     router.isExplicitNavigation = false;
     router.isExplicitNavigationBack = false;
-    
+
     let eventName;
 
     if (result.output instanceof Error) {
