@@ -168,7 +168,9 @@ export class NavigationInstruction {
         return route.name === this.config.name &&
           route.route !== '';
       });
-      fragment = nonEmptyRoute.route;
+      if (nonEmptyRoute) {
+        fragment = nonEmptyRoute.route;
+      }
     }
 
     if (!this.params) {
