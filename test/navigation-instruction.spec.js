@@ -65,7 +65,7 @@ describe('NavigationInstruction', () => {
     });
 
     describe('when using an empty parent route', () => {
-      fit('should return the non-empty matching parent route', (done) => {
+      it('should return the non-empty matching parent route', (done) => {
         router._createNavigationInstruction('').then(parentInstruction => {
           router.currentInstruction = parentInstruction;
           router._refreshBaseUrl();
