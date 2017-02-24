@@ -435,9 +435,45 @@ export class Router {
       }));
 
       return evaluateNavigationStrategy(instruction, this.catchAllHandler);
+    } else if (this.parent) {
+      let router = this._parentCatchAllHandler(this.parent);
+
+      if (router) {
+        let newParentInstruction = this._findParentInstructionFromRouter(router, parentInstruction);
+
+        let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
+          params: { path: fragment },
+          queryParams: results && results.queryParams,
+          router: router,
+          parentInstruction: newParentInstruction,
+          parentCatchHandler: true,
+          config: null // config will be created by the chained parent catchAllHandler
+        }));
+
+        return evaluateNavigationStrategy(instruction, router.catchAllHandler)
+      }
     }
 
     return Promise.reject(new Error(`Route not found: ${url}`));
+  }
+
+  _findParentInstructionFromRouter(router: Router, instruction: NavigationInstruction): NavigationInstruction {
+    if (instruction.router === router) {
+      instruction.fragment = router.baseUrl; //need to change the fragment in case of a redirect instead of moduleId
+      return instruction;
+    } else if (instruction.parentInstruction) {
+      return this._findParentInstructionFromRouter(router, instruction.parentInstruction)
+    }
+    return undefined;
+  }
+
+  _parentCatchAllHandler(router): Function|Boolean {
+    if (router.catchAllHandler) {
+      return router;
+    } else if (router.parent) {
+      return this._parentCatchAllHandler(router.parent);
+    }
+    return false;
   }
 
   _createRouteConfig(config, instruction) {

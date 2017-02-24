@@ -258,6 +258,34 @@ describe('the router', () => {
     describe('catchAllHandler', () => {
       let expectedInstructionShape = jasmine.objectContaining({ config: jasmine.objectContaining({ moduleId: 'test' }) });
 
+      it('should use a parent routers catchAllHandler if one exists', (done) => {
+        const child = router.createChild(new Container());
+        child.baseUrl = 'empty';
+        let expectedFirstInstructionShape = jasmine.objectContaining({ config: jasmine.objectContaining({ moduleId: './empty' }) });
+        let expectedSecondInstructionShape = jasmine.objectContaining({ config: jasmine.objectContaining({ moduleId: 'test' }) });
+        Promise.all([
+          router.configure(config => {
+            config.unknownRouteConfig = 'test';
+            config.mapRoute({route: 'foo', moduleId: './empty'})
+          }),
+          child.configure(config => {
+            config.map([
+              { name: 'empty', route: '', moduleId: './child-empty' }
+            ]);
+          })
+        ])
+        .then(() => {
+          return router._createNavigationInstruction('foo/bar/123?bar=456')
+          .then(x => {
+            expect(x).toEqual(expectedFirstInstructionShape)
+            return child._createNavigationInstruction('bar/123?bar=456', x)
+            .then(x1 => expect(x1).toEqual(expectedInstructionShape))
+          });
+        })
+        .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+        .then(done);
+      });
+
       it('should use string moduleId handler', (done) => {
         router
           .configure(config => {
