@@ -1,3 +1,13 @@
+<a name="1.2.1"></a>
+## [1.2.1](https://github.com/aurelia/router/compare/1.2.0...v1.2.1) (2017-02-27)
+
+
+### Bug Fixes
+
+* **activation:** regression in deactivate ([8ef8840](https://github.com/aurelia/router/commit/8ef8840))
+
+
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/aurelia/router/compare/1.1.1...v1.2.0) (2017-02-21)
 

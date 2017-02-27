@@ -315,8 +315,7 @@ System.register(['aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depende
 
       if (_viewPortPlan.childNavigationInstruction) {
         findDeactivatable(_viewPortPlan.childNavigationInstruction.plan, callbackName, list);
-      }
-      if (prevComponent) {
+      } else if (prevComponent) {
         addPreviousDeactivatable(prevComponent, callbackName, list);
       }
     }
