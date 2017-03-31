@@ -122,13 +122,14 @@ export class NavigationInstruction {
   * Adds a viewPort instruction.
   */
   addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): any {
+    const config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortName });
     let viewportInstruction = this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
       strategy: strategy,
       moduleId: moduleId,
       component: component,
       childRouter: component.childRouter,
-      lifecycleArgs: this.lifecycleArgs.slice()
+      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
     };
 
     return viewportInstruction;
