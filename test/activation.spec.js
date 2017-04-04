@@ -1,8 +1,10 @@
 import {
   CanDeactivatePreviousStep,
-  CanActivateNextStep
+  CanActivateNextStep,
+  ActivateNextStep
 } from '../src/activation';
 import {activationStrategy} from '../src/navigation-plan';
+import {NavigationInstruction} from '../src/navigation-instruction';
 import {createPipelineState} from './test-util';
 
 describe('activation', () => {
@@ -182,6 +184,33 @@ describe('activation', () => {
 
       step.run(instruction, state.next);
       expect(state.rejection).toBeTruthy();
+    });
+  });
+
+  describe('ActivateNextStep', () => {
+    let step;
+    let state;
+
+    beforeEach(() => {
+      step = new ActivateNextStep();
+    });
+
+    it('should pass current viewport name to activate', (done) => {
+      const instruction = new NavigationInstruction({
+        plan: {
+          "my-view-port": { strategy: activationStrategy.invokeLifecycle }
+        }
+      });
+
+      const viewModel = {
+        activate(params, config, instruction) {
+          expect(config.currentViewPort).toBe('my-view-port');
+          done();
+        }
+      }
+    
+      instruction.addViewPortInstruction('my-view-port', 'ignored', 'ignored', { viewModel });
+      step.run(instruction);
     });
   });
 });
