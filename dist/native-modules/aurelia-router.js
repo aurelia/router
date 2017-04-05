@@ -198,13 +198,14 @@ export var NavigationInstruction = function () {
   };
 
   NavigationInstruction.prototype.addViewPortInstruction = function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
+    var config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortName });
     var viewportInstruction = this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
       strategy: strategy,
       moduleId: moduleId,
       component: component,
       childRouter: component.childRouter,
-      lifecycleArgs: this.lifecycleArgs.slice()
+      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
     };
 
     return viewportInstruction;

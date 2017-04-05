@@ -1,3 +1,13 @@
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/aurelia/router/compare/1.2.1...v1.3.0) (2017-04-05)
+
+
+### Features
+
+* **viewport:** add viewport name to life cycle arguments ([34ef2c4](https://github.com/aurelia/router/commit/34ef2c4))
+
+
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/aurelia/router/compare/1.2.0...v1.2.1) (2017-02-27)
 
