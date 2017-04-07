@@ -74,6 +74,18 @@ You can also call `mapRoute()` on a single route configuration.
 
 Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) to the head of your html document. If you're using JSPM, RequireJS or a similar module loader, you will also need to configure it with a base url, corresponding to your base tag's `href`. Finally, be sure to set the `config.options.root` to match your base tag's setting.
 
+<code-listing heading="app.html">
+  <source-code lang="HTML">
+    <template>
+      <ul>
+          <li class="active"><a href="welcome">Welcome</a></li>
+          <li><a href="flickr">Flickr</a></li>
+          <li><a href="child-router">Child Router</a></li>
+      </ul>
+      <router-view></router-view>
+    </template>
+  </source-code>
+</code-listing>
 <code-listing heading="Push State">
   <source-code lang="ES 2015/2016">
     export class App {
