@@ -20,22 +20,25 @@ To use Aurelia's router, your component view must have a `<router-view></router-
 <code-listing heading="app.html">
   <source-code lang="HTML">
     <template>
-      <router-view></router-view>
+       <ul repeat.for="nav of router.navigation">
+           <li class="${nav.isActive ? 'active' : ''}"><a href.bind="nav.href">${nav.title}</a></li>
+       </ul>
+       <router-view></router-view>
     </template>
   </source-code>
 </code-listing>
 
 <code-listing heading="Basic Route Configuration">
-  <source-code lang="ES 2015/2016">
+  <source-code lang="ES 2015/2016">    
     export class App {
       configureRouter(config, router) {
         this.router = router;
         config.title = 'Aurelia';
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
+          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, title: 'Users' },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',      name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'files/*path',      name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, title: 'Files' }
         ]);
       }
     }
@@ -44,19 +47,32 @@ To use Aurelia's router, your component view must have a `<router-view></router-
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
+      router: Router;
+    
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
+          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, title: 'Users' },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',      name: 'files',      moduleId: 'files/index',   href:'#files',   nav: 0 }
+          { route: 'files/*path',      name: 'files',      moduleId: 'files/index',   href:'#files',   nav: 0, title: 'Files'  }
         ]);
       }
     }
   </source-code>
 </code-listing>
+
+You can build navigation using `route`. All objects that are defined as `nav:true` in `config.map()` will be available as array of `NavModel` in `router.navigation`. These are the available properties in `NavModel`.
+
+* `isActive` flag which will be true when the associated route is active.
+* `title` which will be prepended in html title when the associated route is active.
+* `href` can be used on `a` tag.
+* `config` is the object defined in `config.map`.
+* `settings` is equal to the property `settings` of `config` object.
+* `router` is a reference for AppRouter.
+* Other properties includes `relativeHref` and `order`.
+
 
 You can also call `mapRoute()` on a single route configuration.
 
@@ -77,11 +93,9 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
 <code-listing heading="app.html">
   <source-code lang="HTML">
     <template>
-      <ul>
-          <li class="active"><a href="welcome">Welcome</a></li>
-          <li><a href="flickr">Flickr</a></li>
-          <li><a href="child-router">Child Router</a></li>
-      </ul>
+       <ul repeat.for="nav of router.navigation">
+           <li class="${nav.isActive ? 'active' : ''}"><a href.bind="nav.href">${nav.title}</a></li>
+       </ul>
       <router-view></router-view>
     </template>
   </source-code>
@@ -89,13 +103,14 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
 <code-listing heading="Push State">
   <source-code lang="ES 2015/2016">
     export class App {
-      configureRouter(config) {
+      configureRouter(config, router) {
+        this.router = router;
         config.title = 'Aurelia';
         config.options.pushState = true;
         config.options.root = '/';
         config.map([
           { route: ['welcome'],    name: 'welcome',     moduleId: 'welcome',      nav: true, title:'Welcome' },
-          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true },
+          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true, title:'Flickr' },
           { route: 'child-router', name: 'childRouter', moduleId: 'child-router', nav: true, title:'Child Router' },
           { route: '',             redirect: 'welcome' }
         ]);
@@ -103,16 +118,19 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
-      configureRouter(config: RouterConfiguration): void {
+      router: Router;
+      
+      configureRouter(config: RouterConfiguration, router: Router): void {
+        this.router = router;
         config.title = 'Aurelia';
         config.options.pushState = true;
         config.options.root = '/';
         config.map([
           { route: ['welcome'],    name: 'welcome',     moduleId: 'welcome',      nav: true, title:'Welcome' },
-          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true },
+          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true, title:'Flickr' },
           { route: 'child-router', name: 'childRouter', moduleId: 'child-router', nav: true, title:'Child Router' },
           { route: '',             redirect: 'welcome' }
         ]);
