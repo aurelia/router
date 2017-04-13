@@ -230,7 +230,7 @@ export class Router {
     }
 
     this.isExplicitNavigation = true;
-    return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
+    return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._usePushState), options);
   }
 
   /**
@@ -285,7 +285,7 @@ export class Router {
     }
 
     let path = this._recognizer.generate(name, params);
-    let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
+    let rootedPath = _createRootedPath(path, this.baseUrl, this.history._usePushState, options.absolute);
     return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
   }
 
@@ -437,9 +437,9 @@ export class Router {
     for (let i = 0, length = nav.length; i < length; i++) {
       let current = nav[i];
       if (!current.config.href) {
-        current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+        current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._usePushState);
       } else {
-        current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
+        current.href = _normalizeAbsolutePath(current.config.href, this.history._usePushState);
       }
     }
   }
