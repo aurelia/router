@@ -16,7 +16,7 @@ export class ConfigurationLoaderStep implements PipelineStep {
                 let moduleId = paths.join('/');
 
                 return this.loader.loadModule(moduleId)
-                    .then(m => return m.configure(new FrameworkConfiguration(this.aurelia)))
+                    .then(m => m.configure(new FrameworkConfiguration(this.aurelia)))
                     .then(() => {
                         instruction.config.settings.isConfigured = true;
                         return next();
