@@ -111,7 +111,7 @@ interface RoutableComponentCanActivate {
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
   * Return a boolean value, a promise for a boolean value, or a navigation command.
   */
-  canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand|Promise<NavigationCommand>|PromiseLike<NavigationCommand>;
+  canActivate?: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand|Promise<NavigationCommand>|PromiseLike<NavigationCommand>;
 }
 
 /**
@@ -123,7 +123,7 @@ interface RoutableComponentActivate {
   * You can optionally return a promise to tell the router to wait to bind and attach the view until
   * after you finish your work.
   */
-  activate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<void>|PromiseLike<void>|IObservable|void;
+  activate?: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<void>|PromiseLike<void>|IObservable|void;
 }
 
 /**
@@ -135,7 +135,7 @@ interface RoutableComponentCanDeactivate {
   * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
   * or a navigation command.
   */
-  canDeactivate: () => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
+  canDeactivate?: () => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
 }
 
 /**
@@ -147,7 +147,7 @@ interface RoutableComponentDeactivate {
   * navigated away from. You can optionally return a promise to tell the router to wait until
   * after you finish your work.
   */
-  deactivate: () => Promise<void>|PromiseLike<void>|IObservable|void;
+  deactivate?: () => Promise<void>|PromiseLike<void>|IObservable|void;
 }
 
 /**
@@ -158,7 +158,7 @@ interface RoutableComponentDetermineActivationStrategy {
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
   * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => string;
+  determineActivationStrategy?: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => string;
 }
 
 /**
@@ -168,5 +168,5 @@ interface ConfiguresRouter {
   /**
   * Implement this hook if you want to configure a router.
   */
-  configureRouter(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
+  configureRouter?(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
 }
