@@ -952,7 +952,7 @@ The default value of the`transformTitle` property does the following:
 
 In the previous example, the `AppRouter`'s `transformTitle` is set, so all child `Router`s will delegate down to it by default. However, this means that the `transformTitle` can be overridden for specific child `Router`s if some areas of your app need custom transformation.
 
-## [Configuring a Fallback Route](aurelia-doc://section/12/version/1.0.0)
+## [Configuring a Fallback Route](aurelia-doc://section/13/version/1.0.0)
 
 Whenever navigation is rejected, it is redirected to a previous location. However in certain cases a previous location doesn't exist, e.g. when it happens as the first navigation after the startup of application. To handle this scenario, you can set up a fallback route.
 
