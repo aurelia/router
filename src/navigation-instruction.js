@@ -182,7 +182,7 @@ export class NavigationInstruction {
     let path = this.params[wildcardName] || '';
 
     if (!path) {
-      return fragment;
+      return encodeURI(fragment);
     }
 
     return encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
