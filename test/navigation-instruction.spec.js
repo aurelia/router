@@ -28,7 +28,9 @@ describe('NavigationInstruction', () => {
   describe('getBaseUrl()', () => {
     let child;
     const parentRouteName = 'parent';
+    const parentParamRouteName = 'parent/:parent';
     const childRouteName = 'child';
+    const childParamRouteName = 'child/:child';
 
     beforeEach(() => {
       router.addRoute({
@@ -41,10 +43,20 @@ describe('NavigationInstruction', () => {
         route: parentRouteName,
         moduleId: parentRouteName
       });
+      router.addRoute({
+        name: parentParamRouteName,
+        route: parentParamRouteName,
+        moduleId: parentRouteName,
+      })
       child = router.createChild(new Container());
       child.addRoute({
         name: childRouteName,
         route: childRouteName,
+        moduleId: childRouteName
+      });
+      child.addRoute({
+        name: childParamRouteName,
+        route: childParamRouteName,
         moduleId: childRouteName
       });
     });
@@ -60,6 +72,25 @@ describe('NavigationInstruction', () => {
       router._createNavigationInstruction(parentRouteName).then(instruction => {
         instruction.params = { fake: 'fakeParams' };
         expect(instruction.getBaseUrl()).toBe(parentRouteName);
+        done();
+      });
+    });
+
+    it('should handle encoded uris properly', (done) => {
+      router._createNavigationInstruction('parent/parent 1').then(instruction => {
+        expect(instruction.getBaseUrl()).toBe('parent/parent%201');
+        done();
+      });
+      router._createNavigationInstruction('parent/parent%201').then(instruction => {
+        expect(instruction.getBaseUrl()).toBe('parent/parent%201');
+        done();
+      });
+      router._createNavigationInstruction('parent/parent 1/child/child 1').then(instruction => {
+        expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
+        done();
+      });
+      router._createNavigationInstruction('parent/parent%201/child/child%201').then(instruction => {
+        expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
         done();
       });
     });
