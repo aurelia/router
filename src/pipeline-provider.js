@@ -35,8 +35,8 @@ export class PipelineProvider {
     this.container = container;
     this.steps = [
       BuildNavigationPlanStep,
-      CanDeactivatePreviousStep, //optional
       LoadRouteStep,
+      CanDeactivatePreviousStep, //optional
       this._createPipelineSlot('authorize'),
       CanActivateNextStep, //optional
       this._createPipelineSlot('preActivate', 'modelbind'),
