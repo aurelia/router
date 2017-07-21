@@ -94,28 +94,6 @@ describe('activation', () => {
       expect(state.rejection).toBeTruthy();
     });
 
-    describe('with a childNavigationInstruction', () => {
-      it('should return true when child is true', () => {
-        let viewPort = viewPortFactory(() => (true));
-        let instruction = { plan: { first: viewPort } };
-
-        viewPort.childNavigationInstruction = { plan: { first: viewPortFactory(() => (true)) } };
-
-        step.run(instruction, state.next);
-        expect(state.result).toBe(true);
-      });
-
-      it('should cancel when child is false', () => {
-        let viewPort = viewPortFactory(() => (true));
-        let instruction = { plan: { first: viewPort } };
-
-        viewPort.childNavigationInstruction = { plan: { first: viewPortFactory(() => (false)) } };
-
-        step.run(instruction, state.next);
-        expect(state.rejection).toBeTruthy();
-      });
-    });
-
     describe('with router and currentInstruction', ()=> {
       let viewModel = { };
       let viewPort = viewPortFactory(() => (true));
