@@ -69,10 +69,10 @@ function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<
       }
     }
 
-    if (viewPortPlan.childNavigationInstruction) {
-      findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
-    } else if (prevComponent) {
+    if (viewPortPlan.strategy === activationStrategy.replace && prevComponent) {
       addPreviousDeactivatable(prevComponent, callbackName, list);
+    } else if (viewPortPlan.childNavigationInstruction) {
+      findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
     }
   }
 
