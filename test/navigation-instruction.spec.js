@@ -76,23 +76,36 @@ describe('NavigationInstruction', () => {
       });
     });
 
-    it('should handle encoded uris properly', (done) => {
-      router._createNavigationInstruction('parent/parent 1').then(instruction => {
-        expect(instruction.getBaseUrl()).toBe('parent/parent%201');
-        done();
+    describe('when a uri contains spaces', () => {
+
+      it('should handle an encoded uri', (done) => {
+        router._createNavigationInstruction('parent/parent%201').then(instruction => {
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201');;
+          done();
+        });
       });
-      router._createNavigationInstruction('parent/parent%201').then(instruction => {
-        expect(instruction.getBaseUrl()).toBe('parent/parent%201');
-        done();
+
+      it('should encode the uri', (done) => {
+        router._createNavigationInstruction('parent/parent 1').then(instruction => {
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201');
+          done();
+        });
       });
-      router._createNavigationInstruction('parent/parent 1/child/child 1').then(instruction => {
-        expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
-        done();
+
+      it('should identify encoded fragments', (done) => {
+        router._createNavigationInstruction('parent/parent%201/child/child%201').then(instruction => {
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
+          done();
+        });
       });
-      router._createNavigationInstruction('parent/parent%201/child/child%201').then(instruction => {
-        expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
-        done();
+
+      it('should identify fragments and encode them', (done) => { 
+        router._createNavigationInstruction('parent/parent 1/child/child 1').then(instruction => {
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
+          done();
+        });
       });
+
     });
 
     describe('when using an empty parent route', () => {
