@@ -3,7 +3,7 @@ import {isNavigationCommand} from './navigation-commands';
 
 export class CanDeactivatePreviousStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
-    return processDeactivatable(navigationInstruction.plan, 'canDeactivate', next);
+    return processDeactivatable(navigationInstruction, 'canDeactivate', next);
   }
 }
 
@@ -15,7 +15,7 @@ export class CanActivateNextStep {
 
 export class DeactivatePreviousStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
-    return processDeactivatable(navigationInstruction.plan, 'deactivate', next, true);
+    return processDeactivatable(navigationInstruction, 'deactivate', next, true);
   }
 }
 
@@ -25,7 +25,8 @@ export class ActivateNextStep {
   }
 }
 
-function processDeactivatable(plan, callbackName, next, ignoreResult) {
+function processDeactivatable(navigationInstruction: NavigationInstruction, callbackName: string, next: Funcion, ignoreResult: boolean) {
+  const plan = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
   let i = infos.length; //query from inside out
 
@@ -41,7 +42,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
     if (i--) {
       try {
         let viewModel = infos[i];
-        let result = viewModel[callbackName]();
+        let result = viewModel[callbackName](navigationInstruction);
         return processPotential(result, inspect, next.cancel);
       } catch (error) {
         return next.cancel(error);
