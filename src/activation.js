@@ -58,6 +58,7 @@ function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
     let prevComponent = viewPortPlan.prevComponent;
+    let canDeactivate = callbackName === "canDeactivate";
 
     if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle ||
         viewPortPlan.strategy === activationStrategy.replace) &&
@@ -69,7 +70,9 @@ function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<
       }
     }
 
-    if (viewPortPlan.childNavigationInstruction) {
+    if ((viewPortPlan.childNavigationInstruction && canDeactivate) ||
+        (viewPortPlan.childNavigationInstruction && !canDeactivate &&
+        !prevComponent)) {
       findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
     } else if (prevComponent) {
       addPreviousDeactivatable(prevComponent, callbackName, list);
