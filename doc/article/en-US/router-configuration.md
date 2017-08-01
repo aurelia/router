@@ -36,9 +36,9 @@ To use Aurelia's router, your component view must have a `<router-view></router-
         config.title = 'Aurelia';
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, title: 'Users' },
+          { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, title: 'Users' },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',      name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, title: 'Files' }
+          { route: 'files/*path',      name: 'files',      moduleId: 'files/index', nav: 0,    title: 'Files', href:'#files' }
         ]);
       }
     }
@@ -54,9 +54,9 @@ To use Aurelia's router, your component view must have a `<router-view></router-
         config.title = 'Aurelia';
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, title: 'Users' },
+          { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, title: 'Users' },
           { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',      name: 'files',      moduleId: 'files/index',   href:'#files',   nav: 0, title: 'Files'  }
+          { route: 'files/*path',      name: 'files',      moduleId: 'files/index', nav: 0,    title: 'Files', href:'#files' }
         ]);
       }
     }
@@ -109,10 +109,8 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
         config.options.pushState = true;
         config.options.root = '/';
         config.map([
-          { route: ['welcome'],    name: 'welcome',     moduleId: 'welcome',      nav: true, title:'Welcome' },
-          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true, title:'Flickr' },
-          { route: 'child-router', name: 'childRouter', moduleId: 'child-router', nav: true, title:'Child Router' },
-          { route: '',             redirect: 'welcome' }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -129,10 +127,8 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
         config.options.pushState = true;
         config.options.root = '/';
         config.map([
-          { route: ['welcome'],    name: 'welcome',     moduleId: 'welcome',      nav: true, title:'Welcome' },
-          { route: 'flickr',       name: 'flickr',      moduleId: 'flickr',       nav: true, title:'Flickr' },
-          { route: 'child-router', name: 'childRouter', moduleId: 'child-router', nav: true, title:'Child Router' },
-          { route: '',             redirect: 'welcome' }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -157,11 +153,9 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
           instruction.config.href = instruction.fragment
         }
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
-          { route: ['', 'admin*path'],   name: 'route',  navigationStrategy: navStrat }
+          { route: ['', 'home'],       name: 'home',  moduleId: 'home/index' },
+          { route: 'users',            name: 'users', moduleId: 'users/index', nav: true, title: 'Users' },
+          { route: ['', 'admin*path'], name: 'route', navigationStrategy: navStrat }
         ]);
       }
     }
@@ -178,11 +172,9 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
           instruction.config.href = instruction.fragment
         }
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true },
-          { route: ['', 'admin*path'],   name: 'route',  navigationStrategy: navStrat }
+          { route: ['', 'home'],       name: 'home',  moduleId: 'home/index' },
+          { route: 'users',            name: 'users', moduleId: 'users/index', nav: true, title: 'Users' },
+          { route: ['', 'admin*path'], name: 'route', navigationStrategy: navStrat }
         ]);
       }
     }
@@ -201,10 +193,8 @@ Although Aurelia does allow you to pass any additional property to a route's con
         this.router = router;
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users', settings: {data: '...'} }
         ]);
       }
     }
@@ -217,10 +207,8 @@ Although Aurelia does allow you to pass any additional property to a route's con
         this.router = router;
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true, settings: {data: '...'} }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users', settings: {data: '...'} }
         ]);
       }
     }
@@ -238,9 +226,8 @@ You can set a route to be case sensitive, should you wish:
         this.router = router;
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users', caseSensitive: true }
         ]);
       }
     }
@@ -253,16 +240,15 @@ You can set a route to be case sensitive, should you wish:
         this.router = router;
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users', caseSensitive: true }
         ]);
       }
     }
   </source-code>
 </code-listing>
 
-In the above example, our route will only match URL fragment of '/users' and not '/Users', *but* since the route 'users/:id/detail' is not case sensitive the URL Users/:id/detail would match. By default Aurelia's routes are not case sensitive.
+In the above example, our route will only match URL fragment of `/users` and not `/Users`, *but* since the route `home` is not case sensitive the URL `/Home` would match. By default Aurelia's routes are not case sensitive.
 
 ## [Handling Unknown Routes](aurelia-doc://section/6/version/1.0.0)
 
@@ -283,9 +269,8 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
         this.router = router;
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
 
         config.mapUnknownRoutes('not-found');
@@ -300,9 +285,8 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
         this.router = router;
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
 
         config.mapUnknownRoutes('not-found');
@@ -337,10 +321,8 @@ The function passed to `mapUnknownRoutes()` has to return:
         config.mapUnknownRoutes(handleUnknownRoutes);
 
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -362,10 +344,8 @@ The function passed to `mapUnknownRoutes()` has to return:
         config.mapUnknownRoutes(handleUnknownRoutes);
 
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -411,9 +391,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         config.addAuthorizeStep(step)
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index', settings: { auth: true } },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail', settings: { auth: true } },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files', nav: true }
+          { route: 'users',            name: 'users',      moduleId: 'users/index',  settings: { auth: true } },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail', settings: { auth: true } }
         ]);
       }
     }
@@ -440,9 +419,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         config.addPipelineStep('authorize', AuthorizeStep);
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: 'users',            name: 'users',      moduleId: 'users/index',  settings: { auth: true } },
+          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail', settings: { auth: true } }
         ]);
       }
     }
@@ -474,10 +452,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         };
         config.addPreActivateStep(step)
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -497,10 +473,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         config.title = 'Aurelia';
         config.addPreActivateStep(step);
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -518,10 +492,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         };
         config.addPreRenderStep(step);
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -540,10 +512,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         config.title = 'Aurelia';
         config.addPreRenderStep(step);
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -561,10 +531,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         };
         config.addPostRenderStep(step);
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -584,10 +552,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
         config.title = 'Aurelia';
         config.addPostRenderStep(step);
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' },
-          { route: 'files/*path',       name: 'files',      moduleId: 'files/index',   href:'#files',   nav: true }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
       }
     }
@@ -995,9 +961,8 @@ Whenever navigation is rejected, it is redirected to a previous location. Howeve
         this.router = router;
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index',   nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
 
         config.fallbackRoute('users');
@@ -1012,9 +977,8 @@ Whenever navigation is rejected, it is redirected to a previous location. Howeve
         this.router = router;
         config.title = 'Aurelia';
         config.map([
-          { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
-          { route: 'users',            name: 'users',      moduleId: 'users/index', nav: true, caseSensitive: true },
-          { route: 'users/:id/detail', name: 'userDetail', moduleId: 'users/detail' }
+          { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
+          { route: 'users',      name: 'users', moduleId: 'users/index', nav: true, title: 'Users' }
         ]);
 
         config.fallbackRoute('users');
