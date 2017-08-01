@@ -122,7 +122,7 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
 
     export class App {
       router: Router;
-      
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
@@ -379,8 +379,8 @@ Aurelia allows redirecting of routes to URL fragments by specifying redirect wit
 <code-listing heading="Route Config Redirects">
   <source-code lang="ES 2015/ES 2016/TypeScript">
     config.map([
-      { route: '',           redirect: 'home' },
-      { route: 'home',       name: 'home',       moduleId: 'home/index' }
+      { route: '', redirect: 'home' },
+      { route: 'home', name: 'home', moduleId: 'home/index' }
     ]);
   </source-code>
 </code-listing>
@@ -596,7 +596,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
 ## [Rendering View Ports](aurelia-doc://section/9/version/1.0.0)
 
-Every instance of a `router-view` custom element essentially defines a "view port".  When you give a `router-view` a name, you can refer to it in the `viewPorts` property of the route configuration in your javascript.  The value of a `viewPorts` property is an object where each property name is the name of a view port (ie, `router-view`) and each value is the `moduleId` destination of the route.  Thus you can specify any number of view ports on a single route configuration.
+Every instance of a `router-view` custom element essentially defines a "view port". When you give a `router-view` a name, you can refer to it in the `viewPorts` property of the route configuration in your javascript. The value of a `viewPorts` property is an object where each property name is the name of a view port (ie, `router-view`) and each value is the `moduleId` destination of the route. Thus you can specify any number of view ports on a single route configuration.
 
 > Info
 > If you don't name a `router-view`, it will be available under the name 'default'.
@@ -642,19 +642,19 @@ Following is an example of the use of view ports:
 </code-listing>
 
 > Info
-> In addition to the `moduleId`, you can also specify a "layout" in the configuration of a view port.  See the discussion of Layouts elsewhere in this document.
+> In addition to the `moduleId`, you can also specify a "layout" in the configuration of a view port. See the discussion of Layouts elsewhere in this document.
 
 ## [Layouts](aurelia-doc://section/10/version/1.0.0)
 
 Similar to MVC-style master/layout pages, Aurelia allows you to use a "layout" view like an MVC "master template" for a set of views. 
 
-The set of views subject to being part of a layout is defined in Aurelia as a set of views referenced by one or more routes in a router configuration.  There are two ways to associate a layout with routes.  The first is via HTML, the second is via view model code.
+The set of views subject to being part of a layout is defined in Aurelia as a set of views referenced by one or more routes in a router configuration. There are two ways to associate a layout with routes. The first is via HTML, the second is via view model code.
 
 > Info
-> We're going to be a little sloppy here in terminology.  Technically, routes refer to "moduleIds", not 
-"views".  Since the router resolves a moduleId to a view, indirectly the router does reference a view.  It is easy to picture a view visually contained within a layout, so in this topic to we'll refer to views referenced by a route, not modules.
+> We're going to be a little sloppy here in terminology. Technically, routes refer to "moduleIds", not 
+"views". Since the router resolves a moduleId to a view, indirectly the router does reference a view. It is easy to picture a view visually contained within a layout, so in this topic to we'll refer to views referenced by a route, not modules.
 
-We'll look at using HTML first.  We know that the `router-view` custom HTML element is always associated with a set of one or more views referenced in a router configuration given in its parent view's view model.  By associating a layout with a `router-view` one can thus associate a layout with the same set of views with which the `router-view` is associated.  
+We'll look at using HTML first. We know that the `router-view` custom HTML element is always associated with a set of one or more views referenced in a router configuration given in its parent view's view model. By associating a layout with a `router-view` one can thus associate a layout with the same set of views with which the `router-view` is associated.
 
 To specify a layout on the `router-view` custom element, we use the following attributes:
 
@@ -727,14 +727,14 @@ And here we define a view that we want to appear within the layout:
   </source-code>
 </code-listing>
 
-Observe how we use the `slot` mechanism for associating parts of the layout to parts of the views that are to be contained within the layout.  (Happy for developers, this is conveniently the same mechanism and syntax we use in Aurelia when providing content to custom elements.)
+Observe how we use the `slot` mechanism for associating parts of the layout to parts of the views that are to be contained within the layout. (Happy for developers, this is conveniently the same mechanism and syntax we use in Aurelia when providing content to custom elements.)
 
 Now we just have to define the route configuration that will be associated with the `router-view`:
 
 <code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
     export class App {
-      configureRouter(config, router){
+      configureRouter(config, router) {
         config.map([
           { route: '', name: 'home', moduleId: 'home' }
         ]);
@@ -760,18 +760,18 @@ Now we just have to define the route configuration that will be associated with 
 
 Thus when we navigate to the module "home" we find that it is laid-out as desired inside the layout view.
 
-Note there is nothing different about the above route configuration with or without the layout.  It may reference any number of views that would all be included by default in the layout. 
+Note there is nothing different about the above route configuration with or without the layout.  It may reference any number of views that would all be included by default in the layout.
 
 So that is how we use HTML to associate a layout view with a set of views referenced in a router configuration.  
 
-We can also associate layouts with route configurations using code in our view model.  Suppose we like what we've done above, but we have a couple views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML.  The following code is an example of how we can do that:
+We can also associate layouts with route configurations using code in our view model. Suppose we like what we've done above, but we have a couple views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML. The following code is an example of how we can do that:
 
 <code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
     export class App {
-      configureRouter(config, router){
+      configureRouter(config, router) {
         config.map([
-          { route: '', name: 'home', moduleId: 'home' },
+          { route: '',      name: 'home',  moduleId: 'home' },
           { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
           { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: 'layout-users', layoutViewModel: { access: "admin" } }
         ]);
@@ -786,7 +786,7 @@ We can also associate layouts with route configurations using code in our view m
     export class App {
       configureRouter(config: RouterConfiguration, router: Router): void {){
         config.map([
-          { route: '', name: 'home', moduleId: 'home' },
+          { route: '',      name: 'home',  moduleId: 'home' },
           { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
           { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: 'layout-users', layoutViewModel: { access: "admin" } }
         ]);
@@ -797,9 +797,9 @@ We can also associate layouts with route configurations using code in our view m
   </source-code>
 </code-listing>
 
-The above example will assign different layouts to the "login" and "users" views, overriding the HTML while leaving "home" to remain as configured in the HTML.  Noticing we're using camel-cased property names here, unlike in the HTML.  
+The above example will assign different layouts to the "login" and "users" views, overriding the HTML while leaving "home" to remain as configured in the HTML. Noticing we're using camel-cased property names here, unlike in the HTML.
 
-You can also specify a layout in the `viewPorts` configuration of a route.  See a simple example, below:
+You can also specify a layout in the `viewPorts` configuration of a route. See a simple example, below:
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
@@ -814,7 +814,7 @@ You can also specify a layout in the `viewPorts` configuration of a route.  See 
 <code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
     export class App {
-      configureRouter(config, router){
+      configureRouter(config, router) {
         config.map([
           { route: '', name: 'home', viewPorts: { myRouterView: { moduleId: 'home', layoutView: 'default.html' } } }
         ]);
