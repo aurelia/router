@@ -63,32 +63,26 @@ To use Aurelia's router, your component view must have a `<router-view></router-
   </source-code>
 </code-listing>
 
-You can build navigation using `route`. All objects that are defined as `nav:true` in `config.map()` will be available as array of `NavModel` in `router.navigation`. These are the available properties in `NavModel`.
-
-* `isActive` flag which will be true when the associated route is active.
-* `title` which will be prepended in html title when the associated route is active.
-* `href` can be used on `a` tag.
-* `config` is the object defined in `config.map`.
-* `settings` is equal to the property `settings` of `config` object.
-* `router` is a reference for AppRouter.
-* Other properties includes `relativeHref` and `order`.
-
-
-You can also call `mapRoute()` on a single route configuration.
-
-* `config.map()` adds route(s) to the router.  Although only route, name, moduleId, href and nav are shown above there are other properties that can be included in a route. The class name for each route is `RouteConfig`.
+* `config.map()` adds route(s) to the router. Although only `route`, `name`, `moduleId`, `href` and `nav` are shown above there are other properties that can be included in a route. The interface name for a route is `RouteConfig`. You can also use `config.mapRoute()` to add a single route.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route view-model's `activate()` function.
   * A parameter can be made optional by appending a question mark `:token?` (ie: `users/:id?/detail` would match both `users/3/detail` and `users/detail`). When an optional parameter is missing from the url, the property passed to `activate()` is `undefined`.
   * Wildcard routes are used to match the "rest" of a path (ie: files/*path matches files/new/doc or files/temp). An object with the rest of the URL after the segment is set as the `path` property and passed as a parameter to `activate()` as well.
 * `href` - is a conditionally optional property. If it is not defined then route is used. If route has segments then href is required as in the case of files because the router does not know how to fill out the parameterized portions of the pattern.
-* `nav` - is a boolean or number property. When set to true the route will be included in the router's navigation model. This makes it easier to create a dynamic menu or similar elements. When specified as number, the value will be used in sorting the routes.
+* `nav` - is a boolean or number property. When set to true the route will be included in the router's navigation model. When specified as number, the value will be used in sorting the routes. This makes it easier to create a dynamic menu or similar elements.  The navigation model will be available as array of `NavModel` in `router.navigation`. These are the available properties in `NavModel`:
+  * `isActive` flag which will be true when the associated route is active.
+  * `title` which will be prepended in html title when the associated route is active.
+  * `href` can be used on `a` tag.
+  * `config` is the object defined in `config.map`.
+  * `settings` is equal to the property `settings` of `config` object.
+  * `router` is a reference for AppRouter.
+  * Other properties includes `relativeHref` and `order`.
 
 ## [Options](aurelia-doc://section/2/version/1.0.0)
 
 ### Push State
 
-Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) to the head of your html document. If you're using JSPM, RequireJS or a similar module loader, you will also need to configure it with a base url, corresponding to your base tag's `href`. Finally, be sure to set the `config.options.root` to match your base tag's setting.
+Set `config.options.pushState` to `true` to activate push state and add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) to the head of your html document. If you're using JSPM, RequireJS or a similar module loader, you will also need to configure it with a base url, corresponding to your base tag's `href`. Finally, be sure to set the `config.options.root` to match your base tag's setting.
 
 <code-listing heading="Push State">
   <source-code lang="ES 2015/2016">
@@ -130,7 +124,7 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
 
 ## [Dynamically Specify Route Components](aurelia-doc://section/3/version/1.0.0)
 
-You can add a `navigationStrategy` to a route to allow dynamic routes. Within the navigation strategy Aurelia requires you to configure `instruction.config` with the desired `moduleId`, viewPorts or redirect.
+You can add a `navigationStrategy` to a route to allow dynamic routes. Within the navigation strategy Aurelia requires you to configure `instruction.config` with the desired `moduleId`, `viewPorts` or `redirect`.
 
 <code-listing heading="Using a Route Navigation Strategy">
   <source-code lang="ES 2015/2016">
@@ -253,7 +247,7 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
 * A routeConfig object. This configuration object will be used any time a route is not found.
 * A function which is passed the NavigationInstruction object and can decide the route dynamically.
 
-### Using a ModuleId for Unknown Routes
+### Using a `moduleId` for Unknown Routes
 
 <code-listing heading="Static Unknown Routes">
   <source-code>
@@ -291,13 +285,13 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
   </source-code>
 </code-listing>
 
-The above example will redirect any unmatched routes to the `not-found` component module.
+The above example will make any unmatched routes to load the `not-found` component module.
 
 ### Using A Function For Unknown Routes
 
 The function passed to `mapUnknownRoutes()` has to return:
 
-* A string to a moduleId.
+* A string representing `moduleId`.
 * An object with property `moduleId` of type string.
 * A `RouteConfig` object.
 * A `Promise` that resolves to any of the above.
@@ -368,7 +362,7 @@ Aurelia allows redirecting of routes to URL fragments by specifying redirect wit
 
 Aurelia has two router classes, `AppRouter` and `Router`. `AppRouter` extends the `Router` class and is the main application router. `Router` is used for any child routers including nested child routers. One of the main differences between the two is pipelines are only allowed on the `AppRouter` and not any child routers.
 
-You can create your own pipeline steps using `addPipelineStep`, but the step's name must match one of the pipeline's slots, the default slots in order are `authorize`, `preActivate`, `preRender`, and `postRender`. Aurelia also has functions for creating a pipeline step for these slots.
+The default pipeline slots in order are `authorize`, `preActivate`, `preRender`, and `postRender`. For each slot, Aurelia has convenience functions for creating a pipeline step for these slots: `addAuthorizeStep`, `addPreActivateStep`, `addPreRenderStep`, `addPostRenderStep`. You can create your own pipeline steps using `addPipelineStep`, but the step's name must match one of the default pipeline's slots.
 
 * `authorize` is called between loading the route's step and calling the route view-model' `canActivate` function if defined.
 * `preActivate` is called between the route view-model' `canActivate` function and the previous route view-model's `deactivate` function if defined.
@@ -613,7 +607,7 @@ The set of views subject to being part of a layout is defined in Aurelia as a se
 
 > Info
 > We're going to be a little sloppy here in terminology. Technically, routes refer to "moduleIds", not 
-"views". Since the router resolves a moduleId to a view, indirectly the router does reference a view. It is easy to picture a view visually contained within a layout, so in this topic to we'll refer to views referenced by a route, not modules.
+"views". Since the router resolves a `moduleId` to a view, indirectly the router does reference a view. It is easy to picture a view visually contained within a layout, so in this topic to we'll refer to views referenced by a route, not modules.
 
 We'll look at using HTML first. We know that the `router-view` custom HTML element is always associated with a set of one or more views referenced in a router configuration given in its parent view's view model. By associating a layout with a `router-view` one can thus associate a layout with the same set of views with which the `router-view` is associated.
 
