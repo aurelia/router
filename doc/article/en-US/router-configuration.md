@@ -90,16 +90,6 @@ You can also call `mapRoute()` on a single route configuration.
 
 Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) to the head of your html document. If you're using JSPM, RequireJS or a similar module loader, you will also need to configure it with a base url, corresponding to your base tag's `href`. Finally, be sure to set the `config.options.root` to match your base tag's setting.
 
-<code-listing heading="app.html">
-  <source-code lang="HTML">
-    <template>
-       <ul repeat.for="nav of router.navigation">
-           <li class="${nav.isActive ? 'active' : ''}"><a href.bind="nav.href">${nav.title}</a></li>
-       </ul>
-      <router-view></router-view>
-    </template>
-  </source-code>
-</code-listing>
 <code-listing heading="Push State">
   <source-code lang="ES 2015/2016">
     export class App {
@@ -116,7 +106,7 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
+    import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
       router: Router;
@@ -148,10 +138,10 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
       configureRouter(config, router) {
         this.router = router;
         config.title = 'Aurelia';
-        var navStrat = (instruction) => {
+        const navStrat = (instruction) => {
           instruction.config.moduleId = instruction.fragment
           instruction.config.href = instruction.fragment
-        }
+        };
         config.map([
           { route: ['', 'home'],       name: 'home',  moduleId: 'home/index' },
           { route: 'users',            name: 'users', moduleId: 'users/index', nav: true, title: 'Users' },
@@ -164,13 +154,15 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
     import {RouterConfiguration, Router, NavigationInstruction} from 'aurelia-router';
 
     export class App {
+      router: Router;
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
-        let navStrat = (instruction: NavigationInstruction) => {
+        const navStrat = (instruction: NavigationInstruction) => {
           instruction.config.moduleId = instruction.fragment
           instruction.config.href = instruction.fragment
-        }
+        };
         config.map([
           { route: ['', 'home'],       name: 'home',  moduleId: 'home/index' },
           { route: 'users',            name: 'users', moduleId: 'users/index', nav: true, title: 'Users' },
@@ -187,7 +179,6 @@ Although Aurelia does allow you to pass any additional property to a route's con
 
 <code-listing heading="Using Route Settings">
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -203,6 +194,8 @@ Although Aurelia does allow you to pass any additional property to a route's con
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
+      router: Router;
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
@@ -236,6 +229,8 @@ You can set a route to be case sensitive, should you wish:
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
+      router: Router;
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
@@ -263,7 +258,6 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
 <code-listing heading="Static Unknown Routes">
   <source-code>
   <source-code lang="ES 2015/2016">
-
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -281,6 +275,8 @@ Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRo
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
+      router: Router;
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
@@ -311,10 +307,9 @@ The function passed to `mapUnknownRoutes()` has to return:
     export class App {
       configureRouter(config, router) {
         this.router = router;
-
         config.title = 'Aurelia';
 
-        var handleUnknownRoutes = (instruction) => {
+        const handleUnknownRoutes = (instruction) => {
             return { route: 'not-found', moduleId: 'not-found' };
         }
 
@@ -332,12 +327,13 @@ The function passed to `mapUnknownRoutes()` has to return:
     import {RouterConfiguration, NavigationInstruction, Router, RouteConfig} from 'aurelia-router';
 
     export class App {
+      router: Router;
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
-
         config.title = 'Aurelia';
 
-        let handleUnknownRoutes = (instruction: NavigationInstruction): RouteConfig => {
+        const handleUnknownRoutes = (instruction: NavigationInstruction): RouteConfig => {
             return { route: 'not-found', moduleId: 'not-found' };
         }
 
@@ -386,9 +382,9 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     import {Redirect} from 'aurelia-router';
 
     export class App {
-      configureRouter(config, router) {
-        var step = new AuthorizeStep;
-        config.addAuthorizeStep(step)
+      configureRouter(config) {
+        const step = new AuthorizeStep;
+        config.addAuthorizeStep(step);
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',  settings: { auth: true } },
@@ -411,12 +407,12 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration, Router, Next} from 'aurelia-router';
+    import {Redirect, NavigationInstruction, RouterConfiguration, Next} from 'aurelia-router';
 
     export class App {
-      configureRouter(config: RouterConfiguration, router: Router): void {
+      configureRouter(config: RouterConfiguration): void {
         config.title = 'Aurelia';
-        config.addPipelineStep('authorize', AuthorizeStep);
+        config.addAuthorizeStep(AuthorizeStep);
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',  settings: { auth: true } },
@@ -443,7 +439,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 <code-listing heading="A PreActivate Step">
   <source-code lang="ES 2015/2016">
     export class App {
-      configureRouter(config, router) {
+      configureRouter(config) {
         function step() {
           return step.run;
         }
@@ -459,12 +455,12 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
         function step() {
-          return step.run
+          return step.run;
         }
         step.run = (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
           return next();
@@ -484,10 +480,10 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 <code-listing heading="A PreRender Step">
   <source-code lang="ES 2015/2016">
     export class App {
-      configureRouter(config, router) {
-        var step = {
+      configureRouter(config) {
+        const step = {
           run: (navigationInstruction, next) => {
-            return next()
+            return next();
           }
         };
         config.addPreRenderStep(step);
@@ -499,11 +495,11 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
-        let step = {
+        const step = {
           run: (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
             return next();
           }
@@ -523,8 +519,8 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 <code-listing heading="A PostRender Step">
   <source-code lang="ES 2015/2016">
     export class App {
-      configureRouter(config, router) {
-        var step = {
+      configureRouter(config) {
+        const step = {
           run: (navigationInstruction, next) => {
             return next();
           }
@@ -538,12 +534,11 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
+    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
 
     export class App {
-      configureRouter(config: RouterConfiguration, router: Router): void {
-
-        let step = {
+      configureRouter(config: RouterConfiguration): void {
+        const step = {
           run: (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
             return next();
           }
@@ -585,7 +580,7 @@ Following is an example of the use of view ports:
 <code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
     export class App {
-      configureRouter(config, router) {
+      configureRouter(config) {
         config.title = 'Aurelia';
         config.map([
           { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: 'user/detail' } } }
@@ -594,10 +589,10 @@ Following is an example of the use of view ports:
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration, Router} from 'aurelia-router';
+    import {RouterConfiguration} from 'aurelia-router';
 
     export class App {
-      configureRouter(config: RouterConfiguration, router: Router): void {
+      configureRouter(config: RouterConfiguration): void {
         config.title = 'Aurelia';
         config.map([
           { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: 'user/detail' } } }
@@ -685,6 +680,9 @@ And here we define a view that we want to appear within the layout:
   </source-code>
   <source-code lang="TypeScript">
     export class Home {
+      leftMessage: string;
+      rightMessage: string;
+
       constructor() {
         this.leftMessage = "I'm content that will show up on the left";
         this.rightMessage = "I'm content that will show up on the right";
@@ -713,7 +711,9 @@ Now we just have to define the route configuration that will be associated with 
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
-      configureRouter(config: RouterConfiguration, router: Router): void {){
+      router: Router;
+
+      configureRouter(config: RouterConfiguration, router: Router): void {
         config.map([
           { route: '', name: 'home', moduleId: 'home' }
         ]);
@@ -750,7 +750,7 @@ We can also associate layouts with route configurations using code in our view m
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
-      configureRouter(config: RouterConfiguration, router: Router): void {){
+      configureRouter(config: RouterConfiguration, router: Router): void {
         config.map([
           { route: '',      name: 'home',  moduleId: 'home' },
           { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
@@ -793,6 +793,8 @@ You can also specify a layout in the `viewPorts` configuration of a route. See a
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
+      router: Router;
+
       configureRouter(config: RouterConfiguration, router: Router): void {){
         config.map([
           { route: '', name: 'home', viewPorts: { myRouterView: { moduleId: 'home', layoutView: 'default.html' } } }
@@ -874,10 +876,11 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
   </source-code>
   <source-code lang="TypeScript">
     import Backend from 'i18next-xhr-backend';
+    import {Aurelia} from 'aurelia-framework';
     import {AppRouter} from 'aurelia-router';
     import {EventAggregator} from 'aurelia-event-aggregator';
 
-    export function configure(aurelia) {
+    export function configure(aurelia: Aurelia) {
       aurelia.use
         .standardConfiguration()
         .plugin('aurelia-i18n', i18n => {
@@ -930,6 +933,8 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
+      router: Router;
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'titles.app';
@@ -954,8 +959,6 @@ Whenever navigation is rejected, it is redirected to a previous location. Howeve
 
 <code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
-    import {RouterConfiguration, Router} from 'aurelia-router';
-
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -973,6 +976,8 @@ Whenever navigation is rejected, it is redirected to a previous location. Howeve
     import {RouterConfiguration, Router} from 'aurelia-router';
 
     export class App {
+      router: Router;
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
