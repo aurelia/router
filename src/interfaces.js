@@ -170,3 +170,21 @@ interface ConfiguresRouter {
   */
   configureRouter(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
 }
+
+/**
+* An optional interface describing the available activation strategies.
+*/
+interface ActivationStrategy {
+  /**
+  * Reuse the existing the view model without invoking lifecycle hooks.
+  */
+  noChange: 'no-change';
+  /**
+  * Reuse the existing the view model, invoke Router lifecycle hooks.
+  */
+  invokeLifecycle: 'invoke-lifecycle';
+  /**
+  * Replace the existing view model, invoking Router lifecycle hooks.
+  */
+  replace: 'replace';
+}
