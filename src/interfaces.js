@@ -176,11 +176,11 @@ interface ConfiguresRouter {
 */
 interface ActivationStrategy {
   /**
-  * Reuse the existing the view model without invoking lifecycle hooks.
+  * Reuse the existing view model without invoking lifecycle hooks.
   */
   noChange: 'no-change';
   /**
-  * Reuse the existing the view model, invoke Router lifecycle hooks.
+  * Reuse the existing view model, invoke Router lifecycle hooks.
   */
   invokeLifecycle: 'invoke-lifecycle';
   /**
