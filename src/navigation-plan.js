@@ -4,7 +4,7 @@ import {_resolveUrl} from './util';
 /**
 * The strategy to use when activating modules during navigation.
 */
-export const activationStrategy = {
+export const activationStrategy: ActivationStrategy = {
   noChange: 'no-change',
   invokeLifecycle: 'invoke-lifecycle',
   replace: 'replace'
