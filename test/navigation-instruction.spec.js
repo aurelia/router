@@ -28,7 +28,9 @@ describe('NavigationInstruction', () => {
   describe('getBaseUrl()', () => {
     let child;
     const parentRouteName = 'parent';
+    const parentParamRouteName = 'parent/:parent';
     const childRouteName = 'child';
+    const childParamRouteName = 'child/:child';
 
     beforeEach(() => {
       router.addRoute({
@@ -41,10 +43,20 @@ describe('NavigationInstruction', () => {
         route: parentRouteName,
         moduleId: parentRouteName
       });
+      router.addRoute({
+        name: parentParamRouteName,
+        route: parentParamRouteName,
+        moduleId: parentRouteName,
+      })
       child = router.createChild(new Container());
       child.addRoute({
         name: childRouteName,
         route: childRouteName,
+        moduleId: childRouteName
+      });
+      child.addRoute({
+        name: childParamRouteName,
+        route: childParamRouteName,
         moduleId: childRouteName
       });
     });
@@ -62,6 +74,38 @@ describe('NavigationInstruction', () => {
         expect(instruction.getBaseUrl()).toBe(parentRouteName);
         done();
       });
+    });
+
+    describe('when a uri contains spaces', () => {
+
+      it('should handle an encoded uri', (done) => {
+        router._createNavigationInstruction('parent/parent%201').then(instruction => {
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201');;
+          done();
+        });
+      });
+
+      it('should encode the uri', (done) => {
+        router._createNavigationInstruction('parent/parent 1').then(instruction => {
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201');
+          done();
+        });
+      });
+
+      it('should identify encoded fragments', (done) => {
+        router._createNavigationInstruction('parent/parent%201/child/child%201').then(instruction => {
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
+          done();
+        });
+      });
+
+      it('should identify fragments and encode them', (done) => { 
+        router._createNavigationInstruction('parent/parent 1/child/child 1').then(instruction => {
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
+          done();
+        });
+      });
+
     });
 
     describe('when using an empty parent route', () => {
