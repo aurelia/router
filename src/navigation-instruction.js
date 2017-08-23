@@ -12,6 +12,7 @@ interface NavigationInstructionInit {
 
 export class CommitChangesStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
+
     return navigationInstruction._commitChanges(true).then(() => {
       navigationInstruction._updateTitle();
       return next();
@@ -213,17 +214,20 @@ export class NavigationInstruction {
       }
 
       if (viewPortInstruction.strategy === activationStrategy.replace) {
-        if (waitToSwap) {
-          delaySwaps.push({viewPort, viewPortInstruction});
-        }
-
-        loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
-          if (viewPortInstruction.childNavigationInstruction) {
-            return viewPortInstruction.childNavigationInstruction._commitChanges();
+        if (viewPortInstruction.childNavigationInstruction && viewPortInstruction.childNavigationInstruction.parentCatchHandler) {
+          loads.push(viewPortInstruction.childNavigationInstruction._commitChanges());
+        } else {
+          if (waitToSwap) {
+            delaySwaps.push({viewPort, viewPortInstruction});
           }
+          loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
+            if (viewPortInstruction.childNavigationInstruction) {
+              return viewPortInstruction.childNavigationInstruction._commitChanges();
+            }
 
-          return undefined;
-        }));
+            return undefined;
+          }));
+        }
       } else {
         if (viewPortInstruction.childNavigationInstruction) {
           loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
