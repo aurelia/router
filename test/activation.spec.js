@@ -94,27 +94,34 @@ describe('activation', () => {
       expect(state.rejection).toBeTruthy();
     });
 
-    describe('with router and currentInstruction', ()=> {
-      let viewModel = { };
-      let viewPort = viewPortFactory(() => (true));
-      let instruction = { plan: { first: viewPort } };
+    describe('with child routes with a currentInstruction', () => {
 
-      viewPort.prevComponent.childRouter = { currentInstruction: { viewPortInstructions: { first: { component: { viewModel: viewModel }}}} };
+      describe('when navigating on the parent', () => {
 
-      it('should return true when router instruction canDeactivate', () => {
-        viewModel.canDeactivate = () => (true);
+        const viewPortInstructionFactory = (resultHandler) => {
+          return {
+            component: { viewModel: { canDeactivate: resultHandler } }
+          }
+        };
 
-        step.run(instruction, state.next);
-        expect(state.result).toBe(true);
-      });
+        it('should return true when the currentInstruction can deactivate', () => {
+          let viewPort = viewPortFactory(() => (true), activationStrategy.replace);
+          let currentInstruction = { viewPortInstructions: { first: viewPortInstructionFactory(() => (true)) } };
+          viewPort.prevComponent.childRouter = { currentInstruction };
+          let instruction = { plan: { first: viewPort } };
+          step.run(instruction, state.next);
+          expect(state.result).toBe(true);
+        });
 
-      it('should cancel when router instruction cannot deactivate', () => {
-        viewModel.canDeactivate = () => (false);
+        it('should cancel when router instruction cannot deactivate', () => {
+          let viewPort = viewPortFactory(() => (true), activationStrategy.replace);
+          let currentInstruction = { viewPortInstructions: { first: viewPortInstructionFactory(() => (false)) } };
+          viewPort.prevComponent.childRouter = { currentInstruction };
+          let instruction = { plan: { first: viewPort } };
+          step.run(instruction, state.next);
+          expect(state.rejection).toBeTruthy();
+        });
 
-        instruction.plan = { first: viewPort };
-
-        step.run(instruction, state.next);
-        expect(state.rejection).toBeTruthy();
       });
     });
   });
@@ -171,6 +178,7 @@ describe('activation', () => {
 
     beforeEach(() => {
       step = new ActivateNextStep();
+      state = createPipelineState();
     });
 
     it('should pass current viewport name to activate', (done) => {
@@ -188,7 +196,7 @@ describe('activation', () => {
       }
     
       instruction.addViewPortInstruction('my-view-port', 'ignored', 'ignored', { viewModel });
-      step.run(instruction);
+      step.run(instruction, state.next);
     });
   });
 });
