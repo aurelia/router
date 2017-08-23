@@ -94,7 +94,17 @@ describe('activation', () => {
       expect(state.rejection).toBeTruthy();
     });
 
-    describe('with child routes with a currentInstruction', () => {
+    it('should pass a navigationInstruction to the callback function', () => {
+      const instruction = { plan: { first: viewPortFactory(() => (true)) } };
+      const viewModel = instruction.plan.first.prevComponent.viewModel;
+      spyOn(viewModel, 'canDeactivate').and.callThrough();
+      step.run(instruction, state.next);
+      expect(viewModel.canDeactivate).toHaveBeenCalledWith(instruction);      
+    });
+
+    describe('with a childNavigationInstruction', () => {
+        let viewPort = viewPortFactory(() => (true));
+        let instruction = { plan: { first: viewPort } };
 
       describe('when navigating on the parent', () => {
 
