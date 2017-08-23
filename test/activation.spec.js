@@ -178,6 +178,7 @@ describe('activation', () => {
 
     beforeEach(() => {
       step = new ActivateNextStep();
+      state = createPipelineState();
     });
 
     it('should pass current viewport name to activate', (done) => {
@@ -195,7 +196,7 @@ describe('activation', () => {
       }
     
       instruction.addViewPortInstruction('my-view-port', 'ignored', 'ignored', { viewModel });
-      step.run(instruction);
+      step.run(instruction, state.next);
     });
   });
 });
