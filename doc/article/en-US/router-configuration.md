@@ -63,6 +63,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
   </source-code>
 </code-listing>
 
+* `router.isNavigating` True if the `Router` is currently processing a navigation, bear in mind that it only works when you are in base router and not in child routers.
 * `config.map()` adds route(s) to the router. Although only `route`, `name`, `moduleId`, `href` and `nav` are shown above there are other properties that can be included in a route. The interface name for a route is `RouteConfig`. You can also use `config.mapRoute()` to add a single route.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route view-model's `activate()` function.
