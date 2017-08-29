@@ -2,11 +2,16 @@ import {BuildNavigationPlanStep} from '../src/navigation-plan';
 import {NavigationInstruction} from '../src/navigation-instruction';
 import {Redirect} from '../src/navigation-commands';
 import {createPipelineState} from './test-util';
+import {AppRouter} from '../src/app-router';
+import {MockHistory} from './router.spec.js';
+import {Container} from 'aurelia-dependency-injection';
+import {PipelineProvider} from '../src/pipeline-provider';
 
 describe('NavigationPlanStep', () => {
   let step;
   let state;
   let redirectInstruction;
+  let redirectSecondInstruction;
   let firstInstruction;
   let sameAsFirstInstruction;
   let secondInstruction;
@@ -18,7 +23,16 @@ describe('NavigationPlanStep', () => {
     redirectInstruction = new NavigationInstruction({
       fragment: 'first',
       queryString: 'q=1',
-      config: { redirect: 'second' }
+      config: { redirect: 'second' },
+      router: new AppRouter(new Container(), new MockHistory(), new PipelineProvider(new Container()))
+    });
+
+    redirectSecondInstruction = new NavigationInstruction({
+      fragment: 'first/10',
+      queryString: 'q=1',
+      params: {id: 10},
+      config: { name:'first', route: 'first/:id', redirect: 'second/:id' },
+      router: new AppRouter(new Container(), new MockHistory(), new PipelineProvider(new Container()))
     });
 
     firstInstruction = new NavigationInstruction({
@@ -42,11 +56,25 @@ describe('NavigationPlanStep', () => {
   });
 
   it('cancels on redirect configs', (done) => {
+    redirectInstruction.router.addRoute({route: 'first', name: 'frist',  redirect: 'second' });
+    redirectInstruction.router.addRoute({route: 'second', name: 'second',  redirect: 'second' });
     step.run(redirectInstruction, state.next)
       .then(e => {
         expect(state.rejection).toBeTruthy();
         expect(e instanceof Redirect).toBe(true);
         expect(e.url).toBe('#/second?q=1');
+        done();
+      });
+  });
+
+  it('redirect to routes with parameters', (done) => {
+    redirectSecondInstruction.router.addRoute({ name:'second', route: 'second/:id', moduleId: './second' });
+    redirectSecondInstruction.router.addRoute({ name:'first', route: 'first/:id', redirect: 'second' });
+    step.run(redirectSecondInstruction, state.next)
+      .then(e => {
+        expect(state.rejection).toBeTruthy();
+        expect(e instanceof Redirect).toBe(true);
+        expect(e.url).toBe('#/second/10?q=1');
         done();
       });
   });

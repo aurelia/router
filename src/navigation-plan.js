@@ -26,12 +26,18 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
   let plan = {};
 
   if ('redirect' in config) {
-    let redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
-    if (instruction.queryString) {
-      redirectLocation += '?' + instruction.queryString;
-    }
+    let router = instruction.router;
+    return router._createNavigationInstruction(config.redirect)
+    .then(newInstruction => {
+      let params = Object.keys(newInstruction.params).length ? instruction.params : {}
+      let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
 
-    return Promise.reject(new Redirect(redirectLocation));
+      if (instruction.queryString) {
+        redirectLocation += '?' + instruction.queryString;
+      }
+
+      return Promise.reject(new Redirect(redirectLocation));
+    })
   }
 
   if (prev) {
