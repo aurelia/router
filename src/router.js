@@ -430,7 +430,7 @@ export class Router {
     } else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
-        queryParams: results && results.queryParams,
+        queryParams: results ? results.queryParams : {},
         config: null // config will be created by the catchAllHandler
       }));
 
@@ -443,7 +443,7 @@ export class Router {
 
         let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
           params: { path: fragment },
-          queryParams: results && results.queryParams,
+          queryParams: results ? results.queryParams : {},
           router: router,
           parentInstruction: newParentInstruction,
           parentCatchHandler: true,
