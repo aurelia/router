@@ -282,7 +282,7 @@ describe('the router', () => {
             .then(x1 => expect(x1).toEqual(expectedInstructionShape))
           });
         })
-        .catch(reason => fail(reason))
+        .catch(fail)
         .then(done);
       });
 
@@ -293,7 +293,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => fail(reason))
+          .catch(fail)
           .then(done);
       });
 
@@ -304,7 +304,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => fail(reason))
+          .catch(fail)
           .then(done);
       });
 
@@ -315,7 +315,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => fail(reason))
+          .catch(fail)
           .then(done);
       });
 
@@ -326,7 +326,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => fail(reason))
+          .catch(fail)
           .then(done);
       });
 
@@ -340,7 +340,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => fail(reason))
+          .catch(fail)
           .then(done);
       });
 
