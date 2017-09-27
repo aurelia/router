@@ -239,6 +239,53 @@ describe('the router', () => {
         .then(done);
     });
 
+    describe('should match routes with same pattern based on href', () => {
+      it('', (done) => {
+        router.configure(config => config.map([
+          { name: 'a', route: 'test/:p', moduleId: './test', href: '/test/a' },
+          { name: 'b', route: 'test/:p', moduleId: './test', href: '/test/b' }
+        ]))
+          .then(() => router._createNavigationInstruction('test/b?foo=456'))
+          .then(i => {
+            expect(i.fragment).toEqual('test/b');
+            expect(i.queryString).toEqual('foo=456');
+            expect(i.params.p).toEqual('b');
+            expect(i.config.name).toEqual('b');
+          })
+          .catch(reason => fail(reason))
+          .then(done);
+      });
+
+      it('when fragment matches the child router', (done) => {
+        const childRouter = router.createChild(new Container());
+
+        router.configure(config => config.map([
+          { name: 'a', route: 'parent/:p', moduleId: './parent', href: '/parent/a' },
+          { name: 'b', route: 'parent/:p', moduleId: './parent', href: '/parent/b' }
+        ]))
+          .then(() => childRouter.configure(config => config.map([
+            { name: 'c', route: 'child/:p', moduleId: './child', href: '/child/c' },
+            { name: 'd', route: 'child/:p', moduleId: './child', href: '/child/d' },
+          ])))
+          .then(() => router._createNavigationInstruction('parent/b/child/c?foo=456'))
+          .then(i => {
+            expect(i.fragment).toEqual('parent/b/child/c');
+            expect(i.queryString).toEqual('foo=456');
+            expect(i.params.p).toEqual('b');
+            expect(i.config.name).toEqual('b');
+          })
+          .then(() => childRouter._createNavigationInstruction('child/c?foo=456'))
+          .then(i => {
+            expect(i.fragment).toEqual('child/c');
+            expect(i.queryString).toEqual('foo=456');
+            expect(i.params.p).toEqual('c');
+            expect(i.config.name).toEqual('c');
+          })
+          .catch(reason => fail(reason))
+          .then(done);
+      });
+    });
+
     it('should be case insensitive by default', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('TeSt/123?foo=456'))
