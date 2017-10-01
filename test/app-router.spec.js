@@ -9,6 +9,10 @@ class MockHistory extends History {
   deactivate() {}
   navigate() {}
   navigateBack() {}
+  setState(key, value) {}
+  getState(key) {
+    return null;
+  }
 }
 
 class MockLoader extends RouteLoader {

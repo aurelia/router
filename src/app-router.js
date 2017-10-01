@@ -1,10 +1,10 @@
 import * as LogManager from 'aurelia-logging';
-import {Container} from 'aurelia-dependency-injection';
-import {History} from 'aurelia-history';
-import {Router} from './router';
-import {PipelineProvider} from './pipeline-provider';
-import {isNavigationCommand} from './navigation-commands';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import { Container } from 'aurelia-dependency-injection';
+import { History } from 'aurelia-history';
+import { Router } from './router';
+import { PipelineProvider } from './pipeline-provider';
+import { isNavigationCommand } from './navigation-commands';
+import { EventAggregator } from 'aurelia-event-aggregator';
 
 const logger = LogManager.getLogger('app-router');
 
@@ -62,7 +62,7 @@ export class AppRouter extends Router {
       if ('configureRouter' in viewModel) {
         if (!this.isConfigured) {
           let resolveConfiguredPromise = this._resolveConfiguredPromise;
-          this._resolveConfiguredPromise = () => {};
+          this._resolveConfiguredPromise = () => { };
           return this.configure(config => viewModel.configureRouter(config, this))
             .then(() => {
               this.activate();
@@ -125,6 +125,30 @@ export class AppRouter extends Router {
       }
 
       this.isNavigating = true;
+
+      let navtracker: number = this.history.getState('NavigationTracker');
+      if (!navtracker && !this.currentNavigationTracker) {
+        this.isNavigatingFirst = true;
+        this.isNavigatingNew = true;
+      }
+      else if (!navtracker) {
+        this.isNavigatingNew = true;
+      }
+      else if (!this.currentNavigationTracker) {
+        this.isNavigatingRefresh = true;
+      }
+      else if (this.currentNavigationTracker < navtracker) {
+        this.isNavigatingForward = true;
+      }
+      else if (this.currentNavigationTracker > navtracker) {
+        this.isNavigatingBack = true;
+      }
+      if (!navtracker) {
+        navtracker = Date.now();
+        this.history.setState('NavigationTracker', navtracker);
+      }
+      this.currentNavigationTracker = navtracker;
+
       instruction.previousInstruction = this.currentInstruction;
 
       if (!instructionCount) {
@@ -204,7 +228,13 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
     router.isNavigating = false;
     router.isExplicitNavigation = false;
     router.isExplicitNavigationBack = false;
+    router.isNavigatingFirst = false;
+    router.isNavigatingNew = false;
+    router.isNavigatingRefresh = false;
+    router.isNavigatingForward = false;
+    router.isNavigatingBack = false;
 
+    let eventArgs = { instruction, result };
     let eventName;
 
     if (result.output instanceof Error) {
