@@ -1,10 +1,10 @@
 import * as LogManager from 'aurelia-logging';
-import { Container } from 'aurelia-dependency-injection';
-import { History } from 'aurelia-history';
-import { Router } from './router';
-import { PipelineProvider } from './pipeline-provider';
-import { isNavigationCommand } from './navigation-commands';
-import { EventAggregator } from 'aurelia-event-aggregator';
+import {Container} from 'aurelia-dependency-injection';
+import {History} from 'aurelia-history';
+import {Router} from './router';
+import {PipelineProvider} from './pipeline-provider';
+import {isNavigationCommand} from './navigation-commands';
+import {EventAggregator} from 'aurelia-event-aggregator';
 
 const logger = LogManager.getLogger('app-router');
 
@@ -62,7 +62,7 @@ export class AppRouter extends Router {
       if ('configureRouter' in viewModel) {
         if (!this.isConfigured) {
           let resolveConfiguredPromise = this._resolveConfiguredPromise;
-          this._resolveConfiguredPromise = () => { };
+          this._resolveConfiguredPromise = () => {};
           return this.configure(config => viewModel.configureRouter(config, this))
             .then(() => {
               this.activate();
