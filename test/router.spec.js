@@ -235,7 +235,7 @@ describe('the router', () => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('test/123?foo=456'))
         .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'test/123', queryString: 'foo=456' })))
-        .catch(reason => expect(true).toBeFalsy('should have succeeded'))
+        .catch(reason => fail(reason))
         .then(done);
     });
 
@@ -243,7 +243,7 @@ describe('the router', () => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('TeSt/123?foo=456'))
         .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'TeSt/123', queryString: 'foo=456' })))
-        .catch(reason => expect(true).toBeFalsy('should have succeeded'))
+        .catch(reason => fail(reason))
         .then(done);
     });
 
@@ -282,7 +282,7 @@ describe('the router', () => {
             .then(x1 => expect(x1).toEqual(expectedInstructionShape))
           });
         })
-        .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+        .catch(reason => fail(reason))
         .then(done);
       });
 
@@ -293,7 +293,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .catch(reason => fail(reason))
           .then(done);
       });
 
@@ -304,7 +304,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .catch(reason => fail(reason))
           .then(done);
       });
 
@@ -315,7 +315,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .catch(reason => fail(reason))
           .then(done);
       });
 
@@ -326,7 +326,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .catch(reason => fail(reason))
           .then(done);
       });
 
@@ -340,7 +340,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(x => expect(x).toEqual(expectedInstructionShape))
-          .catch(reason => expect(true).toBeFalsy('should have succeeded', reason))
+          .catch(reason => fail(reason))
           .then(done);
       });
 
