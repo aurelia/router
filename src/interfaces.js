@@ -83,7 +83,7 @@ interface RouteConfig {
   * Add to specify an activation strategy if it is always the same and you do not want that
   * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  activationStrategy?: string;
+  activationStrategy?: 'no-change' | 'invoke-lifecycle'| 'replace';
 
   /**
    * specifies the file name of a layout view to use.
@@ -158,7 +158,7 @@ interface RoutableComponentDetermineActivationStrategy {
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
   * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => string;
+  determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => 'no-change' | 'invoke-lifecycle'| 'replace';
 }
 
 /**

@@ -987,3 +987,61 @@ Whenever navigation is rejected, it is redirected to a previous location. Howeve
     }
   </source-code>
 </code-listing>
+
+## [Reusing an Existing View Model](aurelia-doc://section/14/version/1.0.0)
+
+Since the view model's navigation lifecycle is called only once, you may have problems recognizing that the user switched the route from `Product A` to `Product B` (see below). To work around this issue implement the method `determineActivationStrategy` in your view model and return hints for the router about what you'd like to happen. Available return values are `replace` and `invoke-lifecycle`. Remember, "lifecycle" refers to the navigation lifecycle.
+
+<code-listing heading="Router View Model Activation Control">
+  <source-code lang="ES 2015/2016">
+    //app.js
+
+    export class App {
+      configureRouter(config) {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'product/a',    moduleId: 'product',     nav: true },
+          { route: 'product/b',    moduleId: 'product',     nav: true },
+        ]);
+      }
+    }
+
+    //product.js
+
+    import {activationStrategy} from 'aurelia-router';
+
+    export class Product {
+      determineActivationStrategy() {
+        return activationStrategy.replace;
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration} from 'aurelia-router';
+
+    //app.ts
+
+    export class App {
+      configureRouter(config: RouterConfiguration): void {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'product/a',    moduleId: 'product',     nav: true },
+          { route: 'product/b',    moduleId: 'product',     nav: true },
+        ]);
+      }
+    }
+
+    //product.ts
+
+    import {activationStrategy, RoutableComponentDetermineActivationStrategy} from 'aurelia-router';
+
+    export class Product implements RoutableComponentDetermineActivationStrategy {
+      determineActivationStrategy() {
+        return activationStrategy.replace;
+      }
+    }
+  </source-code>
+</code-listing>
+
+> Info
+> Alternatively, if the strategy is always the same and you don't want that to be in your view model code, you can add the `activationStrategy` property to your route config instead.
