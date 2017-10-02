@@ -349,7 +349,7 @@ export class NavigationInstruction {
   * Gets the instruction's base URL, accounting for wildcard route parameters.
   */
   getBaseUrl(): string {
-    let fragment = this.fragment;
+    let fragment = decodeURI(this.fragment);
 
     if (fragment === '') {
       let nonEmptyRoute = this.router.routes.find(route => {
@@ -362,18 +362,17 @@ export class NavigationInstruction {
     }
 
     if (!this.params) {
-      return fragment;
+      return encodeURI(fragment);
     }
 
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
 
     if (!path) {
-      return fragment;
+      return encodeURI(fragment);
     }
 
-    path = encodeURI(path);
-    return fragment.substr(0, fragment.lastIndexOf(path));
+    return encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
   }
 
   _commitChanges(waitToSwap: boolean) {
@@ -401,17 +400,20 @@ export class NavigationInstruction {
       }
 
       if (viewPortInstruction.strategy === activationStrategy.replace) {
-        if (waitToSwap) {
-          delaySwaps.push({viewPort, viewPortInstruction});
-        }
-
-        loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
-          if (viewPortInstruction.childNavigationInstruction) {
-            return viewPortInstruction.childNavigationInstruction._commitChanges();
+        if (viewPortInstruction.childNavigationInstruction && viewPortInstruction.childNavigationInstruction.parentCatchHandler) {
+          loads.push(viewPortInstruction.childNavigationInstruction._commitChanges());
+        } else {
+          if (waitToSwap) {
+            delaySwaps.push({viewPort, viewPortInstruction});
           }
+          loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
+            if (viewPortInstruction.childNavigationInstruction) {
+              return viewPortInstruction.childNavigationInstruction._commitChanges();
+            }
 
-          return undefined;
-        }));
+            return undefined;
+          }));
+        }
       } else {
         if (viewPortInstruction.childNavigationInstruction) {
           loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
@@ -614,7 +616,7 @@ interface RouteConfig {
   * Add to specify an activation strategy if it is always the same and you do not want that
   * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  activationStrategy?: string;
+  activationStrategy?: 'no-change' | 'invoke-lifecycle'| 'replace';
 
   /**
    * specifies the file name of a layout view to use.
@@ -689,7 +691,7 @@ interface RoutableComponentDetermineActivationStrategy {
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
   * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => string;
+  determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => 'no-change' | 'invoke-lifecycle'| 'replace';
 }
 
 /**
@@ -700,6 +702,24 @@ interface ConfiguresRouter {
   * Implement this hook if you want to configure a router.
   */
   configureRouter(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
+}
+
+/**
+* An optional interface describing the available activation strategies.
+*/
+interface ActivationStrategy {
+  /**
+  * Reuse the existing view model, without invoking Router lifecycle hooks.
+  */
+  noChange: 'no-change';
+  /**
+  * Reuse the existing view model, invoking Router lifecycle hooks.
+  */
+  invokeLifecycle: 'invoke-lifecycle';
+  /**
+  * Replace the existing view model, invoking Router lifecycle hooks.
+  */
+  replace: 'replace';
 }
 
 /**
@@ -725,6 +745,10 @@ export function isNavigationCommand(obj: any): boolean {
 * Used during the activation lifecycle to cause a redirect.
 */
 export class Redirect {
+  /**
+   * @param url The URL fragment to use as the navigation destination.
+   * @param options The navigation options.
+   */
   constructor(url: string, options: any = {}) {
     this.url = url;
     this.options = Object.assign({ trigger: true, replace: true }, options);
@@ -753,11 +777,13 @@ export class Redirect {
 
 /**
 * Used during the activation lifecycle to cause a redirect to a named route.
-  * @param route The name of the route.
-  * @param params The parameters to be sent to the activation method.
-  * @param options The options to use for navigation.
 */
 export class RedirectToRoute {
+  /**
+   * @param route The name of the route.
+   * @param params The parameters to be sent to the activation method.
+   * @param options The options to use for navigation.
+   */
   constructor(route: string, params: any = {}, options: any = {}) {
     this.route = route;
     this.params = params;
@@ -965,7 +991,7 @@ export class RouterConfiguration {
 /**
 * The strategy to use when activating modules during navigation.
 */
-export const activationStrategy = {
+export const activationStrategy: ActivationStrategy = {
   noChange: 'no-change',
   invokeLifecycle: 'invoke-lifecycle',
   replace: 'replace'
@@ -1536,14 +1562,50 @@ export class Router {
     } else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
-        queryParams: results && results.queryParams,
+        queryParams: results ? results.queryParams : {},
         config: null // config will be created by the catchAllHandler
       }));
 
       return evaluateNavigationStrategy(instruction, this.catchAllHandler);
+    } else if (this.parent) {
+      let router = this._parentCatchAllHandler(this.parent);
+
+      if (router) {
+        let newParentInstruction = this._findParentInstructionFromRouter(router, parentInstruction);
+
+        let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
+          params: { path: fragment },
+          queryParams: results ? results.queryParams : {},
+          router: router,
+          parentInstruction: newParentInstruction,
+          parentCatchHandler: true,
+          config: null // config will be created by the chained parent catchAllHandler
+        }));
+
+        return evaluateNavigationStrategy(instruction, router.catchAllHandler);
+      }
     }
 
     return Promise.reject(new Error(`Route not found: ${url}`));
+  }
+
+  _findParentInstructionFromRouter(router: Router, instruction: NavigationInstruction): NavigationInstruction {
+    if (instruction.router === router) {
+      instruction.fragment = router.baseUrl; //need to change the fragment in case of a redirect instead of moduleId
+      return instruction;
+    } else if (instruction.parentInstruction) {
+      return this._findParentInstructionFromRouter(router, instruction.parentInstruction);
+    }
+    return undefined;
+  }
+
+  _parentCatchAllHandler(router): Function|Boolean {
+    if (router.catchAllHandler) {
+      return router;
+    } else if (router.parent) {
+      return this._parentCatchAllHandler(router.parent);
+    }
+    return false;
   }
 
   _createRouteConfig(config, instruction) {
@@ -1602,7 +1664,7 @@ function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluato
 
 export class CanDeactivatePreviousStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
-    return processDeactivatable(navigationInstruction.plan, 'canDeactivate', next);
+    return processDeactivatable(navigationInstruction, 'canDeactivate', next);
   }
 }
 
@@ -1614,7 +1676,7 @@ export class CanActivateNextStep {
 
 export class DeactivatePreviousStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
-    return processDeactivatable(navigationInstruction.plan, 'deactivate', next, true);
+    return processDeactivatable(navigationInstruction, 'deactivate', next, true);
   }
 }
 
@@ -1624,7 +1686,8 @@ export class ActivateNextStep {
   }
 }
 
-function processDeactivatable(plan, callbackName, next, ignoreResult) {
+function processDeactivatable(navigationInstruction: NavigationInstruction, callbackName: string, next: Funcion, ignoreResult: boolean) {
+  const plan = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
   let i = infos.length; //query from inside out
 
@@ -1640,7 +1703,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
     if (i--) {
       try {
         let viewModel = infos[i];
-        let result = viewModel[callbackName]();
+        let result = viewModel[callbackName](navigationInstruction);
         return processPotential(result, inspect, next.cancel);
       } catch (error) {
         return next.cancel(error);
@@ -1668,10 +1731,10 @@ function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<
       }
     }
 
-    if (viewPortPlan.childNavigationInstruction) {
-      findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
-    } else if (prevComponent) {
+    if (viewPortPlan.strategy === activationStrategy.replace && prevComponent) {
       addPreviousDeactivatable(prevComponent, callbackName, list);
+    } else if (viewPortPlan.childNavigationInstruction) {
+      findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
     }
   }
 

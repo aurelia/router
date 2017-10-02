@@ -1,3 +1,22 @@
+<a name="1.4.0"></a>
+# [1.4.0](https://github.com/aurelia/router/compare/1.3.0...1.4.0) (2017-10-02)
+
+
+### Bug Fixes
+
+* **activation:** Deactivate child viewModels when replacing a parent ([f73b6d5](https://github.com/aurelia/router/commit/f73b6d5))
+* **router:** fix NavigationInstructionInit's queryParams ([1266b0b](https://github.com/aurelia/router/commit/1266b0b))
+* **router:** getBaseUrl() to return correct URL for encodable chars ([0ef12f6](https://github.com/aurelia/router/commit/0ef12f6))
+
+
+### Features
+
+* **activation:** call can/Deactivate with navigationInstructions ([3d3c444](https://github.com/aurelia/router/commit/3d3c444)), closes [#493](https://github.com/aurelia/router/issues/493)
+* **router:** enable parent chain unknown route handlers ([f692bcb](https://github.com/aurelia/router/commit/f692bcb))
+* **type declarations:** Refine the type ([638aef4](https://github.com/aurelia/router/commit/638aef4))
+
+
+
 <a name="1.3.0"></a>
 # [1.3.0](https://github.com/aurelia/router/compare/1.2.1...v1.3.0) (2017-04-05)
 
