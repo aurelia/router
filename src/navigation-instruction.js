@@ -12,7 +12,6 @@ interface NavigationInstructionInit {
 
 export class CommitChangesStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
-
     return navigationInstruction._commitChanges(true).then(() => {
       navigationInstruction._updateTitle();
       return next();

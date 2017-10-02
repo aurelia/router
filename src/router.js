@@ -450,7 +450,7 @@ export class Router {
           config: null // config will be created by the chained parent catchAllHandler
         }));
 
-        return evaluateNavigationStrategy(instruction, router.catchAllHandler)
+        return evaluateNavigationStrategy(instruction, router.catchAllHandler);
       }
     }
 
@@ -462,7 +462,7 @@ export class Router {
       instruction.fragment = router.baseUrl; //need to change the fragment in case of a redirect instead of moduleId
       return instruction;
     } else if (instruction.parentInstruction) {
-      return this._findParentInstructionFromRouter(router, instruction.parentInstruction)
+      return this._findParentInstructionFromRouter(router, instruction.parentInstruction);
     }
     return undefined;
   }
