@@ -55,7 +55,7 @@ export class Router {
   /**
   * The currently active navigation instruction.
   */
-  currentInstruction: NavigationInstruction;
+  currentInstruction: NavigationInstruction | null;
 
   /**
   * The parent router, or null if this instance is not a child router.
