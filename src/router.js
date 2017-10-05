@@ -396,6 +396,13 @@ export class Router {
     let results = this._recognizer.recognize(url);
     if (!results || !results.length) {
       results = this._childRecognizer.recognize(url);
+      if (
+        results &&
+        (this.catchAllHandler || (this.parent && this._parentCatchAllHandler(this.parent)))
+      ) {
+        results = Array.prototype.filter.call(results,
+          result => result.handler.route !== '/*childRoute');
+      }
     }
 
     let instructionInit = {

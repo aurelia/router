@@ -359,6 +359,30 @@ describe('the router', () => {
           .then(x => expect(true).toBeFalsy('should have rejected', x))
           .catch(reason => done());
       });
+
+      it('should work when route is empty', done => {
+        router
+          .configure(config => {
+            config.unknownRouteConfig = 'test';
+            config.mapRoute({route: '', moduleId: './empty'});
+          })
+          .then(() => router._createNavigationInstruction('foo/123?bar=456'))
+          .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
+          .catch(fail)
+          .then(done);
+      });
+
+      it(`should work when route is '/'`, done => {
+        router
+          .configure(config => {
+            config.unknownRouteConfig = 'test';
+            config.mapRoute({route: '/', moduleId: './empty'});
+          })
+          .then(() => router._createNavigationInstruction('foo/123?bar=456'))
+          .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
+          .catch(fail)
+          .then(done);
+      });
     });
   });
 
