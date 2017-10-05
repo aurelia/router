@@ -136,4 +136,25 @@ describe('NavigationInstruction', () => {
       });
     });
   });
+
+  it('matches child with empty parent route', (done) => {
+    router.addRoute({
+      route: '',
+      moduleId: 'child'
+    });
+    const childRouter = router.createChild();
+    childRouter.addRoute({
+      name: 'child',
+      route: 'test',
+      moduleId: 'test'
+    });
+
+    router
+      ._createNavigationInstruction('test')
+      .then(parentInstruction =>
+        childRouter._createNavigationInstruction('test', parentInstruction))
+      .then(childInstruction => expect(childInstruction.config.name).toBe('child'))
+      .catch(fail)
+      .then(done);
+  });
 });
