@@ -99,7 +99,7 @@ describe('NavigationInstruction', () => {
         });
       });
 
-      it('should identify fragments and encode them', (done) => { 
+      it('should identify fragments and encode them', (done) => {
         router._createNavigationInstruction('parent/parent 1/child/child 1').then(instruction => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
           done();
