@@ -1,5 +1,5 @@
-import {Redirect} from './navigation-commands';
-import {_resolveUrl} from './util';
+import { Redirect } from './navigation-commands';
+import { _resolveUrl } from './util';
 
 /**
 * The strategy to use when activating modules during navigation.
@@ -38,9 +38,13 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
 
   let newParams = prev ? hasDifferentParameterValues(prev, instruction) : true;
 
+  let viewPortDefaults = Object.assign({}, instruction.router.viewPortDefaults);
+
   if (prev && !config.explicitViewPorts) {
     for (let viewPortName in prev.viewPortInstructions) {
-      let viewPortPlan = buildViewPortPlan(instruction, forceLifecycleMinimum, newParams, viewPortName, true);
+      delete viewPortDefaults[viewPortName.split('.')[0]];
+
+      let viewPortPlan = buildViewPortPlan(instruction, instruction.config.viewPorts, forceLifecycleMinimum, newParams, viewPortName, true);
       plan[viewPortPlan.name] = viewPortPlan.plan;
       if (viewPortPlan.task) {
         pending.push(viewPortPlan.task);
@@ -48,15 +52,26 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
     }
   }
 
-  let viewPortNames = {};
-  if (config.viewPorts) {
-    for (let viewPortName in config.viewPorts) {
-      viewPortNames[viewPortName] = config.viewPorts[viewPortName];
+  let viewPorts = {};
+
+  if (viewPortDefaults) {
+    for (let viewPortName in viewPortDefaults) {
+      if (config.viewPorts[viewPortName] === undefined) {
+        viewPorts[viewPortName] = viewPortDefaults[viewPortName];
+      }
     }
   }
 
-  for (let viewPortName in viewPortNames) {
-    let viewPortPlan = buildViewPortPlan(instruction, forceLifecycleMinimum, newParams, viewPortName, false);
+  if (config.viewPorts) {
+    for (let viewPortName in config.viewPorts) {
+      if (config.viewPorts[viewPortName] !== undefined || !viewPorts[viewPortName]) {
+        viewPorts[viewPortName] = config.viewPorts[viewPortName];
+      }
+    }
+  }
+
+  for (let viewPortName in viewPorts) {
+    let viewPortPlan = buildViewPortPlan(instruction, viewPorts, forceLifecycleMinimum, newParams, viewPortName, false);
     plan[viewPortPlan.name] = viewPortPlan.plan;
     if (viewPortPlan.task) {
       pending.push(viewPortPlan.task);
@@ -66,13 +81,13 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
   return Promise.all(pending).then(() => plan);
 }
 
-function buildViewPortPlan(instruction: NavigationInstruction, forceLifecycleMinimum, newParams: boolean, viewPortName: string, previous: boolean) {
+function buildViewPortPlan(instruction: NavigationInstruction, viewPorts: any, forceLifecycleMinimum, newParams: boolean, viewPortName: string, previous: boolean) {
   let plan = {};
   let prev = instruction.previousInstruction;
   let config = instruction.config;
   let configViewPortName = viewPortName;
   let prevViewPortInstruction = prev ? prev.viewPortInstructions[viewPortName] : undefined;
-  let nextViewPortConfig = !previous ? config.viewPorts[configViewPortName] : undefined;
+  let nextViewPortConfig = !previous ? viewPorts[configViewPortName] : undefined;
 
   if (config.explicitViewPorts && nextViewPortConfig === undefined) {
     nextViewPortConfig = null;
