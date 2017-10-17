@@ -121,7 +121,7 @@ export class NavigationInstruction {
   /**
   * Adds a viewPort instruction.
   */
-  addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): any {
+  addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any, active: boolean): any {
     const config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortName });
     let viewportInstruction = this.viewPortInstructions[viewPortName] = {
       name: viewPortName,
@@ -129,7 +129,8 @@ export class NavigationInstruction {
       moduleId: moduleId,
       component: component,
       childRouter: component.childRouter,
-      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
+      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2]),
+      active: active
     };
 
     return viewportInstruction;
@@ -224,6 +225,9 @@ export class NavigationInstruction {
             }
           }));
         }
+      }
+      else if (viewPortInstruction.active && !viewPortInstruction.childNavigationInstruction) {
+        delaySwaps.push({viewPort, viewPortInstruction});
       } else {
         if (viewPortInstruction.childNavigationInstruction) {
           loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));

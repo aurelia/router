@@ -1,4 +1,5 @@
-import { Redirect } from './navigation-commands';
+import {Redirect} from './navigation-commands';
+import {_resolveUrl} from './util';
 
 /**
 * The strategy to use when activating modules during navigation.
@@ -109,7 +110,19 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
       }
     }
 
-    return Promise.all(pending).then(() => plan);
+  if (config.viewPorts) {
+    for (let viewPortName in config.viewPorts) {
+      if (config.viewPorts[viewPortName] === null || config.viewPorts[viewPortName].moduleId === null) {
+        config.viewPorts[viewPortName] = null;
+      }
+      if (config.viewPorts[viewPortName] !== undefined || !viewPorts[viewPortName]) {
+        if (config.stateful || (config.viewPorts[viewPortName] && config.viewPorts[viewPortName].stateful)) {
+          config.viewPorts[viewPortName].stateful = true;
+          viewPortName = instruction.router._ensureStatefulViewPort(viewPortName, config.viewPorts[viewPortName].moduleId);
+        }
+        viewPorts[viewPortName] = config.viewPorts[viewPortName.split('.')[0]];
+      }
+    }
   }
 
   for (let viewPortName in config.viewPorts) {
@@ -124,7 +137,92 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
     };
   }
 
-  return Promise.resolve(plan);
+  return Promise.all(pending).then(() => {
+    for (let viewPortName in plan) {
+      if (viewPortName.indexOf('.') != -1) {
+        let shortName = viewPortName.split('.')[0];
+        if (!plan[shortName]) {
+          plan[shortName] = {
+            name: shortName,
+            strategy: activationStrategy.replace,
+            config: null
+          }
+        }
+      }
+    }
+    return plan;
+  });
+}
+
+function buildViewPortPlan(instruction: NavigationInstruction, viewPorts: any, forceLifecycleMinimum, newParams: boolean, viewPortName: string, previous: boolean) {
+  let plan = {};
+  let prev = instruction.previousInstruction;
+  let config = instruction.config;
+  let configViewPortName = viewPortName;
+  let prevViewPortInstruction = prev ? prev.viewPortInstructions[viewPortName] : undefined;
+  let nextViewPortConfig = !previous ? viewPorts[configViewPortName] : undefined;
+
+  if (config.explicitViewPorts && nextViewPortConfig === undefined) {
+    nextViewPortConfig = null;
+  }
+
+  plan['name'] = viewPortName;
+  let viewPortPlan = plan['plan'] = {
+    name: viewPortName
+  };
+  if (prevViewPortInstruction) {
+    viewPortPlan.prevComponent = prevViewPortInstruction.component;
+    viewPortPlan.prevModuleId = prevViewPortInstruction.moduleId;
+  }
+  if (nextViewPortConfig !== undefined) {
+    viewPortPlan.config = nextViewPortConfig;
+    viewPortPlan.active = true;
+  }
+  else {
+    viewPortPlan.config = prevViewPortInstruction.config;
+  }
+
+  if (!prevViewPortInstruction) {
+    viewPortPlan.strategy = activationStrategy.replace;
+  } else if (nextViewPortConfig === null) { // null value means deliberately cleared!
+    viewPortPlan.strategy = activationStrategy.replace;
+  } else if (nextViewPortConfig === undefined) { // undefined (left out in config) means keep same
+    viewPortPlan.strategy = activationStrategy.noChange;
+  }
+  else if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
+    viewPortPlan.strategy = activationStrategy.replace;
+  }
+  else if (!nextViewPortConfig.stateful && !prevViewPortInstruction.active) {
+    viewPortPlan.strategy = activationStrategy.replace;
+  } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
+    viewPortPlan.strategy = prevViewPortInstruction.component.viewModel
+      .determineActivationStrategy(...instruction.lifecycleArgs);
+  } else if (config.activationStrategy) {
+    viewPortPlan.strategy = config.activationStrategy;
+  } else if (newParams || forceLifecycleMinimum) {
+    viewPortPlan.strategy = activationStrategy.invokeLifecycle;
+  } else {
+    viewPortPlan.strategy = activationStrategy.noChange;
+  }
+
+  if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
+    let path = instruction.getWildcardPath();
+    let task = prevViewPortInstruction.childRouter
+      ._createNavigationInstruction(path, instruction).then(childInstruction => { // eslint-disable-line no-loop-func
+        viewPortPlan.childNavigationInstruction = childInstruction;
+
+        return _buildNavigationPlan(
+          childInstruction,
+          viewPortPlan.strategy === activationStrategy.invokeLifecycle)
+          .then(childPlan => {
+            childInstruction.plan = childPlan;
+          });
+      });
+
+    plan['task'] = task;
+  }
+
+  return plan;
 }
 
 function hasDifferentParameterValues(prev: NavigationInstruction, next: NavigationInstruction): boolean {

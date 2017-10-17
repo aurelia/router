@@ -49,7 +49,8 @@ function determineWhatToLoad(navigationInstruction: NavigationInstruction, toLoa
         viewPortName,
         viewPortPlan.strategy,
         viewPortPlan.prevModuleId,
-        viewPortPlan.prevComponent);
+        viewPortPlan.prevComponent,
+        viewPortPlan.active);
 
       if (viewPortPlan.childNavigationInstruction) {
         viewPortInstruction.childNavigationInstruction = viewPortPlan.childNavigationInstruction;
@@ -69,7 +70,8 @@ function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationIn
       viewPortPlan.name,
       viewPortPlan.strategy,
       moduleId,
-      component);
+      component,
+      viewPortPlan.active);
 
     let childRouter = component.childRouter;
     if (childRouter) {
