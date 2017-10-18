@@ -166,8 +166,9 @@ export class Router {
   * @param fragment The URL fragment to use as the navigation destination.
   * @param options The navigation options.
   * @param params The parameters to be used when populating the url pattern.
+  * @param state A state passed in the navigationInstruction.
   */
-  navigate(fragment: string, options?: any, params?: any): boolean {
+  navigate(fragment: string, options?: any, params?: any, state?: any): boolean {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -178,7 +179,7 @@ export class Router {
     }
 
     this.isExplicitNavigation = true;
-    return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
+    return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options, state);
   }
 
   /**
@@ -188,9 +189,10 @@ export class Router {
   * @param route The name of the route to use when generating the navigation location.
   * @param params The route parameters to be used when populating the route pattern.
   * @param options The navigation options.
+  * @param state A state passed in the navigationInstruction.
   */
-  navigateToRoute(route: string, params?: any, options?: any): boolean {
-    let path = this.generate(route, params);
+  navigateToRoute(route: string, params?: any, options?: any, state?: any): boolean {
+    let path = this.generate(route, params, {}, state);
     return this.navigate(path, options);
   }
 
@@ -425,7 +427,7 @@ export class Router {
     }
   }
 
-  _createNavigationInstruction(url: string = '', parentInstruction: NavigationInstruction = null): Promise<NavigationInstruction> {
+  _createNavigationInstruction(url: string = '', parentInstruction: NavigationInstruction = null, state?: any): Promise<NavigationInstruction> {
     let fragment = url;
     let queryString = '';
 
@@ -457,7 +459,8 @@ export class Router {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: Object.assign({}, first.params, parseQueryString(queryString)),
         queryParams: first.queryParams || results.queryParams,
-        config: first.config || first.handler
+        config: first.config || first.handler,
+        state: state
       }));
 
       if (typeof first.handler === 'function') {
@@ -471,7 +474,8 @@ export class Router {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: Object.assign({ path: fragment }, parseQueryString(queryString)),
         queryParams: results ? results.queryParams : {},
-        config: null // config will be created by the catchAllHandler
+        config: null, // config will be created by the catchAllHandler
+        state: state
       }));
 
       return evaluateNavigationStrategy(instruction, this.catchAllHandler);
@@ -487,7 +491,8 @@ export class Router {
           router: router,
           parentInstruction: newParentInstruction,
           parentCatchHandler: true,
-          config: null // config will be created by the chained parent catchAllHandler
+          config: null, // config will be created by the chained parent catchAllHandler
+          state: state
         }));
 
         return evaluateNavigationStrategy(instruction, router.catchAllHandler);

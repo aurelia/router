@@ -155,47 +155,47 @@ describe('the router', () => {
         })
       ]).then(() => {
         router.navigate('', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/', options, undefined);
         history.navigate.calls.reset();
 
         router.navigate('#/test1', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/test1', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test1', options, undefined);
         history.navigate.calls.reset();
 
         router.navigate('/test2', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/test2', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test2', options, undefined);
         history.navigate.calls.reset();
 
         router.navigate('test3', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/test3', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test3', options, undefined);
         history.navigate.calls.reset();
 
         child.navigate('#/test4', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/test4', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test4', options, undefined);
         history.navigate.calls.reset();
 
         child.navigate('/test5', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/test5', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/test5', options, undefined);
         history.navigate.calls.reset();
 
         child.navigate('test6', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test6', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test6', options, undefined);
         history.navigate.calls.reset();
 
         child.navigate('#/child-router/test7', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test7', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test7', options, undefined);
         history.navigate.calls.reset();
 
         child.navigate('/child-router/test8', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test8', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/test8', options, undefined);
         history.navigate.calls.reset();
 
         child.navigate('child-router/test9', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options, undefined);
         history.navigate.calls.reset();
 
         child.navigate('', options);
-        expect(history.navigate).toHaveBeenCalledWith('#/child-router/', options);
+        expect(history.navigate).toHaveBeenCalledWith('#/child-router/', options, undefined);
         history.navigate.calls.reset();
 
         done();
@@ -209,7 +209,7 @@ describe('the router', () => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => {
           router.navigateToRoute('test', { id: 123 }, options);
-          expect(history.navigate).toHaveBeenCalledWith('#/test/123', options);
+          expect(history.navigate).toHaveBeenCalledWith('#/test/123', options, undefined);
           done();
         });
     });
