@@ -29,7 +29,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
 </code-listing>
 
 <code-listing heading="Basic Route Configuration">
-  <source-code lang="ES 2015/2016">    
+  <source-code lang="ES 2015/2016">
     export class App {
       configureRouter(config, router) {
         this.router = router;
@@ -48,7 +48,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
 
     export class App {
       router: Router;
-    
+
       configureRouter(config: RouterConfiguration, router: Router): void {
         this.router = router;
         config.title = 'Aurelia';
@@ -403,12 +403,12 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration, Next} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Next, Redirect} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
-        config.title = 'Aurelia';
-        config.addAuthorizeStep(AuthorizeStep);
+        const step = new AuthorizeStep;
+        config.addAuthorizeStep(step);
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',  settings: { auth: true } },
@@ -440,7 +440,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
           return step.run;
         }
         step.run = (navigationInstruction, next) => {
-          return next()
+          return next();
         };
         config.addPreActivateStep(step)
         config.map([
@@ -451,18 +451,16 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Next} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
         function step() {
           return step.run;
         }
-        step.run = (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+        step.run = (navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
           return next();
         };
-
-        config.title = 'Aurelia';
         config.addPreActivateStep(step);
         config.map([
           { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
@@ -478,7 +476,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     export class App {
       configureRouter(config) {
         const step = {
-          run: (navigationInstruction, next) => {
+          run(navigationInstruction, next) {
             return next();
           }
         };
@@ -491,17 +489,15 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Next} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
         const step = {
-          run: (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+          run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
             return next();
           }
         };
-
-        config.title = 'Aurelia';
         config.addPreRenderStep(step);
         config.map([
           { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
@@ -517,7 +513,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     export class App {
       configureRouter(config) {
         const step = {
-          run: (navigationInstruction, next) => {
+          run(navigationInstruction, next) {
             return next();
           }
         };
@@ -530,17 +526,15 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {RouterConfiguration, NavigationInstruction, Next} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
         const step = {
-          run: (navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+          run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
             return next();
           }
         };
-
-        config.title = 'Aurelia';
         config.addPostRenderStep(step);
         config.map([
           { route: ['', 'home'], name: 'home',  moduleId: 'home/index' },
@@ -603,12 +597,12 @@ Following is an example of the use of view ports:
 
 ## [Layouts](aurelia-doc://section/10/version/1.0.0)
 
-Similar to MVC-style master/layout pages, Aurelia allows you to use a "layout" view like an MVC "master template" for a set of views. 
+Similar to MVC-style master/layout pages, Aurelia allows you to use a "layout" view like an MVC "master template" for a set of views.
 
 The set of views subject to being part of a layout is defined in Aurelia as a set of views referenced by one or more routes in a router configuration. There are two ways to associate a layout with routes. The first is via HTML, the second is via view model code.
 
 > Info
-> We're going to be a little sloppy here in terminology. Technically, routes refer to "moduleIds", not 
+> We're going to be a little sloppy here in terminology. Technically, routes refer to "moduleIds", not
 "views". Since the router resolves a `moduleId` to a view, indirectly the router does reference a view. It is easy to picture a view visually contained within a layout, so in this topic to we'll refer to views referenced by a route, not modules.
 
 We'll look at using HTML first. We know that the `router-view` custom HTML element is always associated with a set of one or more views referenced in a router configuration given in its parent view's view model. By associating a layout with a `router-view` one can thus associate a layout with the same set of views with which the `router-view` is associated.
@@ -724,7 +718,7 @@ Thus when we navigate to the module "home" we find that it is laid-out as desire
 
 Note there is nothing different about the above route configuration with or without the layout.  It may reference any number of views that would all be included by default in the layout.
 
-So that is how we use HTML to associate a layout view with a set of views referenced in a router configuration.  
+So that is how we use HTML to associate a layout view with a set of views referenced in a router configuration.
 
 We can also associate layouts with route configurations using code in our view model. Suppose we like what we've done above, but we have a couple views that we would like to associate with a different layout and would thus like to partially override the configuration given in the HTML. The following code is an example of how we can do that:
 
@@ -809,7 +803,7 @@ When the Aurelia router navigates from one view to another, we refer to this as 
 > Info
 > If there is no animation defined, then swap-order has no visible impact.
 
-You can apply a swap strategy to one or more routes by applying the `swap-order` attribute to a `router-view` custom HTML element.  The strategy will then be applied in any transition between two views accessible under the `router-view`.  
+You can apply a swap strategy to one or more routes by applying the `swap-order` attribute to a `router-view` custom HTML element.  The strategy will then be applied in any transition between two views accessible under the `router-view`.
 
 > Info
 > `swap-order` is bindable.
@@ -821,7 +815,7 @@ The following swap order strategies are available:
 * after - animate the next view in after the current view has been removed (the default)
 
 Here is an example of setting the swap order strategy on a `router-view`:
- 
+
 <code-listing heading="swap-order">
   <source-code lang="HTML">
     <template>
@@ -859,7 +853,7 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
           }).then(() => {
             const router = aurelia.container.get(AppRouter);
             router.transformTitle = title => i18n.tr(title);
-            
+
             const eventAggregator = aurelia.container.get(EventAggregator);
             eventAggregator.subscribe('i18n:locale:changed', () => {
               router.updateTitle();
@@ -891,7 +885,7 @@ and the `AppRouter`'s `transformTitle` would be configured in such a way that th
           }).then(() => {
             const router = aurelia.container.get(AppRouter);
             router.transformTitle = title => i18n.tr(title);
-            
+
             const eventAggregator = aurelia.container.get(EventAggregator);
             eventAggregator.subscribe('i18n:locale:changed', () => {
               router.updateTitle();
