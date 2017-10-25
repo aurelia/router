@@ -34,7 +34,7 @@ export class NavModel {
   config: RouteConfig = null;
 
   /**
-  * The router associated with this navitation model.
+  * The router associated with this navigation model.
   */
   router: Router;
 
