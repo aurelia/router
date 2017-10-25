@@ -98,7 +98,7 @@ interface RouteConfig {
   /**
    * specifies the model parameter to pass to the layout view model's `activate` function.
    */
-  layoutModel?: string;
+  layoutModel?: any;
 
   [x: string]: any;
 }
