@@ -38,9 +38,10 @@ export class AppRouter extends Router {
   * Loads the specified URL.
   *
   * @param url The URL fragment to load.
+  * @param state A state to pass along in the navigation instruction.
   */
-  loadUrl(url): Promise<NavigationInstruction> {
-    return this._createNavigationInstruction(url)
+  loadUrl(url, state?: any): Promise<NavigationInstruction> {
+    return this._createNavigationInstruction(url, null, state)
       .then(instruction => this._queueInstruction(instruction))
       .catch(error => {
         logger.error(error);
