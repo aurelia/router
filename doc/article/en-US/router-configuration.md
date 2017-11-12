@@ -379,8 +379,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
     export class App {
       configureRouter(config) {
-        const step = new AuthorizeStep;
-        config.addAuthorizeStep(step);
+        config.addAuthorizeStep(AuthorizeStep);
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',  settings: { auth: true } },
@@ -407,8 +406,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
-        const step = new AuthorizeStep;
-        config.addAuthorizeStep(step);
+        config.addAuthorizeStep(AuthorizeStep);
         config.map([
           { route: ['', 'home'],       name: 'home',       moduleId: 'home/index' },
           { route: 'users',            name: 'users',      moduleId: 'users/index',  settings: { auth: true } },
