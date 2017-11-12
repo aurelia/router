@@ -11,6 +11,7 @@ export class RouterConfiguration {
   pipelineSteps: Array<Function|PipelineStep> = [];
   title: string;
   unknownRouteConfig: any;
+  viewPortDefaults: any;
 
   /**
   * Adds a step to be run during the [[Router]]'s navigation pipeline.
@@ -173,6 +174,10 @@ export class RouterConfiguration {
         let {name, step} = pipelineSteps[i];
         pipelineProvider.addStep(name, step);
       }
+    }
+
+    if (this.viewPortDefaults) {
+      router.viewPortDefaults = this.viewPortDefaults;
     }
   }
 }

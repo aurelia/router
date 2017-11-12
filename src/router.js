@@ -65,6 +65,11 @@ export class Router {
   options: any = {};
 
   /**
+  * The defaults used when a viewport lacks specified content
+  */
+  viewPortDefaults: any;
+
+  /**
   * Extension point to transform the document title before it is built and displayed.
   * By default, child routers delegate to the parent router, and the app router
   * returns the title unchanged.
