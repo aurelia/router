@@ -259,7 +259,8 @@ export class Router {
       config.viewPorts = {
         'default': {
           moduleId: config.moduleId,
-          view: config.view
+          view: config.view,
+          cacheable: config.cacheable
         }
       };
     }

@@ -100,6 +100,12 @@ interface RouteConfig {
    */
   layoutModel?: any;
 
+  /**
+  * When true is specified, components activated by this route will be cached
+  * on deactivation and reused in subsequent activations.
+  */
+  cacheable?: boolean;
+
   [x: string]: any;
 }
 
