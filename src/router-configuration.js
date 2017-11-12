@@ -92,6 +92,18 @@ export class RouterConfiguration {
   }
 
   /**
+   * Configures defaults to use for any view ports.
+   *
+   * @param viewPortConfig a view port configuration object to use as a 
+   *  default, of the form { viewPortName: { moduleId } }.
+   * @chainable
+   */
+  useViewPortDefaults(viewPortConfig: any) {
+    this.viewPortDefaults = viewPortConfig;
+    return this;
+  }
+
+  /**
   * Maps a single route to be registered with the router.
   *
   * @param route The [[RouteConfig]] to map.
@@ -161,6 +173,10 @@ export class RouterConfiguration {
       router.fallbackRoute = this._fallbackRoute;
     }
 
+    if (this.viewPortDefaults) {
+      router.useViewPortDefaults(this.viewPortDefaults);
+    }
+
     router.options = this.options;
 
     let pipelineSteps = this.pipelineSteps;
@@ -174,10 +190,6 @@ export class RouterConfiguration {
         let {name, step} = pipelineSteps[i];
         pipelineProvider.addStep(name, step);
       }
-    }
-
-    if (this.viewPortDefaults) {
-      router.viewPortDefaults = this.viewPortDefaults;
     }
   }
 }

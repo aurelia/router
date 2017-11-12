@@ -67,7 +67,7 @@ export class Router {
   /**
   * The defaults used when a viewport lacks specified content
   */
-  viewPortDefaults: any;
+  viewPortDefaults: any = {};
 
   /**
   * Extension point to transform the document title before it is built and displayed.
@@ -105,6 +105,7 @@ export class Router {
     this.isExplicitNavigationBack = false;
     this.navigation = [];
     this.currentInstruction = null;
+    this.viewPortDefaults = {};
     this._fallbackOrder = 100;
     this._recognizer = new RouteRecognizer();
     this._childRecognizer = new RouteRecognizer();
@@ -380,6 +381,20 @@ export class Router {
         current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
       } else {
         current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
+      }
+    }
+  }
+
+  /** 
+   * Sets the default configuration for the view ports. This specifies how to
+   *  populate a view port for which no module is specified. The default is 
+   *  an empty view/view-model pair.
+   */
+  useViewPortDefaults(viewPortDefaults: any) {
+    for (let viewPortName in viewPortDefaults) {
+      let viewPortConfig = viewPortDefaults[viewPortName];
+      this.viewPortDefaults[viewPortName] = {
+        moduleId: viewPortConfig.moduleId
       }
     }
   }
