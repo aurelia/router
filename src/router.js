@@ -163,7 +163,7 @@ export class Router {
   * Navigates to a new location.
   *
   * @param fragment The URL fragment to use as the navigation destination.
-  * @param options The navigation options.
+  * @param options The navigation options. See [[History.NavigationOptions]] for all available options.
   */
   navigate(fragment: string, options?: any): boolean {
     if (!this.isConfigured && this.parent) {
@@ -180,7 +180,7 @@ export class Router {
   *
   * @param route The name of the route to use when generating the navigation location.
   * @param params The route parameters to be used when populating the route pattern.
-  * @param options The navigation options.
+  * @param options The navigation options. See [[History.NavigationOptions]] for all available options. 
   */
   navigateToRoute(route: string, params?: any, options?: any): boolean {
     let path = this.generate(route, params);
@@ -212,6 +212,7 @@ export class Router {
   *
   * @param name The name of the route whose pattern should be used to generate the fragment.
   * @param params The route params to be used to populate the route pattern.
+  * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
   * @returns {string} A string containing the generated URL fragment.
   */
   generate(name: string, params?: any, options?: any = {}): string {
