@@ -214,17 +214,15 @@ export class NavigationInstruction {
 
       if (viewPortInstruction.strategy === activationStrategy.replace) {
         if (viewPortInstruction.childNavigationInstruction && viewPortInstruction.childNavigationInstruction.parentCatchHandler) {
-          loads.push(viewPortInstruction.childNavigationInstruction._commitChanges());
+          loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
         } else {
           if (waitToSwap) {
             delaySwaps.push({viewPort, viewPortInstruction});
           }
           loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
             if (viewPortInstruction.childNavigationInstruction) {
-              return viewPortInstruction.childNavigationInstruction._commitChanges();
+              return viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap);
             }
-
-            return undefined;
           }));
         }
       } else {
