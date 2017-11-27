@@ -11,6 +11,7 @@ export class RouterConfiguration {
   pipelineSteps: Array<Function|PipelineStep> = [];
   title: string;
   unknownRouteConfig: any;
+  viewPortDefaults: any;
 
   /**
   * Adds a step to be run during the [[Router]]'s navigation pipeline.
@@ -91,6 +92,18 @@ export class RouterConfiguration {
   }
 
   /**
+   * Configures defaults to use for any view ports.
+   *
+   * @param viewPortConfig a view port configuration object to use as a 
+   *  default, of the form { viewPortName: { moduleId } }.
+   * @chainable
+   */
+  useViewPortDefaults(viewPortConfig: any) {
+    this.viewPortDefaults = viewPortConfig;
+    return this;
+  }
+
+  /**
   * Maps a single route to be registered with the router.
   *
   * @param route The [[RouteConfig]] to map.
@@ -158,6 +171,10 @@ export class RouterConfiguration {
 
     if (this._fallbackRoute) {
       router.fallbackRoute = this._fallbackRoute;
+    }
+
+    if (this.viewPortDefaults) {
+      router.useViewPortDefaults(this.viewPortDefaults);
     }
 
     router.options = this.options;

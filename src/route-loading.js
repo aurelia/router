@@ -62,7 +62,7 @@ function determineWhatToLoad(navigationInstruction: NavigationInstruction, toLoa
 }
 
 function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, viewPortPlan: any) {
-  let moduleId = viewPortPlan.config.moduleId;
+  let moduleId = viewPortPlan.config ? viewPortPlan.config.moduleId : null;
 
   return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config).then((component) => {
     let viewPortInstruction = navigationInstruction.addViewPortInstruction(
