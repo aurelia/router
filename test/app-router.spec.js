@@ -208,6 +208,20 @@ describe('app-router', () => {
         .then(done);
     });
 
+    it('does not restore previous location when route not found and unknown routes are ignored', (done) => {
+      spyOn(history, 'navigate');
+
+      router.history.previousLocation = 'prev';
+      router.ignoreUnknownRoutes = true;
+      router.loadUrl('next')
+        .then(result => {
+          expect(result).toBeFalsy();
+          expect(history.navigate).not.toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
+        })
+        .catch(result => expect(true).toBeFalsy('should have succeeded'))
+        .then(done);
+    });
+
     it('navigate to fallback route when route not found and there is no previous location', (done) => {
       spyOn(history, 'navigate');
 
