@@ -13,6 +13,10 @@ class MockHistory extends History {
   getAbsoluteRoot() {
     return absoluteRoot;
   }
+  setState(key, value) {}
+  getState(key) {
+    return null;
+  }
 }
 
 describe('the router', () => {

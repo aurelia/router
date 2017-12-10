@@ -48,6 +48,36 @@ export class Router {
   isExplicitNavigationBack: boolean;
 
   /**
+  * True if the [[Router]] is navigating into the app for the first time in the browser session.
+  */
+  isNavigatingFirst: boolean;
+
+  /**
+  * True if the [[Router]] is navigating to a page instance not in the browser session history.
+  */
+  isNavigatingNew: boolean;
+
+  /**
+  * True if the [[Router]] is navigating forward in the browser session history.
+  */
+  isNavigatingForward: boolean;
+
+  /**
+  * True if the [[Router]] is navigating back in the browser session history.
+  */
+  isNavigatingBack: boolean;
+
+  /**
+  * True if the [[Router]] is navigating due to a browser refresh.
+  */
+  isNavigatingRefresh: boolean;
+
+  /**
+  * The currently active navigation tracker.
+  */
+  currentNavigationTracker: number;
+
+  /**
   * The navigation models for routes that specified [[RouteConfig.nav]].
   */
   navigation: NavModel[];
@@ -103,6 +133,11 @@ export class Router {
     this.isNavigating = false;
     this.isExplicitNavigation = false;
     this.isExplicitNavigationBack = false;
+    this.isNavigatingFirst = false;
+    this.isNavigatingNew = false;
+    this.isNavigatingRefresh = false;
+    this.isNavigatingForward = false;
+    this.isNavigatingBack = false;
     this.navigation = [];
     this.currentInstruction = null;
     this.viewPortDefaults = {};
