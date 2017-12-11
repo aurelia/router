@@ -12,6 +12,7 @@ export class RouterConfiguration {
   title: string;
   unknownRouteConfig: any;
   viewPortDefaults: any;
+  ignoreUnknownRoutes: boolean;
 
   /**
   * Adds a step to be run during the [[Router]]'s navigation pipeline.
@@ -94,7 +95,7 @@ export class RouterConfiguration {
   /**
    * Configures defaults to use for any view ports.
    *
-   * @param viewPortConfig a view port configuration object to use as a 
+   * @param viewPortConfig a view port configuration object to use as a
    *  default, of the form { viewPortName: { moduleId } }.
    * @chainable
    */
@@ -175,6 +176,10 @@ export class RouterConfiguration {
 
     if (this.viewPortDefaults) {
       router.useViewPortDefaults(this.viewPortDefaults);
+    }
+
+    if (this.ignoreUnknownRoutes) {
+      router.ignoreUnknownRoutes = this.ignoreUnknownRoutes;
     }
 
     router.options = this.options;
