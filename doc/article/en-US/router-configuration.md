@@ -63,8 +63,6 @@ To use Aurelia's router, your component view must have a `<router-view></router-
   </source-code>
 </code-listing>
 
-* `router.isNavigating` True if the `Router` is currently processing a navigation, bear in mind that it only works when you are in base router and not in child routers.
-
 * `config.map()` adds route(s) to the router. Although only `route`, `name`, `moduleId`, `href` and `nav` are shown above there are other properties that can be included in a route. The interface name for a route is `RouteConfig`. You can also use `config.mapRoute()` to add a single route.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route view-model's `activate()` function.
@@ -79,6 +77,19 @@ To use Aurelia's router, your component view must have a `<router-view></router-
   * `settings` is equal to the property `settings` of `config` object.
   * `router` is a reference for AppRouter.
   * Other properties includes `relativeHref` and `order`.
+
+### Navigation States
+
+The router contains a number of additional properties that indicate the current status of router navigation. These properties are only set on the base router, i.e. not in child routers. Additionally, these properties are all with respect to browser history which extends past the lifecycle of the router itself. 
+
+* `router.isNavigating`: `true` if the router is currently processing a navigation.
+* `router.isNavigatingFirst`: `true` if the router is navigating into the app for the first time in the browser session.
+* `router.isNavigatingNew`: `true` if the router is navigating to a page instance not in the browser session history. This is triggered when the user clicks a link or the navigate function is called explicitly.
+* `router.isNavigatingForward`: `true` if the router is navigating forward in the browser session history. This is triggered when the user clicks the forward button in their browser.
+* `router.isNavigatingBack`: `true` if the router is navigating back in the browser session history. This is triggered when the user clicks the back button in their browser or when the `navigateBack()` function is called.
+* `router.isNavigatingRefresh`: `true` if the router is navigating due to a browser refresh.
+* `router.isExplicitNavigation`: `true` if the router is navigating due to explicit call to navigate function(s).
+* `router.isExplicitNavigationBack`: `true` if the router is navigating due to explicit call to navigateBack function.
 
 ## [Options](aurelia-doc://section/2/version/1.0.0)
 
