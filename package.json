@@ -110,11 +110,11 @@
     "yargs": "^4.8.1"
   },
   "peerDependencies": {
-    "aurelia-history": "^1.1.0",
+    "aurelia-history": "^1.1.0"
   },
   "aurelia": {
     "documentation": {
-      "articles": [
+      "articles": E[
         {
           "title": "Router Configuration",
           "href": "doc/article/en-US/router-configuration.md"
