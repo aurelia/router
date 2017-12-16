@@ -511,7 +511,9 @@ export class Router {
         return evaluateNavigationStrategy(instruction, router.catchAllHandler);
       }
     }
-
+    if (this.ignoreUnknownRoutes) {
+      return Promise.resolve(false);
+    }
     return Promise.reject(new Error(`Route not found: ${url}`));
   }
 

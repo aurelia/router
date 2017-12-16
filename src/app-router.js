@@ -41,12 +41,17 @@ export class AppRouter extends Router {
   */
   loadUrl(url): Promise<NavigationInstruction> {
     return this._createNavigationInstruction(url)
-      .then(instruction => this._queueInstruction(instruction))
-      .catch(error => {
-        if (!this.ignoreUnknownRoutes) {
-          logger.error(error);
-          restorePreviousLocation(this);
+      .then(instruction => {
+        if (!instruction && this.ignoreUnknownRoutes) {
+          this.history.navigate(url, {trigger: true});
+          window.location.pathname = url;
+        } else {
+          this._queueInstruction(instruction);
         }
+      })
+      .catch(error => {
+        logger.error(error);
+        restorePreviousLocation(this);
       });
   }
 
