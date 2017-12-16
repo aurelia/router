@@ -21,7 +21,6 @@ export class Router {
   history: History;
   viewPorts: Object;
   routes: RouteConfig[];
-  ignoreUnknownRoutes: boolean;
 
   /**
   * The [[Router]]'s current base URL, typically based on the [[Router.currentInstruction]].
@@ -148,7 +147,6 @@ export class Router {
     this._configuredPromise = new Promise(resolve => {
       this._resolveConfiguredPromise = resolve;
     });
-    this.ignoreUnknownRoutes = false;
   }
 
   /**
@@ -223,7 +221,7 @@ export class Router {
   *
   * @param route The name of the route to use when generating the navigation location.
   * @param params The route parameters to be used when populating the route pattern.
-  * @param options The navigation options. See [[History.NavigationOptions]] for all available options.
+  * @param options The navigation options. See [[History.NavigationOptions]] for all available options. 
   */
   navigateToRoute(route: string, params?: any, options?: any): boolean {
     let path = this.generate(route, params);
@@ -422,9 +420,9 @@ export class Router {
     }
   }
 
-  /**
+  /** 
    * Sets the default configuration for the view ports. This specifies how to
-   *  populate a view port for which no module is specified. The default is
+   *  populate a view port for which no module is specified. The default is 
    *  an empty view/view-model pair.
    */
   useViewPortDefaults(viewPortDefaults: any) {

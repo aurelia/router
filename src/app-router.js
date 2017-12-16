@@ -43,10 +43,8 @@ export class AppRouter extends Router {
     return this._createNavigationInstruction(url)
       .then(instruction => this._queueInstruction(instruction))
       .catch(error => {
-        if (!this.ignoreUnknownRoutes) {
-          logger.error(error);
-          restorePreviousLocation(this);
-        }
+        logger.error(error);
+        restorePreviousLocation(this);
       });
   }
 
