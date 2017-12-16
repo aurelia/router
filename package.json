@@ -33,7 +33,7 @@
     "peerDependencies": {
       "aurelia-dependency-injection": "^1.0.0",
       "aurelia-event-aggregator": "^1.0.0",
-      "aurelia-history": "^1.0.0",
+      "aurelia-history": "^1.2.0",
       "aurelia-logging": "^1.0.0",
       "aurelia-path": "^1.0.0",
       "aurelia-route-recognizer": "^1.0.0"
@@ -41,7 +41,6 @@
     "dependencies": {
       "aurelia-dependency-injection": "^1.0.0",
       "aurelia-event-aggregator": "^1.0.0",
-      "aurelia-history": "^1.0.0",
       "aurelia-logging": "^1.0.0",
       "aurelia-path": "^1.0.0",
       "aurelia-route-recognizer": "^1.0.0"
@@ -56,7 +55,6 @@
   "dependencies": {
     "aurelia-dependency-injection": "^1.0.0",
     "aurelia-event-aggregator": "^1.0.0",
-    "aurelia-history": "^1.0.0",
     "aurelia-logging": "^1.0.0",
     "aurelia-path": "^1.0.0",
     "aurelia-route-recognizer": "^1.0.0"
@@ -110,6 +108,9 @@
     "vinyl": "^1.1.1",
     "vinyl-paths": "^2.1.0",
     "yargs": "^4.8.1"
+  },
+  "peerDependencies": {
+    "aurelia-history": "^1.2.0",
   },
   "aurelia": {
     "documentation": {
