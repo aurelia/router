@@ -590,8 +590,107 @@ Following is an example of the use of view ports:
   </source-code>
 </code-listing>
 
+### Empty View Ports
+
+You can empty a view port by setting `moduleId` null in the route configuration for that view port.
+
+<code-listing>
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config) {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: null } } }
+        ]);
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration): void {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: null } } }
+        ]);
+      }
+    }
+  </source-code>
+</code-listing>
+
+### View Port Defaults
+
+The empty view port is actually the out-of-the-box default. You can override this default to load a specific `moduleId` whenever `moduleId` is null by passing a view port configuration to the router configuration. These overrides can be set specifically to each view port.
+
+<code-listing>
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config) {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: null } } }
+        ]);
+        config.useViewPortDefaults({
+          right: { moduleId: 'pages/placeholder' }
+        })
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration): void {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' }, right: { moduleId: null } } }
+        ]);
+        config.useViewPortDefaults({
+          right: { moduleId: 'pages/placeholder' }
+        })
+      }
+    }
+  </source-code>
+</code-listing>
+
+### Optional View Ports
+
+If a view port configuration is not defined on a route, the router will skip routing on that particular view port leaving the view port untouched. If there is no existing content in the view port, i.e. when the application is first loaded, the view port will be populated with the view port default configuration, which is empty if not otherwise specified (see View Port Defaults).
+
+<code-listing>
+  <source-code lang="ES 2015/2016">
+    export class App {
+      configureRouter(config) {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' } } }
+        ]);
+        config.useViewPortDefaults({
+          right: { moduleId: 'pages/placeholder' }
+        })
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import {RouterConfiguration} from 'aurelia-router';
+
+    export class App {
+      configureRouter(config: RouterConfiguration): void {
+        config.title = 'Aurelia';
+        config.map([
+          { route: 'users', name: 'users', viewPorts: { left: { moduleId: 'user/list' } } }
+        ]);
+        config.useViewPortDefaults({
+          right: { moduleId: 'pages/placeholder' }
+        })
+      }
+    }
+  </source-code>
+</code-listing>
+
 > Info
-> In addition to the `moduleId`, you can also specify a "layout" in the configuration of a view port. See the discussion of Layouts elsewhere in this document.
+> In addition to the `moduleId`, you can also specify a "layout" in the configuration of a view port (see [Layouts](aurelia-doc://section/10/version/1.0.0)).
 
 ## [Layouts](aurelia-doc://section/10/version/1.0.0)
 
