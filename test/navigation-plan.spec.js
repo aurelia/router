@@ -10,34 +10,40 @@ describe('NavigationPlanStep', () => {
   let firstInstruction;
   let sameAsFirstInstruction;
   let secondInstruction;
+  let router;
 
   beforeEach(() => {
     step = new BuildNavigationPlanStep();
     state = createPipelineState();
+    router = { viewPortDefaults: { default: { moduleId: null } } };
 
     redirectInstruction = new NavigationInstruction({
       fragment: 'first',
       queryString: 'q=1',
-      config: { redirect: 'second' }
+      config: { redirect: 'second' },
+      router
     });
 
     firstInstruction = new NavigationInstruction({
       fragment: 'first',
       config: { viewPorts: { default: { moduleId: './first' }}},
-      params: { id: '1' }
+      params: { id: '1' },
+      router
     });
 
     sameAsFirstInstruction = new NavigationInstruction({
       fragment: 'first',
       config: { viewPorts: { default: { moduleId: './first' }}},
       previousInstruction: firstInstruction,
-      params: { id: '1' }
+      params: { id: '1' },
+      router
     });
 
     secondInstruction = new NavigationInstruction({
       fragment: 'second',
       config: { viewPorts: { default: { moduleId: './second' }}},
-      previousInstruction: firstInstruction
+      previousInstruction: firstInstruction,
+      router
     });
   });
 
