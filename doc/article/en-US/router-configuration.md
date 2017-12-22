@@ -3,7 +3,7 @@ name: Router Configuration
 description: This article covers Aurelia's router configuration.
 author: Jeremy Gonzalez (http://www.jeremyg.net)
 ---
-## [Basic Configuration](aurelia-doc://section/1/version/1.0.0)
+## Basic Configuration
 
 To use Aurelia's router, your component view must have a `<router-view></router-view>` element. In order to configure the router, the component's view-model requires a `configureRouter()` function.
 
@@ -81,7 +81,7 @@ The router contains a number of additional properties that indicate the current 
 * `router.isExplicitNavigation`: `true` if the router is navigating due to explicit call to navigate function(s).
 * `router.isExplicitNavigationBack`: `true` if the router is navigating due to explicit call to navigateBack function.
 
-## [Options](aurelia-doc://section/2/version/1.0.0)
+## Options
 
 ### Push State
 
@@ -125,7 +125,7 @@ Set `config.options.pushState` to `true` to activate push state and add [a base 
 > Warning
 > PushState requires server-side support. Don't forget to configure your server appropriately.
 
-## [Dynamically Specify Route Components](aurelia-doc://section/3/version/1.0.0)
+## Dynamically Specify Route Components
 
 You can add a `navigationStrategy` to a route to allow dynamic routes. Within the navigation strategy Aurelia requires you to configure `instruction.config` with the desired `moduleId`, `viewPorts` or `redirect`.
 
@@ -170,7 +170,7 @@ You can add a `navigationStrategy` to a route to allow dynamic routes. Within th
   </source-code>
 </code-listing>
 
-## [Adding Additional Data To A Route](aurelia-doc://section/4/version/1.0.0)
+## Adding Additional Data To A Route
 
 Although Aurelia does allow you to pass any additional property to a route's configuration object, `settings` is the default parameter to which you should add arbitrary data that you want to pass to the route.
 
@@ -205,7 +205,7 @@ Although Aurelia does allow you to pass any additional property to a route's con
   </source-code>
 </code-listing>
 
-## [Case Sensitive Routes](aurelia-doc://section/5/version/1.0.0)
+## Case Sensitive Routes
 
 You can set a route to be case sensitive, should you wish:
 
@@ -242,7 +242,7 @@ You can set a route to be case sensitive, should you wish:
 
 In the above example, our route will only match URL fragment of `/users` and not `/Users`, *but* since the route `home` is not case sensitive the URL `/Home` would match. By default Aurelia's routes are not case sensitive.
 
-## [Handling Unknown Routes](aurelia-doc://section/6/version/1.0.0)
+## Handling Unknown Routes
 
 Aurelia allows you to map any unknown routes. Parameters passed to `mapUnknownRoutes()` can be:
 
@@ -345,7 +345,7 @@ The function passed to `mapUnknownRoutes()` has to return:
   </source-code>
 </code-listing>
 
-## [Redirecting Routes](aurelia-doc://section/7/version/1.0.0)
+## Redirecting Routes
 
 Aurelia allows redirecting of routes to URL fragments by specifying redirect with a string consisting of a URL fragment.
 
@@ -361,7 +361,7 @@ Aurelia allows redirecting of routes to URL fragments by specifying redirect wit
 > Info: Use Redirect On Empty Routes with Child Routers
 > The `redirect` is particularly useful when you have an "empty" route pattern (such as the first route above) that maps to a component with a child router. In this case, create a non-empty route and then redirect the empty route to the non-empty route (as above). This will enable the child router to consistently match child routes without getting confused in scenarios where the empty route was matched.
 
-## [Pipelines](aurelia-doc://section/8/version/1.0.0)
+## Pipelines
 
 Aurelia has two router classes, `AppRouter` and `Router`. `AppRouter` extends the `Router` class and is the main application router. `Router` is used for any child routers including nested child routers. One of the main differences between the two is pipelines are only allowed on the `AppRouter` and not any child routers.
 
@@ -544,7 +544,7 @@ A pipeline step must be an object that contains a `run(navigationInstruction, ne
   </source-code>
 </code-listing>
 
-## [Rendering View Ports](aurelia-doc://section/9/version/1.0.0)
+## Rendering View Ports
 
 Every instance of a `router-view` custom element essentially defines a "view port". When you give a `router-view` a name, you can refer to it in the `viewPorts` property of the route configuration in your javascript. The value of a `viewPorts` property is an object where each property name is the name of a view port (ie, `router-view`) and each value is the `moduleId` destination of the route. Thus you can specify any number of view ports on a single route configuration.
 
@@ -693,7 +693,7 @@ If a view port configuration is not defined on a route, the router will skip rou
 > Info
 > In addition to the `moduleId`, you can also specify a "layout" in the configuration of a view port (see [Layouts](aurelia-doc://section/10/version/1.0.0)).
 
-## [Layouts](aurelia-doc://section/10/version/1.0.0)
+## Layouts
 
 Similar to MVC-style master/layout pages, Aurelia allows you to use a "layout" view like an MVC "master template" for a set of views.
 
@@ -894,7 +894,7 @@ You can also specify a layout in the `viewPorts` configuration of a route. See a
   </source-code>
 </code-listing>
 
-## [View Swapping and Animation](aurelia-doc://section/11/version/1.0.0)
+## View Swapping and Animation
 
 When the Aurelia router navigates from one view to another, we refer to this as "swapping" one view for another.  Aurelia gives us an optional set of strategies dictating how a swap proceeds, or more specifically, how animation plays out during the swap.  We refer to these strategies more precisely as the "swap order".
 
@@ -925,7 +925,7 @@ Here is an example of setting the swap order strategy on a `router-view`:
 </code-listing>
 
 
-## [Internationalizing Titles](aurelia-doc://section/12/version/1.0.0)
+## Internationalizing Titles
 
 If your application targets multiple cultures or languages, you probably want to translate your route titles. The `Router` class has a `transformTitle` property that can be used for this. It is expected to be assigned a function that takes the active route's title as a parameter and then returns the translated title. For example, if your app uses `aurelia-i18n`, its routes' titles would typically be set to some translation keys
 and the `AppRouter`'s `transformTitle` would be configured in such a way that the active route's title is translated using the `I18N`'s `tr` method. Additionally you can listen to a custom event published by the I18N service to react on locale changes using the EventAggregator:
@@ -1041,7 +1041,7 @@ The default value of the`transformTitle` property does the following:
 
 In the previous example, the `AppRouter`'s `transformTitle` is set, so all child `Router`s will delegate down to it by default. However, this means that the `transformTitle` can be overridden for specific child `Router`s if some areas of your app need custom transformation.
 
-## [Configuring a Fallback Route](aurelia-doc://section/13/version/1.0.0)
+## Configuring a Fallback Route
 
 Whenever navigation is rejected, it is redirected to a previous location. However in certain cases a previous location doesn't exist, e.g. when it happens as the first navigation after the startup of application. To handle this scenario, you can set up a fallback route.
 
@@ -1080,7 +1080,7 @@ Whenever navigation is rejected, it is redirected to a previous location. Howeve
   </source-code>
 </code-listing>
 
-## [Reusing an Existing View Model](aurelia-doc://section/14/version/1.0.0)
+## Reusing an Existing View Model
 
 Since the view model's navigation lifecycle is called only once, you may have problems recognizing that the user switched the route from `Product A` to `Product B` (see below). To work around this issue implement the method `determineActivationStrategy` in your view model and return hints for the router about what you'd like to happen. Available return values are `replace` and `invoke-lifecycle`. Remember, "lifecycle" refers to the navigation lifecycle.
 
