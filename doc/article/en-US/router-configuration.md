@@ -1,17 +1,7 @@
 ---
-{
-  "name": "Router Configuration",
-  "culture": "en-US",
-  "description": "This article covers Aurelia's router configuration.",
-  "engines" : { "aurelia-doc" : "^1.0.0" },
-  "author": {
-    "name": "Jeremy Gonzalez",
-    "url": "http://www.jeremyg.net"
-  },
-  "contributors": [],
-  "translators": [],
-  "keywords": ["JavaScript", "Router"]
-}
+name: Router Configuration
+description: This article covers Aurelia's router configuration.
+author: Jeremy Gonzalez (http://www.jeremyg.net)
 ---
 ## [Basic Configuration](aurelia-doc://section/1/version/1.0.0)
 
@@ -80,7 +70,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
 
 ### Navigation States
 
-The router contains a number of additional properties that indicate the current status of router navigation. These properties are only set on the base router, i.e. not in child routers. Additionally, these properties are all with respect to browser history which extends past the lifecycle of the router itself. 
+The router contains a number of additional properties that indicate the current status of router navigation. These properties are only set on the base router, i.e. not in child routers. Additionally, these properties are all with respect to browser history which extends past the lifecycle of the router itself.
 
 * `router.isNavigating`: `true` if the router is currently processing a navigation.
 * `router.isNavigatingFirst`: `true` if the router is navigating into the app for the first time in the browser session.
