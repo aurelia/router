@@ -91,8 +91,8 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
 
   } else {
 
-    for (let viewPortName in instruction.router.viewPorts) {
-      let viewPortConfig = instruction.config.viewPorts[viewPortName] || { moduleId: null };
+    for (let viewPortName in config.viewPorts) {
+      let viewPortConfig = config.viewPorts[viewPortName];
       if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
         viewPortConfig = defaults[viewPortName];
       }
