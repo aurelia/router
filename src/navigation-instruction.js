@@ -12,7 +12,9 @@ interface NavigationInstructionInit {
 
 export class CommitChangesStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
-    return navigationInstruction._commitChanges(true).then(() => {
+    return navigationInstruction._commitChanges(true).then(delayJobs => {
+      return delayJobs.reduce((chain, job) => chain.then(job), Promise.resolve());
+    }).then(() => {
       navigationInstruction._updateTitle();
       return next();
     });
@@ -202,7 +204,7 @@ export class NavigationInstruction {
     router.refreshNavigation();
 
     let loads = [];
-    let delaySwaps = [];
+    let delayJobs = [];
 
     for (let viewPortName in this.viewPortInstructions) {
       let viewPortInstruction = this.viewPortInstructions[viewPortName];
@@ -217,7 +219,7 @@ export class NavigationInstruction {
           loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
         } else {
           if (waitToSwap) {
-            delaySwaps.push({viewPort, viewPortInstruction});
+            delayJobs.push(() => viewPort.swap(viewPortInstruction));
           }
           loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
             if (viewPortInstruction.childNavigationInstruction) {
@@ -232,10 +234,16 @@ export class NavigationInstruction {
       }
     }
 
-    return Promise.all(loads).then(() => {
-      delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
-      return null;
-    }).then(() => prune(this));
+    const promise = loads.reduce((chain, load) => {
+      return chain.then(() => load).then(_delayJobs => {
+        if (_delayJobs && _delayJobs.length) delayJobs.push.apply(delayJobs, _delayJobs);
+      });
+    }, Promise.resolve());
+
+    return promise.then(() => {
+      delayJobs.push(() => prune(this));
+      return delayJobs;
+    });
   }
 
   _updateTitle(): void {
