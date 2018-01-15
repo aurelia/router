@@ -94,7 +94,7 @@ export class RouterConfiguration {
   /**
    * Configures defaults to use for any view ports.
    *
-   * @param viewPortConfig a view port configuration object to use as a 
+   * @param viewPortConfig a view port configuration object to use as a
    *  default, of the form { viewPortName: { moduleId } }.
    * @chainable
    */

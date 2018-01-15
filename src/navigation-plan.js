@@ -21,7 +21,6 @@ export class BuildNavigationPlanStep {
 }
 
 export function _buildNavigationPlan(instruction: NavigationInstruction, forceLifecycleMinimum): Promise<Object> {
-
   let config = instruction.config;
 
   if ('redirect' in config) {
@@ -42,7 +41,6 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
     let pending = [];
 
     for (let viewPortName in prev.viewPortInstructions) {
-
       let prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
       let nextViewPortConfig = viewPortName in config.viewPorts ? config.viewPorts[viewPortName] : prevViewPortInstruction;
       if (nextViewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
@@ -88,23 +86,21 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
     }
 
     return Promise.all(pending).then(() => plan);
+  }
 
-  } else {
-
-    for (let viewPortName in config.viewPorts) {
-      let viewPortConfig = config.viewPorts[viewPortName];
-      if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
-        viewPortConfig = defaults[viewPortName];
-      }
-      plan[viewPortName] = {
-        name: viewPortName, 
-        strategy: activationStrategy.replace,
-        config: viewPortConfig
-      }
+  for (let viewPortName in config.viewPorts) {
+    let viewPortConfig = config.viewPorts[viewPortName];
+    if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
+      viewPortConfig = defaults[viewPortName];
     }
+    plan[viewPortName] = {
+      name: viewPortName,
+      strategy: activationStrategy.replace,
+      config: viewPortConfig
+    };
+  }
 
-    return Promise.resolve(plan);
-  }  
+  return Promise.resolve(plan);
 }
 
 function hasDifferentParameterValues(prev: NavigationInstruction, next: NavigationInstruction): boolean {
