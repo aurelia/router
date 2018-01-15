@@ -349,17 +349,15 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
         if (viewPortInstruction.strategy === activationStrategy.replace) {
           if (viewPortInstruction.childNavigationInstruction && viewPortInstruction.childNavigationInstruction.parentCatchHandler) {
-            loads.push(viewPortInstruction.childNavigationInstruction._commitChanges());
+            loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
           } else {
             if (waitToSwap) {
               delaySwaps.push({ viewPort: viewPort, viewPortInstruction: viewPortInstruction });
             }
             loads.push(viewPort.process(viewPortInstruction, waitToSwap).then(function (x) {
               if (viewPortInstruction.childNavigationInstruction) {
-                return viewPortInstruction.childNavigationInstruction._commitChanges();
+                return viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap);
               }
-
-              return undefined;
             }));
           }
         } else {
@@ -552,6 +550,11 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
       return this.mapRoute(route);
     };
 
+    RouterConfiguration.prototype.useViewPortDefaults = function useViewPortDefaults(viewPortConfig) {
+      this.viewPortDefaults = viewPortConfig;
+      return this;
+    };
+
     RouterConfiguration.prototype.mapRoute = function mapRoute(config) {
       this.instructions.push(function (router) {
         var routeConfigs = [];
@@ -604,6 +607,10 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
         router.fallbackRoute = this._fallbackRoute;
       }
 
+      if (this.viewPortDefaults) {
+        router.useViewPortDefaults(this.viewPortDefaults);
+      }
+
       router.options = this.options;
 
       var pipelineSteps = this.pipelineSteps;
@@ -648,9 +655,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
   }();
 
   function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
-    var prev = instruction.previousInstruction;
     var config = instruction.config;
-    var plan = {};
 
     if ('redirect' in config) {
       var redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
@@ -661,15 +666,20 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
       return Promise.reject(new Redirect(redirectLocation));
     }
 
+    var prev = instruction.previousInstruction;
+    var plan = {};
+    var defaults = instruction.router.viewPortDefaults;
+
     if (prev) {
       var newParams = hasDifferentParameterValues(prev, instruction);
       var pending = [];
 
       var _loop2 = function _loop2(viewPortName) {
         var prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
-        var nextViewPortConfig = config.viewPorts[viewPortName];
-
-        if (!nextViewPortConfig) throw new Error('Invalid Route Config: Configuration for viewPort "' + viewPortName + '" was not found for route: "' + instruction.config.route + '."');
+        var nextViewPortConfig = viewPortName in config.viewPorts ? config.viewPorts[viewPortName] : prevViewPortInstruction;
+        if (nextViewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
+          nextViewPortConfig = defaults[viewPortName];
+        }
 
         var viewPortPlan = plan[viewPortName] = {
           name: viewPortName,
@@ -716,10 +726,14 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
     }
 
     for (var viewPortName in config.viewPorts) {
+      var viewPortConfig = config.viewPorts[viewPortName];
+      if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
+        viewPortConfig = defaults[viewPortName];
+      }
       plan[viewPortName] = {
         name: viewPortName,
         strategy: activationStrategy.replace,
-        config: instruction.config.viewPorts[viewPortName]
+        config: viewPortConfig
       };
     }
 
@@ -793,6 +807,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
 
       this.parent = null;
       this.options = {};
+      this.viewPortDefaults = {};
 
       this.transformTitle = function (title) {
         if (_this3.parent) {
@@ -816,8 +831,14 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
       this.isNavigating = false;
       this.isExplicitNavigation = false;
       this.isExplicitNavigationBack = false;
+      this.isNavigatingFirst = false;
+      this.isNavigatingNew = false;
+      this.isNavigatingRefresh = false;
+      this.isNavigatingForward = false;
+      this.isNavigatingBack = false;
       this.navigation = [];
       this.currentInstruction = null;
+      this.viewPortDefaults = {};
       this._fallbackOrder = 100;
       this._recognizer = new _aureliaRouteRecognizer.RouteRecognizer();
       this._childRecognizer = new _aureliaRouteRecognizer.RouteRecognizer();
@@ -1016,6 +1037,15 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
         } else {
           _current2.href = _normalizeAbsolutePath(_current2.config.href, this.history._hasPushState);
         }
+      }
+    };
+
+    Router.prototype.useViewPortDefaults = function useViewPortDefaults(viewPortDefaults) {
+      for (var viewPortName in viewPortDefaults) {
+        var viewPortConfig = viewPortDefaults[viewPortName];
+        this.viewPortDefaults[viewPortName] = {
+          moduleId: viewPortConfig.moduleId
+        };
       }
     };
 
@@ -1519,7 +1549,7 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
   }
 
   function loadRoute(routeLoader, navigationInstruction, viewPortPlan) {
-    var moduleId = viewPortPlan.config.moduleId;
+    var moduleId = viewPortPlan.config ? viewPortPlan.config.moduleId : null;
 
     return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config).then(function (component) {
       var viewPortInstruction = navigationInstruction.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
@@ -1773,6 +1803,25 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
         }
 
         _this14.isNavigating = true;
+
+        var navtracker = _this14.history.getState('NavigationTracker');
+        if (!navtracker && !_this14.currentNavigationTracker) {
+          _this14.isNavigatingFirst = true;
+          _this14.isNavigatingNew = true;
+        } else if (!navtracker) {
+          _this14.isNavigatingNew = true;
+        } else if (!_this14.currentNavigationTracker) {
+          _this14.isNavigatingRefresh = true;
+        } else if (_this14.currentNavigationTracker < navtracker) {
+          _this14.isNavigatingForward = true;
+        } else if (_this14.currentNavigationTracker > navtracker) {
+          _this14.isNavigatingBack = true;
+        }if (!navtracker) {
+          navtracker = Date.now();
+          _this14.history.setState('NavigationTracker', navtracker);
+        }
+        _this14.currentNavigationTracker = navtracker;
+
         instruction.previousInstruction = _this14.currentInstruction;
 
         if (!instructionCount) {
@@ -1855,6 +1904,11 @@ define(['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-depen
       router.isNavigating = false;
       router.isExplicitNavigation = false;
       router.isExplicitNavigationBack = false;
+      router.isNavigatingFirst = false;
+      router.isNavigatingNew = false;
+      router.isNavigatingRefresh = false;
+      router.isNavigatingForward = false;
+      router.isNavigatingBack = false;
 
       var eventName = void 0;
 

@@ -1,3 +1,21 @@
+<a name="1.5.0"></a>
+# [1.5.0](https://github.com/aurelia/router/compare/1.4.0...1.5.0) (2018-01-15)
+
+
+### Bug Fixes
+
+* **navigation-instruction:** Wait to swap child routes ([1432234](https://github.com/aurelia/router/commit/1432234))
+
+
+### Features
+
+* **router:** Enhance optional view port feature ([bcf4e33](https://github.com/aurelia/router/commit/bcf4e33))
+* **router:** optional viewports ([8878b45](https://github.com/aurelia/router/commit/8878b45))
+* **router:** viewport defaults ([0bfc4bc](https://github.com/aurelia/router/commit/0bfc4bc)), closes [aurelia/router#482](https://github.com/aurelia/router/issues/482)
+* **router config:** ignoreUnknownRoutes option ([811959b](https://github.com/aurelia/router/commit/811959b))
+
+
+
 <a name="1.4.0"></a>
 # [1.4.0](https://github.com/aurelia/router/compare/1.3.0...1.4.0) (2017-10-02)
 
