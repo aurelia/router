@@ -168,7 +168,7 @@ export class RouterConfiguration {
       router.useViewPortDefaults(this.viewPortDefaults);
     }
 
-    router.options = this.options;
+    Object.assign(router.options, this.options);
 
     let pipelineSteps = this.pipelineSteps;
     if (pipelineSteps.length) {
