@@ -5,6 +5,7 @@ import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
 import {
+  _ensureArrayWithSingleRoutePerConfig,
   _normalizeAbsolutePath,
   _createRootedPath,
   _resolveUrl} from './util';
@@ -299,6 +300,12 @@ export class Router {
   * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
   */
   addRoute(config: RouteConfig, navModel?: NavModel): void {
+    if (Array.isArray(config.route)) {
+      let routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
+      routeConfigs.forEach(this.addRoute.bind(this));
+      return;
+    }
+
     validateRouteConfig(config, this.routes);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
