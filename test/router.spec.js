@@ -71,6 +71,12 @@ describe('the router', () => {
         'number2': { moduleId: 'test2' }
       }})).not.toThrow();
     });
+
+    it('should map a routeconfig with an array of routes to multiple routeconfigs with one route each', () => {
+      router.addRoute({ route: ['test1', 'test2'], moduleId: 'test', nav: true });
+      expect(router.routes[0].route).toEqual('test1');
+      expect(router.routes[1].route).toEqual('test2');
+    });
   });
 
   describe('generate', () => {

@@ -1,4 +1,5 @@
 import {RouteConfig} from './interfaces';
+import {_ensureArrayWithSingleRoutePerConfig} from './util'
 
 /**
  * Class used to configure a [[Router]] instance.
@@ -111,17 +112,7 @@ export class RouterConfiguration {
   */
   mapRoute(config: RouteConfig): RouterConfiguration {
     this.instructions.push(router => {
-      let routeConfigs = [];
-
-      if (Array.isArray(config.route)) {
-        for (let i = 0, ii = config.route.length; i < ii; ++i) {
-          let current = Object.assign({}, config);
-          current.route = config.route[i];
-          routeConfigs.push(current);
-        }
-      } else {
-        routeConfigs.push(Object.assign({}, config));
-      }
+      let routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
 
       let navModel;
       for (let i = 0, ii = routeConfigs.length; i < ii; ++i) {
