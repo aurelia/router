@@ -6,12 +6,19 @@ import {RouteConfig} from './interfaces';
  * @constructor
  */
 export class RouterConfiguration {
-  instructions = [];
-  options: any = {};
-  pipelineSteps: Array<Function|PipelineStep> = [];
+  instructions: Array<(router: Router) => void> = [];
+  options: {
+    [key: string]: any;
+    compareQueryParams?: boolean;
+    root?: string;
+    pushState?: boolean;
+    hashChange?: boolean;
+    silent?: boolean;
+  } = {};
+  pipelineSteps: Array<{name: string, step: Function|PipelineStep}> = [];
   title: string;
-  unknownRouteConfig: any;
-  viewPortDefaults: any;
+  unknownRouteConfig: string|RouteConfig|((instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>);
+  viewPortDefaults: {[name: string]: {moduleId: string; [key: string]: any}};
 
   /**
   * Adds a step to be run during the [[Router]]'s navigation pipeline.
@@ -98,7 +105,7 @@ export class RouterConfiguration {
    *  default, of the form { viewPortName: { moduleId } }.
    * @chainable
    */
-  useViewPortDefaults(viewPortConfig: any) {
+  useViewPortDefaults(viewPortConfig: {[name: string]: {moduleId: string; [key: string]: any}}): RouterConfiguration {
     this.viewPortDefaults = viewPortConfig;
     return this;
   }
