@@ -28,6 +28,11 @@ export class Router {
   */
   baseUrl: string;
 
+  /**   
+   * If defined, used in generation of document title for [[Router]]'s routes.
+   */
+  title: string | undefined
+
   /**
   * True if the [[Router]] has been configured.
   */
