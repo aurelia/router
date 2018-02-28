@@ -58,6 +58,8 @@ To use Aurelia's router, your component view must have a `<router-view></router-
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route view-model's `activate()` function.
   * A parameter can be made optional by appending a question mark `:token?` (ie: `users/:id?/detail` would match both `users/3/detail` and `users/detail`). When an optional parameter is missing from the url, the property passed to `activate()` is `undefined`.
   * Wildcard routes are used to match the "rest" of a path (ie: files/*path matches files/new/doc or files/temp). An object with the rest of the URL after the segment is set as the `path` property and passed as a parameter to `activate()` as well.
+* `name` - is a friendly name that you can use to reference the route with, particularly when using route generation.
+* `moduleId` - is the id (usually a relative path) of the module that exports the component that should be rendered when the route is matched.
 * `href` - is a conditionally optional property. If it is not defined then route is used. If route has segments then href is required as in the case of files because the router does not know how to fill out the parameterized portions of the pattern.
 * `nav` - is a boolean or number property. When set to true the route will be included in the router's navigation model. When specified as number, the value will be used in sorting the routes. This makes it easier to create a dynamic menu or similar elements.  The navigation model will be available as array of `NavModel` in `router.navigation`. These are the available properties in `NavModel`:
   * `isActive` flag which will be true when the associated route is active.
@@ -67,6 +69,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
   * `settings` is equal to the property `settings` of `config` object.
   * `router` is a reference for AppRouter.
   * Other properties includes `relativeHref` and `order`.
+* `title` - is the text to be displayed as the document's title (appears in your browser's title bar or tab). It is combined with the `router.title` and the title from any child routes.
 
 ### Navigation States
 
