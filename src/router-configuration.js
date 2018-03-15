@@ -1,5 +1,5 @@
 import {RouteConfig} from './interfaces';
-import {_ensureArrayWithSingleRoutePerConfig} from './util'
+import {_ensureArrayWithSingleRoutePerConfig} from './util';
 
 /**
  * Class used to configure a [[Router]] instance.

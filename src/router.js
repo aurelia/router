@@ -8,7 +8,8 @@ import {
   _ensureArrayWithSingleRoutePerConfig,
   _normalizeAbsolutePath,
   _createRootedPath,
-  _resolveUrl} from './util';
+  _resolveUrl
+} from './util';
 import {RouteConfig} from './interfaces';
 
 /**
