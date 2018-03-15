@@ -37,20 +37,6 @@ interface Next {
 }
 
 /**
-* A step to be run during processing of the pipeline.
-*/
-interface PipelineStep {
-  /**
-   * Execute the pipeline step. The step should invoke next(), next.complete(),
-   * next.cancel(), or next.reject() to allow the pipeline to continue.
-   *
-   * @param instruction The navigation instruction.
-   * @param next The next step in the pipeline.
-   */
-  run(instruction: NavigationInstruction, next: Next): Promise<any>;
-}
-
-/**
 * The class responsible for managing and processing the navigation pipeline.
 */
 export class Pipeline {
