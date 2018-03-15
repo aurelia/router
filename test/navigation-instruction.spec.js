@@ -46,8 +46,8 @@ describe('NavigationInstruction', () => {
       router.addRoute({
         name: parentParamRouteName,
         route: parentParamRouteName,
-        moduleId: parentRouteName,
-      })
+        moduleId: parentRouteName
+      });
       child = router.createChild(new Container());
       child.addRoute({
         name: childRouteName,
@@ -77,10 +77,9 @@ describe('NavigationInstruction', () => {
     });
 
     describe('when a uri contains spaces', () => {
-
       it('should handle an encoded uri', (done) => {
         router._createNavigationInstruction('parent/parent%201').then(instruction => {
-          expect(instruction.getBaseUrl()).toBe('parent/parent%201');;
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201');
           done();
         });
       });
@@ -99,13 +98,12 @@ describe('NavigationInstruction', () => {
         });
       });
 
-      it('should identify fragments and encode them', (done) => { 
+      it('should identify fragments and encode them', (done) => {
         router._createNavigationInstruction('parent/parent 1/child/child 1').then(instruction => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
           done();
         });
       });
-
     });
 
     describe('when using an empty parent route', () => {

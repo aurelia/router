@@ -20,8 +20,8 @@ describe('NavigationPlanStep', () => {
   beforeEach(() => {
     step = new BuildNavigationPlanStep();
     state = createPipelineState();
-	router = new AppRouter(new Container(), new MockHistory(), new PipelineProvider(new Container()));
-	router.useViewPortDefaults({ default: { moduleId: null } });
+    router = new AppRouter(new Container(), new MockHistory(), new PipelineProvider(new Container()));
+    router.useViewPortDefaults({ default: { moduleId: null } });
 
     redirectInstruction = new NavigationInstruction({
       fragment: 'first',
@@ -33,9 +33,9 @@ describe('NavigationPlanStep', () => {
     redirectSecondInstruction = new NavigationInstruction({
       fragment: 'first/10',
       queryString: 'q=1',
-      params: {id: 10},
-      config: { name:'first', route: 'first/:id', redirect: 'second/:id' },
-      router: new AppRouter(new Container(), new MockHistory(), new PipelineProvider(new Container()))
+      params: { id: 10 },
+      config: { name: 'first', route: 'first/:id', redirect: 'second/:id' },
+      router
     });
 
     firstInstruction = new NavigationInstruction({
@@ -62,7 +62,7 @@ describe('NavigationPlanStep', () => {
   });
 
   it('cancels on redirect configs', (done) => {
-    redirectInstruction.router.addRoute({route: 'first', name: 'frist',  redirect: 'second' });
+    redirectInstruction.router.addRoute({route: 'first', name: 'first',  redirect: 'second' });
     redirectInstruction.router.addRoute({route: 'second', name: 'second',  redirect: 'second' });
     step.run(redirectInstruction, state.next)
       .then(e => {
@@ -74,8 +74,8 @@ describe('NavigationPlanStep', () => {
   });
 
   it('redirect to routes with parameters', (done) => {
-    redirectSecondInstruction.router.addRoute({ name:'second', route: 'second/:id', moduleId: './second' });
-    redirectSecondInstruction.router.addRoute({ name:'first', route: 'first/:id', redirect: 'second' });
+    redirectSecondInstruction.router.addRoute({ name: 'first', route: 'first/:id', redirect: 'second' });
+    redirectSecondInstruction.router.addRoute({ name: 'second', route: 'second/:id', moduleId: './second' });
     step.run(redirectSecondInstruction, state.next)
       .then(e => {
         expect(state.rejection).toBeTruthy();
