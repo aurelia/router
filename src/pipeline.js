@@ -1,3 +1,5 @@
+import { PipelineStep } from './interfaces';
+
 /**
 * The status of a Pipeline.
 */
@@ -49,23 +51,13 @@ interface PipelineStep {
 }
 
 /**
-* The result of a pipeline run.
-*/
-interface PipelineResult {
-  status: string;
-  instruction: NavigationInstruction;
-  output: any;
-  completed: boolean;
-}
-
-/**
 * The class responsible for managing and processing the navigation pipeline.
 */
 export class Pipeline {
   /**
   * The pipeline steps.
   */
-  steps: Array<Function|PipelineStep> = [];
+  steps: Array<Function | PipelineStep> = [];
 
   /**
   * Adds a step to the pipeline.

@@ -188,3 +188,18 @@ interface ActivationStrategy {
   */
   replace: 'replace';
 }
+
+/**
+* The result of a pipeline run.
+*/
+interface PipelineResult {
+  status: string;
+  instruction: NavigationInstruction;
+  output: any;
+  completed: boolean;
+}
+
+/**
+* The result of a router navigation.
+*/
+type NavigationResult = Promise<PipelineResult | boolean>;
