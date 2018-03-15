@@ -19,7 +19,7 @@ export class RouterConfiguration {
   pipelineSteps: Array<{name: string, step: Function|PipelineStep}> = [];
   title: string;
   unknownRouteConfig: string|RouteConfig|((instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>);
-  viewPortDefaults: {[name: string]: {moduleId: string|null; [key: string]: any}};
+  viewPortDefaults: {[name: string]: {moduleId: string|void; [key: string]: any}};
 
   /**
   * Adds a step to be run during the [[Router]]'s navigation pipeline.
