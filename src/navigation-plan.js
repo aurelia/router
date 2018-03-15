@@ -1,5 +1,4 @@
 import { Redirect } from './navigation-commands';
-import { _resolveUrl } from './util';
 
 /**
 * The strategy to use when activating modules during navigation.
@@ -27,7 +26,7 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
     let router = instruction.router;
     return router._createNavigationInstruction(config.redirect)
     .then(newInstruction => {
-      let params = Object.keys(newInstruction.params).length ? instruction.params : {}
+      let params = Object.keys(newInstruction.params).length ? instruction.params : {};
       let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
 
       if (instruction.queryString) {
@@ -35,7 +34,7 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
       }
 
       return Promise.reject(new Redirect(redirectLocation));
-    })
+    });
   }
 
   let prev = instruction.previousInstruction;
@@ -153,17 +152,4 @@ function hasDifferentParameterValues(prev: NavigationInstruction, next: Navigati
   }
 
   return false;
-}
-
-function getInstructionBaseUrl(instruction: NavigationInstruction): string {
-  let instructionBaseUrlParts = [];
-  instruction = instruction.parentInstruction;
-
-  while (instruction) {
-    instructionBaseUrlParts.unshift(instruction.getBaseUrl());
-    instruction = instruction.parentInstruction;
-  }
-
-  instructionBaseUrlParts.unshift('/');
-  return instructionBaseUrlParts.join('');
 }
