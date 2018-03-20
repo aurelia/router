@@ -245,7 +245,7 @@ export class NavigationInstruction {
     }
   }
 
-  _buildTitle(separator: string = ' | '): string {
+  _buildTitle(): string {
     let title = '';
     let childTitles = [];
 
@@ -257,7 +257,7 @@ export class NavigationInstruction {
       let viewPortInstruction = this.viewPortInstructions[viewPortName];
 
       if (viewPortInstruction.childNavigationInstruction) {
-        let childTitle = viewPortInstruction.childNavigationInstruction._buildTitle(separator);
+        let childTitle = viewPortInstruction.childNavigationInstruction._buildTitle();
         if (childTitle) {
           childTitles.push(childTitle);
         }
@@ -265,11 +265,11 @@ export class NavigationInstruction {
     }
 
     if (childTitles.length) {
-      title = childTitles.join(separator) + (title ? separator : '') + title;
+      title = childTitles.join(this.router.separator) + (title ? this.router.separator : '') + title;
     }
 
     if (this.router.title) {
-      title += (title ? separator : '') + this.router.transformTitle(this.router.title);
+      title += (title ? this.router.separator : '') + this.router.transformTitle(this.router.title);
     }
 
     return title;
