@@ -245,9 +245,10 @@ export class NavigationInstruction {
     }
   }
 
-  _buildTitle(separator: string = ' | '): string {
+  _buildTitle(separator?: string): string {
     let title = '';
     let childTitles = [];
+    let titleSeparator = separator || this.router.titleSeparator;
 
     if (this.config.navModel.title) {
       title = this.router.transformTitle(this.config.navModel.title);
@@ -257,7 +258,7 @@ export class NavigationInstruction {
       let viewPortInstruction = this.viewPortInstructions[viewPortName];
 
       if (viewPortInstruction.childNavigationInstruction) {
-        let childTitle = viewPortInstruction.childNavigationInstruction._buildTitle(separator);
+        let childTitle = viewPortInstruction.childNavigationInstruction._buildTitle(titleSeparator);
         if (childTitle) {
           childTitles.push(childTitle);
         }
@@ -265,11 +266,11 @@ export class NavigationInstruction {
     }
 
     if (childTitles.length) {
-      title = childTitles.join(separator) + (title ? separator : '') + title;
+      title = childTitles.join(titleSeparator) + (title ? titleSeparator : '') + title;
     }
 
     if (this.router.title) {
-      title += (title ? separator : '') + this.router.transformTitle(this.router.title);
+      title += (title ? titleSeparator : '') + this.router.transformTitle(this.router.title);
     }
 
     return title;
