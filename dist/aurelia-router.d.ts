@@ -101,7 +101,7 @@ export declare interface RouteConfig {
   /**
     * The moduleId of the view model that should be activated for this route.
     */
-  moduleId?: string;
+  moduleId?: string | null | Function | Promise<Function>;
   
   /**
     * A URL fragment to redirect to when this route is matched.
