@@ -23,6 +23,13 @@ class MockLoader extends RouteLoader {
   }
 }
 
+class MockInstruction {
+  constructor(title: string) {
+    this.title = title;
+  }
+  resolve(): void {}
+}
+
 describe('app-router', () => {
   let router;
   let history;
@@ -246,6 +253,41 @@ describe('app-router', () => {
         .then(done);
     });
   });
+  describe('instruction completes as navigation command', () => {
+    it('should complete instructions in order before terminating', done => {
+      const pipeline = new Pipeline()
+        .addStep({ run(inst, next) { return pipelineStep(inst, next); } });
+      spyOn(pipeline, 'run').and.callThrough();
+
+      const plProvider = {
+        createPipeline: () => pipeline
+      };
+      const router = new AppRouter(container, history, plProvider, ea);
+      const initialInstruction = new MockInstruction('initial resulting navigation (Promise)');
+      const instructionAfterNav = new MockInstruction('instruction after navigation');
+
+      const navigationCommand = {
+        navigate: () => new Promise(resolve => {
+          setTimeout(() => {
+            router._queue.push(instructionAfterNav);
+            pipelineStep = (ctx, next) => next.complete({});
+            resolve();
+          }, 0);
+        })
+      };
+
+      router._queue.push(initialInstruction);
+      pipelineStep = (ctx, next) => next.complete(navigationCommand);
+      
+      router._dequeueInstruction()
+        .then(_ => {
+          expect(pipeline.run).toHaveBeenCalledTimes(2);
+          expect(pipeline.run.calls.argsFor(0)).toEqual([initialInstruction]);
+          expect(pipeline.run.calls.argsFor(1)).toEqual([instructionAfterNav]);
+          done();
+        });
+    });
+  })
 });
 
 function expectSuccess(result) {
