@@ -197,8 +197,9 @@ function processResult(instruction, result, instructionCount, router) {
   }
 
   let finalResult = null;
+  let navigationCommandResult = null;
   if (isNavigationCommand(result.output)) {
-    result.output.navigate(router);
+    navigationCommandResult = result.output.navigate(router);
   } else {
     finalResult = result;
 
@@ -211,7 +212,8 @@ function processResult(instruction, result, instructionCount, router) {
     }
   }
 
-  return router._dequeueInstruction(instructionCount + 1)
+  return Promise.resolve(navigationCommandResult)
+    .then(_ => router._dequeueInstruction(instructionCount + 1))
     .then(innerResult => finalResult || innerResult || result);
 }
 
