@@ -239,7 +239,7 @@ export class NavigationInstruction {
   }
 
   _updateTitle(): void {
-    let title = this._buildTitle();
+    let title = this._buildTitle(this.router.titleSeparator);
     if (title) {
       this.router.history.setTitle(title);
     }

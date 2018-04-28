@@ -32,7 +32,12 @@ export class Router {
   /**
    * If defined, used in generation of document title for [[Router]]'s routes.
    */
-  title: string | undefined
+  title: string | undefined;
+
+  /**
+   * The separator used in the document title between [[Router]]'s routes.
+   */
+  titleSeparator: string | undefined;
 
   /**
   * True if the [[Router]] has been configured.

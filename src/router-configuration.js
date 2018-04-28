@@ -18,6 +18,7 @@ export class RouterConfiguration {
   } = {};
   pipelineSteps: Array<{name: string, step: Function|PipelineStep}> = [];
   title: string;
+  titleSeparator: string;
   unknownRouteConfig: string|RouteConfig|((instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>);
   viewPortDefaults: {[name: string]: {moduleId: string|void; [key: string]: any}};
 
@@ -161,6 +162,10 @@ export class RouterConfiguration {
 
     if (this.title) {
       router.title = this.title;
+    }
+
+    if (this.titleSeparator) {
+      router.titleSeparator = this.titleSeparator;
     }
 
     if (this.unknownRouteConfig) {
