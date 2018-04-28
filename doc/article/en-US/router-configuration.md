@@ -70,6 +70,7 @@ To use Aurelia's router, your component view must have a `<router-view></router-
   * `router` is a reference for AppRouter.
   * Other properties includes `relativeHref` and `order`.
 * `title` - is the text to be displayed as the document's title (appears in your browser's title bar or tab). It is combined with the `router.title` and the title from any child routes.
+* `titleSeparator` - is the text that will be used to join the `title` and any active `route.title`s. The default value is `' | '`.
 
 ### Navigation States
 
