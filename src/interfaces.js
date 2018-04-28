@@ -1,7 +1,7 @@
 /**
 * A configuration object that describes a route.
 */
-interface RouteConfig {
+export interface RouteConfig {
   /**
   * The route pattern to match against incoming URL fragments, or an array of patterns.
   */
@@ -106,7 +106,7 @@ interface RouteConfig {
 /**
 * An optional interface describing the canActivate convention.
 */
-interface RoutableComponentCanActivate {
+export interface RoutableComponentCanActivate {
   /**
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
   * Return a boolean value, a promise for a boolean value, or a navigation command.
@@ -117,7 +117,7 @@ interface RoutableComponentCanActivate {
 /**
 * An optional interface describing the activate convention.
 */
-interface RoutableComponentActivate {
+export interface RoutableComponentActivate {
   /**
   * Implement this hook if you want to perform custom logic just before your view-model is displayed.
   * You can optionally return a promise to tell the router to wait to bind and attach the view until
@@ -129,7 +129,7 @@ interface RoutableComponentActivate {
 /**
 * An optional interface describing the canDeactivate convention.
 */
-interface RoutableComponentCanDeactivate {
+export interface RoutableComponentCanDeactivate {
   /**
   * Implement this hook if you want to control whether or not the router can navigate away from your
   * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
@@ -141,7 +141,7 @@ interface RoutableComponentCanDeactivate {
 /**
 * An optional interface describing the deactivate convention.
 */
-interface RoutableComponentDeactivate {
+export interface RoutableComponentDeactivate {
   /**
   * Implement this hook if you want to perform custom logic when your view-model is being
   * navigated away from. You can optionally return a promise to tell the router to wait until
@@ -153,7 +153,7 @@ interface RoutableComponentDeactivate {
 /**
 * An optional interface describing the determineActivationStrategy convention.
 */
-interface RoutableComponentDetermineActivationStrategy {
+export interface RoutableComponentDetermineActivationStrategy {
   /**
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
   * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
@@ -164,7 +164,7 @@ interface RoutableComponentDetermineActivationStrategy {
 /**
 * An optional interface describing the router configuration convention.
 */
-interface ConfiguresRouter {
+export interface ConfiguresRouter {
   /**
   * Implement this hook if you want to configure a router.
   */
@@ -174,7 +174,7 @@ interface ConfiguresRouter {
 /**
 * An optional interface describing the available activation strategies.
 */
-interface ActivationStrategy {
+export interface ActivationStrategy {
   /**
   * Reuse the existing view model, without invoking Router lifecycle hooks.
   */
@@ -188,3 +188,32 @@ interface ActivationStrategy {
   */
   replace: 'replace';
 }
+
+/**
+* A step to be run during processing of the pipeline.
+*/
+export interface PipelineStep {
+  /**
+   * Execute the pipeline step. The step should invoke next(), next.complete(),
+   * next.cancel(), or next.reject() to allow the pipeline to continue.
+   *
+   * @param instruction The navigation instruction.
+   * @param next The next step in the pipeline.
+   */
+  run(instruction: NavigationInstruction, next: Next): Promise<any>;
+}
+
+/**
+* The result of a pipeline run.
+*/
+export interface PipelineResult {
+  status: string;
+  instruction: NavigationInstruction;
+  output: any;
+  completed: boolean;
+}
+
+/**
+* The result of a router navigation.
+*/
+export type NavigationResult = Promise<PipelineResult | boolean>;

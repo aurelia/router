@@ -3,6 +3,7 @@ import {Container} from 'aurelia-dependency-injection';
 import {AppRouter} from '../src/app-router';
 import {PipelineProvider} from '../src/pipeline-provider';
 import {NavigationInstruction} from '../src/navigation-instruction';
+import {RouterConfiguration} from '../src/router-configuration';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 
@@ -11,6 +12,7 @@ class MockHistory extends History {
   deactivate() {}
   navigate() {}
   navigateBack() {}
+  setTitle() {}
   getAbsoluteRoot() {
     return absoluteRoot;
   }
@@ -23,6 +25,70 @@ describe('NavigationInstruction', () => {
   beforeEach(() => {
     history = new MockHistory();
     router = new AppRouter(new Container(), history, new PipelineProvider(new Container()));
+  });
+
+  describe('build title', () => {
+    let child;
+    let config;
+    beforeEach(() => {
+      router.addRoute({
+        name: 'parent',
+        route: 'parent',
+        moduleId: 'parent',
+        title: 'parent',
+        nav: true
+      });
+      child = router.createChild(new Container());
+      child.addRoute({
+        name: 'child',
+        route: 'child',
+        moduleId: 'child',
+        title: 'child',
+        nav: true
+      });
+      config = new RouterConfiguration();
+      spyOn(history, 'setTitle');
+    });
+
+    it('should generate a title from the nav model', (done) => {
+      router._createNavigationInstruction('parent/child').then((instruction) => {
+        child._createNavigationInstruction(instruction.getWildcardPath(), instruction).then((childInstruction) => {
+          instruction.viewPortInstructions['default'] = { childNavigationInstruction: childInstruction };
+          instruction._updateTitle();
+          expect(history.setTitle).toHaveBeenCalledWith('child | parent');
+          expect(history.setTitle).not.toHaveBeenCalledWith('parent | child');
+          done();
+        });
+      });
+    });
+
+    it('should use a router title when generating the page title', (done) => {
+      config.title = 'app';
+      router.configure(config);
+      router._createNavigationInstruction('parent/child').then((instruction) => {
+        child._createNavigationInstruction(instruction.getWildcardPath(), instruction).then((childInstruction) => {
+          instruction.viewPortInstructions['default'] = { childNavigationInstruction: childInstruction };
+          instruction._updateTitle();
+          expect(history.setTitle).toHaveBeenCalledWith('child | parent | app');
+          expect(history.setTitle).not.toHaveBeenCalledWith('parent | child | app');
+          done();
+        });
+      });
+    });
+
+    it('should use a configured title separator when generating a title', (done) => {
+      config.titleSeparator = ' <3 ';
+      router.configure(config);
+      router._createNavigationInstruction('parent/child').then((instruction) => {
+        child._createNavigationInstruction(instruction.getWildcardPath(), instruction).then((childInstruction) => {
+          instruction.viewPortInstructions['default'] = { childNavigationInstruction: childInstruction };
+          instruction._updateTitle();
+          expect(history.setTitle).toHaveBeenCalledWith('child <3 parent');
+          expect(history.setTitle).not.toHaveBeenCalledWith('child </3 parent');
+          done();
+        });
+      });
+    });  
   });
 
   describe('getBaseUrl()', () => {
@@ -46,8 +112,8 @@ describe('NavigationInstruction', () => {
       router.addRoute({
         name: parentParamRouteName,
         route: parentParamRouteName,
-        moduleId: parentRouteName,
-      })
+        moduleId: parentRouteName
+      });
       child = router.createChild(new Container());
       child.addRoute({
         name: childRouteName,
@@ -77,10 +143,9 @@ describe('NavigationInstruction', () => {
     });
 
     describe('when a uri contains spaces', () => {
-
       it('should handle an encoded uri', (done) => {
         router._createNavigationInstruction('parent/parent%201').then(instruction => {
-          expect(instruction.getBaseUrl()).toBe('parent/parent%201');;
+          expect(instruction.getBaseUrl()).toBe('parent/parent%201');
           done();
         });
       });
@@ -99,13 +164,12 @@ describe('NavigationInstruction', () => {
         });
       });
 
-      it('should identify fragments and encode them', (done) => { 
+      it('should identify fragments and encode them', (done) => {
         router._createNavigationInstruction('parent/parent 1/child/child 1').then(instruction => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
           done();
         });
       });
-
     });
 
     describe('when using an empty parent route', () => {

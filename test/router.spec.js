@@ -5,7 +5,7 @@ import {PipelineProvider} from '../src/pipeline-provider';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 
-class MockHistory extends History {
+export class MockHistory extends History {
   activate() {}
   deactivate() {}
   navigate() {}

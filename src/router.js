@@ -8,8 +8,9 @@ import {
   _ensureArrayWithSingleRoutePerConfig,
   _normalizeAbsolutePath,
   _createRootedPath,
-  _resolveUrl} from './util';
-import {RouteConfig} from './interfaces';
+  _resolveUrl
+} from './util';
+import {RouteConfig, NavigationResult} from './interfaces';
 
 /**
 * The primary class responsible for handling routing and navigation.
@@ -28,10 +29,15 @@ export class Router {
   */
   baseUrl: string;
 
-  /**   
+  /**
    * If defined, used in generation of document title for [[Router]]'s routes.
    */
-  title: string | undefined
+  title: string | undefined;
+
+  /**
+   * The separator used in the document title between [[Router]]'s routes.
+   */
+  titleSeparator: string | undefined;
 
   /**
   * True if the [[Router]] has been configured.
@@ -212,7 +218,7 @@ export class Router {
   * @param fragment The URL fragment to use as the navigation destination.
   * @param options The navigation options. See [[History.NavigationOptions]] for all available options.
   */
-  navigate(fragment: string, options?: any): boolean {
+  navigate(fragment: string, options?: any): NavigationResult {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -229,7 +235,7 @@ export class Router {
   * @param params The route parameters to be used when populating the route pattern.
   * @param options The navigation options. See [[History.NavigationOptions]] for all available options.
   */
-  navigateToRoute(route: string, params?: any, options?: any): boolean {
+  navigateToRoute(route: string, params?: any, options?: any): NavigationResult {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
