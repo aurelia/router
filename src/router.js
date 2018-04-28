@@ -37,7 +37,7 @@ export class Router {
   /**
    * The separator used in the document title between [[Router]]'s routes.
    */
-  titleSeparator: string;
+  titleSeparator: string | undefined;
 
   /**
   * True if the [[Router]] has been configured.

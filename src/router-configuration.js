@@ -162,7 +162,10 @@ export class RouterConfiguration {
 
     if (this.title) {
       router.title = this.title;
-      router.titleSeparator = this.titleSeparator || ' | ';
+    }
+
+    if (this.titleSeparator) {
+      router.titleSeparator = this.titleSeparator;
     }
 
     if (this.unknownRouteConfig) {
