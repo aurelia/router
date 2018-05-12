@@ -85,6 +85,39 @@ The router contains a number of additional properties that indicate the current 
 * `router.isExplicitNavigation`: `true` if the router is navigating due to explicit call to navigate function(s).
 * `router.isExplicitNavigationBack`: `true` if the router is navigating due to explicit call to navigateBack function.
 
+### Webpack Configuration
+
+When using Webpack it is necessary to help Aurelia create a path that is resolvable by the loader. This is done by wrapping the `moduleId` string with `PLATFORM.moduleName()`. You can import `PLATFORM` into your project from either `aurelia-framework` or `aurelia-pal`.
+
+<code-listing heading="app${context.language.fileExtension}">
+  <source-code lang="ES 2015/2016">
+    import { PLATFORM } from "aurelia-framework";
+
+    export class App {
+      configureRouter(config, router) {
+        config.map([
+          { route: ['', 'home'],   name: 'home',    moduleId: PLATFORM.moduleName('home') }
+        ]);
+
+        this.router = router;
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import { PLATFORM } from "aurelia-framework";
+
+    export class App {
+      configureRouter(config: RouterConfiguration, router: Router): void {
+        config.map([
+          { route: ['', 'home'],   name: 'home',    moduleId: PLATFORM.moduleName('home') }
+        ]);
+      }
+    }
+  </source-code>
+</code-listing>
+
+See [Managing dependencies](https://github.com/jods4/aurelia-webpack-build/wiki/Managing-dependencies) for more information on `PLATFORM.moduleName()`.
+
 ## Options
 
 ### Push State
@@ -1141,42 +1174,3 @@ Since the view model's navigation lifecycle is called only once, you may have pr
 
 > Info
 > Alternatively, if the strategy is always the same and you don't want that to be in your view model code, you can add the `activationStrategy` property to your route config instead.
-
-## Webpack Configuration
-
-When using webpack it is necessary to help Aurelia create a path that is resolvable by the loader, this is done by wrapping the contents of `moduleId` with `PLATFORM.moduleName()`. You can import `PLATFORM` into your project from either `aurelia-framework` or `aurelia-pal`.
-
-The method `moduleName` takes up to two parameters: 
-
-`moduleName(moduleName: string, options?: ModuleNameOptions): string`
-
-The first argument is the name of the view-model that you want to use and the second (optional) argument generates a bundle based on the supplied value.
-
-See below for a simple example on how to use `PLATFORM.moduleName` in your router configuration:
-
-<code-listing heading="app${context.language.fileExtension}">
-  <source-code lang="ES 2015/2016">
-    import { PLATFORM } from "aurelia-framework";
-
-    export class App {
-      configureRouter(config, router) {
-        config.map([
-          { route: ['', 'home'],   name: 'home',    moduleId: PLATFORM.moduleName('home') }
-        ]);
-
-        this.router = router;
-      }
-    }
-  </source-code>
-  <source-code lang="TypeScript">
-    import { PLATFORM } from "aurelia-framework";
-
-    export class App {
-      configureRouter(config: RouterConfiguration, router: Router): void {
-        config.map([
-          { route: ['', 'home'],   name: 'home',    moduleId: PLATFORM.moduleName('home') }
-        ]);
-      }
-    }
-  </source-code>
-</code-listing>
