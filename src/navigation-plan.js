@@ -13,6 +13,9 @@ export class BuildNavigationPlanStep {
   run(navigationInstruction: NavigationInstruction, next: Function) {
     return _buildNavigationPlan(navigationInstruction)
       .then(plan => {
+        if (plan instanceof Redirect) {
+          return next.cancel(plan);
+        }
         navigationInstruction.plan = plan;
         return next();
       }).catch(next.cancel);
@@ -33,7 +36,7 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
         redirectLocation += '?' + instruction.queryString;
       }
 
-      return Promise.reject(new Redirect(redirectLocation));
+      return Promise.resolve(new Redirect(redirectLocation));
     });
   }
 
