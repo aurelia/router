@@ -85,6 +85,39 @@ The router contains a number of additional properties that indicate the current 
 * `router.isExplicitNavigation`: `true` if the router is navigating due to explicit call to navigate function(s).
 * `router.isExplicitNavigationBack`: `true` if the router is navigating due to explicit call to navigateBack function.
 
+### Webpack Configuration
+
+When using Webpack it is necessary to help Aurelia create a path that is resolvable by the loader. This is done by wrapping the `moduleId` string with `PLATFORM.moduleName()`. You can import `PLATFORM` into your project from either `aurelia-framework` or `aurelia-pal`.
+
+<code-listing heading="app${context.language.fileExtension}">
+  <source-code lang="ES 2015/2016">
+    import { PLATFORM } from "aurelia-framework";
+
+    export class App {
+      configureRouter(config, router) {
+        config.map([
+          { route: ['', 'home'],   name: 'home',    moduleId: PLATFORM.moduleName('home') }
+        ]);
+
+        this.router = router;
+      }
+    }
+  </source-code>
+  <source-code lang="TypeScript">
+    import { PLATFORM } from "aurelia-framework";
+
+    export class App {
+      configureRouter(config: RouterConfiguration, router: Router): void {
+        config.map([
+          { route: ['', 'home'],   name: 'home',    moduleId: PLATFORM.moduleName('home') }
+        ]);
+      }
+    }
+  </source-code>
+</code-listing>
+
+See [Managing dependencies](https://github.com/jods4/aurelia-webpack-build/wiki/Managing-dependencies) for more information on `PLATFORM.moduleName()`.
+
 ## Options
 
 ### Push State
