@@ -30,6 +30,9 @@ export class RouterConfiguration {
   * @chainable
   */
   addPipelineStep(name: string, step: Function|PipelineStep): RouterConfiguration {
+    if (step === null || step === undefined) {
+      throw new Error('Pipeline step cannot be null or undefined.');
+    }
     this.pipelineSteps.push({name, step});
     return this;
   }
