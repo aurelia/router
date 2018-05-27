@@ -864,7 +864,7 @@ We can also associate layouts with route configurations using code in our view m
         config.map([
           { route: '',      name: 'home',  moduleId: 'home' },
           { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
-          { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: 'layout-users', layoutViewModel: { access: "admin" } }
+          { route: 'users', name: 'users', moduleId: 'users/index', layoutViewModel: 'layout-users', layoutModel: { access: "admin" } }
         ]);
 
         this.router = router;
@@ -879,7 +879,7 @@ We can also associate layouts with route configurations using code in our view m
         config.map([
           { route: '',      name: 'home',  moduleId: 'home' },
           { route: 'login', name: 'login', moduleId: 'login/index', layoutView: 'layout-login.html' },
-          { route: 'users', name: 'users', moduleId: 'users/index', layoutModel: 'layout-users', layoutViewModel: { access: "admin" } }
+          { route: 'users', name: 'users', moduleId: 'users/index', layoutViewModel: 'layout-users', layoutModel: { access: "admin" } }
         ]);
 
         this.router = router;
