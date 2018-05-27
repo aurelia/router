@@ -132,7 +132,7 @@ describe('NavigationInstruction', () => {
         expect(instruction.getBaseUrl()).toBe(parentRouteName);
         done();
       })
-        .catch(fail);
+    .catch(fail);
     });
 
     it('should return the raw fragment when no wildcard exists', (done) => {
@@ -141,7 +141,7 @@ describe('NavigationInstruction', () => {
         expect(instruction.getBaseUrl()).toBe(parentRouteName);
         done();
       })
-        .catch(fail);
+      .catch(fail);
     });
 
     describe('when a uri contains spaces', () => {
@@ -150,7 +150,7 @@ describe('NavigationInstruction', () => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201');
           done();
         })
-          .catch(fail);
+        .catch(fail);
       });
 
       it('should encode the uri', (done) => {
@@ -158,7 +158,7 @@ describe('NavigationInstruction', () => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201');
           done();
         })
-          .catch(fail);
+        .catch(fail);
       });
 
       it('should identify encoded fragments', (done) => {
@@ -166,7 +166,7 @@ describe('NavigationInstruction', () => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
           done();
         })
-          .catch(fail);
+        .catch(fail);
       });
 
       it('should identify fragments and encode them', (done) => {
@@ -174,7 +174,7 @@ describe('NavigationInstruction', () => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
           done();
         })
-          .catch(fail);
+        .catch(fail);
       });
     });
 
@@ -187,10 +187,9 @@ describe('NavigationInstruction', () => {
             child._refreshBaseUrl();
             expect(child.baseUrl).toBe(parentRouteName);
             done();
-          })
-            .catch(fail);
+          });
         })
-          .catch(fail);
+        .catch(fail);
       });
     });
 
@@ -203,10 +202,9 @@ describe('NavigationInstruction', () => {
             child._refreshBaseUrl();
             expect(child.baseUrl).toBe(parentRouteName);
             done();
-          })
-            .catch(fail);
+          });
         })
-          .catch(fail);
+        .catch(fail);
       });
     });
   });
