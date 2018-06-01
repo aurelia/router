@@ -224,7 +224,7 @@ export class Router {
     }
 
     this.isExplicitNavigation = true;
-    return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
+    return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState, this.history.root), options);
   }
 
   /**
@@ -279,8 +279,21 @@ export class Router {
     }
 
     let path = this._recognizer.generate(name, params);
-    let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
-    return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
+    let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, this.history.root);
+    if (options.absolute) {
+      // Hamfisted workaround because history does not expose the origin without the root
+      let origin = this.history.getAbsoluteRoot();
+      if (this.history._hasPushState) {
+        if (this.history.root) {
+          origin = origin.substring(0, origin.length - this.history.root.length);
+        } else {
+          origin = origin.substring(0, origin.length - 1);
+        }
+      }
+
+      rootedPath = origin + rootedPath;
+    }
+    return rootedPath;
   }
 
   /**
@@ -431,9 +444,9 @@ export class Router {
     for (let i = 0, length = nav.length; i < length; i++) {
       let current = nav[i];
       if (!current.config.href) {
-        current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+        current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState, this.history.root);
       } else {
-        current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
+        current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState, this.history.root);
       }
     }
   }

@@ -102,6 +102,29 @@ describe('the router', () => {
       });
     });
 
+    it('should take root into account when creating push-state URIs', (done) => {
+      const child = router.createChild(new Container());
+      child.baseUrl = 'child-router';
+
+      Promise.all([
+        router.configure(config => config.map({ name: 'parent', route: 'parent', moduleId: './test' })),
+        child.configure(config => config.map({ name: 'child', route: 'child', moduleId: './test' }))
+      ]).then(() => {
+        expect(router.generate('parent')).toBe('#/parent');
+        expect(child.generate('parent')).toBe('#/parent');
+        expect(child.generate('child')).toBe('#/child-router/child');
+
+        router.history.root = '/docs/';
+        router.history._hasPushState = true;
+
+        expect(router.generate('parent')).toBe('/docs/parent');
+        expect(child.generate('parent')).toBe('/docs/parent');
+        expect(child.generate('child')).toBe('/docs/child-router/child');
+
+        done();
+      });
+    });
+
     it('should delegate to parent when not configured', (done) => {
       const child = router.createChild(new Container());
 
@@ -128,6 +151,23 @@ describe('the router', () => {
     it('should return a fully-qualified URL when options.absolute is true', (done) => {
       const child = router.createChild(new Container());
       let options = { absolute: true };
+
+      child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(() => {
+          expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}#/test/1`);
+
+          router.history._hasPushState = true;
+
+          expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}test/1`);
+
+          done();
+        });
+    });
+
+    it('should return a fully-qualified URL when options.absolute is true and the root is set', (done) => {
+      const child = router.createChild(new Container());
+      let options = { absolute: true };
+      router.history.root = '/docs/';
 
       child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => {
