@@ -3,14 +3,14 @@ const path = require('path');
 
 const gulp = require('gulp');
 const tools = require('aurelia-tools');
-const glob = require("glob")
+const glob = require('glob');
 const paths = require('../paths');
 const args = require('yargs')
-    .options('target', {
-        alias: 't',
-        description: 'target module dir to copy build results into (eg. "--target ../other-module" to copy build results into "../other-module/node_modules/this-module/dist/…" whenever they change)',
-    })
-    .argv;
+  .options('target', {
+    alias: 't',
+    description: 'target module dir to copy build results into (eg. "--target ../other-module" to copy build results into "../other-module/node_modules/this-module/dist/…" whenever they change)'
+  })
+  .argv;
 
 gulp.task('update-own-deps', function(){
   tools.updateOwnDependenciesFromLocalRepositories();
@@ -42,17 +42,17 @@ gulp.task('dev', ['build'], () => {
         watchAndCopy(amdPath, targetJSPMPath);
       }
     });
-
-    function watchAndCopy(basePath, targetPath) {
-        gulp.watch(path.join(basePath, '**', '*'), (event) => {
-          if (event.type === 'deleted') {
-            return;
-          }
-
-          const relativePath = path.relative(basePath, event.path);
-          const destPath = path.join(targetPath, relativePath);
-          fs.createReadStream(event.path).pipe(fs.createWriteStream(destPath));
-        });
-    }
   }
 });
+
+function watchAndCopy(basePath, targetPath) {
+  gulp.watch(path.join(basePath, '**', '*'), (event) => {
+    if (event.type === 'deleted') {
+      return;
+    }
+
+    const relativePath = path.relative(basePath, event.path);
+    const destPath = path.join(targetPath, relativePath);
+    fs.createReadStream(event.path).pipe(fs.createWriteStream(destPath));
+  });
+}
