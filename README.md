@@ -33,9 +33,28 @@ To build the code, follow these steps.
   ```shell
   gulp build
   ```
-5. You will find the compiled code in the `dist` folder, available in three module formats: AMD, CommonJS and ES6.
+5. You will find the compiled code in the `dist` folder, available in various module formats: AMD, CommonJS, ES6 …
+
+  Use `gulp build --format <format1> [--format <format2> …]` to build only certain formats.
 
 6. See `gulpfile.js` for other tasks related to generating the docs and linting.
+
+### Continuious building and cross-module development
+
+  To build the dist files whenever you make any changes, run:
+
+  ```shell
+  gulp dev
+  ```
+
+  If you want to test your changes in the context of another module that depends on `aurelia-router`, run
+
+  ```shell
+  gulp dev --target <target_module_dir> [--format <format>]
+  ```
+
+  Whenever changes are compiled, they’ll automatically be copied to the `aurelia-router` module within the target module, e.g., `<target_module_dir>/node_modules/aurelia-router` or the jspm equivalent.
+
 
 ## Running The Tests
 
