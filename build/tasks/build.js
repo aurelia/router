@@ -1,21 +1,23 @@
-var gulp = require('gulp');
-var runSequence = require('run-sequence');
-var to5 = require('gulp-babel');
-var paths = require('../paths');
-var compilerOptions = require('../babel-options');
-var compilerTsOptions = require('../typescript-options');
-var assign = Object.assign || require('object.assign');
-var through2 = require('through2');
-var concat = require('gulp-concat');
-var insert = require('gulp-insert');
-var rename = require('gulp-rename');
-var tools = require('aurelia-tools');
-var ts = require('gulp-typescript');
-var gutil = require('gulp-util');
-var gulpIgnore = require('gulp-ignore');
-var merge = require('merge2');
-var jsName = paths.packageName + '.js';
-var compileToModules = ['es2015', 'commonjs', 'amd', 'system', 'native-modules'];
+const gulp = require('gulp');
+const runSequence = require('run-sequence');
+const to5 = require('gulp-babel');
+const paths = require('../paths');
+const compilerOptions = require('../babel-options');
+const compilerTsOptions = require('../typescript-options');
+const assign = Object.assign || require('object.assign');
+const through2 = require('through2');
+const concat = require('gulp-concat');
+const insert = require('gulp-insert');
+const rename = require('gulp-rename');
+const tools = require('aurelia-tools');
+const ts = require('gulp-typescript');
+const gutil = require('gulp-util');
+const gulpIgnore = require('gulp-ignore');
+const merge = require('merge2');
+const args = require('./args');
+
+const jsName = paths.packageName + '.js';
+const compileToModules = args.format || ['es2015', 'commonjs', 'amd', 'system', 'native-modules'];
 
 function cleanGeneratedCode() {
   return through2.obj(function(file, enc, callback) {

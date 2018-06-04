@@ -5,12 +5,7 @@ const gulp = require('gulp');
 const tools = require('aurelia-tools');
 const glob = require('glob');
 const paths = require('../paths');
-const args = require('yargs')
-  .options('target', {
-    alias: 't',
-    description: 'target module dir to copy build results into (eg. "--target ../other-module" to copy build results into "../other-module/node_modules/this-module/dist/…" whenever they change)'
-  })
-  .argv;
+const args = require('./args');
 
 gulp.task('update-own-deps', function(){
   tools.updateOwnDependenciesFromLocalRepositories();
