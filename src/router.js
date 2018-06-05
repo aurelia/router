@@ -268,7 +268,7 @@ export class Router {
   * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
   * @returns {string} A string containing the generated URL fragment.
   */
-  generate(name: string, params?: any, options?: any = {}): string {
+  generate(name: string, params?: any, options?: any = {}, baseUrlOverride: string = null): string {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params);
@@ -279,7 +279,7 @@ export class Router {
     }
 
     let path = this._recognizer.generate(name, params);
-    let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, this.history.root);
+    let rootedPath = _createRootedPath(path, baseUrlOverride ? baseUrlOverride : this.baseUrl, this.history._hasPushState, this.history.root);
     if (options.absolute) {
       // Hamfisted workaround because history does not expose the origin without the root
       let origin = this.history.getAbsoluteRoot();
