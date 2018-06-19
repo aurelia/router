@@ -1,3 +1,28 @@
+<a name="1.6.0"></a>
+# [1.6.0](https://github.com/aurelia/router/compare/1.5.0...1.6.0) (2018-06-19)
+
+
+### Bug Fixes
+
+* **app-router:** await navigation result ([3d1c416](https://github.com/aurelia/router/commit/3d1c416))
+* **interfaces:** Undo interface export ([e21fc9c](https://github.com/aurelia/router/commit/e21fc9c))
+* **navigation:** add NavigationResult type ([089aa37](https://github.com/aurelia/router/commit/089aa37))
+* **redirect:** do not use Promise.reject on redirect ([487c33d](https://github.com/aurelia/router/commit/487c33d)), closes [#480](https://github.com/aurelia/router/issues/480)
+* **router:** define title property ([2ad2280](https://github.com/aurelia/router/commit/2ad2280))
+* **router:** make addRoute split list of routes into multiple routeconfigs with single route each ([0cd5423](https://github.com/aurelia/router/commit/0cd5423))
+* **router-configuration:** merge options instead of assign in exportRouter ([d563f8a](https://github.com/aurelia/router/commit/d563f8a))
+* **router-configuration:** throw early on invalid pipeline steps ([e6e2f62](https://github.com/aurelia/router/commit/e6e2f62))
+* **typings:** moduleId: string|null ([a7cdb68](https://github.com/aurelia/router/commit/a7cdb68))
+
+
+### Features
+
+* **router:** add configurable title separator ([d2a1896](https://github.com/aurelia/router/commit/d2a1896))
+* **router:** redirect with token parameters ([aafa070](https://github.com/aurelia/router/commit/aafa070)), closes [#483](https://github.com/aurelia/router/issues/483)
+* **type declarations:** improve type of RouterConfiguration ([c1775e5](https://github.com/aurelia/router/commit/c1775e5))
+
+
+
 <a name="1.5.0"></a>
 # [1.5.0](https://github.com/aurelia/router/compare/1.4.0...1.5.0) (2018-01-15)
 
