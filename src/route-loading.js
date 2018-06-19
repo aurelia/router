@@ -81,6 +81,9 @@ function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationIn
 
           return _buildNavigationPlan(childInstruction)
             .then((childPlan) => {
+              if (childPlan instanceof Redirect) {
+                return Promise.reject(childPlan);
+              }
               childInstruction.plan = childPlan;
               viewPortInstruction.childNavigationInstruction = childInstruction;
 

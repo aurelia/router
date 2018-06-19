@@ -85,6 +85,9 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
               childInstruction,
               viewPortPlan.strategy === activationStrategy.invokeLifecycle)
               .then(childPlan => {
+                if (childPlan instanceof Redirect) {
+                  return Promise.reject(childPlan);
+                }
                 childInstruction.plan = childPlan;
               });
           });
