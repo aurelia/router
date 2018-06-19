@@ -663,6 +663,9 @@ export function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
           viewPortPlan.childNavigationInstruction = childInstruction;
 
           return _buildNavigationPlan(childInstruction, viewPortPlan.strategy === activationStrategy.invokeLifecycle).then(function (childPlan) {
+            if (childPlan instanceof Redirect) {
+              return Promise.reject(childPlan);
+            }
             childInstruction.plan = childPlan;
           });
         });
@@ -1510,6 +1513,9 @@ function loadRoute(routeLoader, navigationInstruction, viewPortPlan) {
         viewPortPlan.childNavigationInstruction = childInstruction;
 
         return _buildNavigationPlan(childInstruction).then(function (childPlan) {
+          if (childPlan instanceof Redirect) {
+            return Promise.reject(childPlan);
+          }
           childInstruction.plan = childPlan;
           viewPortInstruction.childNavigationInstruction = childInstruction;
 

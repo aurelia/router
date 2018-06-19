@@ -1,3 +1,10 @@
+<a name="1.6.1"></a>
+## [1.6.1](https://github.com/aurelia/router/compare/1.6.0...1.6.1) (2018-06-19)
+
+### Bug Fixes
+
+* **navigation-plan:** fix regression related to substate redirects
+
 <a name="1.6.0"></a>
 # [1.6.0](https://github.com/aurelia/router/compare/1.5.0...1.6.0) (2018-06-19)
 
