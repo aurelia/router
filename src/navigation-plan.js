@@ -27,16 +27,17 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
 
   if ('redirect' in config) {
     let router = instruction.router;
-    return router._createNavigationInstruction(config.redirect)
+    return router._createNavigationInstruction(config.redirect, instruction.parentInstruction)
     .then(newInstruction => {
       let params = Object.keys(newInstruction.params).length ? instruction.params : {};
-      let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
+      const baseUrl = getInstructionBaseUrl(instruction);
+      let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options, baseUrl);
 
       if (instruction.queryString) {
         redirectLocation += '?' + instruction.queryString;
       }
 
-      return Promise.resolve(new Redirect(redirectLocation));
+      return Promise.resolve(new Redirect(redirectLocation, {useHistory: true}));
     });
   }
 
@@ -112,6 +113,18 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
   }
 
   return Promise.resolve(plan);
+}
+
+function getInstructionBaseUrl(instruction) {
+  const instructionBaseUrlParts = [];
+  instruction = instruction.parentInstruction;
+
+  while (instruction) {
+    instructionBaseUrlParts.unshift(instruction.getBaseUrl());
+    instruction = instruction.parentInstruction;
+  }
+
+  return instructionBaseUrlParts.join('');
 }
 
 function hasDifferentParameterValues(prev: NavigationInstruction, next: NavigationInstruction): boolean {

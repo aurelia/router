@@ -46,8 +46,12 @@ export class Redirect {
   * @param appRouter The router to be redirected.
   */
   navigate(appRouter: Router): void {
-    let navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
-    navigatingRouter.navigate(this.url, this.options);
+    if (this.options.useHistory) {
+      appRouter.history.navigate(this.url, this.options);
+    } else {
+      let navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
+      navigatingRouter.navigate(this.url, this.options);
+    }
   }
 }
 
