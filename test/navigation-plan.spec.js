@@ -11,7 +11,6 @@ describe('NavigationPlanStep', () => {
   let step;
   let state;
   let redirectInstruction;
-  let redirectSecondInstruction;
   let firstInstruction;
   let sameAsFirstInstruction;
   let secondInstruction;
@@ -27,14 +26,6 @@ describe('NavigationPlanStep', () => {
       fragment: 'first',
       queryString: 'q=1',
       config: { redirect: 'second' },
-      router
-    });
-
-    redirectSecondInstruction = new NavigationInstruction({
-      fragment: 'first/10',
-      queryString: 'q=1',
-      params: { id: 10 },
-      config: { name: 'first', route: 'first/:id', redirect: 'second/:id' },
       router
     });
 
@@ -73,16 +64,76 @@ describe('NavigationPlanStep', () => {
       });
   });
 
-  it('redirect to routes with parameters', (done) => {
-    redirectSecondInstruction.router.addRoute({ name: 'first', route: 'first/:id', redirect: 'second' });
-    redirectSecondInstruction.router.addRoute({ name: 'second', route: 'second/:id', moduleId: './second' });
-    step.run(redirectSecondInstruction, state.next)
-      .then(e => {
-        expect(state.rejection).toBeTruthy();
-        expect(e instanceof Redirect).toBe(true);
-        expect(e.url).toBe('#/second/10?q=1');
-        done();
-      });
+  it('redirects to routes with static parameters', (done) => {
+    const url = 'first/10?q=1';
+    const from = { name: 'first', route: 'first/:id', redirect: 'second/0' };
+    const to = { name: 'second', route: 'second/:id', moduleId: './second' };
+
+    router.addRoute(from);
+    router.addRoute(to);
+    router._createNavigationInstruction(url).then((instruction) => {
+      step.run(instruction, state.next)
+        .then(e => {
+          expect(state.rejection).toBeTruthy();
+          expect(e instanceof Redirect).toBe(true);
+          expect(e.url).toBe(`#/second/0?q=1`);
+          done();
+        });
+    });
+  });
+
+  it('redirects to routes with dynamic parameters', (done) => {
+    const url = 'first/10?q=1';
+    const from = { name: 'first', route: 'first/:this', redirect: 'second/:this' };
+    const to = { name: 'second', route: 'second/:that', moduleId: './second' };
+
+    router.addRoute(from);
+    router.addRoute(to);
+    router._createNavigationInstruction(url).then((instruction) => {
+      step.run(instruction, state.next)
+        .then(e => {
+          expect(state.rejection).toBeTruthy();
+          expect(e instanceof Redirect).toBe(true);
+          expect(e.url).toBe(`#/second/10?q=1`);
+          done();
+        });
+    });
+  });
+
+  it('redirects and drops unused dynamic parameters', (done) => {
+    const url = 'first/10/20?q=1';
+    const from = { name: 'first', route: 'first/:this/:that', redirect: 'second/:that' };
+    const to = { name: 'second', route: 'second/:id', moduleId: './second' };
+
+    router.addRoute(from);
+    router.addRoute(to);
+    router._createNavigationInstruction(url).then((instruction) => {
+      step.run(instruction, state.next)
+        .then(e => {
+          expect(state.rejection).toBeTruthy();
+          expect(e instanceof Redirect).toBe(true);
+          expect(e.url).toBe(`#/second/20?q=1`);
+          done();
+        });
+    });
+  });
+
+  it('redirects and ignores invalid dynamic parameters', (done) => {
+    const url = 'first/20?q=1';
+    const from = { name: 'first', route: 'first/:this', redirect: 'second/:that' };
+    const to = { name: 'second', route: 'second/:that?', moduleId: './second' };
+
+    router.addRoute(from);
+    router.addRoute(to);
+    router._createNavigationInstruction(url).then((instruction) => {
+      step.run(instruction, state.next)
+        .then(e => {
+          expect(state.rejection).toBeTruthy();
+          expect(e instanceof Redirect).toBe(true);
+          expect(e.url).toBe(`#/second?q=1`);
+          done();
+        });
+    });
   });
 
   describe('generates navigation plans', () => {
