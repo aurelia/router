@@ -1,6 +1,6 @@
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {Container} from 'aurelia-dependency-injection';
-import {History} from 'aurelia-history';
+import {History, NavigationOptions} from 'aurelia-history';
 import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
@@ -216,9 +216,9 @@ export class Router {
   * Navigates to a new location.
   *
   * @param fragment The URL fragment to use as the navigation destination.
-  * @param options The navigation options. See [[History.NavigationOptions]] for all available options.
+  * @param options The navigation options.
   */
-  navigate(fragment: string, options?: any): NavigationResult {
+  navigate(fragment: string, options?: NavigationOptions): NavigationResult {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -233,9 +233,9 @@ export class Router {
   *
   * @param route The name of the route to use when generating the navigation location.
   * @param params The route parameters to be used when populating the route pattern.
-  * @param options The navigation options. See [[History.NavigationOptions]] for all available options.
+  * @param options The navigation options.
   */
-  navigateToRoute(route: string, params?: any, options?: any): NavigationResult {
+  navigateToRoute(route: string, params?: any, options?: NavigationOptions): NavigationResult {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
