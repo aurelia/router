@@ -271,7 +271,7 @@ export class Router {
   generate(name: string, params?: any, options?: any = {}): string {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
-      return this.parent.generate(name, params);
+      return this.parent.generate(name, params, options);
     }
 
     if (!hasRoute) {
