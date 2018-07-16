@@ -129,14 +129,16 @@ describe('the router', () => {
       const child = router.createChild(new Container());
       let options = { absolute: true };
 
-      child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+      Promise.all([
+        router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
+        child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+      ])
         .then(() => {
           expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}#/test/1`);
-
+          expect(child.generate('parent', { id: 2 }, options)).toBe(`${absoluteRoot}#/parent/2`);
           router.history._hasPushState = true;
-
           expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}test/1`);
-
+          expect(child.generate('parent', { id: 2 }, options)).toBe(`${absoluteRoot}parent/2`);
           done();
         });
     });
