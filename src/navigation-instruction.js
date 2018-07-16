@@ -198,7 +198,6 @@ export class NavigationInstruction {
 
     this.config.navModel.isActive = true;
 
-    router._refreshBaseUrl();
     router.refreshNavigation();
 
     let loads = [];
