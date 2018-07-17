@@ -1,7 +1,7 @@
 import * as LogManager from 'aurelia-logging';
 import { RouteRecognizer } from 'aurelia-route-recognizer';
 import { Container } from 'aurelia-dependency-injection';
-import { History } from 'aurelia-history';
+import { History, NavigationOptions } from 'aurelia-history';
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
@@ -185,7 +185,6 @@ export let NavigationInstruction = class NavigationInstruction {
 
     this.config.navModel.isActive = true;
 
-    router._refreshBaseUrl();
     router.refreshNavigation();
 
     let loads = [];
@@ -538,7 +537,19 @@ export function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
   if ('redirect' in config) {
     let router = instruction.router;
     return router._createNavigationInstruction(config.redirect).then(newInstruction => {
-      let params = Object.keys(newInstruction.params).length ? instruction.params : {};
+      let params = {};
+      for (let key in newInstruction.params) {
+        let val = newInstruction.params[key];
+        if (typeof val === 'string' && val[0] === ':') {
+          val = val.slice(1);
+
+          if (val in instruction.params) {
+            params[key] = instruction.params[val];
+          }
+        } else {
+          params[key] = newInstruction.params[key];
+        }
+      }
       let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
 
       if (instruction.queryString) {
@@ -768,7 +779,7 @@ export let Router = class Router {
   generate(name, params, options = {}) {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
-      return this.parent.generate(name, params);
+      return this.parent.generate(name, params, options);
     }
 
     if (!hasRoute) {
@@ -912,8 +923,7 @@ export let Router = class Router {
 
   _refreshBaseUrl() {
     if (this.parent) {
-      let baseUrl = this.parent.currentInstruction.getBaseUrl();
-      this.baseUrl = this.parent.baseUrl + baseUrl;
+      this.baseUrl = generateBaseUrl(this.parent, this.parent.currentInstruction);
     }
   }
 
@@ -944,6 +954,8 @@ export let Router = class Router {
       }
     };
 
+    let result;
+
     if (results && results.length) {
       let first = results[0];
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
@@ -953,19 +965,19 @@ export let Router = class Router {
       }));
 
       if (typeof first.handler === 'function') {
-        return evaluateNavigationStrategy(instruction, first.handler, first);
+        result = evaluateNavigationStrategy(instruction, first.handler, first);
       } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
-        return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
+        result = evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
+      } else {
+        result = Promise.resolve(instruction);
       }
-
-      return Promise.resolve(instruction);
     } else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
         queryParams: results ? results.queryParams : {},
         config: null }));
 
-      return evaluateNavigationStrategy(instruction, this.catchAllHandler);
+      result = evaluateNavigationStrategy(instruction, this.catchAllHandler);
     } else if (this.parent) {
       let router = this._parentCatchAllHandler(this.parent);
 
@@ -980,11 +992,15 @@ export let Router = class Router {
           parentCatchHandler: true,
           config: null }));
 
-        return evaluateNavigationStrategy(instruction, router.catchAllHandler);
+        result = evaluateNavigationStrategy(instruction, router.catchAllHandler);
       }
     }
 
-    return Promise.reject(new Error(`Route not found: ${url}`));
+    if (result && parentInstruction) {
+      this.baseUrl = generateBaseUrl(this.parent, parentInstruction);
+    }
+
+    return result || Promise.reject(new Error(`Route not found: ${url}`));
   }
 
   _findParentInstructionFromRouter(router, instruction) {
@@ -1027,6 +1043,10 @@ export let Router = class Router {
     });
   }
 };
+
+function generateBaseUrl(router, instruction) {
+  return `${router.baseUrl || ''}${instruction.getBaseUrl() || ''}`;
+}
 
 function validateRouteConfig(config, routes) {
   if (typeof config !== 'object') {

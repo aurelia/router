@@ -11,7 +11,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 import * as LogManager from 'aurelia-logging';
 import { RouteRecognizer } from 'aurelia-route-recognizer';
 import { Container } from 'aurelia-dependency-injection';
-import { History } from 'aurelia-history';
+import { History, NavigationOptions } from 'aurelia-history';
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 export function _normalizeAbsolutePath(path, hasPushState) {
@@ -212,7 +212,6 @@ export var NavigationInstruction = function () {
 
     this.config.navModel.isActive = true;
 
-    router._refreshBaseUrl();
     router.refreshNavigation();
 
     var loads = [];
@@ -610,7 +609,19 @@ export function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
   if ('redirect' in config) {
     var _router = instruction.router;
     return _router._createNavigationInstruction(config.redirect).then(function (newInstruction) {
-      var params = Object.keys(newInstruction.params).length ? instruction.params : {};
+      var params = {};
+      for (var _key2 in newInstruction.params) {
+        var val = newInstruction.params[_key2];
+        if (typeof val === 'string' && val[0] === ':') {
+          val = val.slice(1);
+
+          if (val in instruction.params) {
+            params[_key2] = instruction.params[val];
+          }
+        } else {
+          params[_key2] = newInstruction.params[_key2];
+        }
+      }
       var redirectLocation = _router.generate(newInstruction.config.name, params, instruction.options);
 
       if (instruction.queryString) {
@@ -703,22 +714,22 @@ function hasDifferentParameterValues(prev, next) {
   var nextParams = next.params;
   var nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
-  for (var _key2 in nextParams) {
-    if (_key2 === nextWildCardName) {
-      continue;
-    }
-
-    if (prevParams[_key2] !== nextParams[_key2]) {
-      return true;
-    }
-  }
-
-  for (var _key3 in prevParams) {
+  for (var _key3 in nextParams) {
     if (_key3 === nextWildCardName) {
       continue;
     }
 
     if (prevParams[_key3] !== nextParams[_key3]) {
+      return true;
+    }
+  }
+
+  for (var _key4 in prevParams) {
+    if (_key4 === nextWildCardName) {
+      continue;
+    }
+
+    if (prevParams[_key4] !== nextParams[_key4]) {
       return true;
     }
   }
@@ -729,14 +740,14 @@ function hasDifferentParameterValues(prev, next) {
 
   var prevQueryParams = prev.queryParams;
   var nextQueryParams = next.queryParams;
-  for (var _key4 in nextQueryParams) {
-    if (prevQueryParams[_key4] !== nextQueryParams[_key4]) {
+  for (var _key5 in nextQueryParams) {
+    if (prevQueryParams[_key5] !== nextQueryParams[_key5]) {
       return true;
     }
   }
 
-  for (var _key5 in prevQueryParams) {
-    if (prevQueryParams[_key5] !== nextQueryParams[_key5]) {
+  for (var _key6 in prevQueryParams) {
+    if (prevQueryParams[_key6] !== nextQueryParams[_key6]) {
       return true;
     }
   }
@@ -854,7 +865,7 @@ export var Router = function () {
 
     var hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
-      return this.parent.generate(name, params);
+      return this.parent.generate(name, params, options);
     }
 
     if (!hasRoute) {
@@ -1002,8 +1013,7 @@ export var Router = function () {
 
   Router.prototype._refreshBaseUrl = function _refreshBaseUrl() {
     if (this.parent) {
-      var baseUrl = this.parent.currentInstruction.getBaseUrl();
-      this.baseUrl = this.parent.baseUrl + baseUrl;
+      this.baseUrl = generateBaseUrl(this.parent, this.parent.currentInstruction);
     }
   };
 
@@ -1037,6 +1047,8 @@ export var Router = function () {
       }
     };
 
+    var result = void 0;
+
     if (results && results.length) {
       var first = results[0];
       var _instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
@@ -1046,19 +1058,19 @@ export var Router = function () {
       }));
 
       if (typeof first.handler === 'function') {
-        return evaluateNavigationStrategy(_instruction, first.handler, first);
+        result = evaluateNavigationStrategy(_instruction, first.handler, first);
       } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
-        return evaluateNavigationStrategy(_instruction, first.handler.navigationStrategy, first.handler);
+        result = evaluateNavigationStrategy(_instruction, first.handler.navigationStrategy, first.handler);
+      } else {
+        result = Promise.resolve(_instruction);
       }
-
-      return Promise.resolve(_instruction);
     } else if (this.catchAllHandler) {
       var _instruction2 = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
         queryParams: results ? results.queryParams : {},
         config: null }));
 
-      return evaluateNavigationStrategy(_instruction2, this.catchAllHandler);
+      result = evaluateNavigationStrategy(_instruction2, this.catchAllHandler);
     } else if (this.parent) {
       var _router2 = this._parentCatchAllHandler(this.parent);
 
@@ -1073,11 +1085,15 @@ export var Router = function () {
           parentCatchHandler: true,
           config: null }));
 
-        return evaluateNavigationStrategy(_instruction3, _router2.catchAllHandler);
+        result = evaluateNavigationStrategy(_instruction3, _router2.catchAllHandler);
       }
     }
 
-    return Promise.reject(new Error('Route not found: ' + url));
+    if (result && parentInstruction) {
+      this.baseUrl = generateBaseUrl(this.parent, parentInstruction);
+    }
+
+    return result || Promise.reject(new Error('Route not found: ' + url));
   };
 
   Router.prototype._findParentInstructionFromRouter = function _findParentInstructionFromRouter(router, instruction) {
@@ -1133,6 +1149,10 @@ export var Router = function () {
 
   return Router;
 }();
+
+function generateBaseUrl(router, instruction) {
+  return '' + (router.baseUrl || '') + (instruction.getBaseUrl() || '');
+}
 
 function validateRouteConfig(config, routes) {
   if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) !== 'object') {

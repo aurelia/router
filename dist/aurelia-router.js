@@ -1,7 +1,7 @@
 import * as LogManager from 'aurelia-logging';
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {Container} from 'aurelia-dependency-injection';
-import {History} from 'aurelia-history';
+import {History,NavigationOptions} from 'aurelia-history';
 import {EventAggregator} from 'aurelia-event-aggregator';
 
 export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
@@ -267,7 +267,6 @@ export class NavigationInstruction {
 
     this.config.navModel.isActive = true;
 
-    router._refreshBaseUrl();
     router.refreshNavigation();
 
     let loads = [];
@@ -1057,16 +1056,29 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
   if ('redirect' in config) {
     let router = instruction.router;
     return router._createNavigationInstruction(config.redirect)
-    .then(newInstruction => {
-      let params = Object.keys(newInstruction.params).length ? instruction.params : {};
-      let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
+      .then(newInstruction => {
+        let params = {};
+        for (let key in newInstruction.params) {
+          // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
+          let val = newInstruction.params[key];
+          if (typeof(val) === 'string' && val[0] === ':') {
+            val = val.slice(1);
+            // And if that param is found on the original instruction then use it
+            if (val in instruction.params) {
+              params[key] = instruction.params[val];
+            }
+          } else {
+            params[key] = newInstruction.params[key];
+          }
+        }
+        let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
 
-      if (instruction.queryString) {
-        redirectLocation += '?' + instruction.queryString;
-      }
+        if (instruction.queryString) {
+          redirectLocation += '?' + instruction.queryString;
+        }
 
-      return Promise.resolve(new Redirect(redirectLocation));
-    });
+        return Promise.resolve(new Redirect(redirectLocation));
+      });
   }
 
   let prev = instruction.previousInstruction;
@@ -1393,9 +1405,9 @@ export class Router {
   * Navigates to a new location.
   *
   * @param fragment The URL fragment to use as the navigation destination.
-  * @param options The navigation options. See [[History.NavigationOptions]] for all available options.
+  * @param options The navigation options.
   */
-  navigate(fragment: string, options?: any): NavigationResult {
+  navigate(fragment: string, options?: NavigationOptions): NavigationResult {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -1410,9 +1422,9 @@ export class Router {
   *
   * @param route The name of the route to use when generating the navigation location.
   * @param params The route parameters to be used when populating the route pattern.
-  * @param options The navigation options. See [[History.NavigationOptions]] for all available options.
+  * @param options The navigation options.
   */
-  navigateToRoute(route: string, params?: any, options?: any): NavigationResult {
+  navigateToRoute(route: string, params?: any, options?: NavigationOptions): NavigationResult {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
@@ -1448,7 +1460,7 @@ export class Router {
   generate(name: string, params?: any, options?: any = {}): string {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
-      return this.parent.generate(name, params);
+      return this.parent.generate(name, params, options);
     }
 
     if (!hasRoute) {
@@ -1631,8 +1643,7 @@ export class Router {
 
   _refreshBaseUrl(): void {
     if (this.parent) {
-      let baseUrl = this.parent.currentInstruction.getBaseUrl();
-      this.baseUrl = this.parent.baseUrl + baseUrl;
+      this.baseUrl = generateBaseUrl(this.parent, this.parent.currentInstruction);
     }
   }
 
@@ -1663,6 +1674,8 @@ export class Router {
       }
     };
 
+    let result;
+
     if (results && results.length) {
       let first = results[0];
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
@@ -1672,12 +1685,12 @@ export class Router {
       }));
 
       if (typeof first.handler === 'function') {
-        return evaluateNavigationStrategy(instruction, first.handler, first);
+        result = evaluateNavigationStrategy(instruction, first.handler, first);
       } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
-        return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
+        result = evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
+      } else {
+        result = Promise.resolve(instruction);
       }
-
-      return Promise.resolve(instruction);
     } else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
@@ -1685,7 +1698,7 @@ export class Router {
         config: null // config will be created by the catchAllHandler
       }));
 
-      return evaluateNavigationStrategy(instruction, this.catchAllHandler);
+      result = evaluateNavigationStrategy(instruction, this.catchAllHandler);
     } else if (this.parent) {
       let router = this._parentCatchAllHandler(this.parent);
 
@@ -1701,11 +1714,15 @@ export class Router {
           config: null // config will be created by the chained parent catchAllHandler
         }));
 
-        return evaluateNavigationStrategy(instruction, router.catchAllHandler);
+        result = evaluateNavigationStrategy(instruction, router.catchAllHandler);
       }
     }
 
-    return Promise.reject(new Error(`Route not found: ${url}`));
+    if (result && parentInstruction) {
+      this.baseUrl = generateBaseUrl(this.parent, parentInstruction);
+    }
+
+    return result || Promise.reject(new Error(`Route not found: ${url}`));
   }
 
   _findParentInstructionFromRouter(router: Router, instruction: NavigationInstruction): NavigationInstruction {
@@ -1750,6 +1767,10 @@ export class Router {
         return c;
       });
   }
+}
+
+function generateBaseUrl(router: Router, instruction: NavigationInstruction) {
+  return `${router.baseUrl || ''}${instruction.getBaseUrl() || ''}`;
 }
 
 function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {

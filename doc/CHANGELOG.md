@@ -1,3 +1,15 @@
+<a name="1.6.2"></a>
+## [1.6.2](https://github.com/aurelia/router/compare/1.6.1...1.6.2) (2018-07-17)
+
+
+### Bug Fixes
+
+* **navigation-plan:** Accept parameters in a redirect config ([7172ed2](https://github.com/aurelia/router/commit/7172ed2)), closes [#607](https://github.com/aurelia/router/issues/607)
+* Forward options argument to parent router.generate ([78aad40](https://github.com/aurelia/router/commit/78aad40)), closes [#606](https://github.com/aurelia/router/issues/606)
+* Update baseUrl when creating a navigation instruction ([e801550](https://github.com/aurelia/router/commit/e801550)), closes [#378](https://github.com/aurelia/router/issues/378) [#605](https://github.com/aurelia/router/issues/605)
+
+
+
 <a name="1.6.1"></a>
 ## [1.6.1](https://github.com/aurelia/router/compare/1.6.0...1.6.1) (2018-06-19)
 
