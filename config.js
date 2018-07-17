@@ -12,8 +12,8 @@ System.config({
     "aurelia-history": "npm:aurelia-history@1.0.0",
     "aurelia-logging": "npm:aurelia-logging@1.0.0",
     "aurelia-pal-browser": "npm:aurelia-pal-browser@1.0.0",
-    "aurelia-path": "npm:aurelia-path@1.0.0",
-    "aurelia-route-recognizer": "npm:aurelia-route-recognizer@1.0.0",
+    "aurelia-path": "npm:aurelia-path@1.1.1",
+    "aurelia-route-recognizer": "npm:aurelia-route-recognizer@1.2.0",
     "babel": "npm:babel-core@5.8.38",
     "babel-runtime": "npm:babel-runtime@5.8.38",
     "core-js": "npm:core-js@2.4.1",
@@ -54,8 +54,8 @@ System.config({
     "npm:aurelia-pal-browser@1.0.0": {
       "aurelia-pal": "npm:aurelia-pal@1.0.0"
     },
-    "npm:aurelia-route-recognizer@1.0.0": {
-      "aurelia-path": "npm:aurelia-path@1.0.0"
+    "npm:aurelia-route-recognizer@1.2.0": {
+      "aurelia-path": "npm:aurelia-path@1.1.1"
     },
     "npm:babel-runtime@5.8.38": {
       "process": "github:jspm/nodelibs-process@0.1.2"
