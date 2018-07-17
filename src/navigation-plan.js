@@ -28,16 +28,31 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
   if ('redirect' in config) {
     let router = instruction.router;
     return router._createNavigationInstruction(config.redirect)
-    .then(newInstruction => {
-      let params = Object.keys(newInstruction.params).length ? instruction.params : {};
-      let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
+      .then(newInstruction => {
+        let params = {};
+        for (let key in newInstruction.params) {
 
-      if (instruction.queryString) {
-        redirectLocation += '?' + instruction.queryString;
-      }
+          // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
+          let val = newInstruction.params[key];
+          if (typeof(val) === 'string' && val[0] === ':') {
+            val = val.slice(1);
 
-      return Promise.resolve(new Redirect(redirectLocation));
-    });
+            // And if that param is found on the original instruction then use it
+            if (val in instruction.params) {
+              params[key] = instruction.params[val];
+            }
+          } else {
+            params[key] = newInstruction.params[key];
+          }
+        }
+        let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
+
+        if (instruction.queryString) {
+          redirectLocation += '?' + instruction.queryString;
+        }
+
+        return Promise.resolve(new Redirect(redirectLocation));
+      });
   }
 
   let prev = instruction.previousInstruction;
