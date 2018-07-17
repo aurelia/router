@@ -31,12 +31,10 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
       .then(newInstruction => {
         let params = {};
         for (let key in newInstruction.params) {
-
           // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
           let val = newInstruction.params[key];
           if (typeof(val) === 'string' && val[0] === ':') {
             val = val.slice(1);
-
             // And if that param is found on the original instruction then use it
             if (val in instruction.params) {
               params[key] = instruction.params[val];
