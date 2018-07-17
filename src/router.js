@@ -454,8 +454,7 @@ export class Router {
 
   _refreshBaseUrl(): void {
     if (this.parent) {
-      let baseUrl = this.parent.currentInstruction.getBaseUrl();
-      this.baseUrl = this.parent.baseUrl + baseUrl;
+      this.baseUrl = generateBaseUrl(this.parent, this.parent.currentInstruction);
     }
   }
 
@@ -486,6 +485,8 @@ export class Router {
       }
     };
 
+    let result;
+
     if (results && results.length) {
       let first = results[0];
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
@@ -495,12 +496,12 @@ export class Router {
       }));
 
       if (typeof first.handler === 'function') {
-        return evaluateNavigationStrategy(instruction, first.handler, first);
+        result = evaluateNavigationStrategy(instruction, first.handler, first);
       } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
-        return evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
+        result = evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
+      } else {
+        result = Promise.resolve(instruction);
       }
-
-      return Promise.resolve(instruction);
     } else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
@@ -508,7 +509,7 @@ export class Router {
         config: null // config will be created by the catchAllHandler
       }));
 
-      return evaluateNavigationStrategy(instruction, this.catchAllHandler);
+      result = evaluateNavigationStrategy(instruction, this.catchAllHandler);
     } else if (this.parent) {
       let router = this._parentCatchAllHandler(this.parent);
 
@@ -524,11 +525,15 @@ export class Router {
           config: null // config will be created by the chained parent catchAllHandler
         }));
 
-        return evaluateNavigationStrategy(instruction, router.catchAllHandler);
+        result = evaluateNavigationStrategy(instruction, router.catchAllHandler);
       }
     }
 
-    return Promise.reject(new Error(`Route not found: ${url}`));
+    if (result && parentInstruction) {
+      this.baseUrl = generateBaseUrl(this.parent, parentInstruction);
+    }
+
+    return result || Promise.reject(new Error(`Route not found: ${url}`));
   }
 
   _findParentInstructionFromRouter(router: Router, instruction: NavigationInstruction): NavigationInstruction {
@@ -573,6 +578,10 @@ export class Router {
         return c;
       });
   }
+}
+
+function generateBaseUrl(router: Router, instruction: NavigationInstruction) {
+  return `${router.baseUrl || ''}${instruction.getBaseUrl() || ''}`;
 }
 
 function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {

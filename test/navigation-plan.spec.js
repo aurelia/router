@@ -15,12 +15,14 @@ describe('NavigationPlanStep', () => {
   let sameAsFirstInstruction;
   let secondInstruction;
   let router;
+  let child;
 
   beforeEach(() => {
     step = new BuildNavigationPlanStep();
     state = createPipelineState();
     router = new AppRouter(new Container(), new MockHistory(), new PipelineProvider(new Container()));
     router.useViewPortDefaults({ default: { moduleId: null } });
+    child = router.createChild(new Container());
 
     redirectInstruction = new NavigationInstruction({
       fragment: 'first',
@@ -133,6 +135,28 @@ describe('NavigationPlanStep', () => {
           expect(e.url).toBe(`#/second?q=1`);
           done();
         });
+    });
+  });
+
+  it('redirects children', (done) => {
+    const url = 'home/first';
+    const base = { name: 'home', route: 'home', moduleId: './home' };
+    const from = { name: 'first', route: 'first', redirect: 'second' };
+    const to = { name: 'second', route: 'second', moduleId: './second' };
+
+    router.addRoute(base);
+    child.configure(config => config.map([from, to]));
+    router.navigate('home');
+    router._createNavigationInstruction(url).then((parentInstruction) => {
+      child._createNavigationInstruction(parentInstruction.getWildcardPath(), parentInstruction).then(childInstruction => {
+        step.run(childInstruction, state.next)
+          .then(e => {
+            expect(state.rejection).toBeTruthy();
+            expect(e instanceof Redirect).toBe(true);
+            expect(e.url).toBe(`#/home/second`);
+            done();
+          });
+      });
     });
   });
 

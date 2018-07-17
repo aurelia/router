@@ -88,7 +88,7 @@ describe('NavigationInstruction', () => {
           done();
         });
       });
-    });  
+    });
   });
 
   describe('getBaseUrl()', () => {
@@ -182,9 +182,7 @@ describe('NavigationInstruction', () => {
       it('should return the non-empty matching parent route', (done) => {
         router._createNavigationInstruction('').then(parentInstruction => {
           router.currentInstruction = parentInstruction;
-          router._refreshBaseUrl();
-          child._createNavigationInstruction(childRouteName).then(instruction => {
-            child._refreshBaseUrl();
+          child._createNavigationInstruction(childRouteName, parentInstruction).then(instruction => {
             expect(child.baseUrl).toBe(parentRouteName);
             done();
           });
@@ -197,15 +195,24 @@ describe('NavigationInstruction', () => {
       it('should return the non-empty matching parent route', (done) => {
         router._createNavigationInstruction(parentRouteName).then(parentInstruction => {
           router.currentInstruction = parentInstruction;
-          router._refreshBaseUrl();
-          child._createNavigationInstruction(childRouteName).then(instruction => {
-            child._refreshBaseUrl();
+          child._createNavigationInstruction(childRouteName, parentInstruction).then(instruction => {
             expect(child.baseUrl).toBe(parentRouteName);
             done();
           });
         })
         .catch(fail);
       });
+    });
+
+    it('should update the base url when generating navigation instructions', (done) => {
+      router._createNavigationInstruction(parentRouteName).then(parentInstruction => {
+        router.currentInstruction = parentInstruction;
+        child._createNavigationInstruction(childRouteName, parentInstruction).then(instruction => {
+          expect(child.baseUrl).toBe(parentRouteName);
+          done();
+        });
+      })
+      .catch(fail);
     });
   });
 });
