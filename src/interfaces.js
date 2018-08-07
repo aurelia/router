@@ -212,8 +212,3 @@ interface PipelineResult {
   output: any;
   completed: boolean;
 }
-
-/**
-* The result of a router navigation.
-*/
-export type NavigationResult = Promise<PipelineResult | boolean>;
