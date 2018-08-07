@@ -10,7 +10,7 @@ import {
   _createRootedPath,
   _resolveUrl
 } from './util';
-import {RouteConfig} from './interfaces';
+import {RouteConfig, PipelineResult} from './interfaces';
 
 /**
 * The primary class responsible for handling routing and navigation.
