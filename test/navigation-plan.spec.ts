@@ -9,8 +9,7 @@ import {
   NavigationInstructionInit,
   BuildNavigationPlanStep
 } from '../src';
-import { createPipelineState } from './test-util';
-import { MockHistory } from './shared';
+import { MockHistory, createPipelineState } from './shared';
 
 describe('NavigationPlanStep', () => {
   let step;

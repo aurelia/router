@@ -1,5 +1,3 @@
-import { ValueOf } from './shared';
-import { createPipelineState } from './test-util';
 import {
   Router,
   activationStrategy,
@@ -11,6 +9,7 @@ import {
   CanActivateNextStep,
   ActivateNextStep
 } from '../src';
+import { ValueOf, createPipelineState } from './shared';
 
 describe('activation', () => {
   describe('CanDeactivatePreviousStep', () => {
