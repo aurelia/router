@@ -16,6 +16,8 @@ import { PipelineProvider } from './pipeline-provider';
 declare module 'aurelia-history' {
   /**@internal */
   interface History {
+    // This is wrong, as it's an implementation detail from aurelia-history-browser
+    // but we are poking it in here so probably will need to make it official in `aurelia-history`
     _hasPushState: boolean;
   }
 }
@@ -671,13 +673,9 @@ function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
     throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
   }
 
-  if (!('redirect' in config || config.viewModel || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+  if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
     throw new Error('Invalid Route Config for "' + config.route + '": You must specify a "moduleId:", "redirect:", "navigationStrategy:", or "viewPorts:".');
   }
-
-  // if (config.moduleId && config.viewModel) {
-  //   throw new Error(`Ambiguous Route config for "${config.route}": both "moduleId" and "viewModel" specified.`);
-  // }
 }
 
 function evaluateNavigationStrategy(

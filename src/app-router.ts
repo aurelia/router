@@ -1,6 +1,6 @@
 import * as LogManager from 'aurelia-logging';
 import { Container } from 'aurelia-dependency-injection';
-import { History } from 'aurelia-history';
+import { History, NavigationOptions } from 'aurelia-history';
 import { Router } from './router';
 import { PipelineProvider } from './pipeline-provider';
 import { isNavigationCommand } from './navigation-commands';
@@ -105,7 +105,7 @@ export class AppRouter extends Router {
   *
   * @params options The set of options to activate the router with.
   */
-  activate(options?: Object): void {
+  activate(options?: NavigationOptions): void {
     if (this.isActive) {
       return;
     }

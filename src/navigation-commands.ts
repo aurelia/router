@@ -1,4 +1,12 @@
+import { NavigationOptions } from 'aurelia-history';
 import { Router } from './router';
+
+declare module 'aurelia-history' {
+  /**@internal */
+  interface NavigationOptions {
+    useAppRouter?: boolean;
+  }
+}
 
 /**
 * When a navigation command is encountered, the current navigation
@@ -29,8 +37,8 @@ export function isNavigationCommand(obj: any): obj is NavigationCommand {
 export class Redirect implements NavigationCommand {
 
   url: string;
-
-  options: any;
+  /**@internal */
+  options: NavigationOptions;
   /**@internal */
   shouldContinueProcessing: boolean;
 
@@ -40,7 +48,7 @@ export class Redirect implements NavigationCommand {
    * @param url The URL fragment to use as the navigation destination.
    * @param options The navigation options.
    */
-  constructor(url: string, options: any = {}) {
+  constructor(url: string, options: Partial<NavigationOptions> = {}) {
     this.url = url;
     this.options = Object.assign({ trigger: true, replace: true }, options);
     this.shouldContinueProcessing = false;
@@ -73,20 +81,21 @@ export class RedirectToRoute implements NavigationCommand {
 
   route: string;
   params: any;
-  options: any;
+  /**@internal */
+  options: NavigationOptions;
 
   /**@internal */
-  public shouldContinueProcessing: boolean;
+  shouldContinueProcessing: boolean;
 
   /**@internal */
-  public router: Router;
+  router: Router;
 
   /**
    * @param route The name of the route.
    * @param params The parameters to be sent to the activation method.
    * @param options The options to use for navigation.
    */
-  constructor(route: string, params: any = {}, options: any = {}) {
+  constructor(route: string, params: any = {}, options: NavigationOptions = {}) {
     this.route = route;
     this.params = params;
     this.options = Object.assign({ trigger: true, replace: true }, options);

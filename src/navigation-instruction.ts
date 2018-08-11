@@ -133,33 +133,18 @@ export class NavigationInstruction {
   /**
   * Adds a viewPort instruction.
   */
-  addViewPortInstruction(viewPortNameOrInstruction: string | ViewPortInstruction, strategy?: string, moduleId?: string, component?: any): ViewPortInstruction {
-    if (typeof viewPortNameOrInstruction === 'string') {
-      const config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortNameOrInstruction });
-      const viewportInstruction = this.viewPortInstructions[viewPortNameOrInstruction] = {
-        name: viewPortNameOrInstruction,
-        strategy: strategy as any,
-        moduleId: moduleId,
-        component: component,
-        childRouter: component.childRouter,
-        lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
-      };
+  addViewPortInstruction(viewPortNameOrInstruction: string, strategy: string, moduleId: string, component: any): ViewPortInstruction {
+    const config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortNameOrInstruction });
+    const viewportInstruction = this.viewPortInstructions[viewPortNameOrInstruction] = {
+      name: viewPortNameOrInstruction,
+      strategy: strategy as any,
+      moduleId: moduleId,
+      component: component,
+      childRouter: component.childRouter,
+      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
+    };
 
-      return viewportInstruction;
-    } else if (viewPortNameOrInstruction && typeof viewPortNameOrInstruction === 'object') {
-      const viewPortName = viewPortNameOrInstruction.name;
-      const config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortName });
-      const viewportInstruction = this.viewPortInstructions[viewPortName] = {
-        name: viewPortName,
-        strategy: viewPortNameOrInstruction.strategy,
-        moduleId: viewPortNameOrInstruction.moduleId,
-        component: viewPortNameOrInstruction.component,
-        childRouter: viewPortNameOrInstruction.component.childRouter,
-        lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
-      };
-
-      return viewportInstruction;
-    }
+    return viewportInstruction;
   }
 
   /**
@@ -215,6 +200,7 @@ export class NavigationInstruction {
     return encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
   }
 
+  /**@internal */
   _commitChanges(waitToSwap: boolean) {
     let router = this.router;
     router.currentInstruction = this;
@@ -264,6 +250,7 @@ export class NavigationInstruction {
     }).then(() => prune(this));
   }
 
+  /**@internal */
   _updateTitle(): void {
     let title = this._buildTitle(this.router.titleSeparator);
     if (title) {
@@ -271,6 +258,7 @@ export class NavigationInstruction {
     }
   }
 
+  /**@internal */
   _buildTitle(separator: string = ' | '): string {
     let title = '';
     let childTitles = [];

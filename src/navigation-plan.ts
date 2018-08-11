@@ -76,7 +76,7 @@ export function _buildNavigationPlan(
         nextViewPortConfig = defaults[viewPortName];
       }
 
-      let viewPortPlan: Partial<ViewPortInstruction> = plan[viewPortName] = {
+      let viewPortPlan: ViewPortInstruction = plan[viewPortName] = {
         name: viewPortName,
         config: nextViewPortConfig,
         prevComponent: prevViewPortInstruction.component,
