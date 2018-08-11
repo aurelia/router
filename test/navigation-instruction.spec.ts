@@ -1,30 +1,27 @@
-import {History} from 'aurelia-history';
-import {Container} from 'aurelia-dependency-injection';
-import {AppRouter} from '../src/app-router';
-import {PipelineProvider} from '../src/pipeline-provider';
-import {NavigationInstruction} from '../src/navigation-instruction';
-import {RouterConfiguration} from '../src/router-configuration';
+import { History } from 'aurelia-history';
+import { Container } from 'aurelia-dependency-injection';
+import { AppRouter } from '../src/app-router';
+import { PipelineProvider } from '../src/pipeline-provider';
+import { NavigationInstruction } from '../src/navigation-instruction';
+import { RouterConfiguration } from '../src/router-configuration';
+import { MockHistory } from './shared';
+import { Router, ViewPortInstruction } from '../src';
 
-let absoluteRoot = 'http://aurelia.io/docs/';
-
-class MockHistory extends History {
-  activate() {}
-  deactivate() {}
-  navigate() {}
-  navigateBack() {}
-  setTitle() {}
-  getAbsoluteRoot() {
-    return absoluteRoot;
-  }
-}
+const absoluteRoot = 'http://aurelia.io/docs/';
 
 describe('NavigationInstruction', () => {
-  let router;
-  let history;
+  let router: Router;
+  let history: History;
 
   beforeEach(() => {
-    history = new MockHistory();
-    router = new AppRouter(new Container(), history, new PipelineProvider(new Container()));
+    history = new MockHistory() as any;
+    history.getAbsoluteRoot = () => absoluteRoot;
+    router = new AppRouter(
+      new Container(),
+      history,
+      new PipelineProvider(new Container()),
+      null
+    );
   });
 
   describe('build title', () => {
@@ -53,7 +50,9 @@ describe('NavigationInstruction', () => {
     it('should generate a title from the nav model', (done) => {
       router._createNavigationInstruction('parent/child').then((instruction) => {
         child._createNavigationInstruction(instruction.getWildcardPath(), instruction).then((childInstruction) => {
-          instruction.viewPortInstructions['default'] = { childNavigationInstruction: childInstruction };
+          instruction.viewPortInstructions['default'] = {
+            childNavigationInstruction: childInstruction
+          } as ViewPortInstruction;
           instruction._updateTitle();
           expect(history.setTitle).toHaveBeenCalledWith('child | parent');
           expect(history.setTitle).not.toHaveBeenCalledWith('parent | child');
@@ -67,7 +66,9 @@ describe('NavigationInstruction', () => {
       router.configure(config);
       router._createNavigationInstruction('parent/child').then((instruction) => {
         child._createNavigationInstruction(instruction.getWildcardPath(), instruction).then((childInstruction) => {
-          instruction.viewPortInstructions['default'] = { childNavigationInstruction: childInstruction };
+          instruction.viewPortInstructions['default'] = {
+            childNavigationInstruction: childInstruction
+          } as ViewPortInstruction;
           instruction._updateTitle();
           expect(history.setTitle).toHaveBeenCalledWith('child | parent | app');
           expect(history.setTitle).not.toHaveBeenCalledWith('parent | child | app');
@@ -81,7 +82,9 @@ describe('NavigationInstruction', () => {
       router.configure(config);
       router._createNavigationInstruction('parent/child').then((instruction) => {
         child._createNavigationInstruction(instruction.getWildcardPath(), instruction).then((childInstruction) => {
-          instruction.viewPortInstructions['default'] = { childNavigationInstruction: childInstruction };
+          instruction.viewPortInstructions['default'] = {
+            childNavigationInstruction: childInstruction
+          } as ViewPortInstruction;
           instruction._updateTitle();
           expect(history.setTitle).toHaveBeenCalledWith('child <3 parent');
           expect(history.setTitle).not.toHaveBeenCalledWith('child </3 parent');
@@ -132,7 +135,7 @@ describe('NavigationInstruction', () => {
         expect(instruction.getBaseUrl()).toBe(parentRouteName);
         done();
       })
-    .catch(fail);
+        .catch(fail);
     });
 
     it('should return the raw fragment when no wildcard exists', (done) => {
@@ -141,7 +144,7 @@ describe('NavigationInstruction', () => {
         expect(instruction.getBaseUrl()).toBe(parentRouteName);
         done();
       })
-      .catch(fail);
+        .catch(fail);
     });
 
     describe('when a uri contains spaces', () => {
@@ -150,7 +153,7 @@ describe('NavigationInstruction', () => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201');
           done();
         })
-        .catch(fail);
+          .catch(fail);
       });
 
       it('should encode the uri', (done) => {
@@ -158,7 +161,7 @@ describe('NavigationInstruction', () => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201');
           done();
         })
-        .catch(fail);
+          .catch(fail);
       });
 
       it('should identify encoded fragments', (done) => {
@@ -166,7 +169,7 @@ describe('NavigationInstruction', () => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
           done();
         })
-        .catch(fail);
+          .catch(fail);
       });
 
       it('should identify fragments and encode them', (done) => {
@@ -174,7 +177,7 @@ describe('NavigationInstruction', () => {
           expect(instruction.getBaseUrl()).toBe('parent/parent%201/');
           done();
         })
-        .catch(fail);
+          .catch(fail);
       });
     });
 
@@ -187,7 +190,7 @@ describe('NavigationInstruction', () => {
             done();
           });
         })
-        .catch(fail);
+          .catch(fail);
       });
     });
 
@@ -200,7 +203,7 @@ describe('NavigationInstruction', () => {
             done();
           });
         })
-        .catch(fail);
+          .catch(fail);
       });
     });
 
@@ -212,7 +215,7 @@ describe('NavigationInstruction', () => {
           done();
         });
       })
-      .catch(fail);
+        .catch(fail);
     });
   });
 });

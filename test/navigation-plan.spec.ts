@@ -1,26 +1,32 @@
-import {BuildNavigationPlanStep} from '../src/navigation-plan';
-import {NavigationInstruction} from '../src/navigation-instruction';
-import {Redirect} from '../src/navigation-commands';
-import {createPipelineState} from './test-util';
-import {AppRouter} from '../src/app-router';
-import {MockHistory} from './router.spec.js';
-import {Container} from 'aurelia-dependency-injection';
-import {PipelineProvider} from '../src/pipeline-provider';
+import { BuildNavigationPlanStep } from '../src/navigation-plan';
+import { NavigationInstruction, NavigationInstructionInit } from '../src/navigation-instruction';
+import { Redirect } from '../src/navigation-commands';
+import { createPipelineState } from './test-util';
+import { AppRouter } from '../src/app-router';
+import { Container } from 'aurelia-dependency-injection';
+import { PipelineProvider } from '../src/pipeline-provider';
+import { RouteConfig, Router } from '../src';
+import { MockHistory } from './shared';
 
 describe('NavigationPlanStep', () => {
   let step;
   let state;
-  let redirectInstruction;
-  let firstInstruction;
-  let sameAsFirstInstruction;
-  let secondInstruction;
-  let router;
-  let child;
+  let redirectInstruction: NavigationInstruction;
+  let firstInstruction: NavigationInstruction;
+  let sameAsFirstInstruction: NavigationInstruction;
+  let secondInstruction: NavigationInstruction;
+  let router: Router;
+  let child: Router;
 
   beforeEach(() => {
     step = new BuildNavigationPlanStep();
     state = createPipelineState();
-    router = new AppRouter(new Container(), new MockHistory(), new PipelineProvider(new Container()));
+    router = new AppRouter(
+      new Container(),
+      new MockHistory() as any,
+      new PipelineProvider(new Container()),
+      null
+    );
     router.useViewPortDefaults({ default: { moduleId: null } });
     child = router.createChild(new Container());
 
@@ -29,34 +35,34 @@ describe('NavigationPlanStep', () => {
       queryString: 'q=1',
       config: { redirect: 'second' },
       router
-    });
+    } as NavigationInstructionInit);
 
     firstInstruction = new NavigationInstruction({
       fragment: 'first',
-      config: { viewPorts: { default: { moduleId: './first' }}},
+      config: { viewPorts: { default: { moduleId: './first' } } },
       params: { id: '1' },
       router
-    });
+    } as NavigationInstructionInit);
 
     sameAsFirstInstruction = new NavigationInstruction({
       fragment: 'first',
-      config: { viewPorts: { default: { moduleId: './first' }}},
+      config: { viewPorts: { default: { moduleId: './first' } } },
       previousInstruction: firstInstruction,
       params: { id: '1' },
       router
-    });
+    } as NavigationInstructionInit);
 
     secondInstruction = new NavigationInstruction({
       fragment: 'second',
-      config: { viewPorts: { default: { moduleId: './second' }}},
+      config: { viewPorts: { default: { moduleId: './second' } } },
       previousInstruction: firstInstruction,
       router
-    });
+    } as NavigationInstructionInit);
   });
 
   it('cancels on redirect configs', (done) => {
-    redirectInstruction.router.addRoute({route: 'first', name: 'first',  redirect: 'second' });
-    redirectInstruction.router.addRoute({route: 'second', name: 'second',  redirect: 'second' });
+    redirectInstruction.router.addRoute({ route: 'first', name: 'first', redirect: 'second' });
+    redirectInstruction.router.addRoute({ route: 'second', name: 'second', redirect: 'second' });
     step.run(redirectInstruction, state.next)
       .then(e => {
         expect(state.rejection).toBeTruthy();
@@ -163,31 +169,31 @@ describe('NavigationPlanStep', () => {
   describe('generates navigation plans', () => {
     it('with no prev step', (done) => {
       step.run(firstInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(firstInstruction.plan).toBeTruthy();
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(firstInstruction.plan).toBeTruthy();
+          done();
+        });
     });
 
     it('with prev step', (done) => {
       step.run(secondInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(secondInstruction.plan).toBeTruthy();
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(secondInstruction.plan).toBeTruthy();
+          done();
+        });
     });
 
     it('with prev step with viewport', (done) => {
       firstInstruction.addViewPortInstruction('default', 'no-change', './first', {});
 
       step.run(secondInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(secondInstruction.plan).toBeTruthy();
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(secondInstruction.plan).toBeTruthy();
+          done();
+        });
     });
   });
 
@@ -196,73 +202,73 @@ describe('NavigationPlanStep', () => {
       firstInstruction.addViewPortInstruction('default', 'no-change', './first', {});
 
       step.run(secondInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(secondInstruction.plan.default.strategy).toBe('replace');
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(secondInstruction.plan.default.strategy).toBe('replace');
+          done();
+        });
     });
 
     it('is no-change when nothing changes', (done) => {
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {} });
 
       step.run(sameAsFirstInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(sameAsFirstInstruction.plan.default.strategy).toBe('no-change');
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(sameAsFirstInstruction.plan.default.strategy).toBe('no-change');
+          done();
+        });
     });
 
     it('can be determined by route config', (done) => {
-      sameAsFirstInstruction.config.activationStrategy = 'fake-strategy';
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
+      sameAsFirstInstruction.config.activationStrategy = 'fake-strategy' as any;
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {} });
 
       step.run(sameAsFirstInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(sameAsFirstInstruction.plan.default.strategy).toBe('fake-strategy');
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(sameAsFirstInstruction.plan.default.strategy).toBe('fake-strategy');
+          done();
+        });
     });
 
     it('can be determined by view model', (done) => {
-      let viewModel = { determineActivationStrategy: () => 'vm-strategy'};
+      let viewModel = { determineActivationStrategy: () => 'vm-strategy' };
       firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel });
 
       step.run(sameAsFirstInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(sameAsFirstInstruction.plan.default.strategy).toBe('vm-strategy');
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(sameAsFirstInstruction.plan.default.strategy).toBe('vm-strategy');
+          done();
+        });
     });
 
     it('is invoke-lifecycle when only params change', (done) => {
       firstInstruction.params = { id: '1' };
       sameAsFirstInstruction.params = { id: '2' };
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {} });
 
       step.run(sameAsFirstInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(sameAsFirstInstruction.plan.default.strategy).toBe('invoke-lifecycle');
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(sameAsFirstInstruction.plan.default.strategy).toBe('invoke-lifecycle');
+          done();
+        });
     });
 
     it('is invoke-lifecycle when query params change and ignoreQueryParams is false', (done) => {
       firstInstruction.queryParams = { param: 'foo' };
       sameAsFirstInstruction.queryParams = { param: 'bar' };
       sameAsFirstInstruction.options.compareQueryParams = true;
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {} });
 
       step.run(sameAsFirstInstruction, state.next)
-      .then(() => {
-        expect(state.result).toBe(true);
-        expect(sameAsFirstInstruction.plan.default.strategy).toBe('invoke-lifecycle');
-        done();
-      });
+        .then(() => {
+          expect(state.result).toBe(true);
+          expect(sameAsFirstInstruction.plan.default.strategy).toBe('invoke-lifecycle');
+          done();
+        });
     });
   });
 });

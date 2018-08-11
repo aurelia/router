@@ -1,33 +1,29 @@
-import {History} from 'aurelia-history';
-import {Container} from 'aurelia-dependency-injection';
-import {AppRouter} from '../src/app-router';
-import {RouteLoader} from '../src/route-loading';
-import {Pipeline} from '../src/pipeline';
+import { History, NavigationOptions } from 'aurelia-history';
+import { Container } from 'aurelia-dependency-injection';
+import { AppRouter } from '../src/app-router';
+import { RouteLoader } from '../src/route-loading';
+import { Pipeline } from '../src/pipeline';
+import { CompositionContext } from 'aurelia-templating';
+import { Router, RouteConfig, PipelineProvider } from '../src';
+import { MockHistory } from './shared';
 
-class MockHistory extends History {
-  activate() {}
-  deactivate() {}
-  navigate() {}
-  navigateBack() {}
-  setState(key, value) {}
-  getState(key) {
-    return null;
-  }
-}
 
 class MockLoader extends RouteLoader {
-  loadRoute(router, config) {
+  loadRoute(router: Router, config: RouteConfig) {
     return Promise.resolve({
       viewModel: {}
-    });
+    } as CompositionContext);
   }
 }
 
 class MockInstruction {
+
+  title: string;
+
   constructor(title: string) {
     this.title = title;
   }
-  resolve(): void {}
+  resolve(): void { }
 }
 
 describe('app-router', () => {
@@ -44,16 +40,16 @@ describe('app-router', () => {
     history = new MockHistory();
     container = new Container();
     container.registerSingleton(RouteLoader, MockLoader);
-    ea = { publish() {} };
+    ea = { publish() { } };
     viewPort = {
       process(viewPortInstruction) {
         viewPortInstruction.behavior = {};
         return Promise.resolve();
       },
-      swap() {}
+      swap() { }
     };
 
-    instruction = { resolve() {} };
+    instruction = { resolve() { } };
     provider = {
       createPipeline() {
         let p = new Pipeline();
@@ -104,7 +100,7 @@ describe('app-router', () => {
 
     Promise.all([router.registerViewPort(viewPort), router.registerViewPort(viewPort, 'second')])
       .then(result => {
-        expect(viewModel.configureRouter.calls.count()).toBe(1);
+        expect((viewModel.configureRouter as jasmine.Spy).calls.count()).toBe(1);
         expect(router.isConfigured).toBe(true);
         expect(router.routes.length).toBe(1);
         done();
@@ -259,9 +255,9 @@ describe('app-router', () => {
         .addStep({ run(inst, next) { return pipelineStep(inst, next); } });
       spyOn(pipeline, 'run').and.callThrough();
 
-      const plProvider = {
+      const plProvider: PipelineProvider = {
         createPipeline: () => pipeline
-      };
+      } as PipelineProvider;
       const router = new AppRouter(container, history, plProvider, ea);
       const initialInstruction = new MockInstruction('initial resulting navigation (Promise)');
       const instructionAfterNav = new MockInstruction('instruction after navigation');
@@ -278,12 +274,12 @@ describe('app-router', () => {
 
       router._queue.push(initialInstruction);
       pipelineStep = (ctx, next) => next.complete(navigationCommand);
-      
+
       router._dequeueInstruction()
         .then(_ => {
           expect(pipeline.run).toHaveBeenCalledTimes(2);
-          expect(pipeline.run.calls.argsFor(0)).toEqual([initialInstruction]);
-          expect(pipeline.run.calls.argsFor(1)).toEqual([instructionAfterNav]);
+          expect((pipeline.run as jasmine.Spy).calls.argsFor(0)).toEqual([initialInstruction]);
+          expect((pipeline.run as jasmine.Spy).calls.argsFor(1)).toEqual([instructionAfterNav]);
           done();
         });
     });

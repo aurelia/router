@@ -1,30 +1,22 @@
-import {History} from 'aurelia-history';
-import {Container} from 'aurelia-dependency-injection';
-import {AppRouter} from '../src/app-router';
-import {PipelineProvider} from '../src/pipeline-provider';
+import { MockHistory } from './shared';
+import { History } from 'aurelia-history';
+import { Container } from 'aurelia-dependency-injection';
+import { AppRouter } from '../src/app-router';
+import { PipelineProvider } from '../src/pipeline-provider';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 
-export class MockHistory extends History {
-  activate() {}
-  deactivate() {}
-  navigate() {}
-  navigateBack() {}
-  getAbsoluteRoot() {
-    return absoluteRoot;
-  }
-  setState(key, value) {}
-  getState(key) {
-    return null;
-  }
-}
-
 describe('the router', () => {
   let router;
-  let history;
+  let history: History;
   beforeEach(() => {
-    history = new MockHistory();
-    router = new AppRouter(new Container(), history, new PipelineProvider(new Container()));
+    history = new MockHistory() as any;
+    router = new AppRouter(
+      new Container(),
+      history,
+      new PipelineProvider(new Container()),
+      null
+    );
   });
 
   describe('addRoute', () => {
@@ -66,10 +58,12 @@ describe('the router', () => {
     });
 
     it('should add a route with multiple view ports', () => {
-      expect(() => router.addRoute({ route: 'multiple/viewports', viewPorts: {
-        'default': { moduleId: 'test1' },
-        'number2': { moduleId: 'test2' }
-      }})).not.toThrow();
+      expect(() => router.addRoute({
+        route: 'multiple/viewports', viewPorts: {
+          'default': { moduleId: 'test1' },
+          'number2': { moduleId: 'test2' }
+        }
+      })).not.toThrow();
     });
 
     it('should map a routeconfig with an array of routes to multiple routeconfigs with one route each', () => {
@@ -168,47 +162,47 @@ describe('the router', () => {
       ]).then(() => {
         router.navigate('', options);
         expect(history.navigate).toHaveBeenCalledWith('#/', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         router.navigate('#/test1', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test1', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         router.navigate('/test2', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test2', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         router.navigate('test3', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test3', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('#/test4', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test4', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('/test5', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test5', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('test6', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/test6', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('#/child-router/test7', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/test7', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('/child-router/test8', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/test8', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('child-router/test9', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         done();
       });
@@ -322,20 +316,20 @@ describe('the router', () => {
         Promise.all([
           router.configure(config => {
             config.unknownRouteConfig = 'test';
-            config.mapRoute({route: 'foo', moduleId: './empty'});
+            config.mapRoute({ route: 'foo', moduleId: './empty' });
           }),
           child.configure(config => {
             config.mapRoute({ route: '', moduleId: './child-empty' });
           })
         ])
-        .then(() => router._createNavigationInstruction('foo/bar/123?bar=456'))
-        .then(parentInstruction => {
-          expect(parentInstruction.config.moduleId).toEqual('./empty');
-          return child._createNavigationInstruction('bar/123?bar=456', parentInstruction);
-        })
-        .then(childInstruction => expect(childInstruction.config.moduleId).toEqual('test'))
-        .catch(fail)
-        .then(done);
+          .then(() => router._createNavigationInstruction('foo/bar/123?bar=456'))
+          .then(parentInstruction => {
+            expect(parentInstruction.config.moduleId).toEqual('./empty');
+            return child._createNavigationInstruction('bar/123?bar=456', parentInstruction);
+          })
+          .then(childInstruction => expect(childInstruction.config.moduleId).toEqual('test'))
+          .catch(fail)
+          .then(done);
       });
 
       it('should use string moduleId handler', (done) => {

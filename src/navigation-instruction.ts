@@ -3,15 +3,16 @@ import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
 
 export interface NavigationInstructionInit {
-  fragment: string,
-  queryString: string,
-  params?: Record<string, any>,
-  queryParams?: Record<string, any>,
-  config: RouteConfig,
-  parentInstruction: NavigationInstruction,
-  previousInstruction: NavigationInstruction,
-  router: Router,
-  options: Object
+  fragment?: string;
+  queryString?: string;
+  params?: Record<string, any>;
+  queryParams?: Record<string, any>;
+  config?: Partial<RouteConfig>;
+  parentInstruction?: NavigationInstruction;
+  previousInstruction?: NavigationInstruction;
+  router?: Router;
+  options?: Object;
+  plan?: Record<string, ViewPortInstruction>;
 }
 
 export class CommitChangesStep {
