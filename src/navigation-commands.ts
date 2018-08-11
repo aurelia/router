@@ -1,10 +1,16 @@
+import { Router } from './router';
+
 /**
 * When a navigation command is encountered, the current navigation
 * will be cancelled and control will be passed to the navigation
 * command so it can determine the correct action.
 */
-interface NavigationCommand {
+export interface NavigationCommand {
+  /**@internal */
+  shouldContinueProcessing?: boolean;
   navigate: (router: Router) => void;
+
+  setRouter?: (router: Router) => void;
 }
 
 /**
@@ -13,14 +19,23 @@ interface NavigationCommand {
 *
 * @param obj The object to check.
 */
-export function isNavigationCommand(obj: any): boolean {
+export function isNavigationCommand(obj: any): obj is NavigationCommand {
   return obj && typeof obj.navigate === 'function';
 }
 
 /**
 * Used during the activation lifecycle to cause a redirect.
 */
-export class Redirect {
+export class Redirect implements NavigationCommand {
+
+  url: string;
+
+  options: any;
+  /**@internal */
+  shouldContinueProcessing: boolean;
+
+  private router: Router;
+
   /**
    * @param url The URL fragment to use as the navigation destination.
    * @param options The navigation options.
@@ -54,7 +69,18 @@ export class Redirect {
 /**
 * Used during the activation lifecycle to cause a redirect to a named route.
 */
-export class RedirectToRoute {
+export class RedirectToRoute implements NavigationCommand {
+
+  route: string;
+  params: any;
+  options: any;
+
+  /**@internal */
+  public shouldContinueProcessing: boolean;
+
+  /**@internal */
+  public router: Router;
+
   /**
    * @param route The name of the route.
    * @param params The parameters to be sent to the activation method.

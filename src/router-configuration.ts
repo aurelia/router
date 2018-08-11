@@ -1,5 +1,7 @@
-import {RouteConfig} from './interfaces';
-import {_ensureArrayWithSingleRoutePerConfig} from './util';
+import { RouteConfig, PipelineStep } from './interfaces';
+import { _ensureArrayWithSingleRoutePerConfig } from './util';
+import { Router } from './router';
+import { NavigationInstruction } from './navigation-instruction';
 
 /**
  * Class used to configure a [[Router]] instance.
@@ -16,11 +18,14 @@ export class RouterConfiguration {
     hashChange?: boolean;
     silent?: boolean;
   } = {};
-  pipelineSteps: Array<{name: string, step: Function|PipelineStep}> = [];
+  pipelineSteps: Array<{ name: string, step: Function | PipelineStep }> = [];
   title: string;
   titleSeparator: string;
-  unknownRouteConfig: string|RouteConfig|((instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>);
-  viewPortDefaults: {[name: string]: {moduleId: string|void; [key: string]: any}};
+  unknownRouteConfig: string | RouteConfig | ((instruction: NavigationInstruction) => string | RouteConfig | Promise<string | RouteConfig>);
+  viewPortDefaults: { [name: string]: { moduleId: string | void;[key: string]: any } };
+
+  /**@internal */
+  _fallbackRoute: string;
 
   /**
   * Adds a step to be run during the [[Router]]'s navigation pipeline.
@@ -29,11 +34,11 @@ export class RouterConfiguration {
   * @param step The pipeline step.
   * @chainable
   */
-  addPipelineStep(name: string, step: Function|PipelineStep): RouterConfiguration {
+  addPipelineStep(name: string, step: Function | PipelineStep): RouterConfiguration {
     if (step === null || step === undefined) {
       throw new Error('Pipeline step cannot be null or undefined.');
     }
-    this.pipelineSteps.push({name, step});
+    this.pipelineSteps.push({ name, step });
     return this;
   }
 
@@ -43,7 +48,7 @@ export class RouterConfiguration {
   * @param step The pipeline step.
   * @chainable
   */
-  addAuthorizeStep(step: Function|PipelineStep): RouterConfiguration {
+  addAuthorizeStep(step: Function | PipelineStep): RouterConfiguration {
     return this.addPipelineStep('authorize', step);
   }
 
@@ -53,7 +58,7 @@ export class RouterConfiguration {
   * @param step The pipeline step.
   * @chainable
   */
-  addPreActivateStep(step: Function|PipelineStep): RouterConfiguration {
+  addPreActivateStep(step: Function | PipelineStep): RouterConfiguration {
     return this.addPipelineStep('preActivate', step);
   }
 
@@ -63,7 +68,7 @@ export class RouterConfiguration {
   * @param step The pipeline step.
   * @chainable
   */
-  addPreRenderStep(step: Function|PipelineStep): RouterConfiguration {
+  addPreRenderStep(step: Function | PipelineStep): RouterConfiguration {
     return this.addPipelineStep('preRender', step);
   }
 
@@ -73,7 +78,7 @@ export class RouterConfiguration {
   * @param step The pipeline step.
   * @chainable
   */
-  addPostRenderStep(step: Function|PipelineStep): RouterConfiguration {
+  addPostRenderStep(step: Function | PipelineStep): RouterConfiguration {
     return this.addPipelineStep('postRender', step);
   }
 
@@ -94,7 +99,7 @@ export class RouterConfiguration {
   * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
   * @chainable
   */
-  map(route: RouteConfig|RouteConfig[]): RouterConfiguration {
+  map(route: RouteConfig | RouteConfig[]): RouterConfiguration {
     if (Array.isArray(route)) {
       route.forEach(this.map.bind(this));
       return this;
@@ -110,7 +115,7 @@ export class RouterConfiguration {
    *  default, of the form { viewPortName: { moduleId } }.
    * @chainable
    */
-  useViewPortDefaults(viewPortConfig: {[name: string]: {moduleId: string; [key: string]: any}}): RouterConfiguration {
+  useViewPortDefaults(viewPortConfig: { [name: string]: { moduleId: string;[key: string]: any } }): RouterConfiguration {
     this.viewPortDefaults = viewPortConfig;
     return this;
   }
@@ -147,7 +152,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string|RouteConfig|((instruction: NavigationInstruction) => string|RouteConfig|Promise<string|RouteConfig>)): RouterConfiguration {
+  mapUnknownRoutes(config: string | RouteConfig | ((instruction: NavigationInstruction) => string | RouteConfig | Promise<string | RouteConfig>)): RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
@@ -193,8 +198,9 @@ export class RouterConfiguration {
 
       let pipelineProvider = router.pipelineProvider;
       for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
-        let {name, step} = pipelineSteps[i];
-        pipelineProvider.addStep(name, step);
+        let { name, step } = pipelineSteps[i];
+        // Potential error, addStep only accepts PipelineStep, but step here may be also a function
+        pipelineProvider.addStep(name, step as PipelineStep);
       }
     }
   }

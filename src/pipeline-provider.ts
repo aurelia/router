@@ -1,20 +1,29 @@
-import {Container} from 'aurelia-dependency-injection';
-import {Pipeline} from './pipeline';
-import {BuildNavigationPlanStep} from './navigation-plan';
-import {LoadRouteStep} from './route-loading';
-import {CommitChangesStep} from './navigation-instruction';
+import { Container } from 'aurelia-dependency-injection';
+import { Pipeline } from './pipeline';
+import { BuildNavigationPlanStep } from './navigation-plan';
+import { LoadRouteStep } from './route-loading';
+import { CommitChangesStep } from './navigation-instruction';
 import {
   CanDeactivatePreviousStep,
   CanActivateNextStep,
   DeactivatePreviousStep,
   ActivateNextStep
 } from './activation';
+import { PipelineStep } from './interfaces';
 
 
 class PipelineSlot {
+
+  /**@internal */
+  container: Container;
+  /**@internal */
+  slotName: string;
+  /**@internal */
+  slotAlias: string;
+
   steps = [];
 
-  constructor(container, name, alias) {
+  constructor(container: Container, name: string, alias: string) {
     this.container = container;
     this.slotName = name;
     this.slotAlias = alias;
@@ -30,6 +39,10 @@ class PipelineSlot {
 */
 export class PipelineProvider {
   static inject() { return [Container]; }
+  /**@internal */
+  container: Container;
+
+  steps: any[];
 
   constructor(container: Container) {
     this.container = container;
@@ -110,7 +123,7 @@ export class PipelineProvider {
     this._clearSteps('postRender');
   }
 
-  _createPipelineSlot(name, alias) {
+  _createPipelineSlot(name: string, alias?: string) {
     return new PipelineSlot(this.container, name, alias);
   }
 }

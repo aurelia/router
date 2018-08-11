@@ -1,10 +1,20 @@
 import * as LogManager from 'aurelia-logging';
-import {Container} from 'aurelia-dependency-injection';
-import {History} from 'aurelia-history';
-import {Router} from './router';
-import {PipelineProvider} from './pipeline-provider';
-import {isNavigationCommand} from './navigation-commands';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import { Container } from 'aurelia-dependency-injection';
+import { History } from 'aurelia-history';
+import { Router } from './router';
+import { PipelineProvider } from './pipeline-provider';
+import { isNavigationCommand } from './navigation-commands';
+import { EventAggregator } from 'aurelia-event-aggregator';
+import { NavigationInstruction } from '.';
+import { Viewport, ConfiguresRouter } from './interfaces';
+import { RouterConfiguration } from './router-configuration';
+
+declare module 'aurelia-dependency-injection' {
+  /**@internal */
+  interface Container {
+    viewModel?: any;
+  }
+}
 
 const logger = LogManager.getLogger('app-router');
 
@@ -13,6 +23,15 @@ const logger = LogManager.getLogger('app-router');
 */
 export class AppRouter extends Router {
   static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
+
+  /**@internal */
+  events: EventAggregator;
+  /**@internal */
+  maxInstructionCount: number;
+  /**@internal */
+  _queue: any[];
+  /**@internal */
+  isActive: boolean;
 
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
     super(container, history); //Note the super will call reset internally.
@@ -62,8 +81,10 @@ export class AppRouter extends Router {
       if ('configureRouter' in viewModel) {
         if (!this.isConfigured) {
           let resolveConfiguredPromise = this._resolveConfiguredPromise;
-          this._resolveConfiguredPromise = () => {};
-          return this.configure(config => viewModel.configureRouter(config, this))
+          this._resolveConfiguredPromise = () => { };
+          return this
+            // potential error here as callback function should return RouterConfiguration
+            .configure(config => viewModel.configureRouter(config, this) as any)
             .then(() => {
               this.activate();
               resolveConfiguredPromise();
@@ -84,7 +105,7 @@ export class AppRouter extends Router {
   *
   * @params options The set of options to activate the router with.
   */
-  activate(options: Object): void {
+  activate(options?: Object): void {
     if (this.isActive) {
       return;
     }
@@ -103,6 +124,7 @@ export class AppRouter extends Router {
     this.history.deactivate();
   }
 
+  /**@internal */
   _queueInstruction(instruction: NavigationInstruction): Promise<any> {
     return new Promise((resolve) => {
       instruction.resolve = resolve;
@@ -111,6 +133,7 @@ export class AppRouter extends Router {
     });
   }
 
+  /**@internal */
   _dequeueInstruction(instructionCount: number = 0): Promise<any> {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
@@ -168,7 +191,8 @@ export class AppRouter extends Router {
     });
   }
 
-  _findViewModel(viewPort: Object): Object {
+  /**@internal */
+  _findViewModel(viewPort: Viewport): ConfiguresRouter {
     if (this.container.viewModel) {
       return this.container.viewModel;
     }

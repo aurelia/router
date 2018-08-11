@@ -1,4 +1,5 @@
-import { PipelineStep } from './interfaces';
+import { PipelineStep, PipelineResult } from './interfaces';
+import { NavigationInstruction } from './navigation-instruction';
 
 /**
 * The status of a Pipeline.
@@ -14,7 +15,7 @@ export const pipelineStatus = {
 * A callback to indicate when pipeline processing should advance to the next step
 * or be aborted.
 */
-interface Next {
+export interface Next {
   /**
   * Indicates the successful completion of the pipeline step.
   */
@@ -78,23 +79,23 @@ export class Pipeline {
   */
   run(instruction: NavigationInstruction): Promise<PipelineResult> {
     let index = -1;
-    let steps = this.steps;
+    const steps = this.steps;
 
-    function next() {
+    const next = function() {
       index++;
 
       if (index < steps.length) {
         let currentStep = steps[index];
 
         try {
-          return currentStep(instruction, next);
+          return (currentStep as Function)(instruction, next);
         } catch (e) {
           return next.reject(e);
         }
       } else {
         return next.complete();
       }
-    }
+    } as Next;
 
     next.complete = createCompletionHandler(next, pipelineStatus.completed);
     next.cancel = createCompletionHandler(next, pipelineStatus.canceled);

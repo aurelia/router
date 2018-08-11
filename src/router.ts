@@ -1,16 +1,44 @@
-import {RouteRecognizer} from 'aurelia-route-recognizer';
-import {Container} from 'aurelia-dependency-injection';
-import {History, NavigationOptions} from 'aurelia-history';
-import {NavigationInstruction} from './navigation-instruction';
-import {NavModel} from './nav-model';
-import {RouterConfiguration} from './router-configuration';
+import { RouteRecognizer, RouteHandler, ConfigurableRoute, State, DynamicSegment, StarSegment } from 'aurelia-route-recognizer';
+import { Container } from 'aurelia-dependency-injection';
+import { History, NavigationOptions } from 'aurelia-history';
+import { NavigationInstruction, NavigationInstructionInit } from './navigation-instruction';
+import { NavModel } from './nav-model';
+import { RouterConfiguration } from './router-configuration';
 import {
   _ensureArrayWithSingleRoutePerConfig,
   _normalizeAbsolutePath,
   _createRootedPath,
   _resolveUrl
 } from './util';
-import {RouteConfig, PipelineResult} from './interfaces';
+import { RouteConfig, PipelineResult, NavigationResult, ActivationStrategy } from './interfaces';
+import { PipelineProvider } from './pipeline-provider';
+
+declare module 'aurelia-history' {
+  /**@internal */
+  interface History {
+    _hasPushState: boolean;
+  }
+}
+
+declare module 'aurelia-route-recognizer' {
+
+  /**@internal */
+  interface State {
+    types: {
+      dynamics: DynamicSegment;
+      stars: StarSegment;
+    }
+  }
+
+  interface RouteHandler {
+    navigationStrategy?: (instruction: NavigationInstruction) => any;
+  }
+
+  interface RecognizedRoute {
+    config?: RouteConfig;
+    queryParams?: Record<string, any>;
+  }
+}
 
 /**
 * The primary class responsible for handling routing and navigation.
@@ -116,6 +144,23 @@ export class Router {
   */
   viewPortDefaults: any = {};
 
+  /**@internal */
+  catchAllHandler: (instruction: NavigationInstruction) => NavigationInstruction | Promise<NavigationInstruction>;
+  /**@internal */
+  fallbackRoute: string;
+  /**@internal */
+  pipelineProvider: PipelineProvider;
+  /**@internal */
+  _fallbackOrder: number;
+  /**@internal */
+  _recognizer: RouteRecognizer;
+  /**@internal */
+  _childRecognizer: RouteRecognizer;
+  /**@internal */
+  _configuredPromise: Promise<any>;
+  /**@internal */
+  _resolveConfiguredPromise: (value?: any) => void;
+
   /**
   * Extension point to transform the document title before it is built and displayed.
   * By default, child routers delegate to the parent router, and the app router
@@ -197,25 +242,27 @@ export class Router {
   *
   * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
   */
-  configure(callbackOrConfig: RouterConfiguration|((config: RouterConfiguration) => RouterConfiguration)): Promise<void> {
+  configure(callbackOrConfig: RouterConfiguration | ((config: RouterConfiguration) => RouterConfiguration)): Promise<void> {
     this.isConfigured = true;
 
-    let result = callbackOrConfig;
-    let config;
+    let result: RouterConfiguration = callbackOrConfig as RouterConfiguration;
+    let config: RouterConfiguration;
     if (typeof callbackOrConfig === 'function') {
       config = new RouterConfiguration();
       result = callbackOrConfig(config);
     }
 
-    return Promise.resolve(result).then((c) => {
-      if (c && c.exportToRouter) {
-        config = c;
-      }
+    return Promise
+      .resolve(result)
+      .then((c) => {
+        if (c && (c as RouterConfiguration).exportToRouter) {
+          config = c;
+        }
 
-      config.exportToRouter(this);
-      this.isConfigured = true;
-      this._resolveConfiguredPromise();
-    });
+        config.exportToRouter(this);
+        this.isConfigured = true;
+        this._resolveConfiguredPromise();
+      });
   }
 
   /**
@@ -224,7 +271,7 @@ export class Router {
   * @param fragment The URL fragment to use as the navigation destination.
   * @param options The navigation options.
   */
-  navigate(fragment: string, options?: NavigationOptions): Promise<PipelineResult | boolean> {
+  navigate(fragment: string, options?: NavigationOptions): NavigationResult {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -241,7 +288,7 @@ export class Router {
   * @param params The route parameters to be used when populating the route pattern.
   * @param options The navigation options.
   */
-  navigateToRoute(route: string, params?: any, options?: NavigationOptions): Promise<PipelineResult | boolean> {
+  navigateToRoute(route: string, params?: any, options?: NavigationOptions): NavigationResult {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
@@ -274,7 +321,7 @@ export class Router {
   * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
   * @returns {string} A string containing the generated URL fragment.
   */
-  generate(name: string, params?: any, options?: any = {}): string {
+  generate(name: string, params?: any, options: any = {}): string {
     let hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
       return this.parent.generate(name, params, options);
@@ -295,7 +342,12 @@ export class Router {
   * @param config The route config.
   */
   createNavModel(config: RouteConfig): NavModel {
-    let navModel = new NavModel(this, 'href' in config ? config.href : config.route);
+    let navModel = new NavModel(
+      this,
+      'href' in config
+        ? config.href
+        // potential error when config.route is a string[] ?
+        : config.route as string);
     navModel.title = config.title;
     navModel.order = config.nav;
     navModel.href = config.href;
@@ -340,7 +392,11 @@ export class Router {
       path = path.substr(1);
     }
     let caseSensitive = config.caseSensitive === true;
-    let state = this._recognizer.add({path: path, handler: config, caseSensitive: caseSensitive});
+    let state: State = this._recognizer.add({
+      path: path,
+      handler: config as RouteHandler,
+      caseSensitive: caseSensitive
+    } as ConfigurableRoute);
 
     if (path) {
       let settings = config.settings;
@@ -372,7 +428,8 @@ export class Router {
       }
 
       this.navigation.push(navModel);
-      this.navigation = this.navigation.sort((a, b) => a.order - b.order);
+      // this is a potential error / inconsistency between browsers
+      this.navigation = this.navigation.sort((a, b) => <any>a.order - <any>b.order);
     }
   }
 
@@ -399,13 +456,14 @@ export class Router {
   *
   * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
   */
-  handleUnknownRoutes(config?: string|Function|RouteConfig): void {
+  handleUnknownRoutes(config?: string | Function | RouteConfig): void {
     if (!config) {
       throw new Error('Invalid unknown route handler');
     }
 
     this.catchAllHandler = instruction => {
-      return this._createRouteConfig(config, instruction)
+      return this
+        ._createRouteConfig(config, instruction)
         .then(c => {
           instruction.config = c;
           return instruction;
@@ -479,7 +537,7 @@ export class Router {
       results = this._childRecognizer.recognize(url);
     }
 
-    let instructionInit = {
+    let instructionInit: NavigationInstructionInit = {
       fragment,
       queryString,
       config: null,
@@ -497,7 +555,9 @@ export class Router {
       let first = results[0];
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: first.params,
-        queryParams: first.queryParams || results.queryParams,
+        queryParams: first.queryParams
+          // How is this valid
+          || (results as any).queryParams,
         config: first.config || first.handler
       }));
 
@@ -511,7 +571,10 @@ export class Router {
     } else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
-        queryParams: results ? results.queryParams : {},
+        queryParams: results
+          // how is this valid
+          ? (results as any).queryParams
+          : {},
         config: null // config will be created by the catchAllHandler
       }));
 
@@ -524,7 +587,10 @@ export class Router {
 
         let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
           params: { path: fragment },
-          queryParams: results ? results.queryParams : {},
+          queryParams: results
+            // how is this valid
+            ? (results as any).queryParams
+            : {},
           router: router,
           parentInstruction: newParentInstruction,
           parentCatchHandler: true,
@@ -552,7 +618,8 @@ export class Router {
     return undefined;
   }
 
-  _parentCatchAllHandler(router): Function|Boolean {
+  /**@internal */
+  _parentCatchAllHandler(router: Router): Router | false {
     if (router.catchAllHandler) {
       return router;
     } else if (router.parent) {
@@ -561,6 +628,10 @@ export class Router {
     return false;
   }
 
+  /**
+   * @param {RouteConfig} config
+   * @param {NavigationInstruction} instruction
+   */
   _createRouteConfig(config, instruction) {
     return Promise.resolve(config)
       .then(c => {
@@ -600,12 +671,20 @@ function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
     throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
   }
 
-  if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+  if (!('redirect' in config || config.viewModel || config.moduleId || config.navigationStrategy || config.viewPorts)) {
     throw new Error('Invalid Route Config for "' + config.route + '": You must specify a "moduleId:", "redirect:", "navigationStrategy:", or "viewPorts:".');
   }
+
+  // if (config.moduleId && config.viewModel) {
+  //   throw new Error(`Ambiguous Route config for "${config.route}": both "moduleId" and "viewModel" specified.`);
+  // }
 }
 
-function evaluateNavigationStrategy(instruction: NavigationInstruction, evaluator: Function, context: any): Promise<NavigationInstruction> {
+function evaluateNavigationStrategy(
+  instruction: NavigationInstruction,
+  evaluator: Function,
+  context?: any
+): Promise<NavigationInstruction> {
   return Promise.resolve(evaluator.call(context, instruction)).then(() => {
     if (!('viewPorts' in instruction.config)) {
       instruction.config.viewPorts = {

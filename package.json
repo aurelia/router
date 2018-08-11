@@ -13,14 +13,15 @@
   "license": "MIT",
   "author": "Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)",
   "main": "dist/commonjs/aurelia-router.js",
-  "typings": "dist/aurelia-router.d.ts",
+  "typings": "dist/types/aurelia-router.d.ts",
   "repository": {
     "type": "git",
     "url": "http://github.com/aurelia/router"
   },
   "scripts": {
     "test": "gulp test",
-    "ci": "gulp ci"
+    "ci": "gulp ci",
+    "build": "rollup -c --environment NODE_ENV:production"
   },
   "jspm": {
     "registry": "npm",
@@ -59,9 +60,12 @@
     "aurelia-history": "^1.1.0",
     "aurelia-logging": "^1.0.0",
     "aurelia-path": "^1.0.0",
-    "aurelia-route-recognizer": "^1.2.0"
+    "aurelia-route-recognizer": "^1.2.0",
+    "rollup": "^0.64.1",
+    "rollup-plugin-typescript2": "^0.16.1"
   },
   "devDependencies": {
+    "aurelia-templating": "^1.8.2",
     "aurelia-tools": "0.2.4",
     "babel-dts-generator": "^0.6.1",
     "babel-eslint": "^6.1.2",
@@ -76,11 +80,13 @@
     "babel-preset-es2015-loose-native-modules": "^1.0.0",
     "babel-preset-stage-1": "^6.5.0",
     "del": "^2.2.1",
+    "glob": "^7.1.2",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-bump": "^2.2.0",
     "gulp-concat": "^2.6.0",
     "gulp-conventional-changelog": "^1.1.0",
+    "gulp-copy": "^1.1.0",
     "gulp-coveralls": "0.1.4",
     "gulp-eslint": "^3.0.1",
     "gulp-ignore": "^2.0.1",
@@ -90,6 +96,7 @@
     "gulp-typedoc-extractor": "^0.0.8",
     "gulp-typescript": "^2.13.6",
     "gulp-util": "^3.0.7",
+    "gulp-watch": "^5.0.1",
     "isparta": "4.0.0",
     "istanbul": "github:gotwarlost/istanbul#source-map",
     "jasmine-core": "^2.4.1",
@@ -106,7 +113,7 @@
     "run-sequence": "^1.2.2",
     "through2": "^2.0.1",
     "typedoc": "^0.4.4",
-    "typescript": "^1.9.0-dev.20160622-1.0",
+    "typescript": "^3.0.1",
     "vinyl": "^1.1.1",
     "vinyl-paths": "^2.1.0",
     "yargs": "^4.8.1"

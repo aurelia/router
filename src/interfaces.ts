@@ -1,11 +1,35 @@
+import { CompositionContext } from 'aurelia-templating';
+import { Container } from 'aurelia-dependency-injection';
+import { NavigationInstruction } from './navigation-instruction';
+import { Router } from './router';
+import { NavModel } from './nav-model';
+import { RouterConfiguration } from './router-configuration';
+import { NavigationCommand } from './navigation-commands';
+import { Next } from './pipeline';
+import { IObservable } from './activation';
+
+declare module 'aurelia-dependency-injection' {
+  /**@internal */
+  interface Container {
+    getChildRouter?: () => Router;
+  }
+}
+
+declare module 'aurelia-templating' {
+  /**@internal */
+  interface CompositionContext {
+    childRouter?: Router;
+  }
+}
+
 /**
 * A configuration object that describes a route.
 */
-interface RouteConfig {
+export interface RouteConfig {
   /**
   * The route pattern to match against incoming URL fragments, or an array of patterns.
   */
-  route: string|string[];
+  route: string | string[];
 
   /**
   * A unique name for the route that may be used to identify the route when generating URL fragments.
@@ -29,7 +53,7 @@ interface RouteConfig {
   * The function is passed the current [[NavigationInstruction]], and should configure
   * instruction.config with the desired moduleId, viewPorts, or redirect.
   */
-  navigationStrategy?: (instruction: NavigationInstruction) => Promise<void>|void;
+  navigationStrategy?: (instruction: NavigationInstruction) => Promise<void> | void;
 
   /**
   * The view ports to target when activating this route. If unspecified, the target moduleId is loaded
@@ -45,7 +69,7 @@ interface RouteConfig {
   * dynamically generating menus or other navigation elements. When a number is specified, that value
   * will be used as a sort order.
   */
-  nav?: boolean|number;
+  nav?: boolean | number;
 
   /**
   * The URL fragment to use in nav models. If unspecified, the [[RouteConfig.route]] will be used.
@@ -83,7 +107,7 @@ interface RouteConfig {
   * Add to specify an activation strategy if it is always the same and you do not want that
   * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  activationStrategy?: 'no-change' | 'invoke-lifecycle'| 'replace';
+  activationStrategy?: ActivationStrategy[keyof ActivationStrategy];
 
   /**
    * specifies the file name of a layout view to use.
@@ -106,93 +130,93 @@ interface RouteConfig {
 /**
 * An optional interface describing the canActivate convention.
 */
-interface RoutableComponentCanActivate {
+export interface RoutableComponentCanActivate {
   /**
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
   * Return a boolean value, a promise for a boolean value, or a navigation command.
   */
-  canActivate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand|Promise<NavigationCommand>|PromiseLike<NavigationCommand>;
+  canActivate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): boolean | Promise<boolean> | PromiseLike<boolean> | NavigationCommand | Promise<NavigationCommand> | PromiseLike<NavigationCommand>;
 }
 
 /**
 * An optional interface describing the activate convention.
 */
-interface RoutableComponentActivate {
+export interface RoutableComponentActivate {
   /**
   * Implement this hook if you want to perform custom logic just before your view-model is displayed.
   * You can optionally return a promise to tell the router to wait to bind and attach the view until
   * after you finish your work.
   */
-  activate: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => Promise<void>|PromiseLike<void>|IObservable|void;
+  activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): Promise<void> | PromiseLike<void> | IObservable | void;
 }
 
 /**
 * An optional interface describing the canDeactivate convention.
 */
-interface RoutableComponentCanDeactivate {
+export interface RoutableComponentCanDeactivate {
   /**
   * Implement this hook if you want to control whether or not the router can navigate away from your
   * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
   * or a navigation command.
   */
-  canDeactivate: () => boolean|Promise<boolean>|PromiseLike<boolean>|NavigationCommand;
+  canDeactivate: () => boolean | Promise<boolean> | PromiseLike<boolean> | NavigationCommand;
 }
 
 /**
 * An optional interface describing the deactivate convention.
 */
-interface RoutableComponentDeactivate {
+export interface RoutableComponentDeactivate {
   /**
   * Implement this hook if you want to perform custom logic when your view-model is being
   * navigated away from. You can optionally return a promise to tell the router to wait until
   * after you finish your work.
   */
-  deactivate: () => Promise<void>|PromiseLike<void>|IObservable|void;
+  deactivate: () => Promise<void> | PromiseLike<void> | IObservable | void;
 }
 
 /**
 * An optional interface describing the determineActivationStrategy convention.
 */
-interface RoutableComponentDetermineActivationStrategy {
+export interface RoutableComponentDetermineActivationStrategy {
   /**
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
   * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  determineActivationStrategy: (params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction) => 'no-change' | 'invoke-lifecycle'| 'replace';
+  determineActivationStrategy(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): 'no-change' | 'invoke-lifecycle' | 'replace';
 }
 
 /**
 * An optional interface describing the router configuration convention.
 */
-interface ConfiguresRouter {
+export interface ConfiguresRouter {
   /**
   * Implement this hook if you want to configure a router.
   */
-  configureRouter(config: RouterConfiguration, router: Router): Promise<void>|PromiseLike<void>|void;
+  configureRouter(config: RouterConfiguration, router: Router): Promise<void> | PromiseLike<void> | void;
 }
 
 /**
 * An optional interface describing the available activation strategies.
 */
-interface ActivationStrategy {
+export interface ActivationStrategy {
   /**
   * Reuse the existing view model, without invoking Router lifecycle hooks.
   */
-  noChange: 'no-change';
+  noChange: 'no-change',
   /**
   * Reuse the existing view model, invoking Router lifecycle hooks.
   */
-  invokeLifecycle: 'invoke-lifecycle';
+  invokeLifecycle: 'invoke-lifecycle',
   /**
   * Replace the existing view model, invoking Router lifecycle hooks.
   */
-  replace: 'replace';
+  replace: 'replace'
 }
 
 /**
 * A step to be run during processing of the pipeline.
 */
-interface PipelineStep {
+export interface PipelineStep {
   /**
    * Execute the pipeline step. The step should invoke next(), next.complete(),
    * next.cancel(), or next.reject() to allow the pipeline to continue.
@@ -201,14 +225,51 @@ interface PipelineStep {
    * @param next The next step in the pipeline.
    */
   run(instruction: NavigationInstruction, next: Next): Promise<any>;
+
+  /**
+   * @internal
+   */
+  getSteps?(): any[];
 }
 
 /**
 * The result of a pipeline run.
 */
-interface PipelineResult {
+export interface PipelineResult {
   status: string;
   instruction: NavigationInstruction;
   output: any;
   completed: boolean;
 }
+
+export interface Viewport {
+  /**@internal */
+  container: Container;
+  swap(viewportInstruction: ViewPortInstruction): void;
+  process(viewportInstruction: ViewPortInstruction, waitToSwap?: boolean): void;
+}
+
+export interface ViewPortInstruction {
+
+  name: string;
+
+  strategy?: ActivationStrategy[keyof ActivationStrategy];
+
+  childNavigationInstruction?: NavigationInstruction;
+
+  config?: RouteConfig;
+
+  moduleId?: string;
+
+  component?: CompositionContext;
+
+  childRouter?: Router;
+
+  lifecycleArgs?: any[];// [Record<string, any>, RouteConfig, any]
+
+  prevComponent?: CompositionContext;
+
+  prevModuleId?: string;
+}
+
+export type NavigationResult = boolean | Promise<PipelineResult> | Promise<PipelineResult | boolean>;

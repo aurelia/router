@@ -1,19 +1,36 @@
-import {activationStrategy, _buildNavigationPlan} from './navigation-plan';
+import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
+import { NavigationInstruction } from './navigation-instruction';
+import { ViewPortInstruction, RouteConfig } from './interfaces';
+import { Redirect } from './navigation-commands';
+import { CompositionContext } from 'aurelia-templating';
+import { Router } from './router';
+import { Next } from './pipeline';
+
+declare module 'aurelia-templating' {
+  /**@internal */
+  interface CompositionContext {
+    router?: Router;
+    config?: RouteConfig;
+  }
+}
 
 export class RouteLoader {
-  loadRoute(router: any, config: any, navigationInstruction: any) {
+  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<CompositionContext> {
     throw Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }
 }
 
 export class LoadRouteStep {
+
   static inject() { return [RouteLoader]; }
+  /**@internal */
+  routeLoader: RouteLoader;
 
   constructor(routeLoader: RouteLoader) {
     this.routeLoader = routeLoader;
   }
 
-  run(navigationInstruction: NavigationInstruction, next: Function) {
+  run(navigationInstruction: NavigationInstruction, next: Next) {
     return loadNewRoute(this.routeLoader, navigationInstruction)
       .then(next)
       .catch(next.cancel);
@@ -26,20 +43,28 @@ function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: Navigatio
     routeLoader,
     current.navigationInstruction,
     current.viewPortPlan
-    )
+  )
   );
 
   return Promise.all(loadPromises);
 }
 
-function determineWhatToLoad(navigationInstruction: NavigationInstruction, toLoad: Array<Object> = []) {
+interface ILoadingPlan {
+  viewPortPlan: ViewPortInstruction;
+  navigationInstruction: NavigationInstruction;
+}
+
+function determineWhatToLoad(
+  navigationInstruction: NavigationInstruction,
+  toLoad: ILoadingPlan[] = []
+): ILoadingPlan[] {
   let plan = navigationInstruction.plan;
 
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
 
     if (viewPortPlan.strategy === activationStrategy.replace) {
-      toLoad.push({ viewPortPlan, navigationInstruction });
+      toLoad.push({ viewPortPlan, navigationInstruction } as ILoadingPlan);
 
       if (viewPortPlan.childNavigationInstruction) {
         determineWhatToLoad(viewPortPlan.childNavigationInstruction, toLoad);
@@ -100,19 +125,21 @@ function loadComponent(routeLoader: RouteLoader, navigationInstruction: Navigati
   let router = navigationInstruction.router;
   let lifecycleArgs = navigationInstruction.lifecycleArgs;
 
-  return routeLoader.loadRoute(router, config, navigationInstruction).then((component) => {
-    let {viewModel, childContainer} = component;
-    component.router = router;
-    component.config = config;
+  return routeLoader
+    .loadRoute(router, config, navigationInstruction)
+    .then((component) => {
+      let { viewModel, childContainer } = component;
+      component.router = router;
+      component.config = config;
 
-    if ('configureRouter' in viewModel) {
-      let childRouter = childContainer.getChildRouter();
-      component.childRouter = childRouter;
+      if ('configureRouter' in viewModel) {
+        let childRouter = childContainer.getChildRouter();
+        component.childRouter = childRouter;
 
-      return childRouter.configure(c => viewModel.configureRouter(c, childRouter, ...lifecycleArgs))
-        .then(() => component);
-    }
+        return childRouter.configure(c => viewModel.configureRouter(c, childRouter, ...lifecycleArgs))
+          .then(() => component);
+      }
 
-    return component;
-  });
+      return component;
+    });
 }
