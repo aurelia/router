@@ -1,10 +1,13 @@
-import { History, NavigationOptions } from 'aurelia-history';
 import { Container } from 'aurelia-dependency-injection';
-import { AppRouter } from '../src/app-router';
-import { RouteLoader } from '../src/route-loading';
-import { Pipeline } from '../src/pipeline';
 import { CompositionContext } from 'aurelia-templating';
-import { Router, RouteConfig, PipelineProvider } from '../src';
+import {
+  Router,
+  RouteConfig,
+  PipelineProvider,
+  AppRouter,
+  RouteLoader,
+  Pipeline
+} from '../src';
 import { MockHistory } from './shared';
 
 

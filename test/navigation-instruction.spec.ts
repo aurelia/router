@@ -1,11 +1,13 @@
 import { History } from 'aurelia-history';
 import { Container } from 'aurelia-dependency-injection';
-import { AppRouter } from '../src/app-router';
-import { PipelineProvider } from '../src/pipeline-provider';
-import { NavigationInstruction } from '../src/navigation-instruction';
-import { RouterConfiguration } from '../src/router-configuration';
 import { MockHistory } from './shared';
-import { Router, ViewPortInstruction } from '../src';
+import {
+  AppRouter,
+  Router,
+  ViewPortInstruction,
+  RouterConfiguration,
+  PipelineProvider,
+} from '../src';
 
 const absoluteRoot = 'http://aurelia.io/docs/';
 

@@ -1,11 +1,15 @@
-import { BuildNavigationPlanStep } from '../src/navigation-plan';
-import { NavigationInstruction, NavigationInstructionInit } from '../src/navigation-instruction';
-import { Redirect } from '../src/navigation-commands';
-import { createPipelineState } from './test-util';
-import { AppRouter } from '../src/app-router';
 import { Container } from 'aurelia-dependency-injection';
-import { PipelineProvider } from '../src/pipeline-provider';
-import { RouteConfig, Router } from '../src';
+import {
+  RouteConfig,
+  AppRouter,
+  Router,
+  PipelineProvider,
+  Redirect,
+  NavigationInstruction,
+  NavigationInstructionInit,
+  BuildNavigationPlanStep
+} from '../src';
+import { createPipelineState } from './test-util';
 import { MockHistory } from './shared';
 
 describe('NavigationPlanStep', () => {
@@ -23,7 +27,7 @@ describe('NavigationPlanStep', () => {
     state = createPipelineState();
     router = new AppRouter(
       new Container(),
-      new MockHistory() as any,
+      new MockHistory(),
       new PipelineProvider(new Container()),
       null
     );

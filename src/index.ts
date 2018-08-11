@@ -23,7 +23,7 @@ export {
 } from './activation';
 export { AppRouter } from './app-router';
 export { NavModel } from './nav-model';
-export { NavigationCommand, isNavigationCommand } from './navigation-commands';
+export { Redirect, RedirectToRoute, NavigationCommand, isNavigationCommand } from './navigation-commands';
 export { activationStrategy, BuildNavigationPlanStep } from './navigation-plan';
 export {
   CommitChangesStep,

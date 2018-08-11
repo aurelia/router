@@ -1,5 +1,5 @@
 import { Router } from '../src';
-import { NavigationOptions } from 'aurelia-history';
+import { NavigationOptions, History } from 'aurelia-history';
 
 export type ValueOf<T> = T[keyof T];
 
@@ -10,6 +10,7 @@ export interface MockRouter extends Router {
 }
 
 export class MockHistory extends History {
+
   activate(opt?: NavigationOptions) {
     return false;
   }

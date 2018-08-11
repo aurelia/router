@@ -1,16 +1,21 @@
 import { MockHistory } from './shared';
 import { History } from 'aurelia-history';
 import { Container } from 'aurelia-dependency-injection';
-import { AppRouter } from '../src/app-router';
-import { PipelineProvider } from '../src/pipeline-provider';
+import {
+  Router,
+  NavModel,
+  RouteConfig,
+  PipelineProvider,
+  AppRouter
+} from '../src';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 
 describe('the router', () => {
-  let router;
+  let router: Router;
   let history: History;
   beforeEach(() => {
-    history = new MockHistory() as any;
+    history = new MockHistory();
     router = new AppRouter(
       new Container(),
       history,
@@ -46,7 +51,7 @@ describe('the router', () => {
     });
 
     it('should not add a route to navigation if it has a nav=false', () => {
-      let testRoute = {};
+      let testRoute: NavModel = {} as any;
 
       router.addRoute({ route: 'test', moduleId: 'test', title: 'Resume', nav: false }, testRoute);
       expect(router.navigation).not.toContain(testRoute);
@@ -152,12 +157,14 @@ describe('the router', () => {
             { name: 'parent', route: 'parent/:id', moduleId: './test' },
             { name: 'parent-empty', route: '', moduleId: './parent-empty' }
           ]);
+          return config;
         }),
         child.configure(config => {
           config.map([
             { name: 'child', route: 'child/:id', moduleId: './test' },
             { name: 'empty', route: '', moduleId: './empty' }
           ]);
+          return config;
         })
       ]).then(() => {
         router.navigate('', options);
@@ -317,9 +324,11 @@ describe('the router', () => {
           router.configure(config => {
             config.unknownRouteConfig = 'test';
             config.mapRoute({ route: 'foo', moduleId: './empty' });
+            return config;
           }),
           child.configure(config => {
             config.mapRoute({ route: '', moduleId: './child-empty' });
+            return config;
           })
         ])
           .then(() => router._createNavigationInstruction('foo/bar/123?bar=456'))
@@ -336,6 +345,7 @@ describe('the router', () => {
         router
           .configure(config => {
             config.unknownRouteConfig = 'test';
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -346,7 +356,8 @@ describe('the router', () => {
       it('should use route config handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = { moduleId: 'test' };
+            config.unknownRouteConfig = { moduleId: 'test' } as RouteConfig;
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -357,7 +368,8 @@ describe('the router', () => {
       it('should use function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => ({ moduleId: 'test' });
+            config.unknownRouteConfig = instruction => ({ moduleId: 'test' } as RouteConfig);
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -368,7 +380,8 @@ describe('the router', () => {
       it('should use async function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' });
+            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' } as RouteConfig);
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -384,8 +397,9 @@ describe('the router', () => {
               expect(instruction.queryString).toBe('bar=456');
               expect(instruction.config).toBe(null);
 
-              return { moduleId: 'test' };
+              return { moduleId: 'test' } as RouteConfig;
             };
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -403,6 +417,7 @@ describe('the router', () => {
         router
           .configure(config => {
             config.unknownRouteConfig = instruction => null;
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(() => fail('should have rejected'))
@@ -444,9 +459,11 @@ describe('the router', () => {
       expect(router.isConfigured).toBe(false);
 
       router.configure(config => {
+        // This conflicts with type definition so much
+        // what should be fixed ???
         return promise.then(x => {
           config.map({ route: '', moduleId: './test' });
-        });
+        }) as any;
       });
 
       expect(router.isConfigured).toBe(true);
