@@ -38,11 +38,12 @@ class PipelineSlot {
 * Class responsible for creating the navigation pipeline.
 */
 export class PipelineProvider {
+
   static inject() { return [Container]; }
   /**@internal */
   container: Container;
-
-  steps: any[];
+  /**@internal */
+  steps: (Function | PipelineSlot)[];
 
   constructor(container: Container) {
     this.container = container;
@@ -75,8 +76,9 @@ export class PipelineProvider {
     return pipeline;
   }
 
-  _findStep(name: string) {
-    return this.steps.find(x => x.slotName === name || x.slotAlias === name);
+  /**@internal */
+  _findStep(name: string): PipelineSlot {
+    return this.steps.find((x: PipelineSlot) => x.slotName === name || x.slotAlias === name) as PipelineSlot;
   }
 
   /**
@@ -85,8 +87,8 @@ export class PipelineProvider {
   addStep(name: string, step: PipelineStep): void {
     let found = this._findStep(name);
     if (found) {
-      if (!found.steps.includes(step)) { // prevent duplicates
-        found.steps.push(step);
+      if (!(found as PipelineSlot).steps.includes(step)) { // prevent duplicates
+        (found as PipelineSlot).steps.push(step);
       }
     } else {
       throw new Error(`Invalid pipeline slot name: ${name}.`);
@@ -104,6 +106,7 @@ export class PipelineProvider {
   }
 
   /**
+   * @internal
    * Clears all steps from a slot in the pipeline
    */
   _clearSteps(name: string = '') {
@@ -123,6 +126,7 @@ export class PipelineProvider {
     this._clearSteps('postRender');
   }
 
+  /**@internal */
   _createPipelineSlot(name: string, alias?: string) {
     return new PipelineSlot(this.container, name, alias);
   }

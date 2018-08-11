@@ -20,7 +20,6 @@ export interface Next {
   * Indicates the successful completion of the pipeline step.
   */
   (): Promise<any>,
-
   /**
   * Indicates the successful completion of the entire pipeline.
   */
