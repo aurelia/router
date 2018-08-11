@@ -9,8 +9,8 @@ import { NavigationInstruction } from '.';
 import { Viewport, ConfiguresRouter } from './interfaces';
 import { RouterConfiguration } from './router-configuration';
 
+/**@internal */
 declare module 'aurelia-dependency-injection' {
-  /**@internal */
   interface Container {
     viewModel?: any;
   }

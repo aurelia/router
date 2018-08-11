@@ -13,8 +13,8 @@ import {
 import { RouteConfig, PipelineResult, NavigationResult, ActivationStrategy } from './interfaces';
 import { PipelineProvider } from './pipeline-provider';
 
+/**@internal */
 declare module 'aurelia-history' {
-  /**@internal */
   interface History {
     // This is wrong, as it's an implementation detail from aurelia-history-browser
     // but we are poking it in here so probably will need to make it official in `aurelia-history`
@@ -22,9 +22,8 @@ declare module 'aurelia-history' {
   }
 }
 
+/**@internal */
 declare module 'aurelia-route-recognizer' {
-
-  /**@internal */
   interface State {
     types: {
       dynamics: DynamicSegment;
@@ -518,12 +517,14 @@ export class Router {
     }
   }
 
+  /**@internal */
   _refreshBaseUrl(): void {
     if (this.parent) {
       this.baseUrl = generateBaseUrl(this.parent, this.parent.currentInstruction);
     }
   }
 
+  /**@internal */
   _createNavigationInstruction(url: string = '', parentInstruction: NavigationInstruction = null): Promise<NavigationInstruction> {
     let fragment = url;
     let queryString = '';
@@ -610,6 +611,7 @@ export class Router {
     return result || Promise.reject(new Error(`Route not found: ${url}`));
   }
 
+  /**@internal */
   _findParentInstructionFromRouter(router: Router, instruction: NavigationInstruction): NavigationInstruction {
     if (instruction.router === router) {
       instruction.fragment = router.baseUrl; //need to change the fragment in case of a redirect instead of moduleId
@@ -631,6 +633,7 @@ export class Router {
   }
 
   /**
+   * @internal
    * @param {RouteConfig} config
    * @param {NavigationInstruction} instruction
    */

@@ -6,8 +6,8 @@ import { CompositionContext } from 'aurelia-templating';
 import { Router } from './router';
 import { Next } from './pipeline';
 
+/**@internal */
 declare module 'aurelia-templating' {
-  /**@internal */
   interface CompositionContext {
     router?: Router;
     config?: RouteConfig;

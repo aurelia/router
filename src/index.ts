@@ -25,7 +25,11 @@ export { AppRouter } from './app-router';
 export { NavModel } from './nav-model';
 export { NavigationCommand, isNavigationCommand } from './navigation-commands';
 export { activationStrategy, BuildNavigationPlanStep } from './navigation-plan';
-export { CommitChangesStep, NavigationInstruction, NavigationInstructionInit } from './navigation-instruction';
+export {
+  CommitChangesStep,
+  NavigationInstruction,
+  NavigationInstructionInit
+} from './navigation-instruction';
 export { PipelineProvider } from './pipeline-provider';
 export { Pipeline, Next, pipelineStatus } from './pipeline';
 export { RouteLoader, LoadRouteStep } from './route-loading';

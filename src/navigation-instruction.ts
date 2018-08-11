@@ -2,7 +2,6 @@ import { ViewPortInstruction, RouteConfig, ActivationStrategy } from './interfac
 import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
 
-/**@internal */
 export interface NavigationInstructionInit {
   fragment: string,
   queryString: string,

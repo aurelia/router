@@ -1,8 +1,8 @@
 import { NavigationOptions } from 'aurelia-history';
 import { Router } from './router';
 
+/**@internal */
 declare module 'aurelia-history' {
-  /**@internal */
   interface NavigationOptions {
     useAppRouter?: boolean;
   }

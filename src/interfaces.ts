@@ -8,15 +8,15 @@ import { NavigationCommand } from './navigation-commands';
 import { Next } from './pipeline';
 import { IObservable } from './activation';
 
+/**@internal */
 declare module 'aurelia-dependency-injection' {
-  /**@internal */
   interface Container {
     getChildRouter?: () => Router;
   }
 }
 
+/**@internal */
 declare module 'aurelia-templating' {
-  /**@internal */
   interface CompositionContext {
     childRouter?: Router;
   }

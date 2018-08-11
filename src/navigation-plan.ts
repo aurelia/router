@@ -7,7 +7,7 @@ import { Next } from './pipeline';
 /**
 * The strategy to use when activating modules during navigation.
 */
-export const activationStrategy: { noChange: 'no-change'; invokeLifecycle: 'invoke-lifecycle'; replace: 'replace' } = {
+export const activationStrategy: ActivationStrategy = {
   noChange: 'no-change',
   invokeLifecycle: 'invoke-lifecycle',
   replace: 'replace'
