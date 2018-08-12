@@ -117,7 +117,7 @@ function addPreviousDeactivatable(component, callbackName, list): void {
 
 function processActivatable(
   navigationInstruction: NavigationInstruction,
-  callbackName: any,
+  callbackName: string,
   next: Next,
   ignoreResult?: boolean
 ) {
@@ -125,7 +125,7 @@ function processActivatable(
   let length = infos.length;
   let i = -1; //query from top down
 
-  function inspect(val, router) {
+  function inspect(val, router: Router) {
     if (ignoreResult || shouldContinue(val, router)) {
       return iterate();
     }
@@ -153,7 +153,7 @@ function processActivatable(
 }
 
 interface IActivatableInfo {
-  viewModel: { activate?: (...args: any[]) => any; };
+  viewModel: any;
   lifecycleArgs: any[];
   router: Router;
 }
@@ -171,7 +171,7 @@ function findActivatable(
 
   Object
     .keys(plan)
-    .filter((viewPortName) => {
+    .forEach((viewPortName) => {
       let viewPortPlan = plan[viewPortName];
       let viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
       let viewModel = viewPortInstruction.component.viewModel;
@@ -226,7 +226,6 @@ function shouldContinue(output, router?: Router) {
  * A basic interface for an Observable type
  */
 export interface IObservable {
-  // todo: fix sub param
   subscribe(sub?: IObservableConfig): ISubscription;
 }
 

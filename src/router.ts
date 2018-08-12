@@ -18,6 +18,9 @@ declare module 'aurelia-history' {
   interface History {
     // This is wrong, as it's an implementation detail from aurelia-history-browser
     // but we are poking it in here so probably will need to make it official in `aurelia-history`
+    /**
+     * A private flag of Aurelia History implementation to indicate if push state should be used
+     */
     _hasPushState: boolean;
   }
 }
@@ -332,6 +335,7 @@ export class Router {
       throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
     }
 
+    debugger;
     let path = this._recognizer.generate(name, params);
     let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
     return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;

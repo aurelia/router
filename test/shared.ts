@@ -1,4 +1,4 @@
-import { Router } from '../src';
+import { Router, Next } from '../src';
 import { NavigationOptions, History } from 'aurelia-history';
 
 export type ValueOf<T> = T[keyof T];
@@ -31,9 +31,17 @@ export class MockHistory extends History {
   setTitle() { }
 }
 
-interface NextFunction {
+export interface MockNext extends Next {
   (): Promise<any>;
   cancel(rejection: any): any;
+  result: boolean;
+  rejection: boolean;
+}
+
+export interface MockPipelineState {
+  next: MockNext;
+  result: any;
+  rejection: any;
 }
 
 export function createPipelineState() {
@@ -43,7 +51,7 @@ export function createPipelineState() {
   let next = (() => {
     nextResult = true;
     return Promise.resolve(nextResult);
-  }) as NextFunction;
+  }) as MockNext;
 
   next.cancel = (rejection) => {
     cancelResult = rejection || 'cancel';

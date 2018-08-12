@@ -17,7 +17,6 @@ describe('NavigationInstruction', () => {
 
   beforeEach(() => {
     history = new MockHistory() as any;
-    history.getAbsoluteRoot = () => absoluteRoot;
     router = new AppRouter(
       new Container(),
       history,

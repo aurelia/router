@@ -9,7 +9,7 @@ import {
   CanActivateNextStep,
   ActivateNextStep
 } from '../src';
-import { ValueOf, createPipelineState } from './shared';
+import { ValueOf, createPipelineState, MockPipelineState } from './shared';
 
 describe('activation', () => {
   describe('CanDeactivatePreviousStep', () => {
@@ -144,13 +144,13 @@ describe('activation', () => {
   });
 
   describe('CanActivateNextStep', () => {
-    let step;
-    let state;
+    let step: CanActivateNextStep;
+    let state: MockPipelineState;
 
     function getNavigationInstruction(
-      resultHandler,
+      canActivateHandler: () => any,
       strategy: ValueOf<ActivationStrategy> = activationStrategy.invokeLifecycle
-    ) {
+    ): NavigationInstruction {
       return {
         plan: {
           default: {
@@ -159,10 +159,11 @@ describe('activation', () => {
         },
         viewPortInstructions: {
           default: {
-            component: { viewModel: { canActivate: resultHandler } }
+            component: { viewModel: { canActivate: canActivateHandler } },
+            lifecycleArgs: []
           }
         }
-      };
+      } as any;
     }
 
     beforeEach(() => {
@@ -171,21 +172,21 @@ describe('activation', () => {
     });
 
     it('should return true for context that canActivate', () => {
-      let instruction = getNavigationInstruction(() => (true));
+      let instruction = getNavigationInstruction(() => true);
 
       step.run(instruction, state.next);
       expect(state.result).toBe(true);
     });
 
     it('should return true for context that canActivate with activationStrategy.replace', () => {
-      let instruction = getNavigationInstruction(() => (true), activationStrategy.replace);
+      let instruction = getNavigationInstruction(() => true, activationStrategy.replace);
 
       step.run(instruction, state.next);
       expect(state.result).toBe(true);
     });
 
     it('should cancel for context that cannot activate', () => {
-      let instruction = getNavigationInstruction(() => (false));
+      let instruction = getNavigationInstruction(() => false);
 
       step.run(instruction, state.next);
       expect(state.rejection).toBeTruthy();
@@ -193,8 +194,8 @@ describe('activation', () => {
   });
 
   describe('ActivateNextStep', () => {
-    let step;
-    let state;
+    let step: ActivateNextStep;
+    let state: MockPipelineState;
 
     beforeEach(() => {
       step = new ActivateNextStep();
@@ -204,7 +205,7 @@ describe('activation', () => {
     it('should pass current viewport name to activate', (done) => {
       const instruction = new NavigationInstruction({
         plan: {
-          "my-view-port": <ViewPortInstruction>{ strategy: activationStrategy.invokeLifecycle }
+          "my-view-port": { strategy: activationStrategy.invokeLifecycle } as ViewPortInstruction
         }
       });
 

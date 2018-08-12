@@ -6,9 +6,18 @@ import {
   PipelineProvider,
   AppRouter,
   RouteLoader,
-  Pipeline
+  Pipeline,
+  NavigationInstruction
 } from '../src';
 import { MockHistory } from './shared';
+import { EventAggregator } from 'aurelia-event-aggregator';
+import { History } from 'aurelia-history';
+
+declare module 'aurelia-history' {
+  interface History {
+    previousLocation: string;
+  }
+}
 
 
 class MockLoader extends RouteLoader {
@@ -30,20 +39,20 @@ class MockInstruction {
 }
 
 describe('app-router', () => {
-  let router;
-  let history;
-  let ea;
+  let router: AppRouter;
+  let history: History;
+  let ea: EventAggregator;
   let viewPort;
-  let container;
-  let instruction;
-  let provider;
+  let container: Container;
+  let instruction: NavigationInstruction;
+  let provider: PipelineProvider;
   let pipelineStep;
 
   beforeEach(() => {
     history = new MockHistory();
     container = new Container();
     container.registerSingleton(RouteLoader, MockLoader);
-    ea = { publish() { } };
+    ea = { publish() { } } as any;
     viewPort = {
       process(viewPortInstruction) {
         viewPortInstruction.behavior = {};
@@ -52,14 +61,14 @@ describe('app-router', () => {
       swap() { }
     };
 
-    instruction = { resolve() { } };
+    instruction = { resolve() { } } as any;
     provider = {
       createPipeline() {
         let p = new Pipeline();
         p.addStep({ run(inst, next) { return pipelineStep(inst, next); } });
         return p;
       }
-    };
+    } as any;
 
     router = new AppRouter(container, history, provider, ea);
   });
@@ -241,6 +250,7 @@ describe('app-router', () => {
         config.map([
           { name: 'test', route: '', moduleId: './test' }
         ]);
+        return config;
       });
 
       router.loadUrl('next')

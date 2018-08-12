@@ -60,11 +60,10 @@
     "aurelia-history": "^1.1.0",
     "aurelia-logging": "^1.0.0",
     "aurelia-path": "^1.0.0",
-    "aurelia-route-recognizer": "^1.2.0",
-    "rollup": "^0.64.1",
-    "rollup-plugin-typescript2": "^0.16.1"
+    "aurelia-route-recognizer": "^1.2.0"
   },
   "devDependencies": {
+    "@types/jasmine": "^2.8.8",
     "aurelia-templating": "^1.8.2",
     "aurelia-tools": "0.2.4",
     "babel-dts-generator": "^0.6.1",
@@ -110,6 +109,8 @@
     "merge2": "^1.0.2",
     "object.assign": "^4.0.4",
     "require-dir": "^0.3.2",
+    "rollup": "^0.64.1",
+    "rollup-plugin-typescript2": "^0.16.1",
     "run-sequence": "^1.2.2",
     "through2": "^2.0.1",
     "ts-loader": "^4.4.2",

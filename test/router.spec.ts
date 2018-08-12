@@ -16,6 +16,7 @@ describe('the router', () => {
   let history: History;
   beforeEach(() => {
     history = new MockHistory();
+    history.getAbsoluteRoot = () => absoluteRoot;
     router = new AppRouter(
       new Container(),
       history,
@@ -114,24 +115,26 @@ describe('the router', () => {
     it('should delegate to parent when generating unknown route', (done) => {
       const child = router.createChild(new Container());
 
-      Promise.all([
-        router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
-        child.configure(config => config.map({ name: 'child', route: 'child/:id', moduleId: './test' }))
-      ]).then(() => {
-        expect(child.generate('child', { id: 1 })).toBe('#/child/1');
-        expect(child.generate('parent', { id: 1 })).toBe('#/parent/1');
-        done();
-      });
+      Promise
+        .all([
+          router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
+          child.configure(config => config.map({ name: 'child', route: 'child/:id', moduleId: './test' }))
+        ]).then(() => {
+          expect(child.generate('child', { id: 1 })).toBe('#/child/1');
+          expect(child.generate('parent', { id: 1 })).toBe('#/parent/1');
+          done();
+        });
     });
 
     it('should return a fully-qualified URL when options.absolute is true', (done) => {
       const child = router.createChild(new Container());
       let options = { absolute: true };
 
-      Promise.all([
-        router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
-        child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
-      ])
+      Promise
+        .all([
+          router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
+          child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        ])
         .then(() => {
           expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}#/test/1`);
           expect(child.generate('parent', { id: 2 }, options)).toBe(`${absoluteRoot}#/parent/2`);
