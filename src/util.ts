@@ -1,6 +1,6 @@
 import { RouteConfig } from './interfaces';
 
-export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
+export function _normalizeAbsolutePath(path: string, hasPushState: boolean, absolute: boolean = false) {
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
   }
@@ -12,12 +12,6 @@ export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
   return path;
 }
 
-/**
- * @param {string} fragment
- * @param {string} baseUrl
- * @param {boolean} hasPushState
- * @param {boolean} absolute
- */
 export function _createRootedPath(fragment: string, baseUrl: string, hasPushState: boolean, absolute?: boolean) {
   if (isAbsoluteUrl.test(fragment)) {
     return fragment;

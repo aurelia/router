@@ -11,7 +11,8 @@ export {
   PipelineResult,
   PipelineStep,
   Viewport,
-  ViewPortInstruction
+  ViewPortInstruction,
+  RoutingComponent
 } from './interfaces';
 export {
   ActivateNextStep,

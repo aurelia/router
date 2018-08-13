@@ -5,10 +5,11 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
     "moduleResolution": "node",
+    "importHelpers": true,
     "stripInternal": true,
     "preserveConstEnums": true,
     "listFiles": true,
-    "declaration": true,
+    "declaration": false,
     "removeComments": false,
     "lib": [
       "es2015",

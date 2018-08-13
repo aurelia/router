@@ -1,4 +1,3 @@
-import { CompositionContext } from 'aurelia-templating';
 import { Container } from 'aurelia-dependency-injection';
 import { NavigationInstruction } from './navigation-instruction';
 import { Router } from './router';
@@ -12,13 +11,6 @@ import { IObservable } from './activation';
 declare module 'aurelia-dependency-injection' {
   interface Container {
     getChildRouter?: () => Router;
-  }
-}
-
-/**@internal */
-declare module 'aurelia-templating' {
-  interface CompositionContext {
-    childRouter?: Router;
   }
 }
 
@@ -182,7 +174,7 @@ export interface RoutableComponentDetermineActivationStrategy {
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
   * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  determineActivationStrategy(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): 'no-change' | 'invoke-lifecycle' | 'replace';
+  determineActivationStrategy(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): ActivationStrategy[keyof ActivationStrategy];
 }
 
 /**
@@ -242,6 +234,17 @@ export interface PipelineResult {
   completed: boolean;
 }
 
+/**
+ * The component responsible for routing
+ */
+export interface RoutingComponent {
+  viewModel: any;
+  childContainer?: Container;
+  router?: Router;
+  config?: RouteConfig;
+  childRouter?: Router;
+}
+
 export interface Viewport {
   /**@internal */
   container: Container;
@@ -261,13 +264,13 @@ export interface ViewPortInstruction {
 
   moduleId?: string;
 
-  component?: CompositionContext;
+  component?: RoutingComponent;
 
   childRouter?: Router;
 
   lifecycleArgs?: any[];// [Record<string, any>, RouteConfig, any]
 
-  prevComponent?: CompositionContext;
+  prevComponent?: RoutingComponent;
 
   prevModuleId?: string;
 }

@@ -1,5 +1,4 @@
 import { Container } from 'aurelia-dependency-injection';
-import { CompositionContext } from 'aurelia-templating';
 import {
   Router,
   RouteConfig,
@@ -7,7 +6,8 @@ import {
   AppRouter,
   RouteLoader,
   Pipeline,
-  NavigationInstruction
+  NavigationInstruction,
+  RoutingComponent
 } from '../src';
 import { MockHistory } from './shared';
 import { EventAggregator } from 'aurelia-event-aggregator';
@@ -24,7 +24,7 @@ class MockLoader extends RouteLoader {
   loadRoute(router: Router, config: RouteConfig) {
     return Promise.resolve({
       viewModel: {}
-    } as CompositionContext);
+    } as RoutingComponent);
   }
 }
 

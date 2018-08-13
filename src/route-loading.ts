@@ -1,21 +1,12 @@
 import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
 import { NavigationInstruction } from './navigation-instruction';
-import { ViewPortInstruction, RouteConfig } from './interfaces';
+import { ViewPortInstruction, RouteConfig, RoutingComponent } from './interfaces';
 import { Redirect } from './navigation-commands';
-import { CompositionContext } from 'aurelia-templating';
 import { Router } from './router';
 import { Next } from './pipeline';
 
-/**@internal */
-declare module 'aurelia-templating' {
-  interface CompositionContext {
-    router?: Router;
-    config?: RouteConfig;
-  }
-}
-
 export class RouteLoader {
-  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<CompositionContext> {
+  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<RoutingComponent> {
     throw Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }
 }
@@ -37,14 +28,13 @@ export class LoadRouteStep {
   }
 }
 
-function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction) {
+function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction): Promise<any[] | void> {
   let toLoad = determineWhatToLoad(navigationInstruction);
   let loadPromises = toLoad.map((current) => loadRoute(
     routeLoader,
     current.navigationInstruction,
     current.viewPortPlan
-  )
-  );
+  ));
 
   return Promise.all(loadPromises);
 }
@@ -86,42 +76,51 @@ function determineWhatToLoad(
   return toLoad;
 }
 
-function loadRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, viewPortPlan: any) {
+function loadRoute(
+  routeLoader: RouteLoader,
+  navigationInstruction: NavigationInstruction,
+  viewPortPlan: ViewPortInstruction
+) {
   let moduleId = viewPortPlan.config ? viewPortPlan.config.moduleId : null;
 
-  return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config).then((component) => {
-    let viewPortInstruction = navigationInstruction.addViewPortInstruction(
-      viewPortPlan.name,
-      viewPortPlan.strategy,
-      moduleId,
-      component);
+  return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config)
+    .then((component) => {
+      let viewPortInstruction = navigationInstruction.addViewPortInstruction(
+        viewPortPlan.name,
+        viewPortPlan.strategy,
+        moduleId,
+        component);
 
-    let childRouter = component.childRouter;
-    if (childRouter) {
-      let path = navigationInstruction.getWildcardPath();
+      let childRouter = component.childRouter;
+      if (childRouter) {
+        let path = navigationInstruction.getWildcardPath();
 
-      return childRouter._createNavigationInstruction(path, navigationInstruction)
-        .then((childInstruction) => {
-          viewPortPlan.childNavigationInstruction = childInstruction;
+        return childRouter._createNavigationInstruction(path, navigationInstruction)
+          .then((childInstruction) => {
+            viewPortPlan.childNavigationInstruction = childInstruction;
 
-          return _buildNavigationPlan(childInstruction)
-            .then((childPlan) => {
-              if (childPlan instanceof Redirect) {
-                return Promise.reject(childPlan);
-              }
-              childInstruction.plan = childPlan;
-              viewPortInstruction.childNavigationInstruction = childInstruction;
+            return _buildNavigationPlan(childInstruction)
+              .then((childPlan) => {
+                if (childPlan instanceof Redirect) {
+                  return Promise.reject(childPlan);
+                }
+                childInstruction.plan = childPlan;
+                viewPortInstruction.childNavigationInstruction = childInstruction;
 
-              return loadNewRoute(routeLoader, childInstruction);
-            });
-        });
-    }
+                return loadNewRoute(routeLoader, childInstruction);
+              });
+          });
+      }
 
-    return undefined;
-  });
+      return undefined;
+    });
 }
 
-function loadComponent(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction, config: any) {
+function loadComponent(
+  routeLoader: RouteLoader,
+  navigationInstruction: NavigationInstruction,
+  config: RouteConfig
+): Promise<RoutingComponent> {
   let router = navigationInstruction.router;
   let lifecycleArgs = navigationInstruction.lifecycleArgs;
 
@@ -136,7 +135,8 @@ function loadComponent(routeLoader: RouteLoader, navigationInstruction: Navigati
         let childRouter = childContainer.getChildRouter();
         component.childRouter = childRouter;
 
-        return childRouter.configure(c => viewModel.configureRouter(c, childRouter, ...lifecycleArgs))
+        return childRouter
+          .configure(c => viewModel.configureRouter(c, childRouter, ...lifecycleArgs))
           .then(() => component);
       }
 
