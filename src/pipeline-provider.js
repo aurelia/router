@@ -52,9 +52,13 @@ export class PipelineProvider {
   /**
   * Create the navigation pipeline.
   */
-  createPipeline(): Pipeline {
+  createPipeline(useCanDeactivateStep: boolean = true): Pipeline {
     let pipeline = new Pipeline();
-    this.steps.forEach(step => pipeline.addStep(this.container.get(step)));
+    this.steps.forEach(step => {
+      if (useCanDeactivateStep || step !== CanDeactivatePreviousStep) {
+        pipeline.addStep(this.container.get(step));
+      }
+    });
     return pipeline;
   }
 
