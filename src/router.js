@@ -85,6 +85,11 @@ export class Router {
   isNavigatingRefresh: boolean;
 
   /**
+  * True if the previous instruction successfully completed the CanDeactivatePreviousStep in the current navigation.
+  */
+  couldDeactivate: boolean;
+
+  /**
   * The currently active navigation tracker.
   */
   currentNavigationTracker: number;
@@ -150,6 +155,7 @@ export class Router {
     this.isNavigatingRefresh = false;
     this.isNavigatingForward = false;
     this.isNavigatingBack = false;
+    this.couldDeactivate = false;
     this.navigation = [];
     this.currentInstruction = null;
     this.viewPortDefaults = {};

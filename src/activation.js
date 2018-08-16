@@ -25,7 +25,7 @@ export class ActivateNextStep {
   }
 }
 
-function processDeactivatable(navigationInstruction: NavigationInstruction, callbackName: string, next: Funcion, ignoreResult: boolean) {
+function processDeactivatable(navigationInstruction: NavigationInstruction, callbackName: string, next: Function, ignoreResult: boolean) {
   const plan = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
   let i = infos.length; //query from inside out
@@ -48,6 +48,8 @@ function processDeactivatable(navigationInstruction: NavigationInstruction, call
         return next.cancel(error);
       }
     }
+
+    navigationInstruction.router.couldDeactivate = true;
 
     return next();
   }
