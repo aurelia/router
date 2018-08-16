@@ -1,6 +1,5 @@
 import { Container } from 'aurelia-dependency-injection';
 import {
-  RouteConfig,
   AppRouter,
   Router,
   PipelineProvider,
@@ -9,11 +8,11 @@ import {
   NavigationInstructionInit,
   BuildNavigationPlanStep
 } from '../src';
-import { MockHistory, createPipelineState } from './shared';
+import { MockHistory, createPipelineState, MockPipelineState } from './shared';
 
 describe('NavigationPlanStep', () => {
-  let step;
-  let state;
+  let step: BuildNavigationPlanStep;
+  let state: MockPipelineState;
   let redirectInstruction: NavigationInstruction;
   let firstInstruction: NavigationInstruction;
   let sameAsFirstInstruction: NavigationInstruction;

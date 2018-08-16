@@ -281,6 +281,8 @@ export interface ViewPortInstruction {
   childRouter?: Router;
 
   lifecycleArgs?: LifecycleArguments;
+
+  prevComponent?: RoutingComponent;
 }
 
 export type NavigationResult = boolean | Promise<PipelineResult> | Promise<PipelineResult | boolean>;

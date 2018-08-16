@@ -1,4 +1,4 @@
-import { MockHistory } from './shared';
+import { MockHistory, MockInstruction } from './shared';
 import { History } from 'aurelia-history';
 import { Container } from 'aurelia-dependency-injection';
 import {
@@ -6,7 +6,8 @@ import {
   NavModel,
   RouteConfig,
   PipelineProvider,
-  AppRouter
+  AppRouter,
+  NavigationInstruction
 } from '../src';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
@@ -250,7 +251,7 @@ describe('the router', () => {
     it('should resolve matching routes', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('test/123?foo=456'))
-        .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'test/123', queryString: 'foo=456' })))
+        .then(x => expect(x as Required<NavigationInstruction>).toEqual(jasmine.objectContaining({ fragment: 'test/123', queryString: 'foo=456' } as Required<NavigationInstruction>)))
         .catch(reason => fail(reason))
         .then(done);
     });
@@ -306,7 +307,7 @@ describe('the router', () => {
     it('should be case insensitive by default', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('TeSt/123?foo=456'))
-        .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'TeSt/123', queryString: 'foo=456' })))
+        .then(x => expect(x as Required<NavigationInstruction>).toEqual(jasmine.objectContaining({ fragment: 'TeSt/123', queryString: 'foo=456' } as Required<NavigationInstruction>)))
         .catch(reason => fail(reason))
         .then(done);
     });
@@ -456,7 +457,7 @@ describe('the router', () => {
     });
 
     it('waits for async callbacks', (done) => {
-      let resolve;
+      let resolve: (val?: any) => any;
       let promise = new Promise(r => resolve = r);
 
       expect(router.isConfigured).toBe(false);
@@ -482,7 +483,7 @@ describe('the router', () => {
   });
 
   describe('refreshNavigation', () => {
-    let staticHref;
+    let staticHref: string;
 
     beforeEach((done) => {
       staticHref = '#/a/static/href';

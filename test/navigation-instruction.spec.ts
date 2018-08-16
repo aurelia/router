@@ -7,6 +7,8 @@ import {
   ViewPortInstruction,
   RouterConfiguration,
   PipelineProvider,
+  NavigationInstruction,
+  RouteConfig,
 } from '../src';
 
 const absoluteRoot = 'http://aurelia.io/docs/';
@@ -26,8 +28,8 @@ describe('NavigationInstruction', () => {
   });
 
   describe('build title', () => {
-    let child;
-    let config;
+    let child: Router;
+    let config: RouterConfiguration;
     beforeEach(() => {
       router.addRoute({
         name: 'parent',
@@ -96,7 +98,7 @@ describe('NavigationInstruction', () => {
   });
 
   describe('getBaseUrl()', () => {
-    let child;
+    let child: Router;
     const parentRouteName = 'parent';
     const parentParamRouteName = 'parent/:parent';
     const childRouteName = 'child';

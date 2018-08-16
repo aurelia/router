@@ -19,8 +19,8 @@ export class MockHistory extends History {
     return false;
   }
   navigateBack() { }
-  setState(key, value) { }
-  getState(key) {
+  setState(key: any, value: any) { }
+  getState(key: any): any {
     return null;
   }
 
@@ -58,8 +58,8 @@ export interface MockPipelineState {
 }
 
 export function createPipelineState() {
-  let nextResult = null;
-  let cancelResult = null;
+  let nextResult: any = null;
+  let cancelResult: any = null;
 
   let next = (() => {
     nextResult = true;

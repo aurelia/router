@@ -2,13 +2,14 @@ import {
   Router,
   Redirect,
   RedirectToRoute,
-  isNavigationCommand
+  isNavigationCommand,
+  NavigationCommand
 } from '../src';
 import { MockRouter } from './shared';
 
 describe('isNavigationCommand', () => {
   it('should return true for object which has a navigate method', () => {
-    let nc = {
+    let nc: NavigationCommand = {
       navigate() { }
     };
 
@@ -26,9 +27,9 @@ describe('Redirect', () => {
   it('should accept url in constructor and pass this url to passed router\'s navigate method as first parameter', () => {
     let testurl = 'http://aurelia.io/';
     let redirect = new Redirect(testurl);
-    let mockrouter: Router & { url: string } = {
+    let mockrouter: MockRouter = {
       url: '',
-      navigate(url) {
+      navigate(url: string) {
         this.url = url;
       }
     } as any;
@@ -47,13 +48,13 @@ describe('Redirect', () => {
     let redirect = new Redirect(testurl, { useAppRouter: true });
     let mockrouter: MockRouter = {
       url: '',
-      navigate(url) {
+      navigate(url: string) {
         this.url = url;
       }
     } as any;
     let mockapprouter: MockRouter = {
       url: '',
-      navigate(url) {
+      navigate(url: string) {
         this.url = url;
       }
     } as any;
@@ -77,7 +78,7 @@ describe('RedirectToRoute', () => {
     let mockrouter: MockRouter = {
       route: '',
       params: {},
-      navigateToRoute(route, params) {
+      navigateToRoute(route: string, params: Record<string, any>) {
         this.route = route;
         this.params = params;
       }
@@ -101,7 +102,7 @@ describe('RedirectToRoute', () => {
     let mockrouter: MockRouter = {
       route: '',
       params: {},
-      navigateToRoute(route, params) {
+      navigateToRoute(route: string, params: Record<string, any>) {
         this.route = route;
         this.params = params;
       }
@@ -110,7 +111,7 @@ describe('RedirectToRoute', () => {
     let mockapprouter: MockRouter = {
       route: '',
       params: {},
-      navigateToRoute(route, params) {
+      navigateToRoute(route: string, params: Record<string, any>) {
         this.route = route;
         this.params = params;
       }
