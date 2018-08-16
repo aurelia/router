@@ -213,7 +213,7 @@ describe('NavigationPlanStep', () => {
     });
 
     it('is no-change when nothing changes', (done) => {
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {} });
+      firstInstruction.addViewPortInstruction('default', 'ignored' as any, './first', { viewModel: {} });
 
       step.run(sameAsFirstInstruction, state.next)
         .then(() => {
@@ -225,7 +225,7 @@ describe('NavigationPlanStep', () => {
 
     it('can be determined by route config', (done) => {
       sameAsFirstInstruction.config.activationStrategy = 'fake-strategy' as any;
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {} });
+      firstInstruction.addViewPortInstruction('default', 'ignored' as any, './first', { viewModel: {} });
 
       step.run(sameAsFirstInstruction, state.next)
         .then(() => {
@@ -237,7 +237,7 @@ describe('NavigationPlanStep', () => {
 
     it('can be determined by view model', (done) => {
       let viewModel = { determineActivationStrategy: () => 'vm-strategy' };
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel });
+      firstInstruction.addViewPortInstruction('default', 'ignored' as any, './first', { viewModel });
 
       step.run(sameAsFirstInstruction, state.next)
         .then(() => {
@@ -250,7 +250,7 @@ describe('NavigationPlanStep', () => {
     it('is invoke-lifecycle when only params change', (done) => {
       firstInstruction.params = { id: '1' };
       sameAsFirstInstruction.params = { id: '2' };
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {} });
+      firstInstruction.addViewPortInstruction('default', 'ignored' as any, './first', { viewModel: {} });
 
       step.run(sameAsFirstInstruction, state.next)
         .then(() => {
@@ -264,7 +264,7 @@ describe('NavigationPlanStep', () => {
       firstInstruction.queryParams = { param: 'foo' };
       sameAsFirstInstruction.queryParams = { param: 'bar' };
       sameAsFirstInstruction.options.compareQueryParams = true;
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {} });
+      firstInstruction.addViewPortInstruction('default', 'ignored' as any, './first', { viewModel: {} });
 
       step.run(sameAsFirstInstruction, state.next)
         .then(() => {

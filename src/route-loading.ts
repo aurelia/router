@@ -1,6 +1,6 @@
 import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
 import { NavigationInstruction } from './navigation-instruction';
-import { ViewPortInstruction, RouteConfig, RoutingComponent } from './interfaces';
+import { ViewPortInstruction, RouteConfig, RoutingComponent, ViewPortPlan } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { Router } from './router';
 import { Next } from './pipeline';
@@ -12,7 +12,7 @@ export class RouteLoader {
 }
 
 export class LoadRouteStep {
-
+  /**@internal */
   static inject() { return [RouteLoader]; }
   /**@internal */
   routeLoader: RouteLoader;
@@ -40,7 +40,7 @@ function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: Navigatio
 }
 
 interface ILoadingPlan {
-  viewPortPlan: ViewPortInstruction;
+  viewPortPlan: ViewPortPlan;
   navigationInstruction: NavigationInstruction;
 }
 
@@ -79,7 +79,7 @@ function determineWhatToLoad(
 function loadRoute(
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
-  viewPortPlan: ViewPortInstruction
+  viewPortPlan: ViewPortPlan
 ) {
   let moduleId = viewPortPlan.config ? viewPortPlan.config.moduleId : null;
 

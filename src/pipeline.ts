@@ -1,10 +1,19 @@
 import { PipelineStep, PipelineResult } from './interfaces';
 import { NavigationInstruction } from './navigation-instruction';
 
+export interface PipeLineStatus {
+  completed: 'completed';
+  canceled: 'canceled';
+  rejected: 'rejected';
+  running: 'running';
+}
+
+export type PipeLineStatusType = PipeLineStatus[keyof PipeLineStatus];
+
 /**
 * The status of a Pipeline.
 */
-export const pipelineStatus = {
+export const pipelineStatus: PipeLineStatus = {
   completed: 'completed',
   canceled: 'canceled',
   rejected: 'rejected',
@@ -80,7 +89,7 @@ export class Pipeline {
     let index = -1;
     const steps = this.steps;
 
-    const next = function() {
+    const next: Next = function() {
       index++;
 
       if (index < steps.length) {
@@ -104,8 +113,8 @@ export class Pipeline {
   }
 }
 
-function createCompletionHandler(next, status) {
-  return (output) => {
+function createCompletionHandler(next: Next, status: PipeLineStatusType) {
+  return (output: any) => {
     return Promise.resolve({ status, output, completed: status === pipelineStatus.completed });
   };
 }

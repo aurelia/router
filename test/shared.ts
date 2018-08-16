@@ -1,4 +1,4 @@
-import { Router, Next } from '../src';
+import { Router, Next, NavigationInstruction } from '../src';
 import { NavigationOptions, History } from 'aurelia-history';
 
 export type ValueOf<T> = T[keyof T];
@@ -30,6 +30,19 @@ export class MockHistory extends History {
 
   setTitle() { }
 }
+
+export interface MockInstruction extends NavigationInstruction { }
+
+export class MockInstruction {
+
+  title: string;
+
+  constructor(title: string) {
+    this.title = title;
+  }
+  resolve(): void { }
+}
+
 
 export interface MockNext extends Next {
   (): Promise<any>;

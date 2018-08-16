@@ -1,7 +1,6 @@
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { Router } from './router';
-import { ViewPortInstruction, ActivationStrategy } from './interfaces';
+import { ActivationStrategy, ViewPortPlan } from './interfaces';
 import { Next } from './pipeline';
 
 /**
@@ -30,18 +29,19 @@ export class BuildNavigationPlanStep {
 export function _buildNavigationPlan(
   instruction: NavigationInstruction,
   forceLifecycleMinimum?: boolean
-): Promise<Record<string, ViewPortInstruction> | Redirect> {
+): Promise<Record<string, ViewPortPlan> | Redirect> {
   let config = instruction.config;
 
   if ('redirect' in config) {
-    let router = instruction.router;
-    return router._createNavigationInstruction(config.redirect)
+    const router = instruction.router;
+    return router
+      ._createNavigationInstruction(config.redirect)
       .then(newInstruction => {
-        let params = {};
+        const params: Record<string, any> = {};
         for (let key in newInstruction.params) {
           // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
           let val = newInstruction.params[key];
-          if (typeof (val) === 'string' && val[0] === ':') {
+          if (typeof val === 'string' && val[0] === ':') {
             val = val.slice(1);
             // And if that param is found on the original instruction then use it
             if (val in instruction.params) {
@@ -61,27 +61,27 @@ export function _buildNavigationPlan(
       });
   }
 
-  let prev = instruction.previousInstruction;
-  let plan: Record<string, ViewPortInstruction> = {};
-  let defaults = instruction.router.viewPortDefaults;
+  const prev = instruction.previousInstruction;
+  const plan: Record<string, ViewPortPlan> = {};
+  const defaults = instruction.router.viewPortDefaults;
 
   if (prev) {
     let newParams = hasDifferentParameterValues(prev, instruction);
-    let pending = [];
+    let pending: Promise<void>[] = [];
 
     for (let viewPortName in prev.viewPortInstructions) {
-      let prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
+      const prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
       let nextViewPortConfig = viewPortName in config.viewPorts ? config.viewPorts[viewPortName] : prevViewPortInstruction;
       if (nextViewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
         nextViewPortConfig = defaults[viewPortName];
       }
 
-      let viewPortPlan: ViewPortInstruction = plan[viewPortName] = {
+      const viewPortPlan = plan[viewPortName] = {
         name: viewPortName,
         config: nextViewPortConfig,
         prevComponent: prevViewPortInstruction.component,
         prevModuleId: prevViewPortInstruction.moduleId
-      };
+      } as ViewPortPlan;
 
       if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
         viewPortPlan.strategy = activationStrategy.replace;
@@ -97,10 +97,11 @@ export function _buildNavigationPlan(
       }
 
       if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
-        let path = instruction.getWildcardPath();
-        let task = prevViewPortInstruction.childRouter
+        const path = instruction.getWildcardPath();
+        const task: Promise<void> = prevViewPortInstruction
+          .childRouter
           ._createNavigationInstruction(path, instruction)
-          .then(childInstruction => { // eslint-disable-line no-loop-func
+          .then(childInstruction => {
             viewPortPlan.childNavigationInstruction = childInstruction;
 
             return _buildNavigationPlan(
@@ -112,6 +113,8 @@ export function _buildNavigationPlan(
                   return Promise.reject(childPlan);
                 }
                 childInstruction.plan = childPlan;
+                // for bluebird ?
+                return null;
               });
           });
 

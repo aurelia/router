@@ -21,7 +21,7 @@ class PipelineSlot {
   /**@internal */
   slotAlias: string;
 
-  steps = [];
+  steps: PipelineStep[] = [];
 
   constructor(container: Container, name: string, alias: string) {
     this.container = container;
@@ -78,7 +78,7 @@ export class PipelineProvider {
 
   /**@internal */
   _findStep(name: string): PipelineSlot {
-    return this.steps.find((x: PipelineSlot) => x.slotName === name || x.slotAlias === name) as PipelineSlot;
+    return this.steps.find(x => (x as PipelineSlot).slotName === name || (x as PipelineSlot).slotAlias === name) as PipelineSlot;
   }
 
   /**

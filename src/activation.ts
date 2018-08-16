@@ -3,7 +3,7 @@ import { isNavigationCommand } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { Next } from './pipeline';
 import { Router } from './router';
-import { ViewPortInstruction } from './interfaces';
+import { RoutingComponent, ViewPortPlan } from './interfaces';
 
 export class CanDeactivatePreviousStep {
   run(navigationInstruction: NavigationInstruction, next: Next) {
@@ -29,17 +29,21 @@ export class ActivateNextStep {
   }
 }
 
+/**
+ * Recursively find list of deactivate-able view models
+ * and invoke the either 'canDeactivate' or 'deactivate' on each
+ */
 function processDeactivatable(
   navigationInstruction: NavigationInstruction,
   callbackName: string,
   next: Next,
   ignoreResult?: boolean
-) {
+): Promise<any> {
   const plan = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
   let i = infos.length; //query from inside out
 
-  function inspect(val) {
+  function inspect(val: any): Promise<any> {
     if (ignoreResult || shouldContinue(val)) {
       return iterate();
     }
@@ -47,7 +51,7 @@ function processDeactivatable(
     return next.cancel(val);
   }
 
-  function iterate() {
+  function iterate(): Promise<any> {
     if (i--) {
       try {
         let viewModel = infos[i];
@@ -66,11 +70,14 @@ function processDeactivatable(
   return iterate();
 }
 
+/**
+ * Recursively find and returns a list of deactivate-able view models
+ */
 function findDeactivatable(
-  plan: Record<string, ViewPortInstruction>,
+  plan: Record<string, ViewPortPlan>,
   callbackName: string,
-  list: Object[] = []
-): Object[] {
+  list: IActivatableInfo[] = []
+): any[] {
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
     let prevComponent = viewPortPlan.prevComponent;
@@ -95,7 +102,7 @@ function findDeactivatable(
   return list;
 }
 
-function addPreviousDeactivatable(component, callbackName, list): void {
+function addPreviousDeactivatable(component: RoutingComponent, callbackName: string, list: IActivatableInfo[]): void {
   let childRouter = component.childRouter;
 
   if (childRouter && childRouter.currentInstruction) {
@@ -125,7 +132,7 @@ function processActivatable(
   let length = infos.length;
   let i = -1; //query from top down
 
-  function inspect(val, router: Router) {
+  function inspect(val: any, router: Router): Promise<any> {
     if (ignoreResult || shouldContinue(val, router)) {
       return iterate();
     }
@@ -133,14 +140,14 @@ function processActivatable(
     return next.cancel(val);
   }
 
-  function iterate() {
+  function iterate(): Promise<any> {
     i++;
 
     if (i < length) {
       try {
         let current = infos[i];
         let result = current.viewModel[callbackName](...current.lifecycleArgs);
-        return processPotential(result, val => inspect(val, current.router), next.cancel);
+        return processPotential(result, (val: any) => inspect(val, current.router), next.cancel);
       } catch (error) {
         return next.cancel(error);
       }
@@ -202,7 +209,7 @@ function findActivatable(
   return list;
 }
 
-function shouldContinue(output, router?: Router) {
+function shouldContinue(output: any, router?: Router) {
   if (output instanceof Error) {
     return false;
   }
@@ -271,7 +278,7 @@ class SafeSubscription {
   }
 }
 
-function processPotential(obj, resolve, reject) {
+function processPotential(obj: any, resolve: (val?: any) => any, reject: (err?: any) => any) {
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
   }

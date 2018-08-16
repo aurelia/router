@@ -216,7 +216,7 @@ describe('activation', () => {
         }
       }
 
-      instruction.addViewPortInstruction('my-view-port', 'ignored', 'ignored', { viewModel });
+      instruction.addViewPortInstruction('my-view-port', 'ignored' as any, 'ignored', { viewModel });
       step.run(instruction, state.next);
     });
   });

@@ -9,7 +9,7 @@ import {
   NavigationInstruction,
   RoutingComponent
 } from '../src';
-import { MockHistory } from './shared';
+import { MockHistory, MockInstruction } from './shared';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { History } from 'aurelia-history';
 
@@ -26,16 +26,6 @@ class MockLoader extends RouteLoader {
       viewModel: {}
     } as RoutingComponent);
   }
-}
-
-class MockInstruction {
-
-  title: string;
-
-  constructor(title: string) {
-    this.title = title;
-  }
-  resolve(): void { }
 }
 
 describe('app-router', () => {

@@ -1,4 +1,4 @@
-import { RouteRecognizer, RouteHandler, ConfigurableRoute, State, DynamicSegment, StarSegment } from 'aurelia-route-recognizer';
+import { RouteRecognizer, RouteHandler, ConfigurableRoute, State, RecognizedRoute } from 'aurelia-route-recognizer';
 import { Container } from 'aurelia-dependency-injection';
 import { History, NavigationOptions } from 'aurelia-history';
 import { NavigationInstruction, NavigationInstructionInit } from './navigation-instruction';
@@ -10,7 +10,7 @@ import {
   _createRootedPath,
   _resolveUrl
 } from './util';
-import { RouteConfig, PipelineResult, NavigationResult, ActivationStrategy } from './interfaces';
+import { RouteConfig, NavigationResult, RouteConfigSpecifier, ViewPort, ViewPortInstruction } from './interfaces';
 import { PipelineProvider } from './pipeline-provider';
 
 /**@internal */
@@ -22,6 +22,8 @@ declare module 'aurelia-history' {
      * A private flag of Aurelia History implementation to indicate if push state should be used
      */
     _hasPushState: boolean;
+
+    previousLocation: string;
   }
 }
 
@@ -53,7 +55,9 @@ declare module 'aurelia-route-recognizer' {
 export class Router {
   container: Container;
   history: History;
-  viewPorts: Object;
+
+  viewPorts: Record<string, ViewPort>;
+
   routes: RouteConfig[];
 
   /**
@@ -146,7 +150,7 @@ export class Router {
   /**
   * The defaults used when a viewport lacks specified content
   */
-  viewPortDefaults: any = {};
+  viewPortDefaults: Record<string, ViewPortInstruction> = {};
 
   /**@internal */
   catchAllHandler: (instruction: NavigationInstruction) => NavigationInstruction | Promise<NavigationInstruction>;
@@ -335,7 +339,6 @@ export class Router {
       throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
     }
 
-    debugger;
     let path = this._recognizer.generate(name, params);
     let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
     return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
@@ -468,7 +471,7 @@ export class Router {
 
     this.catchAllHandler = instruction => {
       return this
-        ._createRouteConfig(config, instruction)
+        ._createRouteConfig(config as RouteConfigSpecifier, instruction)
         .then(c => {
           instruction.config = c;
           return instruction;
@@ -539,9 +542,9 @@ export class Router {
       queryString = url.substr(queryIndex + 1);
     }
 
-    let results = this._recognizer.recognize(url);
-    if (!results || !results.length) {
-      results = this._childRecognizer.recognize(url);
+    let urlRecognizationResults = this._recognizer.recognize(url) as IRouteRecognizationResults;
+    if (!urlRecognizationResults || !urlRecognizationResults.length) {
+      urlRecognizationResults = this._childRecognizer.recognize(url) as IRouteRecognizationResults;
     }
 
     let instructionInit: NavigationInstructionInit = {
@@ -556,15 +559,13 @@ export class Router {
       }
     };
 
-    let result;
+    let result: Promise<NavigationInstruction>;
 
-    if (results && results.length) {
-      let first = results[0];
+    if (urlRecognizationResults && urlRecognizationResults.length) {
+      let first = urlRecognizationResults[0];
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: first.params,
-        queryParams: first.queryParams
-          // How is this valid
-          || (results as any).queryParams,
+        queryParams: first.queryParams || urlRecognizationResults.queryParams,
         config: first.config || first.handler
       }));
 
@@ -578,10 +579,7 @@ export class Router {
     } else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
-        queryParams: results
-          // how is this valid
-          ? (results as any).queryParams
-          : {},
+        queryParams: urlRecognizationResults ? urlRecognizationResults.queryParams : {},
         config: null // config will be created by the catchAllHandler
       }));
 
@@ -594,10 +592,7 @@ export class Router {
 
         let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
           params: { path: fragment },
-          queryParams: results
-            // how is this valid
-            ? (results as any).queryParams
-            : {},
+          queryParams: urlRecognizationResults ? urlRecognizationResults.queryParams : {},
           router: router,
           parentInstruction: newParentInstruction,
           parentCatchHandler: true,
@@ -638,21 +633,22 @@ export class Router {
 
   /**
    * @internal
-   * @param {RouteConfig} config
-   * @param {NavigationInstruction} instruction
    */
-  _createRouteConfig(config, instruction) {
+  _createRouteConfig(
+    config: RouteConfigSpecifier,
+    instruction: NavigationInstruction
+  ) {
     return Promise.resolve(config)
       .then(c => {
         if (typeof c === 'string') {
-          return { moduleId: c };
+          return { moduleId: c } as RouteConfig;
         } else if (typeof c === 'function') {
           return c(instruction);
         }
 
         return c;
       })
-      .then(c => typeof c === 'string' ? { moduleId: c } : c)
+      .then(c => typeof c === 'string' ? { moduleId: c } as RouteConfig : c)
       .then(c => {
         c.route = instruction.params.path;
         validateRouteConfig(c, this.routes);
@@ -701,4 +697,8 @@ function evaluateNavigationStrategy(
 
     return instruction;
   });
+}
+
+interface IRouteRecognizationResults extends Array<RecognizedRoute> {
+  queryParams: Record<string, any>;
 }

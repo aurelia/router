@@ -1,4 +1,4 @@
-import { RouteConfig, PipelineStep } from './interfaces';
+import { RouteConfig, PipelineStep, RouteConfigSpecifier } from './interfaces';
 import { _ensureArrayWithSingleRoutePerConfig } from './util';
 import { Router } from './router';
 import { NavigationInstruction } from './navigation-instruction';
@@ -21,7 +21,7 @@ export class RouterConfiguration {
   pipelineSteps: Array<{ name: string, step: Function | PipelineStep }> = [];
   title: string;
   titleSeparator: string;
-  unknownRouteConfig: string | RouteConfig | ((instruction: NavigationInstruction) => string | RouteConfig | Promise<string | RouteConfig>);
+  unknownRouteConfig: RouteConfigSpecifier;
   viewPortDefaults: { [name: string]: { moduleId: string | void;[key: string]: any } };
 
   /**@internal */

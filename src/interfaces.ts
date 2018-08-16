@@ -14,6 +14,8 @@ declare module 'aurelia-dependency-injection' {
   }
 }
 
+export type RouteConfigSpecifier = string | RouteConfig | ((instruction: NavigationInstruction) => string | RouteConfig | Promise<string | RouteConfig>);
+
 /**
 * A configuration object that describes a route.
 */
@@ -99,7 +101,7 @@ export interface RouteConfig {
   * Add to specify an activation strategy if it is always the same and you do not want that
   * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  activationStrategy?: ActivationStrategy[keyof ActivationStrategy];
+  activationStrategy?: ActivationStrategyType;
 
   /**
    * specifies the file name of a layout view to use.
@@ -205,6 +207,8 @@ export interface ActivationStrategy {
   replace: 'replace'
 }
 
+export type ActivationStrategyType = ActivationStrategy[keyof ActivationStrategy];
+
 /**
 * A step to be run during processing of the pipeline.
 */
@@ -245,34 +249,40 @@ export interface RoutingComponent {
   childRouter?: Router;
 }
 
-export interface Viewport {
+export interface ViewPort {
   /**@internal */
   container: Container;
   swap(viewportInstruction: ViewPortInstruction): void;
-  process(viewportInstruction: ViewPortInstruction, waitToSwap?: boolean): void;
+  process(viewportInstruction: ViewPortInstruction, waitToSwap?: boolean): Promise<void>;
+}
+
+export interface ViewPortPlan {
+  name: string;
+  config: RouteConfig;
+  strategy: ActivationStrategyType;
+
+  prevComponent?: RoutingComponent;
+  prevModuleId?: string;
+  childNavigationInstruction?: NavigationInstruction;
 }
 
 export interface ViewPortInstruction {
 
-  name: string;
+  name?: string;
 
-  strategy?: ActivationStrategy[keyof ActivationStrategy];
+  strategy?: ActivationStrategyType;
 
   childNavigationInstruction?: NavigationInstruction;
 
-  config?: RouteConfig;
-
-  moduleId?: string;
+  moduleId: string;
 
   component?: RoutingComponent;
 
   childRouter?: Router;
 
-  lifecycleArgs?: any[];// [Record<string, any>, RouteConfig, any]
-
-  prevComponent?: RoutingComponent;
-
-  prevModuleId?: string;
+  lifecycleArgs?: LifecycleArguments;
 }
 
 export type NavigationResult = boolean | Promise<PipelineResult> | Promise<PipelineResult | boolean>;
+
+export type LifecycleArguments = [Record<string, string>, RouteConfig, NavigationInstruction];

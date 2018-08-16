@@ -14,10 +14,10 @@ declare module 'aurelia-history' {
 * command so it can determine the correct action.
 */
 export interface NavigationCommand {
+  navigate: (router: Router) => void;
   /**@internal */
   shouldContinueProcessing?: boolean;
-  navigate: (router: Router) => void;
-
+  /**@internal */
   setRouter?: (router: Router) => void;
 }
 
@@ -48,7 +48,7 @@ export class Redirect implements NavigationCommand {
    * @param url The URL fragment to use as the navigation destination.
    * @param options The navigation options.
    */
-  constructor(url: string, options: Partial<NavigationOptions> = {}) {
+  constructor(url: string, options: NavigationOptions = {}) {
     this.url = url;
     this.options = Object.assign({ trigger: true, replace: true }, options);
     this.shouldContinueProcessing = false;

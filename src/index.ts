@@ -10,7 +10,8 @@ export {
   NavigationResult,
   PipelineResult,
   PipelineStep,
-  Viewport,
+  ViewPort,
+  ViewPortPlan,
   ViewPortInstruction,
   RoutingComponent
 } from './interfaces';

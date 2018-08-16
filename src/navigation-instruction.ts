@@ -1,4 +1,4 @@
-import { ViewPortInstruction, RouteConfig, ActivationStrategy } from './interfaces';
+import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType } from './interfaces';
 import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
 
@@ -75,12 +75,12 @@ export class NavigationInstruction {
   */
   router: Router;
 
-  plan: Record<string, ViewPortInstruction> = null;
+  plan: Record<string, ViewPortPlan> = null;
 
   options: Record<string, any> = {};
 
   /**@internal */
-  lifecycleArgs: any[];
+  lifecycleArgs: LifecycleArguments;
   /**@internal */
   resolve?: (val?: any) => void;
 
@@ -133,15 +133,15 @@ export class NavigationInstruction {
   /**
   * Adds a viewPort instruction.
   */
-  addViewPortInstruction(viewPortNameOrInstruction: string, strategy: string, moduleId: string, component: any): ViewPortInstruction {
-    const config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortNameOrInstruction });
-    const viewportInstruction = this.viewPortInstructions[viewPortNameOrInstruction] = {
-      name: viewPortNameOrInstruction,
-      strategy: strategy as any,
+  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): ViewPortInstruction {
+    const config: RouteConfig = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: name });
+    const viewportInstruction = this.viewPortInstructions[name] = {
+      name: name,
+      strategy: strategy,
       moduleId: moduleId,
       component: component,
       childRouter: component.childRouter,
-      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
+      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2]) as LifecycleArguments
     };
 
     return viewportInstruction;
@@ -201,7 +201,7 @@ export class NavigationInstruction {
   }
 
   /**@internal */
-  _commitChanges(waitToSwap: boolean) {
+  _commitChanges(waitToSwap: boolean): Promise<void> {
     let router = this.router;
     router.currentInstruction = this;
 
@@ -213,11 +213,11 @@ export class NavigationInstruction {
 
     router.refreshNavigation();
 
-    let loads = [];
-    let delaySwaps = [];
+    let loads: Promise<void>[] = [];
+    let delaySwaps: ISwapPlan[] = [];
 
     for (let viewPortName in this.viewPortInstructions) {
-      let viewPortInstruction: ViewPortInstruction = this.viewPortInstructions[viewPortName];
+      let viewPortInstruction = this.viewPortInstructions[viewPortName];
       let viewPort = router.viewPorts[viewPortName];
 
       if (!viewPort) {
@@ -231,11 +231,14 @@ export class NavigationInstruction {
           if (waitToSwap) {
             delaySwaps.push({ viewPort, viewPortInstruction });
           }
-          loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
-            if (viewPortInstruction.childNavigationInstruction) {
-              return viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap);
-            }
-          }));
+          loads.push(viewPort
+            .process(viewPortInstruction, waitToSwap)
+            .then(() => {
+              if (viewPortInstruction.childNavigationInstruction) {
+                return viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap);
+              }
+              return Promise.resolve();
+            }));
         }
       } else {
         if (viewPortInstruction.childNavigationInstruction) {
@@ -244,10 +247,13 @@ export class NavigationInstruction {
       }
     }
 
-    return Promise.all(loads).then(() => {
-      delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
-      return null;
-    }).then(() => prune(this));
+    return Promise
+      .all(loads)
+      .then(() => {
+        delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
+        return null;
+      })
+      .then(() => prune(this));
   }
 
   /**@internal */
@@ -290,7 +296,12 @@ export class NavigationInstruction {
   }
 }
 
-function prune(instruction) {
+function prune(instruction: NavigationInstruction) {
   instruction.previousInstruction = null;
   instruction.plan = null;
+}
+
+interface ISwapPlan {
+  viewPort: ViewPort;
+  viewPortInstruction: ViewPortInstruction;
 }
