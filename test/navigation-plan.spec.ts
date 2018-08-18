@@ -6,7 +6,8 @@ import {
   Redirect,
   NavigationInstruction,
   NavigationInstructionInit,
-  BuildNavigationPlanStep
+  BuildNavigationPlanStep,
+  RouteConfig
 } from '../src';
 import { MockHistory, createPipelineState, MockPipelineState } from './shared';
 
@@ -41,14 +42,14 @@ describe('NavigationPlanStep', () => {
 
     firstInstruction = new NavigationInstruction({
       fragment: 'first',
-      config: { viewPorts: { default: { moduleId: './first' } } },
+      config: { viewPorts: { default: { moduleId: './first' } } } as RouteConfig,
       params: { id: '1' },
       router
     } as NavigationInstructionInit);
 
     sameAsFirstInstruction = new NavigationInstruction({
       fragment: 'first',
-      config: { viewPorts: { default: { moduleId: './first' } } },
+      config: { viewPorts: { default: { moduleId: './first' } } } as RouteConfig,
       previousInstruction: firstInstruction,
       params: { id: '1' },
       router
@@ -56,7 +57,7 @@ describe('NavigationPlanStep', () => {
 
     secondInstruction = new NavigationInstruction({
       fragment: 'second',
-      config: { viewPorts: { default: { moduleId: './second' } } },
+      config: { viewPorts: { default: { moduleId: './second' } } } as RouteConfig,
       previousInstruction: firstInstruction,
       router
     } as NavigationInstructionInit);

@@ -3,14 +3,14 @@ import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
 
 export interface NavigationInstructionInit {
-  fragment?: string;
+  fragment: string;
   queryString?: string;
   params?: Record<string, any>;
   queryParams?: Record<string, any>;
-  config?: Partial<RouteConfig>;
+  config: RouteConfig;
   parentInstruction?: NavigationInstruction;
   previousInstruction?: NavigationInstruction;
-  router?: Router;
+  router: Router;
   options?: Object;
   plan?: Record<string, ViewPortInstruction>;
 }

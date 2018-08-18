@@ -7,7 +7,8 @@ import {
   RouteConfig,
   CanDeactivatePreviousStep,
   CanActivateNextStep,
-  ActivateNextStep
+  ActivateNextStep,
+  NavigationInstructionInit
 } from '../src';
 import { ValueOf, createPipelineState, MockPipelineState, MockInstruction } from './shared';
 
@@ -207,7 +208,7 @@ describe('activation', () => {
         plan: {
           'my-view-port': { strategy: activationStrategy.invokeLifecycle } as ViewPortInstruction
         }
-      });
+      } as any);
 
       const viewModel = {
         activate(params: Record<string, any>, config: RouteConfig, instruction: NavigationInstruction) {
