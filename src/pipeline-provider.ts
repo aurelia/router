@@ -19,11 +19,11 @@ class PipelineSlot {
   /**@internal */
   slotName: string;
   /**@internal */
-  slotAlias: string;
+  slotAlias?: string;
 
   steps: PipelineStep[] = [];
 
-  constructor(container: Container, name: string, alias: string) {
+  constructor(container: Container, name: string, alias?: string) {
     this.container = container;
     this.slotName = name;
     this.slotAlias = alias;
@@ -49,14 +49,14 @@ export class PipelineProvider {
     this.container = container;
     this.steps = [
       BuildNavigationPlanStep,
-      CanDeactivatePreviousStep, //optional
+      CanDeactivatePreviousStep, // optional
       LoadRouteStep,
       this._createPipelineSlot('authorize'),
-      CanActivateNextStep, //optional
+      CanActivateNextStep, // optional
       this._createPipelineSlot('preActivate', 'modelbind'),
-      //NOTE: app state changes start below - point of no return
-      DeactivatePreviousStep, //optional
-      ActivateNextStep, //optional
+      // NOTE: app state changes start below - point of no return
+      DeactivatePreviousStep, // optional
+      ActivateNextStep, // optional
       this._createPipelineSlot('preRender', 'precommit'),
       CommitChangesStep,
       this._createPipelineSlot('postRender', 'postcomplete')

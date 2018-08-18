@@ -251,7 +251,12 @@ describe('the router', () => {
     it('should resolve matching routes', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('test/123?foo=456'))
-        .then(x => expect(x as Required<NavigationInstruction>).toEqual(jasmine.objectContaining({ fragment: 'test/123', queryString: 'foo=456' } as Required<NavigationInstruction>)))
+        .then(x => expect(x as Required<NavigationInstruction>)
+          .toEqual(jasmine.objectContaining({
+            fragment: 'test/123',
+            queryString: 'foo=456'
+          } as Required<NavigationInstruction>))
+        )
         .catch(reason => fail(reason))
         .then(done);
     });
@@ -282,7 +287,7 @@ describe('the router', () => {
         ]))
           .then(() => childRouter.configure(config => config.map([
             { name: 'c', route: 'child/:p', moduleId: './child', href: '/child/c' },
-            { name: 'd', route: 'child/:p', moduleId: './child', href: '/child/d' },
+            { name: 'd', route: 'child/:p', moduleId: './child', href: '/child/d' }
           ])))
           .then(() => router._createNavigationInstruction('parent/b/child/c?foo=456'))
           .then(i => {
@@ -307,7 +312,12 @@ describe('the router', () => {
     it('should be case insensitive by default', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('TeSt/123?foo=456'))
-        .then(x => expect(x as Required<NavigationInstruction>).toEqual(jasmine.objectContaining({ fragment: 'TeSt/123', queryString: 'foo=456' } as Required<NavigationInstruction>)))
+        .then(x => expect(x as Required<NavigationInstruction>)
+          .toEqual(jasmine.objectContaining({
+            fragment: 'TeSt/123',
+            queryString: 'foo=456'
+          } as Required<NavigationInstruction>))
+        )
         .catch(reason => fail(reason))
         .then(done);
     });

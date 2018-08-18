@@ -118,7 +118,7 @@ describe('activation', () => {
         const viewPortInstructionFactory = (resultHandler: (val?: any) => any) => {
           return {
             component: { viewModel: { canDeactivate: resultHandler } }
-          } as ViewPortInstruction
+          } as ViewPortInstruction;
         };
 
         it('should return true when the currentInstruction can deactivate', () => {
@@ -205,7 +205,7 @@ describe('activation', () => {
     it('should pass current viewport name to activate', (done) => {
       const instruction = new NavigationInstruction({
         plan: {
-          "my-view-port": { strategy: activationStrategy.invokeLifecycle } as ViewPortInstruction
+          'my-view-port': { strategy: activationStrategy.invokeLifecycle } as ViewPortInstruction
         }
       });
 
@@ -214,7 +214,7 @@ describe('activation', () => {
           expect(config.currentViewPort).toBe('my-view-port');
           done();
         }
-      }
+      };
 
       instruction.addViewPortInstruction('my-view-port', 'ignored' as any, 'ignored', { viewModel });
       step.run(instruction, state.next);

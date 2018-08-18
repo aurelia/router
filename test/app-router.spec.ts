@@ -48,14 +48,17 @@ describe('app-router', () => {
     history = new MockHistory();
     container = new Container();
     container.registerSingleton(RouteLoader, MockLoader);
+    // tslint:disable-next-line
     ea = { publish() { } } as any;
     viewPort = {
       process(viewPortInstruction: ViewPortInstruction) {
         return Promise.resolve();
       },
+      // tslint:disable-next-line
       swap() { }
     } as any;
 
+    // tslint:disable-next-line
     instruction = { resolve() { } } as any;
     provider = {
       createPipeline() {
@@ -234,7 +237,7 @@ describe('app-router', () => {
       spyOn(history, 'navigate');
 
       router.history.previousLocation = null;
-      router.fallbackRoute = "fallback";
+      router.fallbackRoute = 'fallback';
       router.loadUrl('next')
         .then(result => {
           expect(result).toBeFalsy();
@@ -299,7 +302,7 @@ describe('app-router', () => {
           done();
         });
     });
-  })
+  });
 });
 
 function expectSuccess(result: any) {

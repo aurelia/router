@@ -21,8 +21,10 @@
   "scripts": {
     "dev": "node build/scripts/dev",
     "build": "node build/scripts/build",
+    "bundle-dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
     "test": "karma start",
-    "bundle-dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts"
+    "lint": "tslint -c tslint.json '{src,test}/**/*.ts'",
+    "changelog": "node build/scripts/changelog"
   },
   "jspm": {
     "registry": "npm",

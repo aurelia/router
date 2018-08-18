@@ -41,7 +41,7 @@ function processDeactivatable(
 ): Promise<any> {
   const plan = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
-  let i = infos.length; //query from inside out
+  let i = infos.length; // query from inside out
 
   function inspect(val: any): Promise<any> {
     if (ignoreResult || shouldContinue(val)) {
@@ -130,7 +130,7 @@ function processActivatable(
 ) {
   let infos = findActivatable(navigationInstruction, callbackName);
   let length = infos.length;
-  let i = -1; //query from top down
+  let i = -1; // query from top down
 
   function inspect(val: any, router: Router): Promise<any> {
     if (ignoreResult || shouldContinue(val, router)) {
@@ -264,7 +264,9 @@ class SafeSubscription {
     this._subscribed = true;
     this._subscription = subscriptionFunc(this);
 
-    if (!this._subscribed) this.unsubscribe();
+    if (!this._subscribed) {
+      this.unsubscribe();
+    }
   }
 
   get subscribed(): boolean {
@@ -272,7 +274,9 @@ class SafeSubscription {
   }
 
   unsubscribe(): void {
-    if (this._subscribed && this._subscription) this._subscription.unsubscribe();
+    if (this._subscribed && this._subscription) {
+      this._subscription.unsubscribe();
+    }
 
     this._subscribed = false;
   }

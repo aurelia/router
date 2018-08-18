@@ -129,7 +129,11 @@ export interface RoutableComponentCanActivate {
   * Implement this hook if you want to control whether or not your view-model can be navigated to.
   * Return a boolean value, a promise for a boolean value, or a navigation command.
   */
-  canActivate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): boolean | Promise<boolean> | PromiseLike<boolean> | NavigationCommand | Promise<NavigationCommand> | PromiseLike<NavigationCommand>;
+  canActivate(
+    params: any,
+    routeConfig: RouteConfig,
+    navigationInstruction: NavigationInstruction
+  ): boolean | Promise<boolean> | PromiseLike<boolean> | NavigationCommand | Promise<NavigationCommand> | PromiseLike<NavigationCommand>;
 }
 
 /**
@@ -176,7 +180,7 @@ export interface RoutableComponentDetermineActivationStrategy {
   * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
   * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
   */
-  determineActivationStrategy(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): ActivationStrategy[keyof ActivationStrategy];
+  determineActivationStrategy(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): ActivationStrategyType;
 }
 
 /**
@@ -196,15 +200,15 @@ export interface ActivationStrategy {
   /**
   * Reuse the existing view model, without invoking Router lifecycle hooks.
   */
-  noChange: 'no-change',
+  noChange: 'no-change';
   /**
   * Reuse the existing view model, invoking Router lifecycle hooks.
   */
-  invokeLifecycle: 'invoke-lifecycle',
+  invokeLifecycle: 'invoke-lifecycle';
   /**
   * Replace the existing view model, invoking Router lifecycle hooks.
   */
-  replace: 'replace'
+  replace: 'replace';
 }
 
 export type ActivationStrategyType = ActivationStrategy[keyof ActivationStrategy];

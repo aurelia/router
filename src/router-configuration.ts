@@ -22,7 +22,7 @@ export class RouterConfiguration {
   title: string;
   titleSeparator: string;
   unknownRouteConfig: RouteConfigSpecifier;
-  viewPortDefaults: { [name: string]: { moduleId: string | void;[key: string]: any } };
+  viewPortDefaults: Record<string, { [key: string]: any; moduleId: string | void }>;
 
   /**@internal */
   _fallbackRoute: string;
@@ -115,7 +115,7 @@ export class RouterConfiguration {
    *  default, of the form { viewPortName: { moduleId } }.
    * @chainable
    */
-  useViewPortDefaults(viewPortConfig: { [name: string]: { moduleId: string;[key: string]: any } }): RouterConfiguration {
+  useViewPortDefaults(viewPortConfig: Record<string, { [key: string]: any; moduleId: string }>): RouterConfiguration {
     this.viewPortDefaults = viewPortConfig;
     return this;
   }
@@ -152,7 +152,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: string | RouteConfig | ((instruction: NavigationInstruction) => string | RouteConfig | Promise<string | RouteConfig>)): RouterConfiguration {
+  mapUnknownRoutes(config: RouteConfigSpecifier): RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
@@ -199,7 +199,9 @@ export class RouterConfiguration {
       let pipelineProvider = router.pipelineProvider;
       for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
         let { name, step } = pipelineSteps[i];
-        // Potential error, addStep only accepts PipelineStep, but step here may be also a function
+        // The following type casting is not accurate, but kept as is
+        // It can be a function, which will later be instantiated
+        // by PipelineProvider container inside createPipeline method
         pipelineProvider.addStep(name, step as PipelineStep);
       }
     }

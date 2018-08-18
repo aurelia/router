@@ -1,5 +1,4 @@
 import {
-  Router,
   Redirect,
   RedirectToRoute,
   isNavigationCommand,
@@ -10,6 +9,7 @@ import { MockRouter } from './shared';
 describe('isNavigationCommand', () => {
   it('should return true for object which has a navigate method', () => {
     let nc: NavigationCommand = {
+      // tslint:disable-next-line
       navigate() { }
     };
 

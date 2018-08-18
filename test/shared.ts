@@ -14,11 +14,14 @@ export class MockHistory extends History {
   activate(opt?: NavigationOptions) {
     return false;
   }
+  // tslint:disable-next-line
   deactivate() { }
   navigate(fragment: string, opt?: NavigationOptions): boolean {
     return false;
   }
+  // tslint:disable-next-line
   navigateBack() { }
+  // tslint:disable-next-line
   setState(key: any, value: any) { }
   getState(key: any): any {
     return null;
@@ -28,6 +31,7 @@ export class MockHistory extends History {
     return '';
   }
 
+  // tslint:disable-next-line
   setTitle() { }
 }
 
@@ -40,6 +44,7 @@ export class MockInstruction {
   constructor(title: string) {
     this.title = title;
   }
+  // tslint:disable-next-line
   resolve(): void { }
 }
 

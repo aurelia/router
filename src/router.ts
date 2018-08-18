@@ -33,7 +33,7 @@ declare module 'aurelia-route-recognizer' {
     types: {
       dynamics: DynamicSegment;
       stars: StarSegment;
-    }
+    };
   }
 
   interface RouteHandler {
@@ -179,7 +179,7 @@ export class Router {
       return this.parent.transformTitle(title);
     }
     return title;
-  };
+  }
 
   /**
   * @param container The [[Container]] to use when child routers.
@@ -613,7 +613,7 @@ export class Router {
   /**@internal */
   _findParentInstructionFromRouter(router: Router, instruction: NavigationInstruction): NavigationInstruction {
     if (instruction.router === router) {
-      instruction.fragment = router.baseUrl; //need to change the fragment in case of a redirect instead of moduleId
+      instruction.fragment = router.baseUrl; // need to change the fragment in case of a redirect instead of moduleId
       return instruction;
     } else if (instruction.parentInstruction) {
       return this._findParentInstructionFromRouter(router, instruction.parentInstruction);

@@ -34,7 +34,7 @@ export class AppRouter extends Router {
   isActive: boolean;
 
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
-    super(container, history); //Note the super will call reset internally.
+    super(container, history); // Note the super will call reset internally.
     this.pipelineProvider = pipelineProvider;
     this.events = events;
   }
@@ -82,6 +82,7 @@ export class AppRouter extends Router {
       if ('configureRouter' in viewModel) {
         if (!this.isConfigured) {
           const resolveConfiguredPromise = this._resolveConfiguredPromise;
+          // tslint:disable-next-line
           this._resolveConfiguredPromise = () => { };
           return this
             .configure(config => {
