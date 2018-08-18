@@ -7,17 +7,12 @@
 
 machine:
   node:
-    version: 4.2.6
+    version: 8
 
 dependencies:
   pre:
-    - npm install -g gulp
-    - npm install -g jspm
-  override:
     - npm install
-    - jspm install
 
 test:
   override:
-    - gulp build
-    - gulp test
+    - npm run test
