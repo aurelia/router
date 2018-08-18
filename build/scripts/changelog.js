@@ -1,12 +1,16 @@
-const gulp = require('gulp');
+const fs = require('fs');
 const paths = require('../paths');
-var conventionalChangelog = require('gulp-conventional-changelog');
+const path = require('path');
+const conventionalChangelog = require('conventional-changelog');
+const dest = path.resolve(process.cwd(), paths.doc, 'CHANGELOG.md');
 
-gulp
-  .src(paths.doc + '/CHANGELOG.md', {
-    buffer: false
-  })
-  .pipe(conventionalChangelog({
-    preset: 'angular'
-  }))
-  .pipe(gulp.dest(paths.doc));
+let changelogChunk = '';
+const changelogStream = conventionalChangelog({ preset: 'angular' })
+  .on('data', chunk => changelogChunk += chunk.toString('utf8'))
+  .on('end', () => {
+    changelogStream.removeAllListeners();
+    const data = fs.readFileSync(dest, 'utf-8');
+    const fd = fs.openSync(dest, 'w+');
+    fs.writeSync(fd, Buffer.from(changelogChunk, 'utf8'), 0, changelogChunk.length, 0);
+    fs.writeSync(fd, Buffer.from(data, 'utf8'), 0, data.length, changelogChunk.length);
+  });
