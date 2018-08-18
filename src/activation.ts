@@ -3,7 +3,7 @@ import { isNavigationCommand } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { Next } from './pipeline';
 import { Router } from './router';
-import { RoutingComponent, ViewPortPlan } from './interfaces';
+import { ViewPortComponent, ViewPortPlan } from './interfaces';
 
 export class CanDeactivatePreviousStep {
   run(navigationInstruction: NavigationInstruction, next: Next) {
@@ -102,7 +102,7 @@ function findDeactivatable(
   return list;
 }
 
-function addPreviousDeactivatable(component: RoutingComponent, callbackName: string, list: IActivatableInfo[]): void {
+function addPreviousDeactivatable(component: ViewPortComponent, callbackName: string, list: IActivatableInfo[]): void {
   let childRouter = component.childRouter;
 
   if (childRouter && childRouter.currentInstruction) {

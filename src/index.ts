@@ -13,7 +13,7 @@ export {
   ViewPort,
   ViewPortPlan,
   ViewPortInstruction,
-  RoutingComponent
+  ViewPortComponent
 } from './interfaces';
 export {
   ActivateNextStep,

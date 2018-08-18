@@ -245,7 +245,7 @@ export interface PipelineResult {
 /**
  * The component responsible for routing
  */
-export interface RoutingComponent {
+export interface ViewPortComponent {
   viewModel: any;
   childContainer?: Container;
   router?: Router;
@@ -265,7 +265,7 @@ export interface ViewPortPlan {
   config: RouteConfig;
   strategy: ActivationStrategyType;
 
-  prevComponent?: RoutingComponent;
+  prevComponent?: ViewPortComponent;
   prevModuleId?: string;
   childNavigationInstruction?: NavigationInstruction;
 }
@@ -280,13 +280,13 @@ export interface ViewPortInstruction {
 
   moduleId: string;
 
-  component?: RoutingComponent;
+  component?: ViewPortComponent;
 
   childRouter?: Router;
 
   lifecycleArgs?: LifecycleArguments;
 
-  prevComponent?: RoutingComponent;
+  prevComponent?: ViewPortComponent;
 }
 
 export type NavigationResult = boolean | Promise<PipelineResult> | Promise<PipelineResult | boolean>;

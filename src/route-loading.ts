@@ -1,12 +1,12 @@
 import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
 import { NavigationInstruction } from './navigation-instruction';
-import { ViewPortInstruction, RouteConfig, RoutingComponent, ViewPortPlan } from './interfaces';
+import { ViewPortInstruction, RouteConfig, ViewPortComponent, ViewPortPlan } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { Router } from './router';
 import { Next } from './pipeline';
 
 export class RouteLoader {
-  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<RoutingComponent> {
+  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<ViewPortComponent> {
     throw Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }
 }
@@ -120,7 +120,7 @@ function loadComponent(
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   config: RouteConfig
-): Promise<RoutingComponent> {
+): Promise<ViewPortComponent> {
   let router = navigationInstruction.router;
   let lifecycleArgs = navigationInstruction.lifecycleArgs;
 
