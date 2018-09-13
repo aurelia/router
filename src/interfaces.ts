@@ -248,7 +248,7 @@ export interface PipelineResult {
 export interface ViewPortComponent {
   viewModel: any;
   childContainer?: Container;
-  router?: Router;
+  router: Router;
   config?: RouteConfig;
   childRouter?: Router;
 }

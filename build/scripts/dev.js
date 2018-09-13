@@ -3,9 +3,8 @@ const rollup = require('rollup');
 const typescript = require('rollup-plugin-typescript2');
 const ChildProcess = require('child_process');
 
-const targetFormats = args.format || ['es2015', 'amd', 'commonjs', 'native-modules'];
+const targetFormats = args.format || ['commonjs']; // by default only run devs for commonjs
 const targetDir = args.target;
-const noop = () => {};
 
 const buildConfigs = {
   es2015: {
@@ -19,19 +18,7 @@ const buildConfigs = {
           target: 'es2015'
         }
       }
-    },
-    postTask: () => new Promise(resolve => {
-      ChildProcess.exec('npm run bundle-dts', (err, stdout, stderr) => {
-        if (err || stderr) {
-          console.log('Bundling dts error');
-          console.log(err);
-          console.log('========');
-          console.log('stderr');
-          console.log(stderr);
-        }
-        resolve(err ? [null, err] : [null, null]);
-      });
-    })
+    }
   },
   amd: {
     output: {
@@ -108,13 +95,31 @@ async function roll(format) {
   watcher.on('event', (e) => {
     if (e.code === 'BUNDLE_END') {
       console.log('Finished compilation. Running post task bundling dts.');
-      (buildConfigs[format].postTask || noop)();
+      generateDtsBundle();
     }
+  });
+}
+
+function generateDtsBundle() {
+  return new Promise(resolve => {
+    ChildProcess.exec('npm run bundle-dts', (err, stdout, stderr) => {
+      if (err || stderr) {
+        console.log('Bundling dts error');
+        console.log(err);
+        console.log('========');
+        console.log('stderr');
+        console.log(stderr);
+      } else {
+        console.log('Generated dts bundle successfully');
+      }
+      resolve(err ? [null, err] : [null, null]);
+    });
   });
 }
 
 targetFormats.forEach(roll);
 
+console.log('Target directory for copy: "' + targetDir + '"');
 if (targetDir) {
   console.log('Watching dist folder');
   const gulpWatch = require('gulp-watch');
