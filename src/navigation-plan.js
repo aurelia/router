@@ -109,6 +109,7 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
         pending.push(task);
       }
     }
+  }
 
   if (config.viewPorts) {
     for (let viewPortName in config.viewPorts) {
