@@ -792,6 +792,7 @@ export var Router = function () {
     this.isNavigatingRefresh = false;
     this.isNavigatingForward = false;
     this.isNavigatingBack = false;
+    this.couldDeactivate = false;
     this.navigation = [];
     this.currentInstruction = null;
     this.viewPortDefaults = {};
@@ -1255,6 +1256,8 @@ function processDeactivatable(navigationInstruction, callbackName, next, ignoreR
       }
     }
 
+    navigationInstruction.router.couldDeactivate = true;
+
     return next();
   }
 
@@ -1611,9 +1614,13 @@ export var PipelineProvider = function () {
   PipelineProvider.prototype.createPipeline = function createPipeline() {
     var _this9 = this;
 
+    var useCanDeactivateStep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
     var pipeline = new Pipeline();
     this.steps.forEach(function (step) {
-      return pipeline.addStep(_this9.container.get(step));
+      if (useCanDeactivateStep || step !== CanDeactivatePreviousStep) {
+        pipeline.addStep(_this9.container.get(step));
+      }
     });
     return pipeline;
   };
@@ -1808,7 +1815,7 @@ export var AppRouter = function (_Router) {
         throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 
-      var pipeline = _this14.pipelineProvider.createPipeline();
+      var pipeline = _this14.pipelineProvider.createPipeline(!_this14.couldDeactivate);
 
       return pipeline.run(instruction).then(function (result) {
         return processResult(instruction, result, instructionCount, _this14);
@@ -1886,6 +1893,7 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
     router.isNavigatingRefresh = false;
     router.isNavigatingForward = false;
     router.isNavigatingBack = false;
+    router.couldDeactivate = false;
 
     var eventName = void 0;
 

@@ -1,3 +1,14 @@
+<a name="1.6.3"></a>
+## [1.6.3](https://github.com/aurelia/router/compare/1.6.2...1.6.3) (2018-09-27)
+
+
+### Bug Fixes
+
+* **typings:** Revert aliasing interface ([59e4cf2](https://github.com/aurelia/router/commit/59e4cf2))
+* Prevent running CanDeactivatePreviousStep twice in same navigation ([54b3654](https://github.com/aurelia/router/commit/54b3654)), closes [#45](https://github.com/aurelia/router/issues/45)
+
+
+
 <a name="1.6.2"></a>
 ## [1.6.2](https://github.com/aurelia/router/compare/1.6.1...1.6.2) (2018-07-17)
 

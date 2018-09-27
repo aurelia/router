@@ -706,6 +706,7 @@ export let Router = class Router {
     this.isNavigatingRefresh = false;
     this.isNavigatingForward = false;
     this.isNavigatingBack = false;
+    this.couldDeactivate = false;
     this.navigation = [];
     this.currentInstruction = null;
     this.viewPortDefaults = {};
@@ -1125,6 +1126,8 @@ function processDeactivatable(navigationInstruction, callbackName, next, ignoreR
       }
     }
 
+    navigationInstruction.router.couldDeactivate = true;
+
     return next();
   }
 
@@ -1432,9 +1435,13 @@ export let PipelineProvider = class PipelineProvider {
     this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, this._createPipelineSlot('authorize'), CanActivateNextStep, this._createPipelineSlot('preActivate', 'modelbind'), DeactivatePreviousStep, ActivateNextStep, this._createPipelineSlot('preRender', 'precommit'), CommitChangesStep, this._createPipelineSlot('postRender', 'postcomplete')];
   }
 
-  createPipeline() {
+  createPipeline(useCanDeactivateStep = true) {
     let pipeline = new Pipeline();
-    this.steps.forEach(step => pipeline.addStep(this.container.get(step)));
+    this.steps.forEach(step => {
+      if (useCanDeactivateStep || step !== CanDeactivatePreviousStep) {
+        pipeline.addStep(this.container.get(step));
+      }
+    });
     return pipeline;
   }
 
@@ -1602,7 +1609,7 @@ export let AppRouter = class AppRouter extends Router {
         throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 
-      let pipeline = this.pipelineProvider.createPipeline();
+      let pipeline = this.pipelineProvider.createPipeline(!this.couldDeactivate);
 
       return pipeline.run(instruction).then(result => processResult(instruction, result, instructionCount, this)).catch(error => {
         return { output: error instanceof Error ? error : new Error(error) };
@@ -1670,6 +1677,7 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
     router.isNavigatingRefresh = false;
     router.isNavigatingForward = false;
     router.isNavigatingBack = false;
+    router.couldDeactivate = false;
 
     let eventName;
 
