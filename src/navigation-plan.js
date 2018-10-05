@@ -56,57 +56,30 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
 
   let prev = instruction.previousInstruction;
   let plan = {};
-  let defaults = instruction.router.viewPortDefaults;
+  let pending = [];
 
-  if (prev) {
-    let newParams = hasDifferentParameterValues(prev, instruction);
-    let pending = [];
+  let newParams = prev ? hasDifferentParameterValues(prev, instruction) : true;
 
+  let viewPortDefaults = Object.assign({}, instruction.router.viewPortDefaults);
+
+  if (prev && !config.explicitViewPorts) {
     for (let viewPortName in prev.viewPortInstructions) {
-      let prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
-      let nextViewPortConfig = viewPortName in config.viewPorts ? config.viewPorts[viewPortName] : prevViewPortInstruction;
-      if (nextViewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
-        nextViewPortConfig = defaults[viewPortName];
+      delete viewPortDefaults[viewPortName.split('.')[0]];
+
+      let viewPortPlan = buildViewPortPlan(instruction, instruction.config.viewPorts, forceLifecycleMinimum, newParams, viewPortName, true);
+      plan[viewPortPlan.name] = viewPortPlan.plan;
+      if (viewPortPlan.task) {
+        pending.push(viewPortPlan.task);
       }
+    }
+  }
 
-      let viewPortPlan = plan[viewPortName] = {
-        name: viewPortName,
-        config: nextViewPortConfig,
-        prevComponent: prevViewPortInstruction.component,
-        prevModuleId: prevViewPortInstruction.moduleId
-      };
+  let viewPorts = {};
 
-      if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
-        viewPortPlan.strategy = activationStrategy.replace;
-      } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
-        viewPortPlan.strategy = prevViewPortInstruction.component.viewModel
-          .determineActivationStrategy(...instruction.lifecycleArgs);
-      } else if (config.activationStrategy) {
-        viewPortPlan.strategy = config.activationStrategy;
-      } else if (newParams || forceLifecycleMinimum) {
-        viewPortPlan.strategy = activationStrategy.invokeLifecycle;
-      } else {
-        viewPortPlan.strategy = activationStrategy.noChange;
-      }
-
-      if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
-        let path = instruction.getWildcardPath();
-        let task = prevViewPortInstruction.childRouter
-          ._createNavigationInstruction(path, instruction).then(childInstruction => { // eslint-disable-line no-loop-func
-            viewPortPlan.childNavigationInstruction = childInstruction;
-
-            return _buildNavigationPlan(
-              childInstruction,
-              viewPortPlan.strategy === activationStrategy.invokeLifecycle)
-              .then(childPlan => {
-                if (childPlan instanceof Redirect) {
-                  return Promise.reject(childPlan);
-                }
-                childInstruction.plan = childPlan;
-              });
-          });
-
-        pending.push(task);
+  if (viewPortDefaults) {
+    for (let viewPortName in viewPortDefaults) {
+      if (config.viewPorts[viewPortName] === undefined) {
+        viewPorts[viewPortName] = viewPortDefaults[viewPortName];
       }
     }
   }
@@ -126,16 +99,12 @@ export function _buildNavigationPlan(instruction: NavigationInstruction, forceLi
     }
   }
 
-  for (let viewPortName in config.viewPorts) {
-    let viewPortConfig = config.viewPorts[viewPortName];
-    if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
-      viewPortConfig = defaults[viewPortName];
+  for (let viewPortName in viewPorts) {
+    let viewPortPlan = buildViewPortPlan(instruction, viewPorts, forceLifecycleMinimum, newParams, viewPortName, false);
+    plan[viewPortPlan.name] = viewPortPlan.plan;
+    if (viewPortPlan.task) {
+      pending.push(viewPortPlan.task);
     }
-    plan[viewPortName] = {
-      name: viewPortName,
-      strategy: activationStrategy.replace,
-      config: viewPortConfig
-    };
   }
 
   return Promise.all(pending).then(() => {
