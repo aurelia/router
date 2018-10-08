@@ -5,13 +5,48 @@ import {RouteLoader} from '../src/route-loading';
 import {Pipeline} from '../src/pipeline';
 
 class MockHistory extends History {
+  history;
   activate() {}
   deactivate() {}
-  navigate() {}
+  navigate(location) {
+    this.history.navigate(location)
+  }
   navigateBack() {}
-  setState(key, value) {}
+  setState(key, value) {
+    this.history.setState(key, value);
+  }
   getState(key) {
-    return null;
+    return this.history.getState(key);
+  }
+}
+
+class MockBrowserHistory {
+  currentLocationIndex = 0;
+  states = [];
+  get length() {
+    return this.states.length;
+  }
+  setState(key, value) {
+    if (!this.states[this.currentLocationIndex]) {
+      this.states[this.currentLocationIndex] = {};
+    }
+    this.states[this.currentLocationIndex][key] = value;
+  }
+  getState(key) {
+    if (!this.states[this.currentLocationIndex]) {
+      this.states[this.currentLocationIndex] = {};
+    }
+    return this.states[this.currentLocationIndex][key];
+  }
+  location(location) {
+    this.states.splice(this.currentLocationIndex + 1);
+    this.currentLocationIndex = this.states.length;
+    this.states.push({ HistoryIndex: this.currentLocationIndex });
+    return location;
+  }
+  go(movement) {
+    this.currentLocationIndex += movement;
+    console.log('GO', this.currentLocationIndex, this.states);
   }
 }
 
@@ -42,6 +77,7 @@ describe('app-router', () => {
 
   beforeEach(() => {
     history = new MockHistory();
+    history.history = new MockBrowserHistory();
     container = new Container();
     container.registerSingleton(RouteLoader, MockLoader);
     ea = { publish() {} };
@@ -208,12 +244,17 @@ describe('app-router', () => {
   describe('loadUrl', () => {
     it('restores previous location when route not found', (done) => {
       spyOn(history, 'navigate');
+      spyOn(history.history, 'go');
 
-      router.history.previousLocation = 'prev';
-      router.loadUrl('next')
+      router.history.previousLocation = router.history.history.location('prev');
+
+      router.lastHistoryMovement = 1;
+      router.loadUrl(router.history.history.location('next'))
         .then(result => {
           expect(result).toBeFalsy();
-          expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
+          // Navigation is now restored through the browser history
+          // expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
+          expect(history.history.go).toHaveBeenCalledWith(-1);
         })
         .catch(result => expect(true).toBeFalsy('should have succeeded'))
         .then(done);
@@ -235,8 +276,10 @@ describe('app-router', () => {
 
     it('restores previous location on error', (done) => {
       spyOn(history, 'navigate');
+      spyOn(history.history, 'go');
 
-      router.history.previousLocation = 'prev';
+      router.history.previousLocation = router.history.history.location('prev');
+
       router.activate();
       router.configure(config => {
         config.map([
@@ -244,10 +287,13 @@ describe('app-router', () => {
         ]);
       });
 
-      router.loadUrl('next')
+      router.lastHistoryMovement = 1;
+      router.loadUrl(router.history.history.location('next'))
         .then(result => {
           expect(result).toBeFalsy();
-          expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
+          // Navigation is now restored through the browser history
+          // expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
+          expect(router.history.history.go).toHaveBeenCalledWith(-1);
         })
         .catch(result => expect(true).toBeFalsy('should have succeeded'))
         .then(done);

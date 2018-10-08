@@ -95,6 +95,16 @@ export class Router {
   currentNavigationTracker: number;
 
   /**
+  * The current index in the browser history.
+  */
+  currentHistoryIndex: number;
+
+  /**
+  * The amount of index steps in the last history navigation
+  */
+  lastHistoryMovement: number;
+
+  /**
   * The navigation models for routes that specified [[RouteConfig.nav]].
   */
   navigation: NavModel[];
