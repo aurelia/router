@@ -266,7 +266,7 @@ function restorePreviousLocation(router) {
   if (previousLocation) {
     Promise.resolve().then(() => {
       if (router.lastHistoryMovement && !isNaN(router.lastHistoryMovement)) {
-        router.history.history.go(-router.lastHistoryMovement);
+        router.history.go(-router.lastHistoryMovement);
       }
     });
   } else if (router.fallbackRoute) {
