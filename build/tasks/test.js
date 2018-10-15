@@ -32,3 +32,26 @@ gulp.task('coveralls', ['test'], function (done) {
   gulp.src('build/reports/coverage/lcov/report-lcovonly.txt')
     .pipe(coveralls());
 });
+
+
+/**
+ * Run test once with code coverage and exit
+ */
+gulp.task('cover', function (done) {
+  new karma.Server({
+    configFile: __dirname + '/../../karma.conf.js',
+    singleRun: true,
+    reporters: ['progress', 'coverage'],
+    preprocessors: {
+      'test/**/*.js': ['babel'],
+      'src/**/*.js': ['babel', 'coverage']
+    },
+    coverageReporter: {
+      dir: 'build/reports/coverage',
+      reporters: [
+        { type: 'html', subdir: 'report-html' },
+        { type: 'json', subdir: '.', file: 'coverage-final.json' }
+      ]
+    }
+  }, done).start();
+});

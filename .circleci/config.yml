@@ -1,0 +1,70 @@
+# Defaults for all jobs
+
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: aureliaeffect/circleci-v1:latest
+
+# Variables
+var_1: &cache_key aurelia-{{ .Branch }}-{{ checksum "package.json" }}{{ checksum "package-lock.json" }}
+
+version: 2
+jobs:
+  install:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: npm ci
+      - run: jspm install
+      - run: git checkout -- package.json
+      - save_cache:
+          key: *cache_key
+          paths:
+            - node_modules
+            - jspm_packages
+
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - run: gulp build
+      - store_artifacts:
+          path: ./dist
+
+  unit_tests:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - run: gulp cover
+      - run: codecov -f ./build/reports/coverage/coverage-final.json 
+      - store_test_results:
+          path: ./build/reports/coverage
+      - store_artifacts:
+          path: ./build/reports/coverage
+
+  lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - run: gulp lint
+
+workflows:
+    version: 2
+    default_workflow:
+        jobs:
+            - install
+            - build:
+                requires:
+                    - install
+            - unit_tests:
+                requires:
+                    - install
+            - lint:
+                requires:
+                    - install
