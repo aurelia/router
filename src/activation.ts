@@ -82,9 +82,9 @@ function findDeactivatable(
     let viewPortPlan = plan[viewPortName];
     let prevComponent = viewPortPlan.prevComponent;
 
-    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle ||
-      viewPortPlan.strategy === activationStrategy.replace) &&
-      prevComponent) {
+    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle ||viewPortPlan.strategy === activationStrategy.replace)
+      && prevComponent
+    ) {
       let viewModel = prevComponent.viewModel;
 
       if (callbackName in viewModel) {
