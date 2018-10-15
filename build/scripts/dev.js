@@ -71,7 +71,6 @@ async function roll(format) {
   const inputOptions = {
     input: 'src/index.ts',
     external: [
-      'tslib',
       'aurelia-dependency-injection',
       'aurelia-event-aggregator',
       'aurelia-logging',
