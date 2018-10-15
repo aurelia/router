@@ -29,7 +29,7 @@ class PipelineSlot {
     this.slotAlias = alias;
   }
 
-  getSteps() {
+  getSteps(): PipelineStep[] {
     return this.steps.map(x => this.container.get(x));
   }
 }
@@ -98,7 +98,7 @@ export class PipelineProvider {
   /**
    * Removes a step from a slot in the pipeline
    */
-  removeStep(name: string, step: PipelineStep) {
+  removeStep(name: string, step: PipelineStep): void {
     let slot = this._findStep(name);
     if (slot) {
       slot.steps.splice(slot.steps.indexOf(step), 1);
@@ -109,7 +109,7 @@ export class PipelineProvider {
    * @internal
    * Clears all steps from a slot in the pipeline
    */
-  _clearSteps(name: string = '') {
+  _clearSteps(name: string = ''): void {
     let slot = this._findStep(name);
     if (slot) {
       slot.steps = [];
@@ -119,7 +119,7 @@ export class PipelineProvider {
   /**
    * Resets all pipeline slots
    */
-  reset() {
+  reset(): void {
     this._clearSteps('authorize');
     this._clearSteps('preActivate');
     this._clearSteps('preRender');
@@ -127,7 +127,7 @@ export class PipelineProvider {
   }
 
   /**@internal */
-  _createPipelineSlot(name: string, alias?: string) {
+  _createPipelineSlot(name: string, alias?: string): PipelineSlot {
     return new PipelineSlot(this.container, name, alias);
   }
 }

@@ -251,6 +251,10 @@ export interface ViewPortComponent {
   router: Router;
   config?: RouteConfig;
   childRouter?: Router;
+  /**
+   * This is for backward compat, when moving from any to a more strongly typed interface
+   */
+  [key: string]: any;
 }
 
 export interface ViewPort {

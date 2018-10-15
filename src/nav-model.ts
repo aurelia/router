@@ -41,7 +41,6 @@ export class NavModel {
   */
   router: Router;
 
-  /**@internal */
   order: number | boolean;
 
   constructor(router: Router, relativeHref: string) {
