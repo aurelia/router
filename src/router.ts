@@ -46,6 +46,8 @@ declare module 'aurelia-route-recognizer' {
   }
 }
 
+type RouterConfigurationResolution = RouterConfiguration | ((cfg: RouterConfiguration) => void | RouterConfiguration | Promise<RouterConfiguration>);
+
 /**
 * The primary class responsible for handling routing and navigation.
 *
@@ -253,7 +255,7 @@ export class Router {
   configure(callbackOrConfig: RouterConfiguration | ((config: RouterConfiguration) => RouterConfiguration)): Promise<void> {
     this.isConfigured = true;
 
-    let result: RouterConfiguration = callbackOrConfig as RouterConfiguration;
+    let result: RouterConfigurationResolution = callbackOrConfig as RouterConfiguration;
     let config: RouterConfiguration;
     if (typeof callbackOrConfig === 'function') {
       config = new RouterConfiguration();
