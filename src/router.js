@@ -1,6 +1,7 @@
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {Container} from 'aurelia-dependency-injection';
 import {History, NavigationOptions} from 'aurelia-history';
+import {buildQueryString, parseQueryString} from 'aurelia-path';
 import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
@@ -223,10 +224,16 @@ export class Router {
   *
   * @param fragment The URL fragment to use as the navigation destination.
   * @param options The navigation options.
+  * @param params The parameters to be used when populating the url pattern.
   */
-  navigate(fragment: string, options?: NavigationOptions): Promise<PipelineResult | boolean> {
+  navigate(fragment: string, options?: NavigationOptions, params?: any): Promise<PipelineResult | boolean> {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
+    }
+
+    if (params) {
+      let safeParams = Object.assign({}, params);
+      fragment = this.applyParams(fragment, safeParams);
     }
 
     this.isExplicitNavigation = true;
@@ -264,6 +271,39 @@ export class Router {
     let childRouter = new Router(container || this.container.createChild(), this.history);
     childRouter.parent = this;
     return childRouter;
+  }
+
+  /**
+  * Generates a URL fragment with parameters applied to it.
+  *
+  * @param fragment The route fragment whose pattern should have parameters applied to it.
+  * @param params The route params to be used to populate the route pattern.
+  * @returns {string} A string containing the generated URL fragment.
+  */
+  applyParams(fragment: string, params: any): string {
+    let fragments = fragment.split('/');
+    let consumed = {};
+    for (let i = 0, ilen = fragments.length; i < ilen; ++i) {
+      let segment = fragments[i];
+
+      // Try to parse a parameter :param?
+      let match = segment.match(/^:([^?]+)(\?)?$/);
+      if (match) {
+        let [, name, optional] = match;
+        fragments[i] = params[name];
+        consumed[name] = true;
+      }
+    }
+    fragment = fragments.join('/');
+
+    for (let key of Object.keys(consumed)) {
+      delete params[key];
+    }
+    let query = buildQueryString(params);
+    if (query && query.length) {
+      fragment += (fragment.indexOf('?') < 0 ? '?' : '&') + query;
+    }
+    return fragment;
   }
 
   /**
@@ -496,7 +536,7 @@ export class Router {
     if (results && results.length) {
       let first = results[0];
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
-        params: first.params,
+        params: Object.assign({}, first.params, parseQueryString(queryString)),
         queryParams: first.queryParams || results.queryParams,
         config: first.config || first.handler
       }));
@@ -510,7 +550,7 @@ export class Router {
       }
     } else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
-        params: { path: fragment },
+        params: Object.assign({ path: fragment }, parseQueryString(queryString)),
         queryParams: results ? results.queryParams : {},
         config: null // config will be created by the catchAllHandler
       }));
@@ -523,7 +563,7 @@ export class Router {
         let newParentInstruction = this._findParentInstructionFromRouter(router, parentInstruction);
 
         let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
-          params: { path: fragment },
+          params: Object.assign({ path: fragment }, parseQueryString(queryString)),
           queryParams: results ? results.queryParams : {},
           router: router,
           parentInstruction: newParentInstruction,
