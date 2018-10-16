@@ -342,23 +342,21 @@ export class Router {
     let caseSensitive = config.caseSensitive === true;
     let state = this._recognizer.add({path: path, handler: config, caseSensitive: caseSensitive});
 
-    if (path) {
-      let settings = config.settings;
-      delete config.settings;
-      let withChild = JSON.parse(JSON.stringify(config));
-      config.settings = settings;
-      withChild.route = `${path}/*childRoute`;
-      withChild.hasChildRouter = true;
-      this._childRecognizer.add({
-        path: withChild.route,
-        handler: withChild,
-        caseSensitive: caseSensitive
-      });
+    let settings = config.settings;
+    delete config.settings;
+    let withChild = JSON.parse(JSON.stringify(config));
+    config.settings = settings;
+    withChild.route = `${path}/*childRoute`;
+    withChild.hasChildRouter = true;
+    this._childRecognizer.add({
+      path: withChild.route,
+      handler: withChild,
+      caseSensitive: caseSensitive
+    });
 
-      withChild.navModel = navModel;
-      withChild.settings = config.settings;
-      withChild.navigationStrategy = config.navigationStrategy;
-    }
+    withChild.navModel = navModel;
+    withChild.settings = config.settings;
+    withChild.navigationStrategy = config.navigationStrategy;
 
     config.navModel = navModel;
 
@@ -477,6 +475,13 @@ export class Router {
     let results = this._recognizer.recognize(url);
     if (!results || !results.length) {
       results = this._childRecognizer.recognize(url);
+      if (
+        results &&
+        (this.catchAllHandler || (this.parent && this._parentCatchAllHandler(this.parent)))
+      ) {
+        results = Array.prototype.filter.call(results,
+          result => result.handler.route !== '/*childRoute');
+      }
     }
 
     let instructionInit = {
