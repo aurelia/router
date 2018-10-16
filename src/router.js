@@ -1,6 +1,7 @@
 import {RouteRecognizer} from 'aurelia-route-recognizer';
 import {Container} from 'aurelia-dependency-injection';
 import {History, NavigationOptions} from 'aurelia-history';
+import {TemplatingEngine} from 'aurelia-templating';
 import {NavigationInstruction} from './navigation-instruction';
 import {NavModel} from './nav-model';
 import {RouterConfiguration} from './router-configuration';
@@ -583,6 +584,25 @@ export class Router {
 
         return c;
       });
+  }
+
+  _ensureStatefulViewPort(name, moduleId) {
+    let viewPort = this.viewPorts[name];
+    let viewPortName = `${name}.${moduleId}`;
+
+    if (!this.viewPorts[viewPortName]) {
+      let newElement = viewPort.element.ownerDocument.createElement('router-view');
+      newElement.setAttribute('name', viewPortName);
+      viewPort.element.insertAdjacentElement('afterend', newElement);
+      let templatingEngine = viewPort.container.get(TemplatingEngine);
+      templatingEngine.enhance({
+        element: newElement,
+        container: viewPort.container,
+        resources: viewPort.resources
+      });
+    }
+    
+    return viewPortName;
   }
 }
 

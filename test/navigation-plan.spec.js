@@ -35,7 +35,7 @@ describe('NavigationPlanStep', () => {
       fragment: 'first',
       config: { viewPorts: { default: { moduleId: './first' }}},
       params: { id: '1' },
-      router
+      router: {}
     });
 
     sameAsFirstInstruction = new NavigationInstruction({
@@ -43,14 +43,14 @@ describe('NavigationPlanStep', () => {
       config: { viewPorts: { default: { moduleId: './first' }}},
       previousInstruction: firstInstruction,
       params: { id: '1' },
-      router
+      router: {}
     });
 
     secondInstruction = new NavigationInstruction({
       fragment: 'second',
       config: { viewPorts: { default: { moduleId: './second' }}},
       previousInstruction: firstInstruction,
-      router
+      router: {}
     });
   });
 
@@ -204,8 +204,8 @@ describe('NavigationPlanStep', () => {
     });
 
     it('is no-change when nothing changes', (done) => {
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
-
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}}, true);
+      
       step.run(sameAsFirstInstruction, state.next)
       .then(() => {
         expect(state.result).toBe(true);
@@ -216,7 +216,7 @@ describe('NavigationPlanStep', () => {
 
     it('can be determined by route config', (done) => {
       sameAsFirstInstruction.config.activationStrategy = 'fake-strategy';
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}}, true);
 
       step.run(sameAsFirstInstruction, state.next)
       .then(() => {
@@ -228,7 +228,7 @@ describe('NavigationPlanStep', () => {
 
     it('can be determined by view model', (done) => {
       let viewModel = { determineActivationStrategy: () => 'vm-strategy'};
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel });
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel }, true);
 
       step.run(sameAsFirstInstruction, state.next)
       .then(() => {
@@ -241,7 +241,7 @@ describe('NavigationPlanStep', () => {
     it('is invoke-lifecycle when only params change', (done) => {
       firstInstruction.params = { id: '1' };
       sameAsFirstInstruction.params = { id: '2' };
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}}, true);
 
       step.run(sameAsFirstInstruction, state.next)
       .then(() => {
@@ -255,7 +255,7 @@ describe('NavigationPlanStep', () => {
       firstInstruction.queryParams = { param: 'foo' };
       sameAsFirstInstruction.queryParams = { param: 'bar' };
       sameAsFirstInstruction.options.compareQueryParams = true;
-      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}});
+      firstInstruction.addViewPortInstruction('default', 'ignored', './first', { viewModel: {}}, true);
 
       step.run(sameAsFirstInstruction, state.next)
       .then(() => {
