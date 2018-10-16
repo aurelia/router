@@ -138,11 +138,19 @@ export class AppRouter extends Router {
         this.isNavigatingForward = true;
       } else if (this.currentNavigationTracker > navtracker) {
         this.isNavigatingBack = true;
-      } if (!navtracker) {
+      }
+      if (!navtracker) {
         navtracker = Date.now();
         this.history.setState('NavigationTracker', navtracker);
       }
       this.currentNavigationTracker = navtracker;
+
+      let historyIndex = this.history.getHistoryIndex();
+      this.lastHistoryMovement = historyIndex - this.currentHistoryIndex;
+      if (isNaN(this.lastHistoryMovement)) {
+        this.lastHistoryMovement = 0;
+      }
+      this.currentHistoryIndex = historyIndex;
 
       instruction.previousInstruction = this.currentInstruction;
 
@@ -256,7 +264,11 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
 function restorePreviousLocation(router) {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
-    router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+    Promise.resolve().then(() => {
+      if (router.lastHistoryMovement && !isNaN(router.lastHistoryMovement)) {
+        router.history.go(-router.lastHistoryMovement);
+      }
+    });
   } else if (router.fallbackRoute) {
     router.navigate(router.fallbackRoute, { trigger: true, replace: true });
   } else {
