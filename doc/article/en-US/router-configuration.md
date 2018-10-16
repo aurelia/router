@@ -78,7 +78,7 @@ The router contains a number of additional properties that indicate the current 
 
 * `router.isNavigating`: `true` if the router is currently processing a navigation.
 * `router.isNavigatingFirst`: `true` if the router is navigating into the app for the first time in the browser session.
-* `router.isNavigatingNew`: `true` if the router is navigating to a page instance, not in the browser session history. This is triggered when the user clicks a link or the navigate function is called explicitly.
+* `router.isNavigatingNew`: `true` if the router is navigating to a page instance which is not in the browser session history. This is triggered when the user clicks a link or the navigate function is called explicitly.
 * `router.isNavigatingForward`: `true` if the router is navigating forward in the browser session history. This is triggered when the user clicks the forward button in their browser.
 * `router.isNavigatingBack`: `true` if the router is navigating back in the browser session history. This is triggered when the user clicks the back button in their browser or when the `navigateBack()` function is called.
 * `router.isNavigatingRefresh`: `true` if the router is navigating due to a browser refresh.
