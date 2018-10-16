@@ -56,19 +56,19 @@ To use Aurelia's router, your component view must have a `<router-view></router-
 * `config.map()` adds route(s) to the router. Although only `route`, `name`, `moduleId`, `href` and `nav` are shown above there are other properties that can be included in a route. The interface name for a route is `RouteConfig`. You can also use `config.mapRoute()` to add a single route.
 * `route` - is the pattern to match against incoming URL fragments. It can be a string or array of strings. The route can contain parameterized routes or wildcards as well.
   * Parameterized routes match against a string with a `:token` parameter (ie: 'users/:id/detail'). An object with the token parameter's name is set as property and passed as a parameter to the route view-model's `activate()` function.
-  * A parameter can be made optional by appending a question mark `:token?` (ie: `users/:id?/detail` would match both `users/3/detail` and `users/detail`). When an optional parameter is missing from the url, the property passed to `activate()` is `undefined`.
+  * A parameter can be made optional by appending a question mark `:token?` (ie: `users/:id?/detail` would match both `users/3/detail` and `users/detail`). When an optional parameter is missing from the URL, the property passed to `activate()` is `undefined`.
   * Wildcard routes are used to match the "rest" of a path (ie: files/*path matches files/new/doc or files/temp). An object with the rest of the URL after the segment is set as the `path` property and passed as a parameter to `activate()` as well.
 * `name` - is a friendly name that you can use to reference the route with, particularly when using route generation.
 * `moduleId` - is the id (usually a relative path) of the module that exports the component that should be rendered when the route is matched.
-* `href` - is a conditionally optional property. If it is not defined then route is used. If route has segments then href is required as in the case of files because the router does not know how to fill out the parameterized portions of the pattern.
-* `nav` - is a boolean or number property. When set to true the route will be included in the router's navigation model. When specified as number, the value will be used in sorting the routes. This makes it easier to create a dynamic menu or similar elements.  The navigation model will be available as array of `NavModel` in `router.navigation`. These are the available properties in `NavModel`:
+* `href` - is a conditionally optional property. If it is not defined then the `route` property is used. If `route` has segments then href is required as in the case of files because the router does not know how to fill out the parameterized portions of the pattern.
+* `nav` - is a boolean or number property. When set to true the route will be included in the router's navigation model. When specified as a number, the value will be used in sorting the routes. This makes it easier to create a dynamic menu or similar elements.  The navigation model will be available as an array of `NavModel` in `router.navigation`. These are the available properties in `NavModel`:
   * `isActive` flag which will be true when the associated route is active.
-  * `title` which will be prepended in html title when the associated route is active.
+  * `title` which will be prepended in HTML title when the associated route is active.
   * `href` can be used on `a` tag.
   * `config` is the object defined in `config.map`.
   * `settings` is equal to the property `settings` of `config` object.
   * `router` is a reference for AppRouter.
-  * Other properties includes `relativeHref` and `order`.
+  * Other properties include `relativeHref` and `order`.
 * `title` - is the text to be displayed as the document's title (appears in your browser's title bar or tab). It is combined with the `router.title` and the title from any child routes.
 * `titleSeparator` - is the text that will be used to join the `title` and any active `route.title`s. The default value is `' | '`.
 
@@ -78,12 +78,12 @@ The router contains a number of additional properties that indicate the current 
 
 * `router.isNavigating`: `true` if the router is currently processing a navigation.
 * `router.isNavigatingFirst`: `true` if the router is navigating into the app for the first time in the browser session.
-* `router.isNavigatingNew`: `true` if the router is navigating to a page instance not in the browser session history. This is triggered when the user clicks a link or the navigate function is called explicitly.
+* `router.isNavigatingNew`: `true` if the router is navigating to a page instance, not in the browser session history. This is triggered when the user clicks a link or the navigate function is called explicitly.
 * `router.isNavigatingForward`: `true` if the router is navigating forward in the browser session history. This is triggered when the user clicks the forward button in their browser.
 * `router.isNavigatingBack`: `true` if the router is navigating back in the browser session history. This is triggered when the user clicks the back button in their browser or when the `navigateBack()` function is called.
 * `router.isNavigatingRefresh`: `true` if the router is navigating due to a browser refresh.
 * `router.isExplicitNavigation`: `true` if the router is navigating due to explicit call to navigate function(s).
-* `router.isExplicitNavigationBack`: `true` if the router is navigating due to explicit call to navigateBack function.
+* `router.isExplicitNavigationBack`: `true` if the router is navigating due to an explicit call to navigateBack function.
 
 ### Webpack Configuration
 
@@ -122,7 +122,7 @@ See [Managing dependencies](https://github.com/jods4/aurelia-webpack-build/wiki/
 
 ### Push State
 
-Set `config.options.pushState` to `true` to activate push state and add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) to the head of your html document. If you're using JSPM, RequireJS or a similar module loader, you will also need to configure it with a base url, corresponding to your base tag's `href`. Finally, be sure to set the `config.options.root` to match your base tag's setting.
+Set `config.options.pushState` to `true` to activate push state and add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) to the head of your HTML document. If you're using JSPM, RequireJS or a similar module loader, you will also need to configure it with a base URL, corresponding to your base tag's `href`. Finally, be sure to set the `config.options.root` to match your base tag's setting.
 
 <code-listing heading="Push State">
   <source-code lang="ES 2015/2016">
@@ -164,7 +164,7 @@ Set `config.options.pushState` to `true` to activate push state and add [a base 
 
 ## Dynamically Specify Route Components
 
-You can add a `navigationStrategy` to a route to allow dynamic routes. Within the navigation strategy Aurelia requires you to configure `instruction.config` with the desired `moduleId`, `viewPorts` or `redirect`.
+You can add a `navigationStrategy` to a route to allow dynamic routes. Within the navigation strategy, Aurelia requires you to configure `instruction.config` with the desired `moduleId`, `viewPorts` or `redirect`.
 
 <code-listing heading="Using a Route Navigation Strategy">
   <source-code lang="ES 2015/2016">
@@ -277,7 +277,7 @@ You can set a route to be case sensitive, should you wish:
   </source-code>
 </code-listing>
 
-In the above example, our route will only match URL fragment of `/users` and not `/Users`, *but* since the route `home` is not case sensitive the URL `/Home` would match. By default Aurelia's routes are not case sensitive.
+In the above example, our route will only match URL fragment of `/users` and not `/Users`, *but* since the route `home` is not case sensitive the URL `/Home` would match. By default, Aurelia's routes are not case sensitive.
 
 ## Handling Unknown Routes
 
@@ -407,7 +407,7 @@ The default pipeline slots in order are `authorize`, `preActivate`, `preRender`,
 * `authorize` is called between loading the route's step and calling the route view-model' `canActivate` function if defined.
 * `preActivate` is called between the route view-model' `canActivate` function and the previous route view-model's `deactivate` function if defined.
 * `preRender` is called between the route view-model's activate function and before the component is rendered/composed.
-* `postRender` is called after the component has been render/composed.
+* `postRender` is called after the component has been rendered/composed.
 
 A pipeline step must be an object that contains a `run(navigationInstruction, next)` function.
 
@@ -738,7 +738,7 @@ The set of views subject to being part of a layout is defined in Aurelia as a se
 
 > Info
 > We're going to be a little sloppy here in terminology. Technically, routes refer to "moduleIds", not
-"views". Since the router resolves a `moduleId` to a view, indirectly the router does reference a view. It is easy to picture a view visually contained within a layout, so in this topic to we'll refer to views referenced by a route, not modules.
+"views". Since the router resolves a `moduleId` to a view, indirectly the router does reference a view. It is easy to picture a view visually contained within a layout, so in this topic, we will refer to views referenced by a route, not modules.
 
 We'll look at using HTML first. We know that the `router-view` custom HTML element is always associated with a set of one or more views referenced in a router configuration given in its parent view's view model. By associating a layout with a `router-view` one can thus associate a layout with the same set of views with which the `router-view` is associated.
 
@@ -751,7 +751,7 @@ To specify a layout on the `router-view` custom element, we use the following at
 > Info
 > All of these layout attributes are bindable.
 
-Following is an example of HTML in which we specify that we want all destination views reachable under the `router-view` to be laid-out inside a view with file name `layout.html`, located in the same directory as the view contianing the `router-view`:
+Following is an example of HTML in which we specify that we want all destination views reachable under the `router-view` to be laid-out inside a view with file name `layout.html`, located in the same directory as the view containing the `router-view`:
 
 <code-listing heading="app.html">
   <source-code lang="HTML">
@@ -965,7 +965,7 @@ Here is an example of setting the swap order strategy on a `router-view`:
 ## Internationalizing Titles
 
 If your application targets multiple cultures or languages, you probably want to translate your route titles. The `Router` class has a `transformTitle` property that can be used for this. It is expected to be assigned a function that takes the active route's title as a parameter and then returns the translated title. For example, if your app uses `aurelia-i18n`, its routes' titles would typically be set to some translation keys
-and the `AppRouter`'s `transformTitle` would be configured in such a way that the active route's title is translated using the `I18N`'s `tr` method. Additionally you can listen to a custom event published by the I18N service to react on locale changes using the EventAggregator:
+and the `AppRouter`'s `transformTitle` would be configured in such a way that the active route's title is translated using the `I18N`'s `tr` method. Additionally, you can listen to a custom event published by the I18N service to react to locale changes using the EventAggregator:
 
 <code-listing heading="src/main${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
@@ -1080,7 +1080,7 @@ In the previous example, the `AppRouter`'s `transformTitle` is set, so all child
 
 ## Configuring a Fallback Route
 
-Whenever navigation is rejected, it is redirected to a previous location. However in certain cases a previous location doesn't exist, e.g. when it happens as the first navigation after the startup of application. To handle this scenario, you can set up a fallback route.
+Whenever navigation is rejected, it is redirected to a previous location. However, in certain cases, a previous location doesn't exist, e.g. when it happens as the first navigation after the startup of the application. To handle this scenario, you can set up a fallback route.
 
 <code-listing heading="app${context.language.fileExtension}">
   <source-code lang="ES 2015/2016">
