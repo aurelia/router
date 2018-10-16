@@ -92,7 +92,7 @@ describe('the router', () => {
         expect(child.generate('parent')).toBe('#/parent');
         expect(child.generate('child')).toBe('#/child-router/child');
 
-        router.history._hasPushState = true;
+        router.history._usePushState = true;
 
         expect(router.generate('parent')).toBe('/parent');
         expect(child.generate('parent')).toBe('/parent');
@@ -136,7 +136,9 @@ describe('the router', () => {
         .then(() => {
           expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}#/test/1`);
           expect(child.generate('parent', { id: 2 }, options)).toBe(`${absoluteRoot}#/parent/2`);
-          router.history._hasPushState = true;
+
+          router.history._usePushState = true;
+
           expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}test/1`);
           expect(child.generate('parent', { id: 2 }, options)).toBe(`${absoluteRoot}parent/2`);
           done();
