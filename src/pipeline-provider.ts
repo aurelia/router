@@ -21,7 +21,7 @@ class PipelineSlot {
   /**@internal */
   slotAlias?: string;
 
-  steps: PipelineStep[] = [];
+  steps: (Function | PipelineStep)[] = [];
 
   constructor(container: Container, name: string, alias?: string) {
     this.container = container;
@@ -78,17 +78,18 @@ export class PipelineProvider {
 
   /**@internal */
   _findStep(name: string): PipelineSlot {
+    // Steps that are not PipelineSlots are constructor functions, and they will automatically fail. Probably.
     return this.steps.find(x => (x as PipelineSlot).slotName === name || (x as PipelineSlot).slotAlias === name) as PipelineSlot;
   }
 
   /**
   * Adds a step into the pipeline at a known slot location.
   */
-  addStep(name: string, step: PipelineStep): void {
+  addStep(name: string, step: PipelineStep | Function): void {
     let found = this._findStep(name);
     if (found) {
-      if (!(found as PipelineSlot).steps.includes(step)) { // prevent duplicates
-        (found as PipelineSlot).steps.push(step);
+      if (!found.steps.includes(step)) { // prevent duplicates
+        found.steps.push(step);
       }
     } else {
       throw new Error(`Invalid pipeline slot name: ${name}.`);

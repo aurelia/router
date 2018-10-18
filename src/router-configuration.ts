@@ -199,10 +199,7 @@ export class RouterConfiguration {
       let pipelineProvider = router.pipelineProvider;
       for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
         let { name, step } = pipelineSteps[i];
-        // The following type casting is not accurate, but kept as is
-        // It can be a function, which will later be instantiated
-        // by PipelineProvider container inside createPipeline method
-        pipelineProvider.addStep(name, step as PipelineStep);
+        pipelineProvider.addStep(name, step);
       }
     }
   }
