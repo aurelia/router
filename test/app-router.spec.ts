@@ -7,7 +7,7 @@ import {
   RouteLoader,
   Pipeline,
   NavigationInstruction,
-  RoutingComponent,
+  ViewPortComponent,
   NavigationCommand,
   Next,
   RouterConfiguration,
@@ -27,10 +27,10 @@ declare module 'aurelia-history' {
 
 
 class MockLoader extends RouteLoader {
-  loadRoute(router: Router, config: RouteConfig) {
+  loadRoute(router: Router, config: RouteConfig): Promise<ViewPortComponent> {
     return Promise.resolve({
       viewModel: {}
-    } as RoutingComponent);
+    } as ViewPortComponent);
   }
 }
 
