@@ -20,6 +20,7 @@
     "url": "http://github.com/aurelia/router"
   },
   "scripts": {
+    "start": "npm run dev -- --format es2015",
     "dev": "node build/scripts/dev",
     "build": "node build/scripts/build",
     "bundle-dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",

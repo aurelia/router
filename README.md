@@ -35,13 +35,13 @@ To build the code, follow these steps.
 1. To run the project in development mode, you can run:
 
   ```shell
-  npm run dev -- --format es2015
+  npm start
   ```
 
 2. If you want to copy over the newly built bundle, you can specified `--target`:
 
   ```
-  npm run dev -- --format es2015 --target ..\my-test-project
+  npm start -- --target ..\my-test-project
   ```
 
 ## Running The Tests
