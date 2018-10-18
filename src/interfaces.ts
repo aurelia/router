@@ -293,6 +293,6 @@ export interface ViewPortInstruction {
   prevComponent?: ViewPortComponent;
 }
 
-export type NavigationResult = boolean | Promise<PipelineResult> | Promise<PipelineResult | boolean>;
+export type NavigationResult = boolean | Promise<PipelineResult | boolean>;
 
 export type LifecycleArguments = [Record<string, string>, RouteConfig, NavigationInstruction];
