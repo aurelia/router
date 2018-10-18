@@ -278,17 +278,17 @@ export interface ViewPortInstruction {
 
   name?: string;
 
-  strategy?: ActivationStrategyType;
+  strategy: ActivationStrategyType;
 
   childNavigationInstruction?: NavigationInstruction;
 
   moduleId: string;
 
-  component?: ViewPortComponent;
+  component: ViewPortComponent;
 
   childRouter?: Router;
 
-  lifecycleArgs?: LifecycleArguments;
+  lifecycleArgs: LifecycleArguments;
 
   prevComponent?: ViewPortComponent;
 }

@@ -152,7 +152,7 @@ export class Router {
   /**
   * The defaults used when a viewport lacks specified content
   */
-  viewPortDefaults: Record<string, ViewPortInstruction> = {};
+  viewPortDefaults: Record<string, Partial<ViewPortInstruction>> = {};
 
   /**@internal */
   catchAllHandler: (instruction: NavigationInstruction) => NavigationInstruction | Promise<NavigationInstruction>;
@@ -517,7 +517,7 @@ export class Router {
    *  populate a view port for which no module is specified. The default is
    *  an empty view/view-model pair.
    */
-  useViewPortDefaults(viewPortDefaults: any) {
+  useViewPortDefaults(viewPortDefaults: Record<string, Partial<ViewPortInstruction>>) {
     for (let viewPortName in viewPortDefaults) {
       let viewPortConfig = viewPortDefaults[viewPortName];
       this.viewPortDefaults[viewPortName] = {
