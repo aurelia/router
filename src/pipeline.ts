@@ -1,9 +1,19 @@
-import { PipelineStep } from './interfaces';
+import { PipelineStep, PipelineResult } from './interfaces';
+import { NavigationInstruction } from './navigation-instruction';
+
+export interface PipeLineStatus {
+  completed: 'completed';
+  canceled: 'canceled';
+  rejected: 'rejected';
+  running: 'running';
+}
+
+export type PipeLineStatusType = PipeLineStatus[keyof PipeLineStatus];
 
 /**
 * The status of a Pipeline.
 */
-export const pipelineStatus = {
+export const pipelineStatus: PipeLineStatus = {
   completed: 'completed',
   canceled: 'canceled',
   rejected: 'rejected',
@@ -14,26 +24,25 @@ export const pipelineStatus = {
 * A callback to indicate when pipeline processing should advance to the next step
 * or be aborted.
 */
-interface Next {
+export interface Next {
   /**
   * Indicates the successful completion of the pipeline step.
   */
-  (): Promise<any>,
-
+  (): Promise<any>;
   /**
   * Indicates the successful completion of the entire pipeline.
   */
-  complete: (result?: any) => Promise<any>,
+  complete: (result?: any) => Promise<any>;
 
   /**
   * Indicates that the pipeline should cancel processing.
   */
-  cancel: (result?: any) => Promise<any>,
+  cancel: (result?: any) => Promise<any>;
 
   /**
   * Indicates that pipeline processing has failed and should be stopped.
   */
-  reject: (result?: any) => Promise<any>
+  reject: (result?: any) => Promise<any>;
 }
 
 /**
@@ -78,23 +87,23 @@ export class Pipeline {
   */
   run(instruction: NavigationInstruction): Promise<PipelineResult> {
     let index = -1;
-    let steps = this.steps;
+    const steps = this.steps;
 
-    function next() {
+    const next: Next = function() {
       index++;
 
       if (index < steps.length) {
         let currentStep = steps[index];
 
         try {
-          return currentStep(instruction, next);
+          return (currentStep as Function)(instruction, next);
         } catch (e) {
           return next.reject(e);
         }
       } else {
         return next.complete();
       }
-    }
+    } as Next;
 
     next.complete = createCompletionHandler(next, pipelineStatus.completed);
     next.cancel = createCompletionHandler(next, pipelineStatus.canceled);
@@ -104,8 +113,8 @@ export class Pipeline {
   }
 }
 
-function createCompletionHandler(next, status) {
-  return (output) => {
+function createCompletionHandler(next: Next, status: PipeLineStatusType) {
+  return (output: any) => {
     return Promise.resolve({ status, output, completed: status === pipelineStatus.completed });
   };
 }

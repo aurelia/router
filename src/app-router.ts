@@ -1,10 +1,19 @@
 import * as LogManager from 'aurelia-logging';
-import {Container} from 'aurelia-dependency-injection';
-import {History} from 'aurelia-history';
-import {Router} from './router';
-import {PipelineProvider} from './pipeline-provider';
-import {isNavigationCommand} from './navigation-commands';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import { Container } from 'aurelia-dependency-injection';
+import { History, NavigationOptions } from 'aurelia-history';
+import { Router } from './router';
+import { PipelineProvider } from './pipeline-provider';
+import { isNavigationCommand } from './navigation-commands';
+import { EventAggregator } from 'aurelia-event-aggregator';
+import { NavigationInstruction } from './navigation-instruction';
+import { ViewPort, ConfiguresRouter, PipelineResult } from './interfaces';
+
+/**@internal */
+declare module 'aurelia-dependency-injection' {
+  interface Container {
+    viewModel?: any;
+  }
+}
 
 const logger = LogManager.getLogger('app-router');
 
@@ -12,10 +21,20 @@ const logger = LogManager.getLogger('app-router');
 * The main application router.
 */
 export class AppRouter extends Router {
+
+  /**@internal */
   static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
 
+  events: EventAggregator;
+  /**@internal */
+  maxInstructionCount: number;
+  /**@internal */
+  _queue: NavigationInstruction[];
+  /**@internal */
+  isActive: boolean;
+
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
-    super(container, history); //Note the super will call reset internally.
+    super(container, history); // Note the super will call reset internally.
     this.pipelineProvider = pipelineProvider;
     this.events = events;
   }
@@ -39,8 +58,9 @@ export class AppRouter extends Router {
   *
   * @param url The URL fragment to load.
   */
-  loadUrl(url): Promise<NavigationInstruction> {
-    return this._createNavigationInstruction(url)
+  loadUrl(url: string): Promise<NavigationInstruction> {
+    return this
+      ._createNavigationInstruction(url)
       .then(instruction => this._queueInstruction(instruction))
       .catch(error => {
         logger.error(error);
@@ -54,16 +74,21 @@ export class AppRouter extends Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: any, name: string): Promise<any> {
+  registerViewPort(viewPort: any, name?: string): Promise<any> {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
-      let viewModel = this._findViewModel(viewPort);
+      const viewModel = this._findViewModel(viewPort);
       if ('configureRouter' in viewModel) {
         if (!this.isConfigured) {
-          let resolveConfiguredPromise = this._resolveConfiguredPromise;
-          this._resolveConfiguredPromise = () => {};
-          return this.configure(config => viewModel.configureRouter(config, this))
+          const resolveConfiguredPromise = this._resolveConfiguredPromise;
+          // tslint:disable-next-line
+          this._resolveConfiguredPromise = () => { };
+          return this
+            .configure(config => {
+              viewModel.configureRouter(config, this);
+              return config;
+            })
             .then(() => {
               this.activate();
               resolveConfiguredPromise();
@@ -84,12 +109,14 @@ export class AppRouter extends Router {
   *
   * @params options The set of options to activate the router with.
   */
-  activate(options: Object): void {
+  activate(options?: NavigationOptions): void {
     if (this.isActive) {
       return;
     }
 
     this.isActive = true;
+    // route handler property is responsible for handling url change
+    // the interface of aurelia-history isn't clear on this perspective
     this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
     this.history.activate(this.options);
     this._dequeueInstruction();
@@ -103,6 +130,7 @@ export class AppRouter extends Router {
     this.history.deactivate();
   }
 
+  /**@internal */
   _queueInstruction(instruction: NavigationInstruction): Promise<any> {
     return new Promise((resolve) => {
       instruction.resolve = resolve;
@@ -111,7 +139,8 @@ export class AppRouter extends Router {
     });
   }
 
-  _dequeueInstruction(instructionCount: number = 0): Promise<any> {
+  /**@internal */
+  _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | undefined> {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
         return undefined;
@@ -162,13 +191,14 @@ export class AppRouter extends Router {
         .run(instruction)
         .then(result => processResult(instruction, result, instructionCount, this))
         .catch(error => {
-          return { output: error instanceof Error ? error : new Error(error) };
+          return { output: error instanceof Error ? error : new Error(error) } as PipelineResult;
         })
         .then(result => resolveInstruction(instruction, result, !!instructionCount, this));
     });
   }
 
-  _findViewModel(viewPort: Object): Object {
+  /**@internal */
+  _findViewModel(viewPort: ViewPort): ConfiguresRouter | undefined {
     if (this.container.viewModel) {
       return this.container.viewModel;
     }
@@ -190,13 +220,18 @@ export class AppRouter extends Router {
   }
 }
 
-function processResult(instruction, result, instructionCount, router) {
+function processResult(
+  instruction: NavigationInstruction,
+  result: PipelineResult,
+  instructionCount: number,
+  router: AppRouter
+) {
   if (!(result && 'completed' in result && 'output' in result)) {
-    result = result || {};
+    result = result || {} as PipelineResult;
     result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
   }
 
-  let finalResult = null;
+  let finalResult: PipelineResult = null;
   let navigationCommandResult = null;
   if (isNavigationCommand(result.output)) {
     navigationCommandResult = result.output.navigate(router);
@@ -205,7 +240,7 @@ function processResult(instruction, result, instructionCount, router) {
 
     if (!result.completed) {
       if (result.output instanceof Error) {
-        logger.error(result.output);
+        logger.error(result.output.toString());
       }
 
       restorePreviousLocation(router);
@@ -217,7 +252,12 @@ function processResult(instruction, result, instructionCount, router) {
     .then(innerResult => finalResult || innerResult || result);
 }
 
-function resolveInstruction(instruction, result, isInnerInstruction, router) {
+function resolveInstruction(
+  instruction: NavigationInstruction,
+  result: PipelineResult,
+  isInnerInstruction: boolean,
+  router: AppRouter
+) {
   instruction.resolve(result);
 
   let eventArgs = { instruction, result };
@@ -232,7 +272,7 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
     router.isNavigatingBack = false;
     router.couldDeactivate = false;
 
-    let eventName;
+    let eventName: string;
 
     if (result.output instanceof Error) {
       eventName = 'error';
@@ -253,7 +293,7 @@ function resolveInstruction(instruction, result, isInnerInstruction, router) {
   return result;
 }
 
-function restorePreviousLocation(router) {
+function restorePreviousLocation(router: AppRouter) {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
     router.navigate(router.history.previousLocation, { trigger: false, replace: true });

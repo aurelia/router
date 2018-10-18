@@ -1,9 +1,16 @@
-import {Redirect, RedirectToRoute, isNavigationCommand} from '../src/navigation-commands';
+import {
+  Redirect,
+  RedirectToRoute,
+  isNavigationCommand,
+  NavigationCommand
+} from '../src';
+import { MockRouter } from './shared';
 
 describe('isNavigationCommand', () => {
   it('should return true for object which has a navigate method', () => {
-    let nc = {
-      navigate() {}
+    let nc: NavigationCommand = {
+      // tslint:disable-next-line
+      navigate() { }
     };
 
     expect(isNavigationCommand(nc)).toBe(true);
@@ -20,12 +27,12 @@ describe('Redirect', () => {
   it('should accept url in constructor and pass this url to passed router\'s navigate method as first parameter', () => {
     let testurl = 'http://aurelia.io/';
     let redirect = new Redirect(testurl);
-    let mockrouter = {
+    let mockrouter: MockRouter = {
       url: '',
-      navigate(url) {
+      navigate(url: string) {
         this.url = url;
       }
-    };
+    } as any;
 
     redirect.setRouter(mockrouter);
 
@@ -38,19 +45,19 @@ describe('Redirect', () => {
 
   it('should accept options in constructor to use the app router', () => {
     let testurl = 'http://aurelia.io/';
-    let redirect = new Redirect(testurl, {useAppRouter: true});
-    let mockrouter = {
+    let redirect = new Redirect(testurl, { useAppRouter: true });
+    let mockrouter: MockRouter = {
       url: '',
-      navigate(url) {
+      navigate(url: string) {
         this.url = url;
       }
-    };
-    let mockapprouter = {
+    } as any;
+    let mockapprouter: MockRouter = {
       url: '',
-      navigate(url) {
+      navigate(url: string) {
         this.url = url;
       }
-    };
+    } as any;
 
     redirect.setRouter(mockrouter);
 
@@ -66,16 +73,16 @@ describe('Redirect', () => {
 describe('RedirectToRoute', () => {
   it('should accept url in constructor and pass this url to passed router\'s navigate method as first parameter', () => {
     let testroute = 'test';
-    let testparams = {id: 1};
+    let testparams = { id: 1 };
     let redirect = new RedirectToRoute(testroute, testparams);
-    let mockrouter = {
+    let mockrouter: MockRouter = {
       route: '',
       params: {},
-      navigateToRoute(route, params) {
+      navigateToRoute(route: string, params: Record<string, any>) {
         this.route = route;
         this.params = params;
       }
-    };
+    } as any;
 
     redirect.setRouter(mockrouter);
 
@@ -90,25 +97,25 @@ describe('RedirectToRoute', () => {
 
   it('should accept options in constructor to use the app router', () => {
     let testroute = 'test';
-    let testparams = {id: 1};
-    let redirect = new RedirectToRoute(testroute, testparams, {useAppRouter: true});
-    let mockrouter = {
+    let testparams = { id: 1 };
+    let redirect = new RedirectToRoute(testroute, testparams, { useAppRouter: true });
+    let mockrouter: MockRouter = {
       route: '',
       params: {},
-      navigateToRoute(route, params) {
+      navigateToRoute(route: string, params: Record<string, any>) {
         this.route = route;
         this.params = params;
       }
-    };
+    } as any;
 
-    let mockapprouter = {
+    let mockapprouter: MockRouter = {
       route: '',
       params: {},
-      navigateToRoute(route, params) {
+      navigateToRoute(route: string, params: Record<string, any>) {
         this.route = route;
         this.params = params;
       }
-    };
+    } as any;
 
     redirect.setRouter(mockrouter);
 

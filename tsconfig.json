@@ -5,12 +5,21 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
     "moduleResolution": "node",
+    "importHelpers": true,
     "stripInternal": true,
     "preserveConstEnums": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
     "listFiles": true,
-    "declaration": true,
-    "removeComments": true,
-    "lib": ["es2015", "dom"]
+    "declaration": false,
+    "removeComments": false,
+    "lib": [
+      "es2015",
+      "dom",
+      "es2016.array.include"
+    ]
   },
   "exclude": [
     "node_modules",

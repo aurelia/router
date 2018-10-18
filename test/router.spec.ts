@@ -1,30 +1,29 @@
-import {History} from 'aurelia-history';
-import {Container} from 'aurelia-dependency-injection';
-import {AppRouter} from '../src/app-router';
-import {PipelineProvider} from '../src/pipeline-provider';
+import { MockHistory, MockInstruction } from './shared';
+import { History } from 'aurelia-history';
+import { Container } from 'aurelia-dependency-injection';
+import {
+  Router,
+  NavModel,
+  RouteConfig,
+  PipelineProvider,
+  AppRouter,
+  NavigationInstruction
+} from '../src';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 
-export class MockHistory extends History {
-  activate() {}
-  deactivate() {}
-  navigate() {}
-  navigateBack() {}
-  getAbsoluteRoot() {
-    return absoluteRoot;
-  }
-  setState(key, value) {}
-  getState(key) {
-    return null;
-  }
-}
-
 describe('the router', () => {
-  let router;
-  let history;
+  let router: Router;
+  let history: History;
   beforeEach(() => {
     history = new MockHistory();
-    router = new AppRouter(new Container(), history, new PipelineProvider(new Container()));
+    history.getAbsoluteRoot = () => absoluteRoot;
+    router = new AppRouter(
+      new Container(),
+      history,
+      new PipelineProvider(new Container()),
+      null
+    );
   });
 
   describe('addRoute', () => {
@@ -54,7 +53,7 @@ describe('the router', () => {
     });
 
     it('should not add a route to navigation if it has a nav=false', () => {
-      let testRoute = {};
+      let testRoute: NavModel = {} as any;
 
       router.addRoute({ route: 'test', moduleId: 'test', title: 'Resume', nav: false }, testRoute);
       expect(router.navigation).not.toContain(testRoute);
@@ -66,10 +65,12 @@ describe('the router', () => {
     });
 
     it('should add a route with multiple view ports', () => {
-      expect(() => router.addRoute({ route: 'multiple/viewports', viewPorts: {
-        'default': { moduleId: 'test1' },
-        'number2': { moduleId: 'test2' }
-      }})).not.toThrow();
+      expect(() => router.addRoute({
+        route: 'multiple/viewports', viewPorts: {
+          'default': { moduleId: 'test1' },
+          'number2': { moduleId: 'test2' }
+        }
+      })).not.toThrow();
     });
 
     it('should map a routeconfig with an array of routes to multiple routeconfigs with one route each', () => {
@@ -115,24 +116,26 @@ describe('the router', () => {
     it('should delegate to parent when generating unknown route', (done) => {
       const child = router.createChild(new Container());
 
-      Promise.all([
-        router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
-        child.configure(config => config.map({ name: 'child', route: 'child/:id', moduleId: './test' }))
-      ]).then(() => {
-        expect(child.generate('child', { id: 1 })).toBe('#/child/1');
-        expect(child.generate('parent', { id: 1 })).toBe('#/parent/1');
-        done();
-      });
+      Promise
+        .all([
+          router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
+          child.configure(config => config.map({ name: 'child', route: 'child/:id', moduleId: './test' }))
+        ]).then(() => {
+          expect(child.generate('child', { id: 1 })).toBe('#/child/1');
+          expect(child.generate('parent', { id: 1 })).toBe('#/parent/1');
+          done();
+        });
     });
 
     it('should return a fully-qualified URL when options.absolute is true', (done) => {
       const child = router.createChild(new Container());
       let options = { absolute: true };
 
-      Promise.all([
-        router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
-        child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
-      ])
+      Promise
+        .all([
+          router.configure(config => config.map({ name: 'parent', route: 'parent/:id', moduleId: './test' })),
+          child.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        ])
         .then(() => {
           expect(child.generate('test', { id: 1 }, options)).toBe(`${absoluteRoot}#/test/1`);
           expect(child.generate('parent', { id: 2 }, options)).toBe(`${absoluteRoot}#/parent/2`);
@@ -158,57 +161,59 @@ describe('the router', () => {
             { name: 'parent', route: 'parent/:id', moduleId: './test' },
             { name: 'parent-empty', route: '', moduleId: './parent-empty' }
           ]);
+          return config;
         }),
         child.configure(config => {
           config.map([
             { name: 'child', route: 'child/:id', moduleId: './test' },
             { name: 'empty', route: '', moduleId: './empty' }
           ]);
+          return config;
         })
       ]).then(() => {
         router.navigate('', options);
         expect(history.navigate).toHaveBeenCalledWith('#/', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         router.navigate('#/test1', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test1', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         router.navigate('/test2', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test2', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         router.navigate('test3', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test3', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('#/test4', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test4', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('/test5', options);
         expect(history.navigate).toHaveBeenCalledWith('#/test5', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('test6', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/test6', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('#/child-router/test7', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/test7', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('/child-router/test8', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/test8', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('child-router/test9', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/child-router/test9', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         child.navigate('', options);
         expect(history.navigate).toHaveBeenCalledWith('#/child-router/', options);
-        history.navigate.calls.reset();
+        (history.navigate as jasmine.Spy).calls.reset();
 
         done();
       });
@@ -246,7 +251,12 @@ describe('the router', () => {
     it('should resolve matching routes', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('test/123?foo=456'))
-        .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'test/123', queryString: 'foo=456' })))
+        .then(x => expect(x as Required<NavigationInstruction>)
+          .toEqual(jasmine.objectContaining({
+            fragment: 'test/123',
+            queryString: 'foo=456'
+          } as Required<NavigationInstruction>))
+        )
         .catch(reason => fail(reason))
         .then(done);
     });
@@ -277,7 +287,7 @@ describe('the router', () => {
         ]))
           .then(() => childRouter.configure(config => config.map([
             { name: 'c', route: 'child/:p', moduleId: './child', href: '/child/c' },
-            { name: 'd', route: 'child/:p', moduleId: './child', href: '/child/d' },
+            { name: 'd', route: 'child/:p', moduleId: './child', href: '/child/d' }
           ])))
           .then(() => router._createNavigationInstruction('parent/b/child/c?foo=456'))
           .then(i => {
@@ -302,7 +312,12 @@ describe('the router', () => {
     it('should be case insensitive by default', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('TeSt/123?foo=456'))
-        .then(x => expect(x).toEqual(jasmine.objectContaining({ fragment: 'TeSt/123', queryString: 'foo=456' })))
+        .then(x => expect(x as Required<NavigationInstruction>)
+          .toEqual(jasmine.objectContaining({
+            fragment: 'TeSt/123',
+            queryString: 'foo=456'
+          } as Required<NavigationInstruction>))
+        )
         .catch(reason => fail(reason))
         .then(done);
     });
@@ -322,26 +337,29 @@ describe('the router', () => {
         Promise.all([
           router.configure(config => {
             config.unknownRouteConfig = 'test';
-            config.mapRoute({route: 'foo', moduleId: './empty'});
+            config.mapRoute({ route: 'foo', moduleId: './empty' });
+            return config;
           }),
           child.configure(config => {
             config.mapRoute({ route: '', moduleId: './child-empty' });
+            return config;
           })
         ])
-        .then(() => router._createNavigationInstruction('foo/bar/123?bar=456'))
-        .then(parentInstruction => {
-          expect(parentInstruction.config.moduleId).toEqual('./empty');
-          return child._createNavigationInstruction('bar/123?bar=456', parentInstruction);
-        })
-        .then(childInstruction => expect(childInstruction.config.moduleId).toEqual('test'))
-        .catch(fail)
-        .then(done);
+          .then(() => router._createNavigationInstruction('foo/bar/123?bar=456'))
+          .then(parentInstruction => {
+            expect(parentInstruction.config.moduleId).toEqual('./empty');
+            return child._createNavigationInstruction('bar/123?bar=456', parentInstruction);
+          })
+          .then(childInstruction => expect(childInstruction.config.moduleId).toEqual('test'))
+          .catch(fail)
+          .then(done);
       });
 
       it('should use string moduleId handler', (done) => {
         router
           .configure(config => {
             config.unknownRouteConfig = 'test';
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -352,7 +370,8 @@ describe('the router', () => {
       it('should use route config handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = { moduleId: 'test' };
+            config.unknownRouteConfig = { moduleId: 'test' } as RouteConfig;
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -363,7 +382,8 @@ describe('the router', () => {
       it('should use function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => ({ moduleId: 'test' });
+            config.unknownRouteConfig = instruction => ({ moduleId: 'test' } as RouteConfig);
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -374,7 +394,8 @@ describe('the router', () => {
       it('should use async function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' });
+            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' } as RouteConfig);
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -390,8 +411,9 @@ describe('the router', () => {
               expect(instruction.queryString).toBe('bar=456');
               expect(instruction.config).toBe(null);
 
-              return { moduleId: 'test' };
+              return { moduleId: 'test' } as RouteConfig;
             };
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(instruction => expect(instruction.config.moduleId).toEqual('test'))
@@ -409,6 +431,7 @@ describe('the router', () => {
         router
           .configure(config => {
             config.unknownRouteConfig = instruction => null;
+            return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(() => fail('should have rejected'))
@@ -444,15 +467,17 @@ describe('the router', () => {
     });
 
     it('waits for async callbacks', (done) => {
-      let resolve;
+      let resolve: (val?: any) => any;
       let promise = new Promise(r => resolve = r);
 
       expect(router.isConfigured).toBe(false);
 
       router.configure(config => {
+        // This conflicts with type definition so much
+        // what should be fixed ???
         return promise.then(x => {
           config.map({ route: '', moduleId: './test' });
-        });
+        }) as any;
       });
 
       expect(router.isConfigured).toBe(true);
@@ -468,7 +493,7 @@ describe('the router', () => {
   });
 
   describe('refreshNavigation', () => {
-    let staticHref;
+    let staticHref: string;
 
     beforeEach((done) => {
       staticHref = '#/a/static/href';

@@ -1,36 +1,49 @@
-import {activationStrategy} from './navigation-plan';
-import {isNavigationCommand} from './navigation-commands';
+import { activationStrategy } from './navigation-plan';
+import { isNavigationCommand } from './navigation-commands';
+import { NavigationInstruction } from './navigation-instruction';
+import { Next } from './pipeline';
+import { Router } from './router';
+import { ViewPortComponent, ViewPortPlan } from './interfaces';
 
 export class CanDeactivatePreviousStep {
-  run(navigationInstruction: NavigationInstruction, next: Function) {
+  run(navigationInstruction: NavigationInstruction, next: Next) {
     return processDeactivatable(navigationInstruction, 'canDeactivate', next);
   }
 }
 
 export class CanActivateNextStep {
-  run(navigationInstruction: NavigationInstruction, next: Function) {
+  run(navigationInstruction: NavigationInstruction, next: Next) {
     return processActivatable(navigationInstruction, 'canActivate', next);
   }
 }
 
 export class DeactivatePreviousStep {
-  run(navigationInstruction: NavigationInstruction, next: Function) {
+  run(navigationInstruction: NavigationInstruction, next: Next) {
     return processDeactivatable(navigationInstruction, 'deactivate', next, true);
   }
 }
 
 export class ActivateNextStep {
-  run(navigationInstruction: NavigationInstruction, next: Function) {
+  run(navigationInstruction: NavigationInstruction, next: Next) {
     return processActivatable(navigationInstruction, 'activate', next, true);
   }
 }
 
-function processDeactivatable(navigationInstruction: NavigationInstruction, callbackName: string, next: Function, ignoreResult: boolean) {
+/**
+ * Recursively find list of deactivate-able view models
+ * and invoke the either 'canDeactivate' or 'deactivate' on each
+ */
+function processDeactivatable(
+  navigationInstruction: NavigationInstruction,
+  callbackName: string,
+  next: Next,
+  ignoreResult?: boolean
+): Promise<any> {
   const plan = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
-  let i = infos.length; //query from inside out
+  let i = infos.length; // query from inside out
 
-  function inspect(val) {
+  function inspect(val: any): Promise<any> {
     if (ignoreResult || shouldContinue(val)) {
       return iterate();
     }
@@ -38,7 +51,7 @@ function processDeactivatable(navigationInstruction: NavigationInstruction, call
     return next.cancel(val);
   }
 
-  function iterate() {
+  function iterate(): Promise<any> {
     if (i--) {
       try {
         let viewModel = infos[i];
@@ -57,14 +70,21 @@ function processDeactivatable(navigationInstruction: NavigationInstruction, call
   return iterate();
 }
 
-function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<Object> {
+/**
+ * Recursively find and returns a list of deactivate-able view models
+ */
+function findDeactivatable(
+  plan: Record<string, ViewPortPlan>,
+  callbackName: string,
+  list: IActivatableInfo[] = []
+): any[] {
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
     let prevComponent = viewPortPlan.prevComponent;
 
-    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle ||
-        viewPortPlan.strategy === activationStrategy.replace) &&
-        prevComponent) {
+    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace)
+      && prevComponent
+    ) {
       let viewModel = prevComponent.viewModel;
 
       if (callbackName in viewModel) {
@@ -82,7 +102,7 @@ function findDeactivatable(plan, callbackName, list: Array<Object> = []): Array<
   return list;
 }
 
-function addPreviousDeactivatable(component, callbackName, list): void {
+function addPreviousDeactivatable(component: ViewPortComponent, callbackName: string, list: IActivatableInfo[]): void {
   let childRouter = component.childRouter;
 
   if (childRouter && childRouter.currentInstruction) {
@@ -102,12 +122,17 @@ function addPreviousDeactivatable(component, callbackName, list): void {
   }
 }
 
-function processActivatable(navigationInstruction: NavigationInstruction, callbackName: any, next: Function, ignoreResult: boolean) {
+function processActivatable(
+  navigationInstruction: NavigationInstruction,
+  callbackName: string,
+  next: Next,
+  ignoreResult?: boolean
+) {
   let infos = findActivatable(navigationInstruction, callbackName);
   let length = infos.length;
-  let i = -1; //query from top down
+  let i = -1; // query from top down
 
-  function inspect(val, router) {
+  function inspect(val: any, router: Router): Promise<any> {
     if (ignoreResult || shouldContinue(val, router)) {
       return iterate();
     }
@@ -115,14 +140,14 @@ function processActivatable(navigationInstruction: NavigationInstruction, callba
     return next.cancel(val);
   }
 
-  function iterate() {
+  function iterate(): Promise<any> {
     i++;
 
     if (i < length) {
       try {
         let current = infos[i];
         let result = current.viewModel[callbackName](...current.lifecycleArgs);
-        return processPotential(result, val => inspect(val, current.router), next.cancel);
+        return processPotential(result, (val: any) => inspect(val, current.router), next.cancel);
       } catch (error) {
         return next.cancel(error);
       }
@@ -134,36 +159,57 @@ function processActivatable(navigationInstruction: NavigationInstruction, callba
   return iterate();
 }
 
-function findActivatable(navigationInstruction: NavigationInstruction, callbackName: string, list: Array<Object> = [], router: Router): Array<Object> {
+interface IActivatableInfo {
+  viewModel: any;
+  lifecycleArgs: any[];
+  router: Router;
+}
+
+/**
+ * Find list of activatable view model and add to list (3rd parameter)
+ */
+function findActivatable(
+  navigationInstruction: NavigationInstruction,
+  callbackName: string,
+  list: IActivatableInfo[] = [],
+  router?: Router
+): IActivatableInfo[] {
   let plan = navigationInstruction.plan;
 
-  Object.keys(plan).filter((viewPortName) => {
-    let viewPortPlan = plan[viewPortName];
-    let viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
-    let viewModel = viewPortInstruction.component.viewModel;
+  Object
+    .keys(plan)
+    .forEach((viewPortName) => {
+      let viewPortPlan = plan[viewPortName];
+      let viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
+      let viewModel = viewPortInstruction.component.viewModel;
 
-    if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in viewModel) {
-      list.push({
-        viewModel,
-        lifecycleArgs: viewPortInstruction.lifecycleArgs,
-        router
-      });
-    }
+      if (
+        (viewPortPlan.strategy === activationStrategy.invokeLifecycle
+          || viewPortPlan.strategy === activationStrategy.replace
+        )
+        && callbackName in viewModel
+      ) {
+        list.push({
+          viewModel,
+          lifecycleArgs: viewPortInstruction.lifecycleArgs,
+          router
+        });
+      }
 
-    if (viewPortPlan.childNavigationInstruction) {
-      findActivatable(
-        viewPortPlan.childNavigationInstruction,
-        callbackName,
-        list,
-        viewPortInstruction.component.childRouter || router
-      );
-    }
-  });
+      if (viewPortPlan.childNavigationInstruction) {
+        findActivatable(
+          viewPortPlan.childNavigationInstruction,
+          callbackName,
+          list,
+          viewPortInstruction.component.childRouter || router
+        );
+      }
+    });
 
   return list;
 }
 
-function shouldContinue(output, router: Router) {
+function shouldContinue(output: any, router?: Router) {
   if (output instanceof Error) {
     return false;
   }
@@ -186,8 +232,14 @@ function shouldContinue(output, router: Router) {
 /**
  * A basic interface for an Observable type
  */
-interface IObservable {
-  subscribe(): ISubscription;
+export interface IObservable {
+  subscribe(sub?: IObservableConfig): ISubscription;
+}
+
+export interface IObservableConfig {
+  next(): void;
+  error(err?: any): void;
+  complete(): void;
 }
 
 /**
@@ -204,11 +256,17 @@ type SafeSubscriptionFunc = (sub: SafeSubscription) => ISubscription;
  * the first value comes synchronously
  */
 class SafeSubscription {
+
+  private _subscribed: boolean;
+  private _subscription: ISubscription;
+
   constructor(subscriptionFunc: SafeSubscriptionFunc) {
     this._subscribed = true;
     this._subscription = subscriptionFunc(this);
 
-    if (!this._subscribed) this.unsubscribe();
+    if (!this._subscribed) {
+      this.unsubscribe();
+    }
   }
 
   get subscribed(): boolean {
@@ -216,13 +274,15 @@ class SafeSubscription {
   }
 
   unsubscribe(): void {
-    if (this._subscribed && this._subscription) this._subscription.unsubscribe();
+    if (this._subscribed && this._subscription) {
+      this._subscription.unsubscribe();
+    }
 
     this._subscribed = false;
   }
 }
 
-function processPotential(obj, resolve, reject) {
+function processPotential(obj: any, resolve: (val?: any) => any, reject: (err?: any) => any) {
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
   }

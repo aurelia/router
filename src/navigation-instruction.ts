@@ -1,13 +1,18 @@
-interface NavigationInstructionInit {
-  fragment: string,
-  queryString: string,
-  params : Object,
-  queryParams: Object,
-  config: RouteConfig,
-  parentInstruction: NavigationInstruction,
-  previousInstruction: NavigationInstruction,
-  router: Router,
-  options: Object
+import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType } from './interfaces';
+import { Router } from './router';
+import { activationStrategy } from './navigation-plan';
+
+export interface NavigationInstructionInit {
+  fragment: string;
+  queryString?: string;
+  params?: Record<string, any>;
+  queryParams?: Record<string, any>;
+  config: RouteConfig;
+  parentInstruction?: NavigationInstruction;
+  previousInstruction?: NavigationInstruction;
+  router: Router;
+  options?: Object;
+  plan?: Record<string, ViewPortInstruction>;
 }
 
 export class CommitChangesStep {
@@ -53,6 +58,8 @@ export class NavigationInstruction {
   */
   parentInstruction: NavigationInstruction;
 
+  parentCatchHandler: any;
+
   /**
   * The instruction being replaced by this instruction in the current router.
   */
@@ -61,16 +68,21 @@ export class NavigationInstruction {
   /**
   * viewPort instructions to used activation.
   */
-  viewPortInstructions: any;
+  viewPortInstructions: Record<string, ViewPortInstruction>;
 
   /**
     * The router instance.
   */
   router: Router;
 
-  plan: Object = null;
+  plan: Record<string, ViewPortPlan> = null;
 
-  options: Object = {};
+  options: Record<string, any> = {};
+
+  /**@internal */
+  lifecycleArgs: LifecycleArguments;
+  /**@internal */
+  resolve?: (val?: any) => void;
 
   constructor(init: NavigationInstructionInit) {
     Object.assign(this, init);
@@ -79,7 +91,7 @@ export class NavigationInstruction {
     this.viewPortInstructions = {};
 
     let ancestorParams = [];
-    let current = this;
+    let current: NavigationInstruction = this;
     do {
       let currentParams = Object.assign({}, current.params);
       if (current.config && current.config.hasChildRouter) {
@@ -99,7 +111,7 @@ export class NavigationInstruction {
   * Gets an array containing this instruction and all child instructions for the current navigation.
   */
   getAllInstructions(): Array<NavigationInstruction> {
-    let instructions = [this];
+    let instructions: NavigationInstruction[] = [this];
     for (let key in this.viewPortInstructions) {
       let childInstruction = this.viewPortInstructions[key].childNavigationInstruction;
       if (childInstruction) {
@@ -121,15 +133,15 @@ export class NavigationInstruction {
   /**
   * Adds a viewPort instruction.
   */
-  addViewPortInstruction(viewPortName: string, strategy: string, moduleId: string, component: any): any {
-    const config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortName });
-    let viewportInstruction = this.viewPortInstructions[viewPortName] = {
-      name: viewPortName,
+  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): ViewPortInstruction {
+    const config: RouteConfig = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: name });
+    const viewportInstruction = this.viewPortInstructions[name] = {
+      name: name,
       strategy: strategy,
       moduleId: moduleId,
       component: component,
       childRouter: component.childRouter,
-      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
+      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2]) as LifecycleArguments
     };
 
     return viewportInstruction;
@@ -140,7 +152,7 @@ export class NavigationInstruction {
   */
   getWildCardName(): string {
     let wildcardIndex = this.config.route.lastIndexOf('*');
-    return this.config.route.substr(wildcardIndex + 1);
+    return (this.config.route as string).substr(wildcardIndex + 1);
   }
 
   /**
@@ -170,7 +182,7 @@ export class NavigationInstruction {
           route.route !== '';
       });
       if (nonEmptyRoute) {
-        fragment = nonEmptyRoute.route;
+        fragment = nonEmptyRoute.route as any;
       }
     }
 
@@ -188,7 +200,8 @@ export class NavigationInstruction {
     return encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
   }
 
-  _commitChanges(waitToSwap: boolean) {
+  /**@internal */
+  _commitChanges(waitToSwap: boolean): Promise<void> {
     let router = this.router;
     router.currentInstruction = this;
 
@@ -200,8 +213,8 @@ export class NavigationInstruction {
 
     router.refreshNavigation();
 
-    let loads = [];
-    let delaySwaps = [];
+    let loads: Promise<void>[] = [];
+    let delaySwaps: ISwapPlan[] = [];
 
     for (let viewPortName in this.viewPortInstructions) {
       let viewPortInstruction = this.viewPortInstructions[viewPortName];
@@ -216,13 +229,16 @@ export class NavigationInstruction {
           loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
         } else {
           if (waitToSwap) {
-            delaySwaps.push({viewPort, viewPortInstruction});
+            delaySwaps.push({ viewPort, viewPortInstruction });
           }
-          loads.push(viewPort.process(viewPortInstruction, waitToSwap).then((x) => {
-            if (viewPortInstruction.childNavigationInstruction) {
-              return viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap);
-            }
-          }));
+          loads.push(viewPort
+            .process(viewPortInstruction, waitToSwap)
+            .then(() => {
+              if (viewPortInstruction.childNavigationInstruction) {
+                return viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap);
+              }
+              return Promise.resolve();
+            }));
         }
       } else {
         if (viewPortInstruction.childNavigationInstruction) {
@@ -231,12 +247,16 @@ export class NavigationInstruction {
       }
     }
 
-    return Promise.all(loads).then(() => {
-      delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
-      return null;
-    }).then(() => prune(this));
+    return Promise
+      .all(loads)
+      .then(() => {
+        delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
+        return null;
+      })
+      .then(() => prune(this));
   }
 
+  /**@internal */
   _updateTitle(): void {
     let title = this._buildTitle(this.router.titleSeparator);
     if (title) {
@@ -244,6 +264,7 @@ export class NavigationInstruction {
     }
   }
 
+  /**@internal */
   _buildTitle(separator: string = ' | '): string {
     let title = '';
     let childTitles = [];
@@ -275,7 +296,12 @@ export class NavigationInstruction {
   }
 }
 
-function prune(instruction) {
+function prune(instruction: NavigationInstruction) {
   instruction.previousInstruction = null;
   instruction.plan = null;
+}
+
+interface ISwapPlan {
+  viewPort: ViewPort;
+  viewPortInstruction: ViewPortInstruction;
 }

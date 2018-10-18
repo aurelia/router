@@ -1,10 +1,24 @@
+import { NavigationOptions } from 'aurelia-history';
+import { Router } from './router';
+
+/**@internal */
+declare module 'aurelia-history' {
+  interface NavigationOptions {
+    useAppRouter?: boolean;
+  }
+}
+
 /**
 * When a navigation command is encountered, the current navigation
 * will be cancelled and control will be passed to the navigation
 * command so it can determine the correct action.
 */
-interface NavigationCommand {
+export interface NavigationCommand {
   navigate: (router: Router) => void;
+  /**@internal */
+  shouldContinueProcessing?: boolean;
+  /**@internal */
+  setRouter?: (router: Router) => void;
 }
 
 /**
@@ -13,19 +27,28 @@ interface NavigationCommand {
 *
 * @param obj The object to check.
 */
-export function isNavigationCommand(obj: any): boolean {
+export function isNavigationCommand(obj: any): obj is NavigationCommand {
   return obj && typeof obj.navigate === 'function';
 }
 
 /**
 * Used during the activation lifecycle to cause a redirect.
 */
-export class Redirect {
+export class Redirect implements NavigationCommand {
+
+  url: string;
+  /**@internal */
+  options: NavigationOptions;
+  /**@internal */
+  shouldContinueProcessing: boolean;
+
+  private router: Router;
+
   /**
    * @param url The URL fragment to use as the navigation destination.
    * @param options The navigation options.
    */
-  constructor(url: string, options: any = {}) {
+  constructor(url: string, options: NavigationOptions = {}) {
     this.url = url;
     this.options = Object.assign({ trigger: true, replace: true }, options);
     this.shouldContinueProcessing = false;
@@ -54,13 +77,25 @@ export class Redirect {
 /**
 * Used during the activation lifecycle to cause a redirect to a named route.
 */
-export class RedirectToRoute {
+export class RedirectToRoute implements NavigationCommand {
+
+  route: string;
+  params: any;
+  /**@internal */
+  options: NavigationOptions;
+
+  /**@internal */
+  shouldContinueProcessing: boolean;
+
+  /**@internal */
+  router: Router;
+
   /**
    * @param route The name of the route.
    * @param params The parameters to be sent to the activation method.
    * @param options The options to use for navigation.
    */
-  constructor(route: string, params: any = {}, options: any = {}) {
+  constructor(route: string, params: any = {}, options: NavigationOptions = {}) {
     this.route = route;
     this.params = params;
     this.options = Object.assign({ trigger: true, replace: true }, options);

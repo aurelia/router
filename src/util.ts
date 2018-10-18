@@ -1,4 +1,6 @@
-export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
+import { RouteConfig } from './interfaces';
+
+export function _normalizeAbsolutePath(path: string, hasPushState: boolean, absolute: boolean = false) {
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
   }
@@ -10,7 +12,7 @@ export function _normalizeAbsolutePath(path, hasPushState, absolute = false) {
   return path;
 }
 
-export function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
+export function _createRootedPath(fragment: string, baseUrl: string, hasPushState: boolean, absolute?: boolean) {
   if (isAbsoluteUrl.test(fragment)) {
     return fragment;
   }
@@ -34,7 +36,7 @@ export function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
   return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
 }
 
-export function _resolveUrl(fragment, baseUrl, hasPushState) {
+export function _resolveUrl(fragment: string, baseUrl: string, hasPushState?: boolean) {
   if (isRootedPath.test(fragment)) {
     return _normalizeAbsolutePath(fragment, hasPushState);
   }
@@ -42,7 +44,7 @@ export function _resolveUrl(fragment, baseUrl, hasPushState) {
   return _createRootedPath(fragment, baseUrl, hasPushState);
 }
 
-export function _ensureArrayWithSingleRoutePerConfig(config) {
+export function _ensureArrayWithSingleRoutePerConfig(config: RouteConfig) {
   let routeConfigs = [];
 
   if (Array.isArray(config.route)) {

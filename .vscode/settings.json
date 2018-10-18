@@ -1,0 +1,3 @@
+{
+  "typescript.tsdk": "aurelia-router/node_modules/typescript/lib"
+}

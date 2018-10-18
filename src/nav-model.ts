@@ -1,3 +1,6 @@
+import { Router } from './router';
+import { RouteConfig } from './interfaces';
+
 /**
 * Class for storing and interacting with a route's navigation settings.
 */
@@ -37,6 +40,8 @@ export class NavModel {
   * The router associated with this navigation model.
   */
   router: Router;
+
+  order: number | boolean;
 
   constructor(router: Router, relativeHref: string) {
     this.router = router;

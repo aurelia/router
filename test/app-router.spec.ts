@@ -1,74 +1,80 @@
-import {History} from 'aurelia-history';
-import {Container} from 'aurelia-dependency-injection';
-import {AppRouter} from '../src/app-router';
-import {RouteLoader} from '../src/route-loading';
-import {Pipeline} from '../src/pipeline';
+import { Container } from 'aurelia-dependency-injection';
+import {
+  Router,
+  RouteConfig,
+  PipelineProvider,
+  AppRouter,
+  RouteLoader,
+  Pipeline,
+  NavigationInstruction,
+  ViewPortComponent,
+  NavigationCommand,
+  Next,
+  RouterConfiguration,
+  ViewPortInstruction,
+  ViewPort,
+  PipelineStep
+} from '../src';
+import { MockHistory, MockInstruction } from './shared';
+import { EventAggregator } from 'aurelia-event-aggregator';
+import { History } from 'aurelia-history';
 
-class MockHistory extends History {
-  activate() {}
-  deactivate() {}
-  navigate() {}
-  navigateBack() {}
-  setState(key, value) {}
-  getState(key) {
-    return null;
+declare module 'aurelia-history' {
+  interface History {
+    previousLocation: string;
   }
 }
+
 
 class MockLoader extends RouteLoader {
-  loadRoute(router, config) {
+  loadRoute(router: Router, config: RouteConfig): Promise<ViewPortComponent> {
     return Promise.resolve({
       viewModel: {}
-    });
+    } as ViewPortComponent);
   }
-}
-
-class MockInstruction {
-  constructor(title: string) {
-    this.title = title;
-  }
-  resolve(): void {}
 }
 
 describe('app-router', () => {
-  let router;
-  let history;
-  let ea;
-  let viewPort;
-  let container;
-  let instruction;
-  let provider;
-  let pipelineStep;
+  let router: AppRouter;
+  let history: History;
+  let ea: EventAggregator;
+  let viewPort: ViewPort;
+  let container: Container;
+  let instruction: NavigationInstruction;
+  let provider: PipelineProvider;
+  let pipelineStep: PipelineStep['run'];
 
   beforeEach(() => {
     history = new MockHistory();
     container = new Container();
     container.registerSingleton(RouteLoader, MockLoader);
-    ea = { publish() {} };
+    // tslint:disable-next-line
+    ea = { publish() { } } as any;
     viewPort = {
-      process(viewPortInstruction) {
-        viewPortInstruction.behavior = {};
+      process(viewPortInstruction: ViewPortInstruction) {
         return Promise.resolve();
       },
-      swap() {}
-    };
+      // tslint:disable-next-line
+      swap() { }
+    } as any;
 
-    instruction = { resolve() {} };
+    // tslint:disable-next-line
+    instruction = { resolve() { } } as any;
     provider = {
       createPipeline() {
         let p = new Pipeline();
         p.addStep({ run(inst, next) { return pipelineStep(inst, next); } });
         return p;
       }
-    };
+    } as any;
 
     router = new AppRouter(container, history, provider, ea);
   });
 
   it('configures from root view model configureRouter method', (done) => {
-    let routeConfig = { route: '', moduleId: './test' };
+    let routeConfig: RouteConfig = { route: '', moduleId: './test' };
     let viewModel = {
-      configureRouter(config) {
+      configureRouter(config: RouterConfiguration) {
         config.map([routeConfig]);
       }
     };
@@ -85,7 +91,7 @@ describe('app-router', () => {
         expect(viewModel.configureRouter).toHaveBeenCalled();
         expect(router.isConfigured).toBe(true);
         expect(router.routes.length).toBe(1);
-        expect(router.routes[0]).toEqual(jasmine.objectContaining(routeConfig));
+        expect(router.routes[0] as Required<RouteConfig>).toEqual(jasmine.objectContaining(routeConfig as Required<RouteConfig>));
         done();
       });
   });
@@ -93,7 +99,7 @@ describe('app-router', () => {
   it('configures only once with multiple viewPorts', (done) => {
     let routeConfig = { route: '', moduleId: './test' };
     let viewModel = {
-      configureRouter(config) {
+      configureRouter(config: RouterConfiguration) {
         config.map([routeConfig]);
       }
     };
@@ -102,9 +108,13 @@ describe('app-router', () => {
 
     container.viewModel = viewModel;
 
-    Promise.all([router.registerViewPort(viewPort), router.registerViewPort(viewPort, 'second')])
-      .then(result => {
-        expect(viewModel.configureRouter.calls.count()).toBe(1);
+    Promise
+      .all([
+        router.registerViewPort(viewPort),
+        router.registerViewPort(viewPort, 'second')
+      ])
+      .then((result: any[]) => {
+        expect((viewModel.configureRouter as jasmine.Spy).calls.count()).toBe(1);
         expect(router.isConfigured).toBe(true);
         expect(router.routes.length).toBe(1);
         done();
@@ -112,8 +122,8 @@ describe('app-router', () => {
   });
 
   describe('dequeueInstruction', () => {
-    let processingResult;
-    let completedResult;
+    let processingResult: any;
+    let completedResult: any;
 
     beforeEach(() => {
       router._queue.push(instruction);
@@ -124,9 +134,10 @@ describe('app-router', () => {
     });
 
     it('triggers events on successful navigations', (done) => {
-      pipelineStep = (ctx, next) => next.complete({});
+      pipelineStep = (ctx: any, next: Next) => next.complete({});
 
-      router._dequeueInstruction()
+      router
+        ._dequeueInstruction()
         .then(result => {
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:processing', processingResult);
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:success', completedResult);
@@ -138,9 +149,10 @@ describe('app-router', () => {
 
     it('returns expected results from successful navigations', (done) => {
       let output = {};
-      pipelineStep = (ctx, next) => next.complete(output);
+      pipelineStep = (ctx: any, next: Next) => next.complete(output);
 
-      router._dequeueInstruction()
+      router
+        ._dequeueInstruction()
         .then(result => {
           expect(result.completed).toBe(true);
           expect(result.status).toBe('completed');
@@ -151,9 +163,10 @@ describe('app-router', () => {
     });
 
     it('triggers events on canceled navigations', (done) => {
-      pipelineStep = (ctx, next) => next.cancel('test');
+      pipelineStep = (ctx: any, next: Next) => next.cancel('test');
 
-      router._dequeueInstruction()
+      router
+        ._dequeueInstruction()
         .then(result => {
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:processing', processingResult);
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:canceled', completedResult);
@@ -165,7 +178,7 @@ describe('app-router', () => {
 
     it('returns expected results from canceled navigations', (done) => {
       let output = {};
-      pipelineStep = (ctx, next) => next.cancel(output);
+      pipelineStep = (ctx: any, next: Next) => next.cancel(output);
 
       router._dequeueInstruction()
         .then(result => {
@@ -178,9 +191,10 @@ describe('app-router', () => {
     });
 
     it('triggers events on error navigations', (done) => {
-      pipelineStep = (ctx, next) => { throw new Error('test'); };
+      pipelineStep = (ctx: any, next: Next) => { throw new Error('test'); };
 
-      router._dequeueInstruction()
+      router
+        ._dequeueInstruction()
         .then(result => {
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:processing', processingResult);
           expect(ea.publish).toHaveBeenCalledWith('router:navigation:error', completedResult);
@@ -192,7 +206,7 @@ describe('app-router', () => {
 
     it('returns expected results from error navigations', (done) => {
       let output = new Error('test');
-      pipelineStep = (ctx, next) => next.reject(output);
+      pipelineStep = (ctx: any, next: Next) => next.reject(output);
 
       router._dequeueInstruction()
         .then(result => {
@@ -215,7 +229,7 @@ describe('app-router', () => {
           expect(result).toBeFalsy();
           expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
         })
-        .catch(result => expect(true).toBeFalsy('should have succeeded'))
+        .catch(() => expect(true).toBeFalsy('should have succeeded'))
         .then(done);
     });
 
@@ -223,7 +237,7 @@ describe('app-router', () => {
       spyOn(history, 'navigate');
 
       router.history.previousLocation = null;
-      router.fallbackRoute = "fallback";
+      router.fallbackRoute = 'fallback';
       router.loadUrl('next')
         .then(result => {
           expect(result).toBeFalsy();
@@ -242,6 +256,7 @@ describe('app-router', () => {
         config.map([
           { name: 'test', route: '', moduleId: './test' }
         ]);
+        return config;
       });
 
       router.loadUrl('next')
@@ -249,47 +264,47 @@ describe('app-router', () => {
           expect(result).toBeFalsy();
           expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
         })
-        .catch(result => expect(true).toBeFalsy('should have succeeded'))
+        .catch(() => expect(true).toBeFalsy('should have succeeded'))
         .then(done);
     });
   });
   describe('instruction completes as navigation command', () => {
     it('should complete instructions in order before terminating', done => {
       const pipeline = new Pipeline()
-        .addStep({ run(inst, next) { return pipelineStep(inst, next); } });
+        .addStep({ run(inst: NavigationInstruction, next: Next) { return pipelineStep(inst, next); } });
       spyOn(pipeline, 'run').and.callThrough();
 
-      const plProvider = {
+      const plProvider: PipelineProvider = {
         createPipeline: () => pipeline
-      };
+      } as PipelineProvider;
       const router = new AppRouter(container, history, plProvider, ea);
       const initialInstruction = new MockInstruction('initial resulting navigation (Promise)');
       const instructionAfterNav = new MockInstruction('instruction after navigation');
 
-      const navigationCommand = {
+      const navigationCommand: NavigationCommand = {
         navigate: () => new Promise(resolve => {
           setTimeout(() => {
             router._queue.push(instructionAfterNav);
-            pipelineStep = (ctx, next) => next.complete({});
+            pipelineStep = (ctx: any, next: Next) => next.complete({});
             resolve();
           }, 0);
         })
       };
 
       router._queue.push(initialInstruction);
-      pipelineStep = (ctx, next) => next.complete(navigationCommand);
-      
+      pipelineStep = (ctx: any, next: Next) => next.complete(navigationCommand);
+
       router._dequeueInstruction()
         .then(_ => {
           expect(pipeline.run).toHaveBeenCalledTimes(2);
-          expect(pipeline.run.calls.argsFor(0)).toEqual([initialInstruction]);
-          expect(pipeline.run.calls.argsFor(1)).toEqual([instructionAfterNav]);
+          expect((pipeline.run as jasmine.Spy).calls.argsFor(0)).toEqual([initialInstruction]);
+          expect((pipeline.run as jasmine.Spy).calls.argsFor(1)).toEqual([instructionAfterNav]);
           done();
         });
     });
-  })
+  });
 });
 
-function expectSuccess(result) {
+function expectSuccess(result: any) {
   expect(result).not.toBe(result, 'should have succeeded');
 }
