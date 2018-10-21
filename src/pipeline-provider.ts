@@ -110,7 +110,7 @@ export class PipelineProvider {
    * @internal
    * Clears all steps from a slot in the pipeline
    */
-  _clearSteps(name: string = ''): void {
+  _clearSteps(name: string): void {
     let slot = this._findStep(name);
     if (slot) {
       slot.steps = [];

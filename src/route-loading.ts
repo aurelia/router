@@ -1,6 +1,6 @@
 import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
 import { NavigationInstruction } from './navigation-instruction';
-import { ViewPortInstruction, RouteConfig, ViewPortComponent, ViewPortPlan } from './interfaces';
+import { ViewPortInstruction, RouteConfig, ViewPortComponent, ViewPortPlan, ViewModelSpecifier } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { Router } from './router';
 import { Next } from './pipeline';
@@ -30,10 +30,10 @@ export class LoadRouteStep {
 
 function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction): Promise<any[] | void> {
   let toLoad = determineWhatToLoad(navigationInstruction);
-  let loadPromises = toLoad.map((current) => loadRoute(
+  let loadPromises = toLoad.map((loadingPlan: ILoadingPlan) => loadRoute(
     routeLoader,
-    current.navigationInstruction,
-    current.viewPortPlan
+    loadingPlan.navigationInstruction,
+    loadingPlan.viewPortPlan
   ));
 
   return Promise.all(loadPromises);
@@ -44,14 +44,20 @@ interface ILoadingPlan {
   navigationInstruction: NavigationInstruction;
 }
 
+/**
+ * Determine what are needed to be loaded based on navigation instruction's plan
+ * All determined loading plans will be added to 2nd parameter array
+ * @param navigationInstruction
+ * @param toLoad
+ */
 function determineWhatToLoad(
   navigationInstruction: NavigationInstruction,
   toLoad: ILoadingPlan[] = []
 ): ILoadingPlan[] {
-  let plan = navigationInstruction.plan;
+  let plans = navigationInstruction.plans;
 
-  for (let viewPortName in plan) {
-    let viewPortPlan = plan[viewPortName];
+  for (let viewPortName in plans) {
+    let viewPortPlan = plans[viewPortName];
 
     if (viewPortPlan.strategy === activationStrategy.replace) {
       toLoad.push({ viewPortPlan, navigationInstruction } as ILoadingPlan);
@@ -76,47 +82,59 @@ function determineWhatToLoad(
   return toLoad;
 }
 
-function loadRoute(
+async function loadRoute(
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   viewPortPlan: ViewPortPlan
 ) {
-  let moduleId = viewPortPlan.config ? viewPortPlan.config.moduleId : null;
+  let config = viewPortPlan.config;
+  let moduleId: string | null = null;
+  let viewModel: ViewModelSpecifier | null = null;
+  if (config) {
+    if ('moduleId' in config) {
+      moduleId = config.moduleId;
+    }
+    if ('viewModel' in config) {
+      viewModel = config.viewModel;
+    }
+  }
+  let component = await loadComponent(routeLoader, navigationInstruction, viewPortPlan.config);
+  // let viewPortInstruction = navigationInstruction.addViewPortInstruction(
+  //   viewPortPlan.name,
+  //   viewPortPlan.strategy,
+  //   moduleId,
+  //   component);
+  let viewPortInstruction = navigationInstruction.addViewPortInstruction(
+    viewPortPlan.name,
+    // Missing lifecycleArgs property
+    {
+      strategy: viewPortPlan.strategy,
+      moduleId: moduleId,
+      viewModel: viewModel,
+      component,
+    } as ViewPortInstruction
+  );
 
-  return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config)
-    .then((component) => {
-      let viewPortInstruction = navigationInstruction.addViewPortInstruction(
-        viewPortPlan.name,
-        viewPortPlan.strategy,
-        moduleId,
-        component);
+  let childRouter = component.childRouter;
+  if (childRouter) {
+    let path = navigationInstruction.getWildcardPath();
 
-      let childRouter = component.childRouter;
-      if (childRouter) {
-        let path = navigationInstruction.getWildcardPath();
+    const childInstruction = await childRouter._createNavigationInstruction(path, navigationInstruction);
+    viewPortPlan.childNavigationInstruction = childInstruction;
 
-        return childRouter._createNavigationInstruction(path, navigationInstruction)
-          .then((childInstruction) => {
-            viewPortPlan.childNavigationInstruction = childInstruction;
+    const childPlan = await _buildNavigationPlan(childInstruction);
+    if (childPlan instanceof Redirect) {
+      return Promise.reject(childPlan);
+    }
+    childInstruction.plans = childPlan;
+    viewPortInstruction.childNavigationInstruction = childInstruction;
+    return loadNewRoute(routeLoader, childInstruction);
+  }
 
-            return _buildNavigationPlan(childInstruction)
-              .then((childPlan) => {
-                if (childPlan instanceof Redirect) {
-                  return Promise.reject(childPlan);
-                }
-                childInstruction.plan = childPlan;
-                viewPortInstruction.childNavigationInstruction = childInstruction;
-
-                return loadNewRoute(routeLoader, childInstruction);
-              });
-          });
-      }
-
-      return undefined;
-    });
+  return undefined;
 }
 
-function loadComponent(
+async function loadComponent(
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   config: RouteConfig
@@ -124,22 +142,17 @@ function loadComponent(
   let router = navigationInstruction.router;
   let lifecycleArgs = navigationInstruction.lifecycleArgs;
 
-  return routeLoader
-    .loadRoute(router, config, navigationInstruction)
-    .then((component) => {
-      let { viewModel, childContainer } = component;
-      component.router = router;
-      component.config = config;
+  let component = await routeLoader.loadRoute(router, config, navigationInstruction);
+  let { viewModel, childContainer } = component;
+  component.router = router;
+  component.config = config;
 
-      if ('configureRouter' in viewModel) {
-        let childRouter = childContainer.getChildRouter();
-        component.childRouter = childRouter;
+  if ('configureRouter' in viewModel) {
+    let childRouter = childContainer.getChildRouter();
+    component.childRouter = childRouter;
 
-        return childRouter
-          .configure(c => viewModel.configureRouter(c, childRouter, ...lifecycleArgs))
-          .then(() => component);
-      }
+    await childRouter.configure(c => viewModel.configureRouter(c, childRouter, ...lifecycleArgs));
+  }
 
-      return component;
-    });
+  return component;
 }

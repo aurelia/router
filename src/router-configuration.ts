@@ -115,7 +115,7 @@ export class RouterConfiguration {
    *  default, of the form { viewPortName: { moduleId } }.
    * @chainable
    */
-  useViewPortDefaults(viewPortConfig: Record<string, { [key: string]: any; moduleId: string }>): RouterConfiguration {
+  useViewPortDefaults(viewPortConfig: Record<string, Partial<ViewPortInstruction>>): RouterConfiguration {
     this.viewPortDefaults = viewPortConfig;
     return this;
   }

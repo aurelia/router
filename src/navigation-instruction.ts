@@ -1,4 +1,4 @@
-import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType } from './interfaces';
+import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType, ViewPortComponent } from './interfaces';
 import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
 
@@ -71,11 +71,13 @@ export class NavigationInstruction {
   viewPortInstructions: Record<string, ViewPortInstruction>;
 
   /**
-    * The router instance.
+  * The router instance.
   */
   router: Router;
-
-  plan: Record<string, ViewPortPlan> = null;
+  /**
+  * Navigation plans for view ports
+  */
+  plans: Record<string, ViewPortPlan> = null;
 
   options: Record<string, any> = {};
 
@@ -133,16 +135,30 @@ export class NavigationInstruction {
   /**
   * Adds a viewPort instruction.
   */
-  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): ViewPortInstruction {
+  addViewPortInstruction(name: string, instruction: ViewPortInstruction): ViewPortInstruction;
+  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): ViewPortInstruction;
+  addViewPortInstruction(
+    name: string,
+    instructionOrStrategy: ViewPortInstruction | ActivationStrategyType,
+    moduleId?: string,
+    component?: ViewPortComponent
+  ): ViewPortInstruction {
     const config: RouteConfig = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: name });
-    const viewportInstruction = this.viewPortInstructions[name] = {
-      name: name,
-      strategy: strategy,
-      moduleId: moduleId,
-      component: component,
-      childRouter: component.childRouter,
-      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2]) as LifecycleArguments
-    };
+    let viewportInstruction: ViewPortInstruction;
+    if (typeof instructionOrStrategy === 'string') {
+      viewportInstruction = this.viewPortInstructions[name] = {
+        name: name,
+        strategy: instructionOrStrategy,
+        moduleId: moduleId,
+        component: component,
+        childRouter: component.childRouter,
+        lifecycleArgs: [this.lifecycleArgs[0], config, this.lifecycleArgs[2]]
+      };
+    } else {
+      viewportInstruction.name = name;
+      viewportInstruction.childRouter = component.childRouter;
+      viewportInstruction.lifecycleArgs = [this.lifecycleArgs[0], config, this.lifecycleArgs[2]];
+    }
 
     return viewportInstruction;
   }
@@ -251,9 +267,8 @@ export class NavigationInstruction {
       .all(loads)
       .then(() => {
         delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
-        return null;
-      })
-      .then(() => prune(this));
+        prune(this);
+      });
   }
 
   /**@internal */
@@ -298,7 +313,7 @@ export class NavigationInstruction {
 
 function prune(instruction: NavigationInstruction) {
   instruction.previousInstruction = null;
-  instruction.plan = null;
+  instruction.plans = null;
 }
 
 interface ISwapPlan {

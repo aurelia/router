@@ -17,6 +17,8 @@ declare module 'aurelia-dependency-injection' {
 export type RouteCommand = { redirect: string } | { moduleId: string } | { viewModel: string };
 export type RouteConfigSpecifier = string | RouteCommand | ((instruction: NavigationInstruction) => string | RouteCommand | Promise<string | RouteCommand>);
 
+export type ViewModelSpecifier = () => Function | Promise<Function | Record<string, any>>;
+
 /**
 * A configuration object that describes a route.
 */
@@ -24,7 +26,7 @@ export interface RouteConfig {
   /**
   * The route pattern to match against incoming URL fragments, or an array of patterns.
   */
-  route: string | string[];
+  route?: string | string[];
 
   /**
   * A unique name for the route that may be used to identify the route when generating URL fragments.
@@ -37,6 +39,11 @@ export interface RouteConfig {
   * The moduleId of the view model that should be activated for this route.
   */
   moduleId?: string;
+
+  /**
+   * The view model factory that should be activated for this route
+   */
+  viewModel?: ViewModelSpecifier;
 
   /**
   * A URL fragment to redirect to when this route is matched.
@@ -57,7 +64,7 @@ export interface RouteConfig {
   * specifying the moduleId to load into that viewPort.  The values may optionally include properties related to layout:
   * `layoutView`, `layoutViewModel` and `layoutModel`.
   */
-  viewPorts?: any;
+  viewPorts?: Record<string, RouteConfig>;
 
   /**
   * When specified, this route will be included in the [[Router.navigation]] nav model. Useful for
@@ -118,6 +125,11 @@ export interface RouteConfig {
    * specifies the model parameter to pass to the layout view model's `activate` function.
    */
   layoutModel?: any;
+
+  /**
+   * View of view model used for this route
+   */
+  view?: any;
 
   [x: string]: any;
 }
@@ -272,6 +284,7 @@ export interface ViewPortPlan {
 
   prevComponent?: ViewPortComponent;
   prevModuleId?: string;
+  prevViewModel?: ViewModelSpecifier;
   childNavigationInstruction?: NavigationInstruction;
 }
 
@@ -283,7 +296,9 @@ export interface ViewPortInstruction {
 
   childNavigationInstruction?: NavigationInstruction;
 
-  moduleId: string;
+  moduleId?: string;
+
+  viewModel?: ViewModelSpecifier;
 
   component: ViewPortComponent;
 

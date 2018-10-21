@@ -140,61 +140,59 @@ export class AppRouter extends Router {
   }
 
   /**@internal */
-  _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | undefined> {
-    return Promise.resolve().then(() => {
-      if (this.isNavigating && !instructionCount) {
-        return undefined;
-      }
-
-      let instruction = this._queue.shift();
-      this._queue.length = 0;
-
-      if (!instruction) {
-        return undefined;
-      }
-
-      this.isNavigating = true;
-
-      let navtracker: number = this.history.getState('NavigationTracker');
-      if (!navtracker && !this.currentNavigationTracker) {
-        this.isNavigatingFirst = true;
-        this.isNavigatingNew = true;
-      } else if (!navtracker) {
-        this.isNavigatingNew = true;
-      } else if (!this.currentNavigationTracker) {
-        this.isNavigatingRefresh = true;
-      } else if (this.currentNavigationTracker < navtracker) {
-        this.isNavigatingForward = true;
-      } else if (this.currentNavigationTracker > navtracker) {
-        this.isNavigatingBack = true;
-      } if (!navtracker) {
-        navtracker = Date.now();
-        this.history.setState('NavigationTracker', navtracker);
-      }
-      this.currentNavigationTracker = navtracker;
-
-      instruction.previousInstruction = this.currentInstruction;
-
-      if (!instructionCount) {
-        this.events.publish('router:navigation:processing', { instruction });
-      } else if (instructionCount === this.maxInstructionCount - 1) {
-        logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
-        restorePreviousLocation(this);
-        return this._dequeueInstruction(instructionCount + 1);
-      } else if (instructionCount > this.maxInstructionCount) {
-        throw new Error('Maximum navigation attempts exceeded. Giving up.');
-      }
-
-      let pipeline = this.pipelineProvider.createPipeline(!this.couldDeactivate);
-
-      return pipeline
-        .run(instruction)
-        .then(result => processResult(instruction, result, instructionCount, this))
-        .catch(error => {
-          return { output: error instanceof Error ? error : new Error(error) } as PipelineResult;
-        })
-        .then(result => resolveInstruction(instruction, result, !!instructionCount, this));
-    });
+  async _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | void> {
+    if (this.isNavigating && !instructionCount) {
+      return undefined;
+    }
+    let instruction = this._queue.shift();
+    this._queue.length = 0;
+    if (!instruction) {
+      return undefined;
+    }
+    this.isNavigating = true;
+    let navtracker: number = this.history.getState('NavigationTracker');
+    if (!navtracker && !this.currentNavigationTracker) {
+      this.isNavigatingFirst = true;
+      this.isNavigatingNew = true;
+    }
+    else if (!navtracker) {
+      this.isNavigatingNew = true;
+    }
+    else if (!this.currentNavigationTracker) {
+      this.isNavigatingRefresh = true;
+    }
+    else if (this.currentNavigationTracker < navtracker) {
+      this.isNavigatingForward = true;
+    }
+    else if (this.currentNavigationTracker > navtracker) {
+      this.isNavigatingBack = true;
+    }
+    if (!navtracker) {
+      navtracker = Date.now();
+      this.history.setState('NavigationTracker', navtracker);
+    }
+    this.currentNavigationTracker = navtracker;
+    instruction.previousInstruction = this.currentInstruction;
+    if (!instructionCount) {
+      this.events.publish('router:navigation:processing', { instruction });
+    }
+    else if (instructionCount === this.maxInstructionCount - 1) {
+      logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
+      restorePreviousLocation(this);
+      return this._dequeueInstruction(instructionCount + 1);
+    }
+    else if (instructionCount > this.maxInstructionCount) {
+      throw new Error('Maximum navigation attempts exceeded. Giving up.');
+    }
+    let pipeline = this.pipelineProvider.createPipeline(!this.couldDeactivate);
+    let result: PipelineResult;
+    try {
+      const $result = await pipeline.run(instruction);
+      result = await processResult(instruction, $result, instructionCount, this);
+    } catch (error) {
+      result = ({ output: error instanceof Error ? error : new Error(error) } as PipelineResult);
+    }
+    return resolveInstruction(instruction, result, !!instructionCount, this);
   }
 
   /**@internal */

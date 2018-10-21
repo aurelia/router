@@ -45,14 +45,17 @@ export interface Next {
   reject: (result?: any) => Promise<any>;
 }
 
+export type StepRunnerFunction = <TThis = any>(this: TThis, instruction: NavigationInstruction, next: Next) => any;
+
 /**
 * The class responsible for managing and processing the navigation pipeline.
 */
 export class Pipeline {
   /**
-  * The pipeline steps.
+  * The pipeline steps. And steps added via addStep will be converted to a function
+  * The actualy running functions with correct step contexts of this pipeline
   */
-  steps: Array<Function | PipelineStep> = [];
+  steps: StepRunnerFunction[] = [];
 
   /**
   * Adds a step to the pipeline.
@@ -60,11 +63,14 @@ export class Pipeline {
   * @param step The pipeline step.
   */
   addStep(step: PipelineStep): Pipeline {
-    let run;
+    // This situation is a bit unfortunate where there is an implicit conversion of any incoming step to a fn
+    let run: StepRunnerFunction;
 
     if (typeof step === 'function') {
       run = step;
     } else if (typeof step.getSteps === 'function') {
+      // getSteps is to enable support open slots
+      // where devs can add multiple steps into the same slot name
       let steps = step.getSteps();
       for (let i = 0, l = steps.length; i < l; i++) {
         this.addStep(steps[i]);
@@ -96,7 +102,7 @@ export class Pipeline {
         let currentStep = steps[index];
 
         try {
-          return (currentStep as Function)(instruction, next);
+          return currentStep(instruction, next);
         } catch (e) {
           return next.reject(e);
         }
