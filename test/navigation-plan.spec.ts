@@ -11,7 +11,7 @@ import {
 } from '../src';
 import { MockHistory, createPipelineState, MockPipelineState } from './shared';
 
-describe('NavigationPlanStep', () => {
+describe('NavigationPlanStep', function NavigationPlanStep_Test() {
   let step: BuildNavigationPlanStep;
   let state: MockPipelineState;
   let redirectInstruction: NavigationInstruction;
@@ -122,15 +122,15 @@ describe('NavigationPlanStep', () => {
     router.addRoute(from);
     router.addRoute(to);
     router._createNavigationInstruction(url).then((instruction) => {
-      step.run(instruction, state.next)
+      return step.run(instruction, state.next)
         .then(e => {
           expect(state.rejection).toBeTruthy();
           expect(e instanceof Redirect).toBe(true);
           expect(e.url).toBe(`#/second/10?q=1`);
           done();
-        })
-        .catch(done.fail);
-    });
+        });
+    })
+    .catch(done.fail);
   });
 
   it('redirects and drops unused dynamic parameters', (done) => {
@@ -398,7 +398,7 @@ describe('NavigationPlanStep', () => {
     });
   });
 
-  describe('generates navigation plans', () => {
+  describe('generates navigation plans', function NavigationPlan_Generation_Test() {
     it('with no prev step', (done) => {
       step.run(firstInstruction, state.next)
         .then(() => {
@@ -432,7 +432,7 @@ describe('NavigationPlanStep', () => {
     });
   });
 
-  describe('activation strategy', () => {
+  describe('activation strategy', function ActivationStrategy_Test() {
     it('is replace when moduleId changes', (done) => {
       firstInstruction.addViewPortInstruction('default', 'no-change', './first', {});
 

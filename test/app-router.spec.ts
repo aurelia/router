@@ -34,7 +34,7 @@ class MockLoader extends RouteLoader {
   }
 }
 
-describe('app-router', () => {
+describe('app-router', function AppRouter_Test() {
   let router: AppRouter;
   let history: History;
   let ea: EventAggregator;

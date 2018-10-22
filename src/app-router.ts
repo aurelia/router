@@ -140,7 +140,7 @@ export class AppRouter extends Router {
   }
 
   /**@internal */
-  async _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | void> {
+  async _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | undefined> {
     if (this.isNavigating && !instructionCount) {
       return undefined;
     }
