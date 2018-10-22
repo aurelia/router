@@ -54,7 +54,7 @@ function determineWhatToLoad(
   navigationInstruction: NavigationInstruction,
   toLoad: ILoadingPlan[] = []
 ): ILoadingPlan[] {
-  let plans = navigationInstruction.plans;
+  let plans = navigationInstruction.plan;
 
   for (let viewPortName in plans) {
     let viewPortPlan = plans[viewPortName];
@@ -66,11 +66,29 @@ function determineWhatToLoad(
         determineWhatToLoad(viewPortPlan.childNavigationInstruction, toLoad);
       }
     } else {
+      // let viewPortInstruction = navigationInstruction.addViewPortInstruction(
+      //   viewPortName,
+      //   viewPortPlan.strategy,
+      //   viewPortPlan.prevModuleId,
+      //   viewPortPlan.prevComponent);
+      let partialInstruction: ViewPortInstruction = {
+        strategy: viewPortPlan.strategy,
+        component: viewPortPlan.prevComponent
+      } as ViewPortInstruction;
+      let prevViewModel = viewPortPlan.prevViewModel;
+
+      if (typeof prevViewModel === 'string' || prevViewModel === null) {
+        partialInstruction.moduleId = prevViewModel as string | null;
+      } else if (typeof prevViewModel === 'function') {
+        partialInstruction.viewModel = () => prevViewModel as Function;
+      } else {
+        throw new Error('Invaid previous view model specification');
+      }
+
       let viewPortInstruction = navigationInstruction.addViewPortInstruction(
         viewPortName,
-        viewPortPlan.strategy,
-        viewPortPlan.prevModuleId,
-        viewPortPlan.prevComponent);
+        partialInstruction
+      );
 
       if (viewPortPlan.childNavigationInstruction) {
         viewPortInstruction.childNavigationInstruction = viewPortPlan.childNavigationInstruction;
@@ -126,7 +144,7 @@ async function loadRoute(
     if (childPlan instanceof Redirect) {
       return Promise.reject(childPlan);
     }
-    childInstruction.plans = childPlan;
+    childInstruction.plan = childPlan;
     viewPortInstruction.childNavigationInstruction = childInstruction;
     return loadNewRoute(routeLoader, childInstruction);
   }

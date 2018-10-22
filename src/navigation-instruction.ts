@@ -16,11 +16,10 @@ export interface NavigationInstructionInit {
 }
 
 export class CommitChangesStep {
-  run(navigationInstruction: NavigationInstruction, next: Function) {
-    return navigationInstruction._commitChanges(true).then(() => {
-      navigationInstruction._updateTitle();
-      return next();
-    });
+  async run(navigationInstruction: NavigationInstruction, next: Function) {
+    await navigationInstruction._commitChanges(true);
+    navigationInstruction._updateTitle();
+    return next();
   }
 }
 
@@ -77,7 +76,7 @@ export class NavigationInstruction {
   /**
   * Navigation plans for view ports
   */
-  plans: Record<string, ViewPortPlan> = null;
+  plan: Record<string, ViewPortPlan> = null;
 
   options: Record<string, any> = {};
 
@@ -313,7 +312,7 @@ export class NavigationInstruction {
 
 function prune(instruction: NavigationInstruction) {
   instruction.previousInstruction = null;
-  instruction.plans = null;
+  instruction.plan = null;
 }
 
 interface ISwapPlan {

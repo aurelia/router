@@ -39,7 +39,7 @@ function processDeactivatable(
   next: Next,
   ignoreResult?: boolean
 ): Promise<any> {
-  const plan = navigationInstruction.plans;
+  const plan = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
   let i = infos.length; // query from inside out
 
@@ -95,7 +95,7 @@ function findDeactivatable(
     if (viewPortPlan.strategy === activationStrategy.replace && prevComponent) {
       addPreviousDeactivatable(prevComponent, callbackName, list);
     } else if (viewPortPlan.childNavigationInstruction) {
-      findDeactivatable(viewPortPlan.childNavigationInstruction.plans, callbackName, list);
+      findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
     }
   }
 
@@ -174,7 +174,7 @@ function findActivatable(
   list: IActivatableInfo[] = [],
   router?: Router
 ): IActivatableInfo[] {
-  let plan = navigationInstruction.plans;
+  let plan = navigationInstruction.plan;
 
   Object
     .keys(plan)

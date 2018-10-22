@@ -1,7 +1,10 @@
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { ActivationStrategy, ViewPortPlan, RouteConfig } from './interfaces';
+import { ActivationStrategy, ViewPortPlan, RouteConfig, ViewPortInstruction } from './interfaces';
 import { Next } from './pipeline';
+
+const moduleIdPropName = 'moduleId';
+const viewModelPropName = 'viewModel';
 
 /**
 * The strategy to use when activating modules during navigation.
@@ -19,7 +22,7 @@ export class BuildNavigationPlanStep {
         if (plan instanceof Redirect) {
           return next.cancel(plan);
         }
-        navigationInstruction.plans = plan;
+        navigationInstruction.plan = plan;
         return next();
       })
       .catch(next.cancel);
@@ -73,28 +76,24 @@ export async function _buildNavigationPlan(
         nextViewPortConfig = defaults[viewPortName] as RouteConfig;
       }
 
+      // Cannot simply do an equality comparison as user may have code like this:
+      // { route: 'a', viewModel: () => import('a') }
+      // { route: 'b', viewModel: () => import('a') }
+      // the two viewModel factories are different, but they are expected to be the same
+      // as they points to the same default export from module 'a'
+      let prevViewModelTarget: string | Function | null = await resolveViewModel(prevViewPortInstruction);
+      let nextViewModelTarget: string | Function | null = await resolveViewModel(nextViewPortConfig);
+
       const viewPortPlan = viewPortPlans[viewPortName] = {
         strategy: activationStrategy.noChange,
         name: viewPortName,
         config: nextViewPortConfig as RouteConfig,
         prevComponent: prevViewPortInstruction.component,
-        // prevModuleId: prevViewPortInstruction.moduleId
+        prevModuleId: prevViewModelTarget,
+        prevViewModel: prevViewModelTarget,
       } as ViewPortPlan;
 
-      if ('moduleId' in prevViewPortInstruction) {
-        viewPortPlan.prevModuleId = prevViewPortInstruction.moduleId;
-        if ('moduleId' in nextViewPortConfig) {
-
-        } else {
-
-        }
-      } else if ('viewModel' in prevViewPortInstruction) {
-        viewPortPlan.prevViewModel = prevViewPortInstruction.viewModel;
-      } else {
-        throw new Error('Invalid previous viewport instruction.');
-      }
-
-      if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
+      if (prevViewModelTarget !== nextViewModelTarget) {
         viewPortPlan.strategy = activationStrategy.replace;
       } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
         viewPortPlan.strategy = prevViewPortInstruction.component.viewModel
@@ -122,7 +121,7 @@ export async function _buildNavigationPlan(
             if (childPlanOrRedirect instanceof Redirect) {
               return Promise.reject(childPlanOrRedirect);
             }
-            childNavInstruction.plans = childPlanOrRedirect;
+            childNavInstruction.plan = childPlanOrRedirect;
             // for bluebird ?
             return null;
           });
@@ -196,6 +195,44 @@ function hasDifferentParameterValues(prev: NavigationInstruction, next: Navigati
   return false;
 }
 
-function areViewModelDifferent() {
+export async function resolveViewModel(viewPortInstruction: ViewPortInstruction | RouteConfig): Promise<string | Function | null> {
+  if (moduleIdPropName in viewPortInstruction) {
+    return viewPortInstruction[moduleIdPropName];
+  }
+  if (viewModelPropName in viewPortInstruction) {
+    let $viewModel = await viewPortInstruction[viewModelPropName]();
+    if ($viewModel && typeof $viewModel === 'object') {
+      $viewModel = $viewModel.default as Function;
+    }
+    if (typeof $viewModel !== 'function' && $viewModel !== null) {
+      throw new Error(`Invalid viewModel specification in ${viewPortInstruction.name || ''} viewport/ route config`)
+    }
+    return $viewModel as Function | null;
+  }
+  throw new Error(`moduleId / viewModel not found in ${viewPortInstruction.name || ''} viewport / route config`);
+}
 
+function areViewModelsDifferent(
+  prevViewPortInstruction: ViewPortInstruction,
+  nextViewPortConfig: RouteConfig,
+  nextViewModel: Function | null
+) {
+
+  if (moduleIdPropName in prevViewPortInstruction) {
+    if (moduleIdPropName in nextViewPortConfig) {
+      return prevViewPortInstruction[moduleIdPropName] === nextViewPortConfig[moduleIdPropName];
+    }
+    return true;
+  }
+
+  if (viewModelPropName in prevViewPortInstruction) {
+    if (moduleIdPropName in nextViewPortConfig) {
+      return true;
+    }
+    if (viewModelPropName in nextViewPortConfig) {
+      
+    }
+  }
+
+  throw new Error('Invalid previous viewport instruction.');
 }
