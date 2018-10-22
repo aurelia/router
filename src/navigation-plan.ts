@@ -211,28 +211,3 @@ export async function resolveViewModel(viewPortInstruction: ViewPortInstruction 
   }
   throw new Error(`moduleId / viewModel not found in ${viewPortInstruction.name || ''} viewport / route config`);
 }
-
-function areViewModelsDifferent(
-  prevViewPortInstruction: ViewPortInstruction,
-  nextViewPortConfig: RouteConfig,
-  nextViewModel: Function | null
-) {
-
-  if (moduleIdPropName in prevViewPortInstruction) {
-    if (moduleIdPropName in nextViewPortConfig) {
-      return prevViewPortInstruction[moduleIdPropName] === nextViewPortConfig[moduleIdPropName];
-    }
-    return true;
-  }
-
-  if (viewModelPropName in prevViewPortInstruction) {
-    if (moduleIdPropName in nextViewPortConfig) {
-      return true;
-    }
-    if (viewModelPropName in nextViewPortConfig) {
-      
-    }
-  }
-
-  throw new Error('Invalid previous viewport instruction.');
-}
