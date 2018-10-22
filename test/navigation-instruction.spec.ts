@@ -25,7 +25,7 @@ describe('NavigationInstruction', () => {
     );
   });
 
-  describe('build title', () => {
+  describe('build title', function Build_Title_Test() {
     let child: Router;
     let config: RouterConfiguration;
     beforeEach(() => {
@@ -95,7 +95,7 @@ describe('NavigationInstruction', () => {
     });
   });
 
-  describe('getBaseUrl()', () => {
+  describe('getBaseUrl()', function GetBaseUrl_Test() {
     let child: Router;
     const parentRouteName = 'parent';
     const parentParamRouteName = 'parent/:parent';
