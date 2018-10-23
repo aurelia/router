@@ -411,7 +411,23 @@ describe('NavigationInstruction', () => {
     }
   });
 
-  describe('_commitChanges()', function _5_commitChanges_Tests() {
+  describe('getWildcardPath()', function _5_getWildcardPath_Tests() {
+
+    let navInstruction: NavigationInstruction;
+    beforeEach(function __setup__() {
+      navInstruction = new NavigationInstruction({
+        fragment: '',
+        router: {} as Router,
+        config: {}
+      });
+    });
+
+    it('calls successfully', () => {
+
+    });
+  });
+
+  describe('_commitChanges()', function _6_commitChanges_Tests() {
 
   });
 });

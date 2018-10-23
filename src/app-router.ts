@@ -84,11 +84,10 @@ export class AppRouter extends Router {
           const resolveConfiguredPromise = this._resolveConfiguredPromise;
           // tslint:disable-next-line
           this._resolveConfiguredPromise = () => { };
-          await this
-            .configure(config => {
-              viewModel.configureRouter(config, this);
-              return config;
-            });
+          await this.configure(config => {
+            viewModel.configureRouter(config, this);
+            return config;
+          });
           this.activate();
           resolveConfiguredPromise();
         }

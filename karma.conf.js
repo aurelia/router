@@ -5,7 +5,10 @@ module.exports = function(config) {
   const options = {
     basePath: '',
     frameworks: ["jasmine"],
-    files: ["test/setup.ts"],
+    files: [
+      'test/setup.ts',
+      'test/setup.integration.ts'
+    ],
     preprocessors: {
       "**/*.ts": ["webpack", 'sourcemap']
     },
@@ -45,14 +48,17 @@ module.exports = function(config) {
 };
 
 function getWebpackConfigs(cliOptions) {
+  const webpack = require('webpack');
+  const { AureliaPlugin } = require('aurelia-webpack-plugin');
+
   return {
     mode: "development",
     resolve: {
       extensions: [".ts", ".js"],
       modules: ["src", "node_modules"],
-      // alias: {
-      //   src: path.resolve(__dirname, "src")
-      // }
+      alias: {
+        'aurelia-router': path.resolve(__dirname, 'src', 'index')
+      }
     },
     devtool: "inline-source-map",
     module: {
@@ -67,6 +73,19 @@ function getWebpackConfigs(cliOptions) {
           }
         }
       ]
-    }
+    },
+    plugins: [
+      new AureliaPlugin({
+        aureliaApp: undefined,
+        aureliaConfig: [
+          "defaultBindingLanguage",
+          "history",
+          "defaultResources",
+          'developmentLogging',
+          'router'
+        ],
+        noWebpackLoader: true,
+      })
+    ]
   };
 }

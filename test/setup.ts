@@ -1,11 +1,6 @@
 import './interfaces';
 
-// import 'aurelia-polyfills';
-// import 'aurelia-loader-webpack';
-// import { initialize } from 'aurelia-pal-browser';
-
-// initialize();
 Error.stackTraceLimit = Infinity;
 
-const testContext = require.context('./', true, /\.spec\.ts$/im);
+const testContext = require.context('./unit', true, /\.spec\.ts$/im);
 testContext.keys().forEach(testContext);
