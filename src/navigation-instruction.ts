@@ -216,7 +216,7 @@ export class NavigationInstruction {
   }
 
   /**@internal */
-  _commitChanges(waitToSwap: boolean): Promise<void> {
+  async _commitChanges(waitToSwap: boolean): Promise<void> {
     let router = this.router;
     router.currentInstruction = this;
 
@@ -262,12 +262,10 @@ export class NavigationInstruction {
       }
     }
 
-    return Promise
-      .all(loads)
-      .then(() => {
-        delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
-        prune(this);
-      });
+    await Promise.all(loads);
+    delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
+    await Promise.resolve();
+    prune(this);
   }
 
   /**@internal */

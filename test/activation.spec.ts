@@ -13,8 +13,8 @@ import {
 } from '../src';
 import { ValueOf, createPipelineState, MockPipelineState, MockInstruction } from './shared';
 
-describe('activation', function activation() {
-  describe('CanDeactivatePreviousStep', function CanDeactivatePreviousStep_Test() {
+describe('activation', function activation_Tests() {
+  describe('CanDeactivatePreviousStep', function CanDeactivatePreviousStep_Tests() {
     let step: CanDeactivatePreviousStep;
     let state: MockPipelineState;
 
@@ -209,7 +209,7 @@ describe('activation', function activation() {
     });
   });
 
-  describe('CanActivateNextStep', function CanActivateNextStep_Test() {
+  describe('CanActivateNextStep', function CanActivateNextStep_Tests() {
     let step: CanActivateNextStep;
     let state: MockPipelineState;
 
@@ -259,7 +259,7 @@ describe('activation', function activation() {
     });
   });
 
-  describe('ActivateNextStep', function ActivateNextStep_Test() {
+  describe('ActivateNextStep', function ActivateNextStep_Tests() {
     let step: ActivateNextStep;
     let state: MockPipelineState;
 

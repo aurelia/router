@@ -12,10 +12,11 @@ import {
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 
-describe('the router', () => {
+describe('Router', function Route_Tests() {
+
   let router: Router;
   let history: History;
-  beforeEach(() => {
+  beforeEach(function __setup__() {
     history = new MockHistory();
     history.getAbsoluteRoot = () => absoluteRoot;
     router = new AppRouter(
@@ -26,7 +27,7 @@ describe('the router', () => {
     );
   });
 
-  describe('addRoute', () => {
+  describe('addRoute', function addRoute_Tests() {
     it('should register named routes', () => {
       const child = router.createChild(new Container());
 
@@ -80,7 +81,7 @@ describe('the router', () => {
     });
   });
 
-  describe('generate', () => {
+  describe('generate', function generate_Tests() {
     it('should generate route URIs', (done) => {
       const child = router.createChild(new Container());
       child.baseUrl = 'child-router';
@@ -147,7 +148,7 @@ describe('the router', () => {
     });
   });
 
-  describe('navigate', () => {
+  describe('navigate', function navigate_Tests() {
     it('should navigate to absolute paths', (done) => {
       const options = {};
       spyOn(history, 'navigate');
@@ -232,7 +233,7 @@ describe('the router', () => {
     });
   });
 
-  describe('_createNavigationInstruction', () => {
+  describe('_createNavigationInstruction', function _createNavigationInstruction_Tests() {
     it('should reject when router not configured', (done) => {
       router._createNavigationInstruction()
         .then(x => expect(true).toBeFalsy('should have rejected'))
@@ -440,7 +441,7 @@ describe('the router', () => {
     });
   });
 
-  describe('configure', () => {
+  describe('configure', function configure_Tests() {
     it('notifies when configured', (done) => {
       expect(router.isConfigured).toBe(false);
 
@@ -492,7 +493,7 @@ describe('the router', () => {
     });
   });
 
-  describe('refreshNavigation', () => {
+  describe('refreshNavigation', function refreshNavigation_Tests() {
     let staticHref: string;
 
     beforeEach((done) => {

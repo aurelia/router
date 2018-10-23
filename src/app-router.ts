@@ -141,6 +141,8 @@ export class AppRouter extends Router {
 
   /**@internal */
   async _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | undefined> {
+    // keep the timing for backward compat
+    await Promise.resolve();
     if (this.isNavigating && !instructionCount) {
       return undefined;
     }
@@ -190,7 +192,7 @@ export class AppRouter extends Router {
       const $result = await pipeline.run(instruction);
       result = await processResult(instruction, $result, instructionCount, this);
     } catch (error) {
-      result = ({ output: error instanceof Error ? error : new Error(error) } as PipelineResult);
+      result = { output: error instanceof Error ? error : new Error(error) } as PipelineResult;
     }
     return resolveInstruction(instruction, result, !!instructionCount, this);
   }
@@ -218,12 +220,12 @@ export class AppRouter extends Router {
   }
 }
 
-function processResult(
+async function processResult(
   instruction: NavigationInstruction,
   result: PipelineResult,
   instructionCount: number,
   router: AppRouter
-) {
+): Promise<PipelineResult> {
   if (!(result && 'completed' in result && 'output' in result)) {
     result = result || {} as PipelineResult;
     result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
@@ -245,9 +247,11 @@ function processResult(
     }
   }
 
-  return Promise.resolve(navigationCommandResult)
-    .then(_ => router._dequeueInstruction(instructionCount + 1))
-    .then(innerResult => finalResult || innerResult || result);
+  // The navigation returns void
+  // is this necessary
+  await Promise.resolve(navigationCommandResult);
+  const innerResult = await router._dequeueInstruction(instructionCount + 1);
+  return finalResult || innerResult || result;
 }
 
 function resolveInstruction(

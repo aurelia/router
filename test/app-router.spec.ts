@@ -34,7 +34,7 @@ class MockLoader extends RouteLoader {
   }
 }
 
-describe('app-router', function AppRouter_Test() {
+describe('app-router', function AppRouter_Tests() {
   let router: AppRouter;
   let history: History;
   let ea: EventAggregator;
@@ -121,7 +121,7 @@ describe('app-router', function AppRouter_Test() {
       });
   });
 
-  describe('dequeueInstruction', () => {
+  describe('dequeueInstruction', function DequeueInstruction_Tests() {
     let processingResult: any;
     let completedResult: any;
 
@@ -219,7 +219,7 @@ describe('app-router', function AppRouter_Test() {
     });
   });
 
-  describe('loadUrl', () => {
+  describe('loadUrl', function LoadUrl_Tests() {
     it('restores previous location when route not found', (done) => {
       spyOn(history, 'navigate');
 
@@ -268,7 +268,8 @@ describe('app-router', function AppRouter_Test() {
         .then(done);
     });
   });
-  describe('instruction completes as navigation command', () => {
+
+  describe('instruction completes as navigation command', function InstructionCompletion_Tests () {
     it('should complete instructions in order before terminating', done => {
       const pipeline = new Pipeline()
         .addStep({ run(inst: NavigationInstruction, next: Next) { return pipelineStep(inst, next); } });

@@ -11,7 +11,7 @@ import {
 } from '../src';
 import { MockHistory, createPipelineState, MockPipelineState } from './shared';
 
-describe('NavigationPlanStep', function NavigationPlanStep_Test() {
+describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
   let step: BuildNavigationPlanStep;
   let state: MockPipelineState;
   let redirectInstruction: NavigationInstruction;
@@ -398,7 +398,7 @@ describe('NavigationPlanStep', function NavigationPlanStep_Test() {
     });
   });
 
-  describe('generates navigation plans', function NavigationPlan_Generation_Test() {
+  describe('generates navigation plans', function NavigationPlan_Generation_Tests() {
     it('with no prev step', (done) => {
       step.run(firstInstruction, state.next)
         .then(() => {
@@ -432,7 +432,7 @@ describe('NavigationPlanStep', function NavigationPlanStep_Test() {
     });
   });
 
-  describe('activation strategy', function ActivationStrategy_Test() {
+  describe('activation strategy', function ActivationStrategy_Tests() {
     it('is replace when moduleId changes', (done) => {
       firstInstruction.addViewPortInstruction('default', 'no-change', './first', {});
 
