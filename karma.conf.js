@@ -5,26 +5,30 @@ module.exports = function(config) {
 
     basePath: '',
     frameworks: ["jasmine"],
-    files: ["test/*.spec.ts"],
+    files: ["test/setup.ts"],
     preprocessors: {
-      "**/*.ts": ["webpack"]
+      "**/*.ts": ["webpack", 'sourcemap']
     },
     webpack: {
       mode: "development",
       resolve: {
         extensions: [".ts", ".js"],
         modules: ["src", "node_modules"],
-        alias: {
-          src: path.resolve(__dirname, "src")
-        }
+        // alias: {
+        //   src: path.resolve(__dirname, "src")
+        // }
       },
-      devtool: "cheap-module-eval-source-map",
+      devtool: "inline-source-map",
       module: {
         rules: [
           {
             test: /\.ts$/,
             loader: "ts-loader",
-            exclude: /node_modules/
+            exclude: /node_modules/,
+            options: {
+              // load this relatively to each entry file
+              configFile: './tsconfig-test.json'
+            }
           }
         ]
       }

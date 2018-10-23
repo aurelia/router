@@ -1,13 +1,16 @@
 import { History } from 'aurelia-history';
 import { Container } from 'aurelia-dependency-injection';
-import { MockHistory } from './shared';
+import { MockHistory, MockRouter } from '../shared';
 import {
   AppRouter,
   Router,
   ViewPortInstruction,
   RouterConfiguration,
-  PipelineProvider
-} from '../src';
+  PipelineProvider,
+  NavigationInstruction,
+  ViewPortComponent
+} from '../../src';
+import { ActivationStrategyType } from '../../src/interfaces';
 
 const absoluteRoot = 'http://aurelia.io/docs/';
 
@@ -15,7 +18,7 @@ describe('NavigationInstruction', () => {
   let router: Router;
   let history: History;
 
-  beforeEach(() => {
+  beforeEach(function __setup__() {
     history = new MockHistory() as any;
     router = new AppRouter(
       new Container(),
@@ -25,7 +28,7 @@ describe('NavigationInstruction', () => {
     );
   });
 
-  describe('build title', function Build_Title_Tests() {
+  describe('build title', function _1_Build_Title_Tests() {
     let child: Router;
     let config: RouterConfiguration;
     beforeEach(() => {
@@ -95,7 +98,7 @@ describe('NavigationInstruction', () => {
     });
   });
 
-  describe('getBaseUrl()', function GetBaseUrl_Tests() {
+  describe('getBaseUrl()', function _2_GetBaseUrl_Tests() {
     let child: Router;
     const parentRouteName = 'parent';
     const parentParamRouteName = 'parent/:parent';
@@ -217,6 +220,65 @@ describe('NavigationInstruction', () => {
         });
       })
         .catch(fail);
+    });
+  });
+
+  fdescribe('addViewPortInstruction()', function _3_addViewPortInstruction_Tests() {
+    const activationStrategies: ActivationStrategyType[] = ['replace', 'invoke-lifecycle', 'no-change'];
+    let mockRouter: MockRouter;
+    let navInstruction: NavigationInstruction;
+
+    beforeEach(function __setup__() {
+      mockRouter = {} as MockRouter;
+      navInstruction = new NavigationInstruction({
+        fragment: '',
+        router: mockRouter,
+        config: {}
+      });
+    });
+
+    describe('with primitive params overload', function addWithPrimitiveParams_Tests() {
+      it('adds', () => {
+        activationStrategies.forEach(strategy => {
+          const childRouter = {} as Router;
+          const component = { viewModel: {}, childRouter } as ViewPortComponent;
+          const viewPortInstruction = navInstruction.addViewPortInstruction('a', strategy, 'aa', component);
+          expect(viewPortInstruction.childRouter).toBe(childRouter);
+          expect(viewPortInstruction.component).toBe(component);
+          expect(viewPortInstruction.moduleId).toBe('aa');
+          expect(viewPortInstruction.name).toBe('a');
+          expect(viewPortInstruction.strategy).toBe(strategy);
+        });
+      });
+
+      it('throws when viewModel is undefined / null', () => {
+        activationStrategies.forEach(strategy => {
+          for (const component of [undefined, null] as any[]) {
+            expect(() => {
+              navInstruction.addViewPortInstruction('a', strategy, 'aa', component);
+            }).toThrowError(new RegExp(`Cannot read property ['"]childRouter['"] of ${component}`));
+          };
+        });
+      });
+    });
+
+    describe('with partial viewport instruction overload', function addWithPartialInstruction_Tests() {
+      it('adds using viewport instruction parameter', () => {
+        for (const strategy of activationStrategies) {
+          const childRouter = {} as Router;
+          const component = { viewModel: {}, childRouter } as ViewPortComponent;
+          const moduleId = 'a';
+          const viewPortInstruction = navInstruction.addViewPortInstruction('a', {
+            strategy,
+            moduleId,
+            component
+          } as ViewPortInstruction);
+          expect(viewPortInstruction.strategy).toBe(strategy);
+          expect(viewPortInstruction.moduleId).toBe(moduleId);
+          expect(viewPortInstruction.component).toBe(component);
+          expect(viewPortInstruction.childRouter).toBe(childRouter);
+        }
+      });
     });
   });
 });

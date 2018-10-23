@@ -154,9 +154,15 @@ export class NavigationInstruction {
         lifecycleArgs: [this.lifecycleArgs[0], config, this.lifecycleArgs[2]]
       };
     } else {
-      viewportInstruction.name = name;
-      viewportInstruction.childRouter = component.childRouter;
-      viewportInstruction.lifecycleArgs = [this.lifecycleArgs[0], config, this.lifecycleArgs[2]];
+      viewportInstruction = this.viewPortInstructions[name] = {
+        name: name,
+        strategy: instructionOrStrategy.strategy,
+        moduleId: instructionOrStrategy.moduleId,
+        viewModel: instructionOrStrategy.viewModel,
+        childRouter: instructionOrStrategy.component.childRouter,
+        component: instructionOrStrategy.component,
+        lifecycleArgs: [this.lifecycleArgs[0], config, this.lifecycleArgs[2]]
+      };
     }
 
     return viewportInstruction;
@@ -264,7 +270,6 @@ export class NavigationInstruction {
 
     await Promise.all(loads);
     delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
-    await Promise.resolve();
     prune(this);
   }
 

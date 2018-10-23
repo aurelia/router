@@ -74,7 +74,7 @@ export class AppRouter extends Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: any, name?: string): Promise<any> {
+  async registerViewPort(viewPort: any, name?: string): Promise<any> {
     super.registerViewPort(viewPort, name);
 
     if (!this.isActive) {
@@ -84,15 +84,13 @@ export class AppRouter extends Router {
           const resolveConfiguredPromise = this._resolveConfiguredPromise;
           // tslint:disable-next-line
           this._resolveConfiguredPromise = () => { };
-          return this
+          await this
             .configure(config => {
               viewModel.configureRouter(config, this);
               return config;
-            })
-            .then(() => {
-              this.activate();
-              resolveConfiguredPromise();
             });
+          this.activate();
+          resolveConfiguredPromise();
         }
       } else {
         this.activate();

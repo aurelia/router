@@ -10,8 +10,8 @@ import {
   ActivateNextStep,
   NavigationInstructionInit,
   ViewPortPlan
-} from '../src';
-import { ValueOf, createPipelineState, MockPipelineState, MockInstruction } from './shared';
+} from '../../src';
+import { ValueOf, createPipelineState, MockPipelineState, MockInstruction } from '../shared';
 
 describe('activation', function activation_Tests() {
   describe('CanDeactivatePreviousStep', function CanDeactivatePreviousStep_Tests() {
@@ -35,7 +35,7 @@ describe('activation', function activation_Tests() {
       return Object.assign({ router: {} }, instruction as NavigationInstruction);
     };
 
-    beforeEach(() => {
+    beforeEach(function __setup__() {
       step = new CanDeactivatePreviousStep();
       state = createPipelineState();
     });

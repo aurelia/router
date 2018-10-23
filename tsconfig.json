@@ -21,6 +21,10 @@
       "es2016.array.include"
     ]
   },
+  "include": [
+    "src",
+    "test"
+  ],
   "exclude": [
     "node_modules",
     "dist",

@@ -3,8 +3,8 @@ import {
   RedirectToRoute,
   isNavigationCommand,
   NavigationCommand
-} from '../src';
-import { MockRouter } from './shared';
+} from '../../src';
+import { MockRouter } from '../shared';
 
 describe('NavigationCommand', function NavigationCommand_Tests() {
 

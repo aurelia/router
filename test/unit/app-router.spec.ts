@@ -14,16 +14,10 @@ import {
   ViewPortInstruction,
   ViewPort,
   PipelineStep
-} from '../src';
-import { MockHistory, MockInstruction } from './shared';
+} from '../../src';
+import { MockHistory, MockInstruction } from '../shared';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { History } from 'aurelia-history';
-
-declare module 'aurelia-history' {
-  interface History {
-    previousLocation: string;
-  }
-}
 
 
 class MockLoader extends RouteLoader {
@@ -44,7 +38,7 @@ describe('app-router', function AppRouter_Tests() {
   let provider: PipelineProvider;
   let pipelineStep: PipelineStep['run'];
 
-  beforeEach(() => {
+  beforeEach(function __setup__() {
     history = new MockHistory();
     container = new Container();
     container.registerSingleton(RouteLoader, MockLoader);

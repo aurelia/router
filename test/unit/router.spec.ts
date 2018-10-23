@@ -1,4 +1,4 @@
-import { MockHistory, MockInstruction } from './shared';
+import { MockHistory, MockInstruction } from '../shared';
 import { History } from 'aurelia-history';
 import { Container } from 'aurelia-dependency-injection';
 import {
@@ -8,7 +8,7 @@ import {
   PipelineProvider,
   AppRouter,
   NavigationInstruction
-} from '../src';
+} from '../../src';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 

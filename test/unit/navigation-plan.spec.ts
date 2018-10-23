@@ -8,8 +8,8 @@ import {
   NavigationInstructionInit,
   BuildNavigationPlanStep,
   RouteConfig
-} from '../src';
-import { MockHistory, createPipelineState, MockPipelineState } from './shared';
+} from '../../src';
+import { MockHistory, createPipelineState, MockPipelineState } from '../shared';
 
 describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
   let step: BuildNavigationPlanStep;
@@ -22,7 +22,7 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
   let child: Router;
   let grandchild: Router;
 
-  beforeEach(() => {
+  beforeEach(function __setup__() {
     step = new BuildNavigationPlanStep();
     state = createPipelineState();
     router = new AppRouter(
