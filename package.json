@@ -24,7 +24,8 @@
     "dev": "node build/scripts/dev",
     "build": "node build/scripts/build",
     "bundle-dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
-    "test": "karma start",
+    "test": "karma start --no-single-run false",
+    "test:watch": "karma start --coverage",
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --force"
   },
   "jspm": {
@@ -66,9 +67,11 @@
     "aurelia-tools": "0.2.4",
     "dts-bundle-generator": "^1.6.1",
     "gulp-watch": "^5.0.1",
+    "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "^2.4.1",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage-istanbul-reporter": "^2.0.4",
     "karma-jasmine": "^1.1.2",
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.7",

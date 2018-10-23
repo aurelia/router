@@ -1,6 +1,6 @@
 import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType, ViewPortComponent } from './interfaces';
 import { Router } from './router';
-import { activationStrategy } from './navigation-plan';
+import { activationStrategy, moduleIdPropName, viewModelPropName } from './navigation-plan';
 
 export interface NavigationInstructionInit {
   fragment: string;
@@ -142,28 +142,34 @@ export class NavigationInstruction {
     moduleId?: string,
     component?: ViewPortComponent
   ): ViewPortInstruction {
-    const config: RouteConfig = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: name });
+    let lifecycleArgs = this.lifecycleArgs;
+    let config: RouteConfig = Object.assign({}, lifecycleArgs[1], { currentViewPort: name });
     let viewportInstruction: ViewPortInstruction;
     if (typeof instructionOrStrategy === 'string') {
-      viewportInstruction = this.viewPortInstructions[name] = {
+      viewportInstruction = {
         name: name,
         strategy: instructionOrStrategy,
         moduleId: moduleId,
         component: component,
         childRouter: component.childRouter,
-        lifecycleArgs: [this.lifecycleArgs[0], config, this.lifecycleArgs[2]]
+        lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]]
       };
     } else {
-      viewportInstruction = this.viewPortInstructions[name] = {
+      viewportInstruction = {
         name: name,
         strategy: instructionOrStrategy.strategy,
-        moduleId: instructionOrStrategy.moduleId,
-        viewModel: instructionOrStrategy.viewModel,
         childRouter: instructionOrStrategy.component.childRouter,
         component: instructionOrStrategy.component,
-        lifecycleArgs: [this.lifecycleArgs[0], config, this.lifecycleArgs[2]]
+        lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]]
       };
+      if (moduleIdPropName in instructionOrStrategy) {
+        viewportInstruction.moduleId = instructionOrStrategy.moduleId;
+      } else if (viewModelPropName in instructionOrStrategy) {
+        viewportInstruction.viewModel = instructionOrStrategy.viewModel;
+      }
     }
+
+    this.viewPortInstructions[name] = viewportInstruction;
 
     return viewportInstruction;
   }

@@ -223,7 +223,7 @@ describe('NavigationInstruction', () => {
     });
   });
 
-  fdescribe('addViewPortInstruction()', function _3_addViewPortInstruction_Tests() {
+  describe('addViewPortInstruction()', function _3_addViewPortInstruction_Tests() {
     const activationStrategies: ActivationStrategyType[] = ['replace', 'invoke-lifecycle', 'no-change'];
     let mockRouter: MockRouter;
     let navInstruction: NavigationInstruction;

@@ -3,8 +3,8 @@ import { NavigationInstruction } from './navigation-instruction';
 import { ActivationStrategy, ViewPortPlan, RouteConfig, ViewPortInstruction } from './interfaces';
 import { Next } from './pipeline';
 
-const moduleIdPropName = 'moduleId';
-const viewModelPropName = 'viewModel';
+export const moduleIdPropName = 'moduleId';
+export const viewModelPropName = 'viewModel';
 
 /**
 * The strategy to use when activating modules during navigation.
