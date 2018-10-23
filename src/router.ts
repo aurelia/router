@@ -670,7 +670,7 @@ function generateBaseUrl(router: Router, instruction: NavigationInstruction) {
   return `${router.baseUrl || ''}${instruction.getBaseUrl() || ''}`;
 }
 
-function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
+function validateRouteConfig(config: RouteConfig, routes: Object[]): void {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }

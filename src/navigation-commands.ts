@@ -42,7 +42,7 @@ export class Redirect implements NavigationCommand {
   /**@internal */
   shouldContinueProcessing: boolean;
 
-  private router: Router;
+  router: Router;
 
   /**
    * @param url The URL fragment to use as the navigation destination.
@@ -77,18 +77,11 @@ export class Redirect implements NavigationCommand {
 /**
 * Used during the activation lifecycle to cause a redirect to a named route.
 */
-export class RedirectToRoute implements NavigationCommand {
+// extends Redirect to avoid having to do instanceof check twice
+export class RedirectToRoute extends Redirect {
 
   route: string;
   params: any;
-  /**@internal */
-  options: NavigationOptions;
-
-  /**@internal */
-  shouldContinueProcessing: boolean;
-
-  /**@internal */
-  router: Router;
 
   /**
    * @param route The name of the route.
@@ -96,19 +89,9 @@ export class RedirectToRoute implements NavigationCommand {
    * @param options The options to use for navigation.
    */
   constructor(route: string, params: any = {}, options: NavigationOptions = {}) {
+    super('', options);
     this.route = route;
     this.params = params;
-    this.options = Object.assign({ trigger: true, replace: true }, options);
-    this.shouldContinueProcessing = false;
-  }
-
-  /**
-  * Called by the activation system to set the child router.
-  *
-  * @param router The router.
-  */
-  setRouter(router: Router): void {
-    this.router = router;
   }
 
   /**

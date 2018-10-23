@@ -111,7 +111,7 @@ export class NavigationInstruction {
   /**
   * Gets an array containing this instruction and all child instructions for the current navigation.
   */
-  getAllInstructions(): Array<NavigationInstruction> {
+  getAllInstructions(): NavigationInstruction[] {
     let instructions: NavigationInstruction[] = [this];
     for (let key in this.viewPortInstructions) {
       let childInstruction = this.viewPortInstructions[key].childNavigationInstruction;
@@ -127,7 +127,7 @@ export class NavigationInstruction {
   * Gets an array containing the instruction and all child instructions for the previous navigation.
   * Previous instructions are no longer available after navigation completes.
   */
-  getAllPreviousInstructions(): Array<NavigationInstruction> {
+  getAllPreviousInstructions(): NavigationInstruction[] {
     return this.getAllInstructions().map(c => c.previousInstruction).filter(c => c);
   }
 
@@ -166,6 +166,8 @@ export class NavigationInstruction {
         viewportInstruction.moduleId = instructionOrStrategy.moduleId;
       } else if (viewModelPropName in instructionOrStrategy) {
         viewportInstruction.viewModel = instructionOrStrategy.viewModel;
+      } else {
+        throw new Error('Invalid instruction. No "moduleId" or "viewModel" found.');
       }
     }
 
@@ -179,6 +181,7 @@ export class NavigationInstruction {
   */
   getWildCardName(): string {
     let wildcardIndex = this.config.route.lastIndexOf('*');
+    // Todo: make this have sense
     return (this.config.route as string).substr(wildcardIndex + 1);
   }
 
@@ -276,6 +279,7 @@ export class NavigationInstruction {
 
     await Promise.all(loads);
     delaySwaps.forEach(x => x.viewPort.swap(x.viewPortInstruction));
+    await Promise.resolve();
     prune(this);
   }
 

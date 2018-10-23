@@ -15,6 +15,7 @@ import { ActivationStrategyType } from '../../src/interfaces';
 const absoluteRoot = 'http://aurelia.io/docs/';
 
 describe('NavigationInstruction', () => {
+  const activationStrategies: ActivationStrategyType[] = ['replace', 'invoke-lifecycle', 'no-change'];
   let router: Router;
   let history: History;
 
@@ -224,7 +225,6 @@ describe('NavigationInstruction', () => {
   });
 
   describe('addViewPortInstruction()', function _3_addViewPortInstruction_Tests() {
-    const activationStrategies: ActivationStrategyType[] = ['replace', 'invoke-lifecycle', 'no-change'];
     let mockRouter: MockRouter;
     let navInstruction: NavigationInstruction;
 
@@ -251,7 +251,7 @@ describe('NavigationInstruction', () => {
         });
       });
 
-      it('throws when viewModel is undefined / null', () => {
+      it('throws when component is undefined / null', () => {
         activationStrategies.forEach(strategy => {
           for (const component of [undefined, null] as any[]) {
             expect(() => {
@@ -279,6 +279,139 @@ describe('NavigationInstruction', () => {
           expect(viewPortInstruction.childRouter).toBe(childRouter);
         }
       });
+
+      it('throws when component is undefined/ null', () => {
+        activationStrategies.forEach(strategy => {
+          for (const component of [undefined, null] as any[]) {
+            expect(() => {
+              navInstruction.addViewPortInstruction('a', {
+                strategy,
+                moduleId: '',
+                component,
+              } as ViewPortInstruction);
+            }).toThrowError(new RegExp(`Cannot read property ['"]childRouter['"] of ${component}`));
+          };
+        });
+      });
+
+      describe('with "viewModel"', () => {
+
+        it('adds', () => {
+          activationStrategies.forEach(strategy => {
+            const childRouter = {} as Router;
+            const component = { viewModel: {}, childRouter } as ViewPortComponent;
+            const viewModelSpec = () => class{} as Function;
+            const viewPortInstruction = navInstruction.addViewPortInstruction('a', {
+              strategy,
+              viewModel: viewModelSpec,
+              component: component,
+            } as ViewPortInstruction);
+            expect(viewPortInstruction.strategy).toBe(strategy);
+            expect(viewPortInstruction.viewModel).toBe(viewModelSpec);
+            expect(viewPortInstruction.component).toBe(component);
+            expect(viewPortInstruction.childRouter).toBe(childRouter);
+          });
+        });
+
+      });
+
+      it('throws when no "moduleId"/"viewModel" supplied', () => {
+        activationStrategies.forEach(strategy => {
+          expect(() => navInstruction.addViewPortInstruction('a', { component: {} } as any))
+            .toThrowError(new RegExp(`Invalid instruction`));
+        });
+      });
+
     });
+  });
+
+  describe('getAllInstructions()', function _4_getAllInstructions_Tests() {
+    let navInstruction: NavigationInstruction;
+    beforeEach(function __setup__() {
+      navInstruction = new NavigationInstruction({
+        fragment: '',
+        router: {} as Router,
+        config: {}
+      });
+    });
+
+    it('gets when it doesnt have childInstructions', () => {
+      const allInstructions = navInstruction.getAllInstructions();
+      expect(allInstructions.length).toBe(1);
+      expect(allInstructions.includes(navInstruction)).toBe(true);
+    });
+
+    it('gets when it has childInstructions', () => {
+      const childNavInstruction = new NavigationInstruction({
+        fragment: '',
+        router: {} as Router,
+        config: {}
+      });
+      navInstruction.viewPortInstructions['a'] = {
+        strategy: 'invoke-lifecycle',
+        component: null,
+        lifecycleArgs: null,
+        childNavigationInstruction: childNavInstruction
+      };
+      const allInstructions = navInstruction.getAllInstructions();
+      expect(allInstructions.length).toBe(2);
+      const [firstInst, secondInst] = allInstructions;
+      expect(firstInst).toBe(navInstruction);
+      expect(secondInst).toBe(childNavInstruction);
+    });
+
+    it('gets correct instructions with deep nested level', () => {
+      for (const strategy of activationStrategies) {
+        const max = 10;
+        let i = 0;
+        let current = navInstruction;
+        while (i < max) {
+          current = addFakeViewPort(`a${i}`, current, strategy).childNavigationInstruction;
+          i++;
+        }
+        const allInstructions = navInstruction.getAllInstructions();
+        expect(allInstructions.length).toBe(max + 1);
+        // test to ensure the instruction are recusively placed
+        i = 0;
+        current = navInstruction;
+        while (i < max) {
+          const childInstructions = getChildInstructions(current);
+          expect(childInstructions.length).toBe(1);
+          i++;
+        }
+      }
+    });
+
+    it('ignores view port without childNavigationInstruction', () => {
+      for (const strategy of activationStrategies) {
+        addFakeViewPort('a', navInstruction, strategy, false);
+        const allInstructions = navInstruction.getAllInstructions();
+        expect(allInstructions.length).toBe(1);
+        expect(allInstructions[0]).toBe(navInstruction);
+      }
+    });
+
+    function addFakeViewPort(name: string, navInstruction: NavigationInstruction, strategy: ActivationStrategyType, hasChild = true) {
+      return navInstruction.viewPortInstructions[name] = {
+        strategy: strategy,
+        component: null,
+        lifecycleArgs: null,
+        childNavigationInstruction: hasChild
+          ? new NavigationInstruction({
+              fragment: '',
+              router: {} as Router,
+              config: {}
+            })
+          : null,
+      } as ViewPortInstruction;
+    }
+
+    function getChildInstructions(navInstruction: NavigationInstruction): NavigationInstruction[] {
+      return Object.keys(navInstruction.viewPortInstructions).map(name => navInstruction.viewPortInstructions[name].childNavigationInstruction);
+    }
+  });
+
+  describe('_commitChanges()', function _5_commitChanges_Tests() {
+
   });
 });
