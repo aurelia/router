@@ -28,7 +28,7 @@ export class LoadRouteStep {
   }
 }
 
-function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction): Promise<any[] | void> {
+/*@internal*/export function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction): Promise<any[] | void> {
   let toLoad = determineWhatToLoad(navigationInstruction);
   let loadPromises = toLoad.map((loadingPlan: ILoadingPlan) => loadRoute(
     routeLoader,
@@ -50,7 +50,7 @@ interface ILoadingPlan {
  * @param navigationInstruction
  * @param toLoad
  */
-function determineWhatToLoad(
+/*@internal*/export function determineWhatToLoad(
   navigationInstruction: NavigationInstruction,
   toLoad: ILoadingPlan[] = []
 ): ILoadingPlan[] {
@@ -100,7 +100,7 @@ function determineWhatToLoad(
   return toLoad;
 }
 
-async function loadRoute(
+/*@internal*/export async function loadRoute(
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   viewPortPlan: ViewPortPlan
@@ -129,7 +129,7 @@ async function loadRoute(
       strategy: viewPortPlan.strategy,
       moduleId: moduleId,
       viewModel: viewModel,
-      component,
+      component
     } as ViewPortInstruction
   );
 
@@ -152,7 +152,7 @@ async function loadRoute(
   return undefined;
 }
 
-async function loadComponent(
+/*@internal*/export async function loadComponent(
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   config: RouteConfig
