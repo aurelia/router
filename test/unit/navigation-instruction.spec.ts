@@ -411,7 +411,7 @@ describe('NavigationInstruction', () => {
     }
   });
 
-  describe('getWildcardPath()', function _5_getWildcardPath_Tests() {
+  fdescribe('wild card', function _5_getWildcardPath_Tests() {
 
     let navInstruction: NavigationInstruction;
     beforeEach(function __setup__() {
@@ -422,8 +422,45 @@ describe('NavigationInstruction', () => {
       });
     });
 
-    it('calls successfully', () => {
+    it('getWildCardName()', () => {
+      [
+        ['', ''],
+        ['a/*', ''],
+        ['a/*/', '/'],
+        ['a/*/abc', '/abc'],
+        ['a/*/*/abc', '/abc'],
+        ['a/*abc', 'abc'],
+        ['a**', ''],
+        ['a*abcd', 'abcd'],
+        ['*abcd', 'abcd'],
+        ['****', ''],
+      ].forEach(([route, expectedName]) => {
+        navInstruction.config.route = route;
+        const name = navInstruction.getWildCardName();
+        expect(name).toBe(expectedName);
+      });
+    });
 
+    describe('getWildCardPath()', () => {
+      type ITestCase = [
+        /* route */ string, /* params */ Record<string, any>, /* queryString */ string, /* expected */ string
+      ];
+      const cases: ITestCase[] = [
+        ['', {}, '', ''],
+        ['*', {}, '', ''],
+        ['a/*', {}, '', ''],
+        ['a/*', { ['']: 'a' }, '', 'a'],
+        ['a/*', {}, 'b', '?b']
+      ];
+      cases.forEach(([route, params, queryString, expectedPath]) => {
+        it(`gets ["${expectedPath}"] from ["${route}${queryString ? `?${queryString}` : ''}"]`, () => {
+          navInstruction.config.route = route;
+          navInstruction.params = params;
+          navInstruction.queryString = queryString;
+          const wildCardPath = navInstruction.getWildcardPath();
+          expect(wildCardPath).toBe(expectedPath);
+        });
+      });
     });
   });
 

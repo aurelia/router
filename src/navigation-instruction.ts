@@ -181,7 +181,7 @@ export class NavigationInstruction {
   */
   getWildCardName(): string {
     let wildcardIndex = this.config.route.lastIndexOf('*');
-    // Todo: make this have sense
+    // Todo: make typings have more sense as it is confusing with string/ string[]
     return (this.config.route as string).substr(wildcardIndex + 1);
   }
 

@@ -2,6 +2,7 @@ const path = require('path');
 
 module.exports = function(config) {
   const webpackConfigs = getWebpackConfigs(config);
+  const browsers = config.browsers;
   const options = {
     basePath: '',
     frameworks: ["jasmine"],
@@ -18,7 +19,7 @@ module.exports = function(config) {
     },
     reporters: ["mocha", "progress"],
     // webpackServer: { noInfo: config.noInfo },
-    browsers: ["Chrome"],
+    browsers: Array.isArray(browsers) && browsers.length > 0 ? browsers : ['Chrome'],
     customLaunchers: {
       ChromeDebugging: {
         base: "Chrome",
@@ -44,7 +45,7 @@ module.exports = function(config) {
     };
   }
 
-  config.set(options)
+  config.set(options);
 };
 
 function getWebpackConfigs(cliOptions) {
