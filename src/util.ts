@@ -44,8 +44,8 @@ export function _resolveUrl(fragment: string, baseUrl: string, hasPushState?: bo
   return _createRootedPath(fragment, baseUrl, hasPushState);
 }
 
-export function _ensureArrayWithSingleRoutePerConfig(config: RouteConfig) {
-  let routeConfigs = [];
+export function _ensureArrayWithSingleRoutePerConfig(config: RouteConfig): RouteConfig[] {
+  let routeConfigs: RouteConfig[] = [];
 
   if (Array.isArray(config.route)) {
     for (let i = 0, ii = config.route.length; i < ii; ++i) {

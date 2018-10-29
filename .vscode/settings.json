@@ -1,3 +1,11 @@
+// Place your settings in this file to overwrite default and user settings.
 {
-  "typescript.tsdk": "aurelia-router/node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "html.suggest.angular1": false,
+  "html.suggest.ionic": false,
+  // this may needs concensus but basically we want a formatter that can help free devs from linting and formatting
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "tslint.autoFixOnSave": true,
+  "typescript.preferences.quoteStyle": "single"
 }

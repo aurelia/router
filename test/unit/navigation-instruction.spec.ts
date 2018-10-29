@@ -434,6 +434,7 @@ describe('NavigationInstruction', () => {
         ['a*abcd', 'abcd'],
         ['*abcd', 'abcd'],
         ['****', ''],
+        // TODO: more cases
       ].forEach(([route, expectedName]) => {
         navInstruction.config.route = route;
         const name = navInstruction.getWildCardName();
@@ -460,6 +461,7 @@ describe('NavigationInstruction', () => {
         })(),
         ['a/*', { ['']: {} }, 'a', '[object Object]?a'],
         ['a/*', { ['']: 5 }, 'a', '5?a'],
+        // TODO: more cases
       ];
       cases.forEach(([route, params, queryString, expectedPath]) => {
         it(`gets ["${expectedPath}"] from ["${route}${queryString ? `?${queryString}` : ''}"]`, () => {
@@ -474,6 +476,7 @@ describe('NavigationInstruction', () => {
   });
 
   describe('_commitChanges()', function _6_commitChanges_Tests() {
-
+    // Quite challenging to add unit tests
+    // todo: add unit tests
   });
 });

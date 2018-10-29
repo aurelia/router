@@ -12,6 +12,7 @@ import {
 } from './util';
 import { RouteConfig, NavigationResult, RouteConfigSpecifier, ViewPort, ViewPortInstruction } from './interfaces';
 import { PipelineProvider } from './pipeline-provider';
+import { moduleIdPropName, viewModelPropName } from './navigation-plan';
 
 /**@internal */
 declare module 'aurelia-history' {
@@ -378,18 +379,23 @@ export class Router {
   addRoute(config: RouteConfig, navModel?: NavModel): void {
     if (Array.isArray(config.route)) {
       let routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
-      routeConfigs.forEach(this.addRoute.bind(this));
+      routeConfigs.forEach(cfg => this.addRoute(cfg, navModel));
       return;
     }
 
     validateRouteConfig(config, this.routes);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
+      let defaultViewPortConfig = {
+        view: config.view
+      } as RouteConfig;
+      if (moduleIdPropName in config) {
+        defaultViewPortConfig[moduleIdPropName] = config[moduleIdPropName];
+      } else {
+        defaultViewPortConfig[viewModelPropName] = config[viewModelPropName];
+      }
       config.viewPorts = {
-        'default': {
-          moduleId: config.moduleId,
-          view: config.view
-        } as RouteConfig
+        'default': defaultViewPortConfig
       };
     }
 
@@ -519,7 +525,7 @@ export class Router {
    *  populate a view port for which no module is specified. The default is
    *  an empty view/view-model pair.
    */
-  useViewPortDefaults(viewPortDefaults: Record<string, Partial<ViewPortInstruction>>) {
+  useViewPortDefaults(viewPortDefaults: Record<string, Partial<ViewPortInstruction>>): void {
     for (let viewPortName in viewPortDefaults) {
       let viewPortConfig = viewPortDefaults[viewPortName];
       this.viewPortDefaults[viewPortName] = {
@@ -691,11 +697,16 @@ function evaluateNavigationStrategy(
   context?: any
 ): Promise<NavigationInstruction> {
   return Promise.resolve(evaluator.call(context, instruction)).then(() => {
-    if (!('viewPorts' in instruction.config)) {
-      instruction.config.viewPorts = {
-        'default': {
-          moduleId: instruction.config.moduleId
-        } as RouteConfig
+    let routeConfig = instruction.config;
+    if (!('viewPorts' in routeConfig)) {
+      let defaultViewPortConfig = {} as RouteConfig;
+      if (moduleIdPropName in routeConfig) {
+        defaultViewPortConfig[moduleIdPropName] = routeConfig[moduleIdPropName];
+      } else {
+        defaultViewPortConfig[viewModelPropName] = routeConfig[viewModelPropName];
+      }
+      routeConfig.viewPorts = {
+        'default': defaultViewPortConfig
       };
     }
 

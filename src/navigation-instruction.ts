@@ -323,7 +323,7 @@ export class NavigationInstruction {
   }
 }
 
-function prune(instruction: NavigationInstruction) {
+function prune(instruction: NavigationInstruction): void {
   instruction.previousInstruction = null;
   instruction.plan = null;
 }
