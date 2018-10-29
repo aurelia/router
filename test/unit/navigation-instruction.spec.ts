@@ -411,7 +411,7 @@ describe('NavigationInstruction', () => {
     }
   });
 
-  fdescribe('wild card', function _5_getWildcardPath_Tests() {
+  fdescribe('wild card', function _5_wildcard__Tests() {
 
     let navInstruction: NavigationInstruction;
     beforeEach(function __setup__() {
@@ -450,7 +450,16 @@ describe('NavigationInstruction', () => {
         ['*', {}, '', ''],
         ['a/*', {}, '', ''],
         ['a/*', { ['']: 'a' }, '', 'a'],
-        ['a/*', {}, 'b', '?b']
+        ['a/*', {}, 'b', '?b'],
+        ['a/*', { ['']: 5 }, '', 5 as any],
+        // This theoretically never happens as params are Record<string, string>
+        // but this test demonstrates its behavior, as taking the params as is
+        (() => {
+          const params = {};
+          return ['a/*', { ['']: params }, '', params as any] as ITestCase;
+        })(),
+        ['a/*', { ['']: {} }, 'a', '[object Object]?a'],
+        ['a/*', { ['']: 5 }, 'a', '5?a'],
       ];
       cases.forEach(([route, params, queryString, expectedPath]) => {
         it(`gets ["${expectedPath}"] from ["${route}${queryString ? `?${queryString}` : ''}"]`, () => {
