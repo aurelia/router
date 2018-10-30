@@ -257,7 +257,7 @@ describe('NavigationInstruction', () => {
             expect(() => {
               navInstruction.addViewPortInstruction('a', strategy, 'aa', component);
             }).toThrowError(new RegExp(`Cannot read property ['"]childRouter['"] of ${component}`));
-          };
+          }
         });
       });
     });
@@ -287,10 +287,10 @@ describe('NavigationInstruction', () => {
               navInstruction.addViewPortInstruction('a', {
                 strategy,
                 moduleId: '',
-                component,
+                component
               } as ViewPortInstruction);
             }).toThrowError(new RegExp(`Cannot read property ['"]childRouter['"] of ${component}`));
-          };
+          }
         });
       });
 
@@ -300,11 +300,11 @@ describe('NavigationInstruction', () => {
           activationStrategies.forEach(strategy => {
             const childRouter = {} as Router;
             const component = { viewModel: {}, childRouter } as ViewPortComponent;
-            const viewModelSpec = () => class{} as Function;
+            const viewModelSpec = () => class { } as Function;
             const viewPortInstruction = navInstruction.addViewPortInstruction('a', {
               strategy,
               viewModel: viewModelSpec,
-              component: component,
+              component: component
             } as ViewPortInstruction);
             expect(viewPortInstruction.strategy).toBe(strategy);
             expect(viewPortInstruction.viewModel).toBe(viewModelSpec);
@@ -398,11 +398,11 @@ describe('NavigationInstruction', () => {
         lifecycleArgs: null,
         childNavigationInstruction: hasChild
           ? new NavigationInstruction({
-              fragment: '',
-              router: {} as Router,
-              config: {}
-            })
-          : null,
+            fragment: '',
+            router: {} as Router,
+            config: {}
+          })
+          : null
       } as ViewPortInstruction;
     }
 
@@ -433,7 +433,7 @@ describe('NavigationInstruction', () => {
         ['a**', ''],
         ['a*abcd', 'abcd'],
         ['*abcd', 'abcd'],
-        ['****', ''],
+        ['****', '']
         // TODO: more cases
       ].forEach(([route, expectedName]) => {
         navInstruction.config.route = route;
@@ -460,7 +460,7 @@ describe('NavigationInstruction', () => {
           return ['a/*', { ['']: params }, '', params as any] as ITestCase;
         })(),
         ['a/*', { ['']: {} }, 'a', '[object Object]?a'],
-        ['a/*', { ['']: 5 }, 'a', '5?a'],
+        ['a/*', { ['']: 5 }, 'a', '5?a']
         // TODO: more cases
       ];
       cases.forEach(([route, params, queryString, expectedPath]) => {

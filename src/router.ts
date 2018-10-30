@@ -12,7 +12,7 @@ import {
 } from './util';
 import { RouteConfig, NavigationResult, RouteConfigSpecifier, ViewPort, ViewPortInstruction } from './interfaces';
 import { PipelineProvider } from './pipeline-provider';
-import { moduleIdPropName, viewModelPropName } from './navigation-plan';
+import { moduleIdPropName, viewModelPropName, PropName } from './constants';
 
 /**@internal */
 declare module 'aurelia-history' {
@@ -672,11 +672,13 @@ export class Router {
   }
 }
 
-function generateBaseUrl(router: Router, instruction: NavigationInstruction) {
+/* @internal exported for unit testing */
+export function generateBaseUrl(router: Router, instruction: NavigationInstruction) {
   return `${router.baseUrl || ''}${instruction.getBaseUrl() || ''}`;
 }
 
-function validateRouteConfig(config: RouteConfig, routes: Object[]): void {
+/* @internal exported for unit testing */
+export function validateRouteConfig(config: RouteConfig, routes: Object[]): void {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }
@@ -686,32 +688,46 @@ function validateRouteConfig(config: RouteConfig, routes: Object[]): void {
     throw new Error('Invalid Route Config for "' + name + '": You must specify a "route:" pattern.');
   }
 
-  if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
-    throw new Error('Invalid Route Config for "' + config.route + '": You must specify a "moduleId:", "redirect:", "navigationStrategy:", or "viewPorts:".');
+  if (!(
+    'redirect' in config
+    // TODO: does this handle moduleId: null case?
+    || config.moduleId
+    || config.navigationStrategy
+    || config.viewPorts
+    || config.viewModel
+  )) {
+    // tslint:disable-next-line:max-line-length
+    throw new Error(`Invalid Route Config for "${config.route}": You must specify a "moduleId:", "viewModel:", "redirect:", "navigationStrategy:", or "viewPorts:".`);
+  }
+
+  if (PropName.moduleId in config && PropName.viewModel in config) {
+    throw new Error(`Invalid Route Config for "${config.route}". Both "moduleId" and "viewModel" specified.`);
   }
 }
 
-function evaluateNavigationStrategy(
+/* @internal exported for unit testing */
+export function evaluateNavigationStrategy(
   instruction: NavigationInstruction,
   evaluator: Function,
   context?: any
 ): Promise<NavigationInstruction> {
-  return Promise.resolve(evaluator.call(context, instruction)).then(() => {
-    let routeConfig = instruction.config;
-    if (!('viewPorts' in routeConfig)) {
-      let defaultViewPortConfig = {} as RouteConfig;
-      if (moduleIdPropName in routeConfig) {
-        defaultViewPortConfig[moduleIdPropName] = routeConfig[moduleIdPropName];
-      } else {
-        defaultViewPortConfig[viewModelPropName] = routeConfig[viewModelPropName];
+  return Promise.resolve(evaluator.call(context, instruction))
+    .then(() => {
+      let routeConfig = instruction.config;
+      if (!(PropName.viewPorts in routeConfig)) {
+        let defaultViewPortConfig = {} as RouteConfig;
+        if (PropName.moduleId in routeConfig) {
+          defaultViewPortConfig[PropName.moduleId] = routeConfig[PropName.moduleId];
+        } else {
+          defaultViewPortConfig[PropName.viewModel] = routeConfig[PropName.viewModel];
+        }
+        routeConfig.viewPorts = {
+          'default': defaultViewPortConfig
+        };
       }
-      routeConfig.viewPorts = {
-        'default': defaultViewPortConfig
-      };
-    }
 
-    return instruction;
-  });
+      return instruction;
+    });
 }
 
 interface IRouteRecognizationResults extends Array<RecognizedRoute> {

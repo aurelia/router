@@ -1,6 +1,7 @@
 import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType, ViewPortComponent } from './interfaces';
 import { Router } from './router';
-import { activationStrategy, moduleIdPropName, viewModelPropName } from './navigation-plan';
+import { activationStrategy } from './navigation-plan';
+import { moduleIdPropName, viewModelPropName } from './constants';
 
 export interface NavigationInstructionInit {
   fragment: string;

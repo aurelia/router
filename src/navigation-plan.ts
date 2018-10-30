@@ -2,9 +2,7 @@ import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { ActivationStrategy, ViewPortPlan, RouteConfig, ViewPortInstruction } from './interfaces';
 import { Next } from './pipeline';
-
-export const moduleIdPropName = 'moduleId';
-export const viewModelPropName = 'viewModel';
+import { moduleIdPropName, viewModelPropName } from './constants';
 
 /**
 * The strategy to use when activating modules during navigation.
@@ -90,7 +88,7 @@ export async function _buildNavigationPlan(
         config: nextViewPortConfig as RouteConfig,
         prevComponent: prevViewPortInstruction.component,
         prevModuleId: prevViewModelTarget,
-        prevViewModel: prevViewModelTarget,
+        prevViewModel: prevViewModelTarget
       } as ViewPortPlan;
 
       if (prevViewModelTarget !== nextViewModelTarget) {
@@ -205,7 +203,7 @@ export async function resolveViewModel(viewPortInstruction: ViewPortInstruction 
       $viewModel = $viewModel.default as Function;
     }
     if (typeof $viewModel !== 'function' && $viewModel !== null) {
-      throw new Error(`Invalid viewModel specification in ${viewPortInstruction.name || ''} viewport/ route config`)
+      throw new Error(`Invalid viewModel specification in ${viewPortInstruction.name || ''} viewport/ route config`);
     }
     return $viewModel as Function | null;
   }
