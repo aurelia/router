@@ -1,6 +1,6 @@
 const path = require('path');
 
-module.exports = function(config) {
+module.exports = function (config) {
   const webpackConfigs = getWebpackConfigs(config);
   const browsers = config.browsers;
   const options = {
@@ -17,8 +17,8 @@ module.exports = function(config) {
     mime: {
       "text/x-typescript": ["ts"]
     },
-    reporters: ["mocha", "progress"],
-    // webpackServer: { noInfo: config.noInfo },
+    reporters: ["mocha"],
+    webpackServer: { noInfo: true },
     browsers: Array.isArray(browsers) && browsers.length > 0 ? browsers : ['Chrome'],
     customLaunchers: {
       ChromeDebugging: {
@@ -29,7 +29,7 @@ module.exports = function(config) {
     },
     singleRun: false
   };
-  
+
   if (config.coverage) {
     webpackConfigs.module.rules.push({
       enforce: 'post',

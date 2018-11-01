@@ -411,7 +411,7 @@ describe('NavigationInstruction', () => {
     }
   });
 
-  fdescribe('wild card', function _5_wildcard__Tests() {
+  describe('wild card', function _5_wildcard__Tests() {
 
     let navInstruction: NavigationInstruction;
     beforeEach(function __setup__() {

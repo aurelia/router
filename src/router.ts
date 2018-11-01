@@ -389,10 +389,10 @@ export class Router {
       let defaultViewPortConfig = {
         view: config.view
       } as RouteConfig;
-      if (moduleIdPropName in config) {
-        defaultViewPortConfig[moduleIdPropName] = config[moduleIdPropName];
+      if (PropName.moduleId in config) {
+        defaultViewPortConfig[PropName.moduleId] = config[PropName.moduleId];
       } else {
-        defaultViewPortConfig[viewModelPropName] = config[viewModelPropName];
+        defaultViewPortConfig[PropName.viewModel] = config[PropName.viewModel];
       }
       config.viewPorts = {
         'default': defaultViewPortConfig
@@ -678,7 +678,7 @@ export function generateBaseUrl(router: Router, instruction: NavigationInstructi
 }
 
 /* @internal exported for unit testing */
-export function validateRouteConfig(config: RouteConfig, routes: Object[]): void {
+export function validateRouteConfig(config: RouteConfig, routes?: Object[]): void {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }

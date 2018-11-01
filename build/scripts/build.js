@@ -76,7 +76,6 @@ function build() {
       external: externalLibs,
       plugins: [
         typescript({
-          useTsconfigDeclarationDir: true,
           tsconfigOverride: {
             compilerOptions: {
               target: 'es5'
