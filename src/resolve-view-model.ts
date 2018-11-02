@@ -7,7 +7,9 @@ export async function resolveViewModel(viewPortInstruction: ViewPortInstruction 
     return viewPortInstruction.moduleId;
   }
   if (PropName.viewModel in viewPortInstruction) {
-    let $viewModel = await viewPortInstruction.viewModel();
+    // to have undefined as context
+    let vm = viewPortInstruction.viewModel;
+    let $viewModel = await vm();
     if ($viewModel && typeof $viewModel === 'object') {
       $viewModel = $viewModel.default as Function;
     }
