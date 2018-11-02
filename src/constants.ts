@@ -4,5 +4,6 @@ export const viewModelPropName = 'viewModel';
 export const enum PropName {
   viewPorts = 'viewPorts',
   moduleId = 'moduleId',
-  viewModel = 'viewModel'
+  viewModel = 'viewModel',
+  redirect = 'redirect'
 }

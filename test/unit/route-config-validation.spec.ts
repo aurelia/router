@@ -1,7 +1,7 @@
 import { validateRouteConfig } from '../../src/router';
 import { RouteConfig } from '../../src';
 
-fdescribe('RouteConfig validation', () => {
+describe('RouteConfig validation', () => {
   let routeConfig: RouteConfig;
 
   it('ensures object', function _1_validateConfigObject__Tests() {

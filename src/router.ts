@@ -711,7 +711,8 @@ export function evaluateNavigationStrategy(
   evaluator: Function,
   context?: any
 ): Promise<NavigationInstruction> {
-  return Promise.resolve(evaluator.call(context, instruction))
+  return Promise
+    .resolve(evaluator.call(context, instruction))
     .then(() => {
       let routeConfig = instruction.config;
       if (!(PropName.viewPorts in routeConfig)) {

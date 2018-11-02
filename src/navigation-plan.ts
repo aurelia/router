@@ -2,7 +2,8 @@ import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { ActivationStrategy, ViewPortPlan, RouteConfig, ViewPortInstruction } from './interfaces';
 import { Next } from './pipeline';
-import { moduleIdPropName, viewModelPropName } from './constants';
+import { moduleIdPropName, viewModelPropName, PropName } from './constants';
+import { resolveViewModel } from './resolve-view-model';
 
 /**
 * The strategy to use when activating modules during navigation.
@@ -14,7 +15,7 @@ export const activationStrategy: ActivationStrategy = {
 };
 
 export class BuildNavigationPlanStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return _buildNavigationPlan(navigationInstruction)
       .then(plan => {
         if (plan instanceof Redirect) {
@@ -191,21 +192,4 @@ function hasDifferentParameterValues(prev: NavigationInstruction, next: Navigati
   }
 
   return false;
-}
-
-export async function resolveViewModel(viewPortInstruction: ViewPortInstruction | RouteConfig): Promise<string | Function | null> {
-  if (moduleIdPropName in viewPortInstruction) {
-    return viewPortInstruction[moduleIdPropName];
-  }
-  if (viewModelPropName in viewPortInstruction) {
-    let $viewModel = await viewPortInstruction[viewModelPropName]();
-    if ($viewModel && typeof $viewModel === 'object') {
-      $viewModel = $viewModel.default as Function;
-    }
-    if (typeof $viewModel !== 'function' && $viewModel !== null) {
-      throw new Error(`Invalid viewModel specification in ${viewPortInstruction.name || ''} viewport/ route config`);
-    }
-    return $viewModel as Function | null;
-  }
-  throw new Error(`moduleId / viewModel not found in ${viewPortInstruction.name || ''} viewport / route config`);
 }

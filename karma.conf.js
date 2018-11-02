@@ -27,7 +27,10 @@ module.exports = function (config) {
         debug: true
       }
     },
-    singleRun: false
+    singleRun: false,
+    mochaReporter: {
+      ignoreSkipped: true,
+    }
   };
 
   if (config.coverage) {
@@ -35,7 +38,10 @@ module.exports = function (config) {
       enforce: 'post',
       exclude: /(node_modules|\.spec\.ts$)/,
       loader: 'istanbul-instrumenter-loader',
-      options: { esModules: true },
+      options: {
+        esModules: true,
+        produceSourceMap: true,
+      },
       test: /src[\/\\].+\.ts$/
     });
     options.reporters.push('coverage-istanbul');
