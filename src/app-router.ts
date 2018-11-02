@@ -153,17 +153,13 @@ export class AppRouter extends Router {
     if (!navtracker && !this.currentNavigationTracker) {
       this.isNavigatingFirst = true;
       this.isNavigatingNew = true;
-    }
-    else if (!navtracker) {
+    } else if (!navtracker) {
       this.isNavigatingNew = true;
-    }
-    else if (!this.currentNavigationTracker) {
+    } else if (!this.currentNavigationTracker) {
       this.isNavigatingRefresh = true;
-    }
-    else if (this.currentNavigationTracker < navtracker) {
+    } else if (this.currentNavigationTracker < navtracker) {
       this.isNavigatingForward = true;
-    }
-    else if (this.currentNavigationTracker > navtracker) {
+    } else if (this.currentNavigationTracker > navtracker) {
       this.isNavigatingBack = true;
     }
     if (!navtracker) {
@@ -174,13 +170,11 @@ export class AppRouter extends Router {
     instruction.previousInstruction = this.currentInstruction;
     if (!instructionCount) {
       this.events.publish('router:navigation:processing', { instruction });
-    }
-    else if (instructionCount === this.maxInstructionCount - 1) {
+    } else if (instructionCount === this.maxInstructionCount - 1) {
       logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
       restorePreviousLocation(this);
       return this._dequeueInstruction(instructionCount + 1);
-    }
-    else if (instructionCount > this.maxInstructionCount) {
+    } else if (instructionCount > this.maxInstructionCount) {
       throw new Error('Maximum navigation attempts exceeded. Giving up.');
     }
     let pipeline = this.pipelineProvider.createPipeline(!this.couldDeactivate);
@@ -246,7 +240,7 @@ async function processResult(
 
   // The navigation returns void
   // is this necessary
-  await Promise.resolve(navigationCommandResult);
+  await navigationCommandResult;
   const innerResult = await router._dequeueInstruction(instructionCount + 1);
   return finalResult || innerResult || result;
 }

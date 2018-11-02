@@ -5,7 +5,7 @@ describe('RouteConfig validation', () => {
   let routeConfig: RouteConfig;
 
   it('ensures object', function _1_validateConfigObject__Tests() {
-    [undefined, '', 5, Symbol(), function () {/**/ }].forEach((v: any) => {
+    [undefined, '', 5, Symbol(), function () { }].forEach((v: any) => {
       expect(() => validateRouteConfig(v)).toThrowError('Invalid Route Config');
     });
   });
@@ -18,7 +18,7 @@ describe('RouteConfig validation', () => {
     });
 
     it('throws when "route" is not a string', () => {
-      [undefined, null, 5, Symbol(), function () {/**/ }].forEach((v: any) => {
+      [undefined, null, 5, Symbol(), function () { }].forEach((v: any) => {
         routeConfig.route = v;
         expect(() => validateRouteConfig(routeConfig)).toThrowError(/You must specify a "route\:" pattern/);
       });
@@ -58,9 +58,9 @@ describe('RouteConfig validation', () => {
     it('throws if both "moduleId" and "viewModel" specified', () => {
       type ITestCase = [/* moduleId */any, /* viewModel */ any];
       const cases: ITestCase[] = [
-        [null, () => {/**/ }],
+        [null, () => { }],
         ['s', null],
-        [undefined, () => {/**/ }]
+        [undefined, () => { }]
       ];
 
       cases.forEach(([moduleId, viewModel]) => {

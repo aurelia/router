@@ -7,7 +7,7 @@ import { determineWhatToLoad } from '../../src/route-loading';
 
 const { replace, invokeLifecycle, noChange } = activationStrategy;
 
-describe('determineWhatToLoad', () => {
+describe('determineWhatToLoad', function _1_determineWhatToLoad__Tests() {
   it('returns empty array if there is no plan', () => {
     const actual = determineWhatToLoad(<any>{});
 

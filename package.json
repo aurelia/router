@@ -25,8 +25,9 @@
     "build": "node build/scripts/build",
     "bundle-dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
     "karma": "karma start",
-    "test": "npm run karma -- --unit --integration --single-run",
-    "test:watch": "npm run karma -- --unit --integration --coverage --browsers ChromeDebugging",
+    "test": "npm run karma -- --unit --integration --single-run --browsers ChromeHeadless",
+    "test:watch": "npm run karma -- --unit --integration --coverage --browsers ChromeHeadless",
+    "test:debugger": "npm run karma -- --unit --integration --coverage --browsers ChromeDebugging",
     "test:unit": "npm run karma -- --unit",
     "test:integration": "npm run karma -- --integration",
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --force"

@@ -11,8 +11,23 @@ import {
 } from './activation';
 import { PipelineStep } from './interfaces';
 
+/**@internal exported for unit testing */
+// Constant enum to reduce amount of code generated
+export const enum SlottableStep {
+  authorize = 'authorize',
+  preActivate = 'preActivate',
+  preRender = 'preRender',
+  postRender = 'postRender',
+  // following are deliberately named in such way
+  // probably we will want to remove the alias in future
+  // as they are not as useful as expected
+  preActivate__or__modelbind = 'modelbind',
+  preRender__or__precommit = 'precommit',
+  postRender__or__postcomplete = 'postcomplete'
+}
 
-class PipelineSlot {
+/**@internal exported for unit testing */
+export class PipelineSlot {
 
   /**@internal */
   container: Container;
@@ -47,19 +62,25 @@ export class PipelineProvider {
 
   constructor(container: Container) {
     this.container = container;
+    this._buildSteps();
+  }
+
+  /**@internal */
+  _buildSteps() {
     this.steps = [
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, // optional
       LoadRouteStep,
-      this._createPipelineSlot('authorize'),
+      // adding alias with the same name to prevent error where user pass in an undefined in addStep
+      this._createPipelineSlot(SlottableStep.authorize, SlottableStep.authorize),
       CanActivateNextStep, // optional
-      this._createPipelineSlot('preActivate', 'modelbind'),
+      this._createPipelineSlot(SlottableStep.preActivate, SlottableStep.preActivate__or__modelbind),
       // NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, // optional
       ActivateNextStep, // optional
-      this._createPipelineSlot('preRender', 'precommit'),
+      this._createPipelineSlot(SlottableStep.preRender, SlottableStep.preRender__or__precommit),
       CommitChangesStep,
-      this._createPipelineSlot('postRender', 'postcomplete')
+      this._createPipelineSlot(SlottableStep.postRender, SlottableStep.postRender__or__postcomplete)
     ];
   }
 
@@ -78,8 +99,9 @@ export class PipelineProvider {
 
   /**@internal */
   _findStep(name: string): PipelineSlot {
-    // Steps that are not PipelineSlots are constructor functions, and they will automatically fail. Probably.
-    return this.steps.find(x => (x as PipelineSlot).slotName === name || (x as PipelineSlot).slotAlias === name) as PipelineSlot;
+    // A change compared to v1. (typeof x === 'object') Making it safer to find PipelineSlot
+    // As it avoids accidental hook when a step constructor has either static property slotName or slotAlias
+    return this.steps.find(x => typeof x === 'object' && (x.slotName === name || x.slotAlias === name)) as PipelineSlot;
   }
 
   /**
@@ -121,10 +143,10 @@ export class PipelineProvider {
    * Resets all pipeline slots
    */
   reset(): void {
-    this._clearSteps('authorize');
-    this._clearSteps('preActivate');
-    this._clearSteps('preRender');
-    this._clearSteps('postRender');
+    this._clearSteps(SlottableStep.authorize);
+    this._clearSteps(SlottableStep.preActivate);
+    this._clearSteps(SlottableStep.preRender);
+    this._clearSteps(SlottableStep.postRender);
   }
 
   /**@internal */
