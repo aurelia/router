@@ -32,7 +32,8 @@ export class ActivateNextStep {
  * Recursively find list of deactivate-able view models
  * and invoke the either 'canDeactivate' or 'deactivate' on each
  */
-function processDeactivatable(
+/*@internal exported for unit testing */
+export function processDeactivatable(
   navigationInstruction: NavigationInstruction,
   callbackName: string,
   next: Next,
@@ -72,7 +73,8 @@ function processDeactivatable(
 /**
  * Recursively find and returns a list of deactivate-able view models
  */
-function findDeactivatable(
+/*@internal exported for unit testing */
+export function findDeactivatable(
   plan: Record<string, ViewPortPlan>,
   callbackName: string,
   list: IActivatableInfo[] = []
@@ -101,7 +103,8 @@ function findDeactivatable(
   return list;
 }
 
-function addPreviousDeactivatable(component: ViewPortComponent, callbackName: string, list: IActivatableInfo[]): void {
+/*@internal exported for unit testing */
+export function addPreviousDeactivatable(component: ViewPortComponent, callbackName: string, list: IActivatableInfo[]): void {
   let childRouter = component.childRouter;
 
   if (childRouter && childRouter.currentInstruction) {
@@ -121,7 +124,8 @@ function addPreviousDeactivatable(component: ViewPortComponent, callbackName: st
   }
 }
 
-function processActivatable(
+/*@internal exported for unit testing */
+export function processActivatable(
   navigationInstruction: NavigationInstruction,
   callbackName: string,
   next: Next,
@@ -167,7 +171,8 @@ interface IActivatableInfo {
 /**
  * Find list of activatable view model and add to list (3rd parameter)
  */
-function findActivatable(
+/*@internal exported for unit testing */
+export function findActivatable(
   navigationInstruction: NavigationInstruction,
   callbackName: string,
   list: IActivatableInfo[] = [],
@@ -208,7 +213,8 @@ function findActivatable(
   return list;
 }
 
-function shouldContinue(output: any, router?: Router) {
+/*@internal exported for unit testing */
+export function shouldContinue(output: any, router?: Router) {
   if (output instanceof Error) {
     return false;
   }
@@ -254,7 +260,8 @@ type SafeSubscriptionFunc = (sub: SafeSubscription) => ISubscription;
  * wraps a subscription, allowing unsubscribe calls even if
  * the first value comes synchronously
  */
-class SafeSubscription {
+/*@internal exported for unit testing */
+export class SafeSubscription {
 
   private _subscribed: boolean;
   private _subscription: ISubscription;
@@ -281,7 +288,8 @@ class SafeSubscription {
   }
 }
 
-function processPotential(obj: any, resolve: (val?: any) => any, reject: (err?: any) => any) {
+/*@internal exported for unit testing */
+export function processPotential(obj: any, resolve: (val?: any) => any, reject: (err?: any) => any) {
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
   }
