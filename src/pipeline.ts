@@ -1,27 +1,6 @@
 import { PipelineStep, PipelineResult, IPipelineSlot, StepRunnerFunction, Next } from './interfaces';
 import { NavigationInstruction } from './navigation-instruction';
-import { createNext } from './next';
-
-export interface PipeLineStatus {
-  completed: 'completed';
-  canceled: 'canceled';
-  rejected: 'rejected';
-  running: 'running';
-}
-
-export type PipeLineStatusType = PipeLineStatus[keyof PipeLineStatus];
-
-/**
-* The status of a Pipeline.
-*/
-export const pipelineStatus: PipeLineStatus = {
-  completed: 'completed',
-  canceled: 'canceled',
-  rejected: 'rejected',
-  running: 'running'
-};
-
-
+import { createNextFn } from './next';
 
 /**
 * The class responsible for managing and processing the navigation pipeline.
@@ -68,7 +47,7 @@ export class Pipeline {
   * @param instruction The navigation instruction to process.
   */
   run(instruction: NavigationInstruction): Promise<PipelineResult> {
-    const next = createNext(instruction, this.steps);
-    return next();
+    const nextFn = createNextFn(instruction, this.steps);
+    return nextFn();
   }
 }

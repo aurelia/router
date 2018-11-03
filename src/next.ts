@@ -1,9 +1,9 @@
-import { pipelineStatus, PipeLineStatusType } from './pipeline';
+import { pipelineStatus, PipeLineStatusType } from './pipeline-status';
 import { NavigationInstruction } from './navigation-instruction';
 import { Next, StepRunnerFunction } from './interfaces';
 
 /**@internal exported for unit testing */
-export function createNext(instruction: NavigationInstruction, steps: StepRunnerFunction[]): Next {
+export function createNextFn(instruction: NavigationInstruction, steps: StepRunnerFunction[]): Next {
   let index = -1;
   const next: Next = function() {
     index++;

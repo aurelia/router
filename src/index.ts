@@ -34,7 +34,8 @@ export {
   NavigationInstructionInit
 } from './navigation-instruction';
 export { PipelineProvider } from './pipeline-provider';
-export { Pipeline, pipelineStatus } from './pipeline';
+export { Pipeline } from './pipeline';
+export { pipelineStatus, PipeLineStatus, PipeLineStatusType } from './pipeline-status';
 export { RouteLoader, LoadRouteStep } from './route-loading';
 export { RouterConfiguration } from './router-configuration';
 export { Router } from './router';

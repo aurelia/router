@@ -1,7 +1,7 @@
 import { Container } from 'aurelia-dependency-injection';
 import { LoadRouteStep, RouteLoader } from '../../../src/route-loading';
 import { NavigationInstruction, Next, PipelineResult, pipelineStatus, activationStrategy } from '../../../src';
-import { createNext } from '../../../src/next';
+import { createNextFn } from '../../../src/next';
 
 describe('RouteLoading -- LoadRouteStep', function _2_LoadRouteStep__Tests() {
   let container: Container;
@@ -28,7 +28,7 @@ describe('RouteLoading -- LoadRouteStep', function _2_LoadRouteStep__Tests() {
         config: {}
       }
     };
-    next = createNext(navInstruction, [loadRouteStep.run.bind(loadRouteStep)]);
+    next = createNextFn(navInstruction, [loadRouteStep.run.bind(loadRouteStep)]);
   });
 
   it('throws when there is no proper RouteLoader implementation', async () => {

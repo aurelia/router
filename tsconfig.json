@@ -24,14 +24,5 @@
   "include": [
     "src",
     "test"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    "doc",
-    "config.js",
-    "gulpfile.js",
-    "karma.conf.js"
   ]
 }
