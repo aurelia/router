@@ -9,7 +9,7 @@ import {
   DeactivatePreviousStep,
   ActivateNextStep
 } from './activation';
-import { PipelineStep } from './interfaces';
+import { PipelineStep, IPipelineSlot } from './interfaces';
 
 /**@internal exported for unit testing */
 // Constant enum to reduce amount of code generated
@@ -27,7 +27,7 @@ export const enum SlottableStep {
 }
 
 /**@internal exported for unit testing */
-export class PipelineSlot {
+export class PipelineSlot implements IPipelineSlot {
 
   /**@internal */
   container: Container;

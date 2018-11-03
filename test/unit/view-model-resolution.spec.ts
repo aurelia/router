@@ -7,7 +7,7 @@ describe('View Model resolution', function resolveViewModel__Tests() {
 
   describe('with "moduleId"', function _1_resolveViewModel__With_moduleId__Tests() {
     it('resolves "moduleId"', async () => {
-      for await (const moduleId of [5, 'a', null, undefined, Symbol(), function () { }, {}, []]) {
+      for await (const moduleId of [5, 'a', null, undefined, Symbol(), function() { }, {}, []]) {
         vpInstructionOrConfig = { moduleId: moduleId as any };
         expect(await resolveViewModel(vpInstructionOrConfig)).toBe(moduleId as any);
       }
@@ -15,7 +15,7 @@ describe('View Model resolution', function resolveViewModel__Tests() {
 
     it('prioritizes "moduleId" over "viewModel"', async () => {
       let count = 0;
-      for await (const moduleId of [Math.random(), 'b', null, undefined, Symbol(), function () { }, {}, []]) {
+      for await (const moduleId of [Math.random(), 'b', null, undefined, Symbol(), function() { }, {}, []]) {
         vpInstructionOrConfig = {
           moduleId: moduleId as any,
           get viewModel() {
@@ -54,9 +54,9 @@ describe('View Model resolution', function resolveViewModel__Tests() {
       const validViewModels = [
         null,
         class Abc { },
-        function () { },
+        function() { },
         { default: class Abc { } },
-        { default: function () { } }
+        { default: function() { } }
       ];
 
       // resolve valid view model

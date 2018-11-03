@@ -2,7 +2,7 @@ import { Container } from 'aurelia-dependency-injection';
 import { SlottableStep, PipelineProvider, PipelineSlot } from '../../src/pipeline-provider';
 import { Pipeline, CanDeactivatePreviousStep } from '../../src';
 
-fdescribe('PipelineProvider', function PipelineProvider__Tests() {
+describe('PipelineProvider', function PipelineProvider__Tests() {
   let container: Container;
   let pipelineProvider: PipelineProvider;
   let slottableSteps = [
@@ -33,7 +33,7 @@ fdescribe('PipelineProvider', function PipelineProvider__Tests() {
     });
 
     it('returns undefined for unregistered name', () => {
-      const invalidSlotNames: any[] = [null, undefined, '1', 5, Symbol(), function () { }, {}, []];
+      const invalidSlotNames: any[] = [null, undefined, '1', 5, Symbol(), function() { }, {}, []];
       for (const slotName of invalidSlotNames) {
         expect(pipelineProvider._findStep(slotName)).toBeUndefined();
       }
@@ -43,14 +43,14 @@ fdescribe('PipelineProvider', function PipelineProvider__Tests() {
   describe('addStep', function _3_addStep__Tests() {
     it('adds step for standard step name', () => {
       for (const stepSlotName of slottableSteps) {
-        for (const step of [function () { }, {} as any]) {
+        for (const step of [function() { }, {} as any]) {
           expect(() => pipelineProvider.addStep(stepSlotName, step)).not.toThrow();
         }
       }
     });
 
     it('throws when adding unregistered slot', () => {
-      const invalidSlotNames: any[] = [null, undefined, '1', 5, function () { }, {}, []];
+      const invalidSlotNames: any[] = [null, undefined, '1', 5, function() { }, {}, []];
       for (const slotName of invalidSlotNames) {
         expect(() => pipelineProvider.addStep(slotName, class { })).toThrowError(/Invalid pipeline slot name:/);
       }
@@ -64,7 +64,7 @@ fdescribe('PipelineProvider', function PipelineProvider__Tests() {
         SlottableStep.postRender
       ];
       for (const stepSlotName of slots) {
-        for (const step of [function () { }, {} as any]) {
+        for (const step of [function() { }, {} as any]) {
           container = new Container();
           pipelineProvider = container.get(PipelineProvider);
           const stepSlotSteps = pipelineProvider._findStep(stepSlotName).steps;
@@ -88,7 +88,7 @@ fdescribe('PipelineProvider', function PipelineProvider__Tests() {
         SlottableStep.postRender
       ];
       for (const stepSlotName of slots) {
-        for (const step of [function () { }, {} as any]) {
+        for (const step of [function() { }, {} as any]) {
           const stepSlotSteps = pipelineProvider._findStep(stepSlotName).steps;
           stepSlotSteps.push(step);
           pipelineProvider.removeStep(stepSlotName, step);
@@ -98,7 +98,7 @@ fdescribe('PipelineProvider', function PipelineProvider__Tests() {
     });
 
     it('does nothing for unregistered slot', () => {
-      const invalidSlotNames: any[] = [null, undefined, '1', 5, Symbol(), function () { }, {}, []];
+      const invalidSlotNames: any[] = [null, undefined, '1', 5, Symbol(), function() { }, {}, []];
       for (const stepSlotName of invalidSlotNames) {
         expect(() => pipelineProvider.removeStep(stepSlotName, {} as any)).not.toThrow();
       }
@@ -118,7 +118,7 @@ fdescribe('PipelineProvider', function PipelineProvider__Tests() {
     });
 
     it('does nothing for unregistered slot', () => {
-      const invalidSlotNames: any[] = [null, undefined, '1', 5, Symbol(), function () { }, {}, []];
+      const invalidSlotNames: any[] = [null, undefined, '1', 5, Symbol(), function() { }, {}, []];
       for (const stepSlotName of invalidSlotNames) {
         expect(() => pipelineProvider._clearSteps(stepSlotName)).not.toThrow();
       }
@@ -214,7 +214,7 @@ fdescribe('PipelineProvider', function PipelineProvider__Tests() {
         [Symbol(), step],
         [{}, step],
         [[], step],
-        [function () { }, step]
+        [function() { }, step]
       ];
 
       const spy = spyOn(container, 'get').and.callThrough();

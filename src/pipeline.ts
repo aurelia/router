@@ -1,4 +1,4 @@
-import { PipelineStep, PipelineResult } from './interfaces';
+import { PipelineStep, PipelineResult, IPipelineSlot } from './interfaces';
 import { NavigationInstruction } from './navigation-instruction';
 
 export interface PipeLineStatus {
@@ -62,23 +62,23 @@ export class Pipeline {
   *
   * @param step The pipeline step.
   */
-  addStep(step: PipelineStep): Pipeline {
+  addStep(step: StepRunnerFunction | PipelineStep | IPipelineSlot): Pipeline {
     // This situation is a bit unfortunate where there is an implicit conversion of any incoming step to a fn
     let run: StepRunnerFunction;
 
     if (typeof step === 'function') {
       run = step;
-    } else if (typeof step.getSteps === 'function') {
+    } else if (typeof (step as IPipelineSlot).getSteps === 'function') {
       // getSteps is to enable support open slots
       // where devs can add multiple steps into the same slot name
-      let steps = step.getSteps();
+      let steps = (step as IPipelineSlot).getSteps();
       for (let i = 0, l = steps.length; i < l; i++) {
         this.addStep(steps[i]);
       }
 
       return this;
     } else {
-      run = step.run.bind(step);
+      run = (step as PipelineStep).run.bind(step);
     }
 
     this.steps.push(run);
@@ -119,7 +119,8 @@ export class Pipeline {
   }
 }
 
-function createCompletionHandler(next: Next, status: PipeLineStatusType) {
+/**@internal exported for unit testing */
+export function createCompletionHandler(next: Next, status: PipeLineStatusType) {
   return (output: any) => {
     return Promise.resolve({ status, output, completed: status === pipelineStatus.completed });
   };

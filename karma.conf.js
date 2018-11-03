@@ -1,5 +1,7 @@
 const path = require('path');
 
+const BASE_DIR = __dirname;
+
 module.exports = function (config) {
   const webpackConfigs = getWebpackConfigs(config);
   const browsers = config.browsers;
@@ -64,9 +66,10 @@ function getWebpackConfigs(cliOptions) {
       extensions: [".ts", ".js"],
       modules: ["src", "node_modules"],
       alias: {
-        'aurelia-router': path.resolve(__dirname, 'src', 'index')
+        'aurelia-router': path.resolve(BASE_DIR, 'src', 'index')
       }
     },
+    context: BASE_DIR,
     devtool: "inline-source-map",
     module: {
       rules: [

@@ -5,7 +5,7 @@ describe('RouteConfig validation', () => {
   let routeConfig: RouteConfig;
 
   it('ensures object', function _1_validateConfigObject__Tests() {
-    [undefined, '', 5, Symbol(), function () { }].forEach((v: any) => {
+    [undefined, '', 5, Symbol(), function() { }].forEach((v: any) => {
       expect(() => validateRouteConfig(v)).toThrowError('Invalid Route Config');
     });
   });
@@ -18,7 +18,7 @@ describe('RouteConfig validation', () => {
     });
 
     it('throws when "route" is not a string', () => {
-      [undefined, null, 5, Symbol(), function () { }].forEach((v: any) => {
+      [undefined, null, 5, Symbol(), function() { }].forEach((v: any) => {
         routeConfig.route = v;
         expect(() => validateRouteConfig(routeConfig)).toThrowError(/You must specify a "route\:" pattern/);
       });

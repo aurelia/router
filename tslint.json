@@ -65,6 +65,14 @@
     "semicolon": [
       true
     ],
+    "space-before-function-paren": [
+      true,
+      {
+        "anonymous": "never",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
     "trailing-comma": [
       true,
       {

@@ -4,7 +4,7 @@ import { Router } from './router';
 import { NavModel } from './nav-model';
 import { RouterConfiguration } from './router-configuration';
 import { NavigationCommand } from './navigation-commands';
-import { Next } from './pipeline';
+import { Next, StepRunnerFunction } from './pipeline';
 import { IObservable } from './activation';
 
 /**@internal */
@@ -241,11 +241,13 @@ export interface PipelineStep {
    * @param next The next step in the pipeline.
    */
   run(instruction: NavigationInstruction, next: Next): Promise<any>;
+}
 
+export interface IPipelineSlot {
   /**
    * @internal
    */
-  getSteps?(): any[];
+  getSteps(): (StepRunnerFunction | IPipelineSlot | PipelineStep)[];
 }
 
 /**

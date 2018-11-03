@@ -263,7 +263,7 @@ describe('app-router', function AppRouter_Tests() {
     });
   });
 
-  describe('instruction completes as navigation command', function InstructionCompletion_Tests () {
+  describe('instruction completes as navigation command', function InstructionCompletion_Tests() {
     it('should complete instructions in order before terminating', done => {
       const pipeline = new Pipeline()
         .addStep({ run(inst: NavigationInstruction, next: Next) { return pipelineStep(inst, next); } });
