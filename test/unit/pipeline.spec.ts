@@ -1,7 +1,7 @@
 import { Pipeline, PipelineStep, Next, pipelineStatus, NavigationInstruction } from '../../src';
 import { IPipelineSlot } from '../../src/interfaces';
 
-fdescribe('Pipeline', function Pipeline__Tests() {
+describe('Pipeline', function Pipeline__Tests() {
   let pipeline: Pipeline;
 
   beforeEach(function __setup__() {
@@ -146,7 +146,7 @@ fdescribe('Pipeline', function Pipeline__Tests() {
         expect(result.status).toBe(pipelineStatus.rejected);
       });
 
-      it('completes with "rejected" status when a step reject', async () => {
+      it('completes with "rejected" status when a step invokes reject()', async () => {
         let firstCalled = 0;
         let secondCalled = 0;
         let thirdCalled = 0;

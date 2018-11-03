@@ -33,9 +33,13 @@ describe('utilities', function Utilities__Tests() {
     ];
     const cases: ITestCase[] = [
       // TODO: cases
+      ['http://g.c', '', true, true, 'http://g.c'],
+      ['https://g.c', '', true, true, 'https://g.c'],
+      ['//g.c', '', true, true, '//g.c'],
+      ['///g.c', '', true, true, '///g.c']
     ];
     for (const [fragment, baseUrl, hasPushState, absolute, expectedRootPath] of cases) {
-      it(`creates "${expectedRootPath}" from { fragment: ${fragment}, baseUrl: ${baseUrl}, hasPushState: ${hasPushState}, absolute: ${absolute} }`, () => {
+      it(`creates "${expectedRootPath}" from { fragment: ${fragment}, baseUrl: "${baseUrl}", hasPushState: ${hasPushState}, absolute: ${absolute} }`, () => {
         expect(_createRootedPath(fragment, baseUrl, hasPushState, absolute)).toBe(expectedRootPath);
       });
     }
