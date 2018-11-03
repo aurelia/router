@@ -47,6 +47,15 @@ module.exports = function (config) {
       test: /src[\/\\].+\.ts$/
     });
     options.reporters.push('coverage-istanbul');
+    // options.reporters.push('coverage');
+    // options.coverageReporter = {
+    //   dir: 'coverage/',
+    //   reporters: [
+    //     { type: 'text-summary' },
+    //     { type: 'json' },
+    //     { type: 'html' }
+    //   ]
+    // };
     options.coverageIstanbulReporter = {
       reports: ['html', 'lcovonly', 'text-summary'],
       fixWebpackSourcePaths: true
@@ -70,7 +79,7 @@ function getWebpackConfigs(cliOptions) {
       }
     },
     context: BASE_DIR,
-    devtool: "inline-source-map",
+    devtool: 'inline-source-map',
     module: {
       rules: [
         {

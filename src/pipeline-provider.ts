@@ -9,7 +9,7 @@ import {
   DeactivatePreviousStep,
   ActivateNextStep
 } from './activation';
-import { PipelineStep, IPipelineSlot } from './interfaces';
+import { PipelineStep, IPipelineSlot, Constructable, StepRunnerFunction } from './interfaces';
 
 /**@internal exported for unit testing */
 // Constant enum to reduce amount of code generated
@@ -44,7 +44,7 @@ export class PipelineSlot implements IPipelineSlot {
     this.slotAlias = alias;
   }
 
-  getSteps(): PipelineStep[] {
+  getSteps(): (StepRunnerFunction | IPipelineSlot | PipelineStep)[] {
     return this.steps.map(x => this.container.get(x));
   }
 }
@@ -58,7 +58,7 @@ export class PipelineProvider {
   /**@internal */
   container: Container;
   /**@internal */
-  steps: (Function | PipelineSlot)[];
+  steps: (Constructable<PipelineStep> | PipelineSlot)[];
 
   constructor(container: Container) {
     this.container = container;

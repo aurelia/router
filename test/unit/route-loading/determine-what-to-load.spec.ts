@@ -1,13 +1,11 @@
-import { RouteConfig, ViewPortInstruction, ViewPortComponent, ViewPortPlan, ActivationStrategyType } from './../../src/interfaces';
-import { activationStrategy } from './../../src/navigation-plan';
-import { Next } from './../../src/pipeline';
-import { NavigationInstruction } from './../../src/navigation-instruction';
-import { LoadRouteStep, RouteLoader, Router } from '../../src';
-import { determineWhatToLoad } from '../../src/route-loading';
+import { determineWhatToLoad } from '../../../src/route-loading';
+import { ActivationStrategyType, ViewPortComponent, ViewPortInstruction, ViewPortPlan } from '../../../src/interfaces';
+import { NavigationInstruction } from '../../../src/navigation-instruction';
+import { activationStrategy } from '../../../src/navigation-plan';
 
 const { replace, invokeLifecycle, noChange } = activationStrategy;
 
-describe('determineWhatToLoad', function _1_determineWhatToLoad__Tests() {
+describe('RouteLoading -- determineWhatToLoad', function _1_determineWhatToLoad__Tests() {
   it('returns empty array if there is no plan', () => {
     const actual = determineWhatToLoad(<any>{});
 
@@ -235,7 +233,6 @@ describe('determineWhatToLoad', function _1_determineWhatToLoad__Tests() {
     expect(addViewPortInstructionCalled).toBe(false);
   });
 });
-
 
 function verifyStringifyEqual(actual: any, expected: any) {
   const actualJson = JSON.stringify(actual, null, 2);

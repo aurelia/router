@@ -1,8 +1,6 @@
+import { ActivationStrategy, Next, RouteConfig, ViewPortPlan } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { ActivationStrategy, ViewPortPlan, RouteConfig, ViewPortInstruction } from './interfaces';
-import { Next } from './pipeline';
-import { moduleIdPropName, viewModelPropName, PropName } from './constants';
 import { resolveViewModel } from './resolve-view-model';
 
 /**
@@ -148,7 +146,8 @@ export async function _buildNavigationPlan(
   return Promise.resolve(viewPortPlans);
 }
 
-function hasDifferentParameterValues(prev: NavigationInstruction, next: NavigationInstruction): boolean {
+/**@internal exported for unit testing */
+export function hasDifferentParameterValues(prev: NavigationInstruction, next: NavigationInstruction): boolean {
   let prevParams = prev.params;
   let nextParams = next.params;
   let nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;

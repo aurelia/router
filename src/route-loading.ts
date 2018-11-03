@@ -1,13 +1,13 @@
-import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
-import { NavigationInstruction } from './navigation-instruction';
-import { ViewPortInstruction, RouteConfig, ViewPortComponent, ViewPortPlan, ViewModelSpecifier } from './interfaces';
+import { Next, RouteConfig, ViewModelSpecifier, ViewPortComponent, ViewPortInstruction, ViewPortPlan } from './interfaces';
 import { Redirect } from './navigation-commands';
+import { NavigationInstruction } from './navigation-instruction';
+import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
 import { Router } from './router';
-import { Next } from './pipeline';
+import { PropName } from './constants';
 
 export class RouteLoader {
   loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<ViewPortComponent> {
-    throw Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
+    throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }
 }
 
@@ -106,31 +106,29 @@ interface ILoadingPlan {
   viewPortPlan: ViewPortPlan
 ) {
   let config = viewPortPlan.config;
-  let moduleId: string | null = null;
-  let viewModel: ViewModelSpecifier | null = null;
-  if (config) {
-    if ('moduleId' in config) {
-      moduleId = config.moduleId;
-    }
-    if ('viewModel' in config) {
-      viewModel = config.viewModel;
-    }
-  }
   let component = await loadComponent(routeLoader, navigationInstruction, viewPortPlan.config);
   // let viewPortInstruction = navigationInstruction.addViewPortInstruction(
   //   viewPortPlan.name,
   //   viewPortPlan.strategy,
   //   moduleId,
   //   component);
+
+  // Missing lifecycleArgs property
+  let partialInstruction: ViewPortInstruction = {
+    strategy: viewPortPlan.strategy,
+    component
+  } as ViewPortInstruction;
+  if (config) {
+    if (PropName.moduleId in config) {
+      partialInstruction.moduleId = config.moduleId;
+    } else {
+      partialInstruction.viewModel = config.viewModel;
+    }
+  }
   let viewPortInstruction = navigationInstruction.addViewPortInstruction(
     viewPortPlan.name,
     // Missing lifecycleArgs property
-    {
-      strategy: viewPortPlan.strategy,
-      moduleId: moduleId,
-      viewModel: viewModel,
-      component
-    } as ViewPortInstruction
+    partialInstruction
   );
 
   let childRouter = component.childRouter;

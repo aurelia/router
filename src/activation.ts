@@ -1,9 +1,8 @@
-import { activationStrategy } from './navigation-plan';
+import { Next, ViewPortComponent, ViewPortPlan } from './interfaces';
 import { isNavigationCommand } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { Next } from './pipeline';
+import { activationStrategy } from './navigation-plan';
 import { Router } from './router';
-import { ViewPortComponent, ViewPortPlan } from './interfaces';
 
 export class CanDeactivatePreviousStep {
   run(navigationInstruction: NavigationInstruction, next: Next) {

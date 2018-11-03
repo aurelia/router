@@ -4,7 +4,6 @@ import { Router } from './router';
 import { NavModel } from './nav-model';
 import { RouterConfiguration } from './router-configuration';
 import { NavigationCommand } from './navigation-commands';
-import { Next, StepRunnerFunction } from './pipeline';
 import { IObservable } from './activation';
 
 /**@internal */
@@ -230,6 +229,33 @@ export interface ActivationStrategy {
 export type ActivationStrategyType = ActivationStrategy[keyof ActivationStrategy];
 
 /**
+* A callback to indicate when pipeline processing should advance to the next step
+* or be aborted.
+*/
+export interface Next {
+  /**
+  * Indicates the successful completion of the pipeline step.
+  */
+  (): Promise<any>;
+  /**
+  * Indicates the successful completion of the entire pipeline.
+  */
+  complete: (result?: any) => Promise<any>;
+
+  /**
+  * Indicates that the pipeline should cancel processing.
+  */
+  cancel: (result?: any) => Promise<any>;
+
+  /**
+  * Indicates that pipeline processing has failed and should be stopped.
+  */
+  reject: (result?: any) => Promise<any>;
+}
+
+export type StepRunnerFunction = <TThis = any>(this: TThis, instruction: NavigationInstruction, next: Next) => any;
+
+/**
 * A step to be run during processing of the pipeline.
 */
 export interface PipelineStep {
@@ -244,9 +270,7 @@ export interface PipelineStep {
 }
 
 export interface IPipelineSlot {
-  /**
-   * @internal
-   */
+  /**@internal */
   getSteps(): (StepRunnerFunction | IPipelineSlot | PipelineStep)[];
 }
 
