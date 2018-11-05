@@ -1,5 +1,6 @@
 jspm_packages
 bower_components
+node_modules
 .idea
 .circleci
 .vscode
@@ -15,7 +16,6 @@ config.js
 CONTRIBUTING.md
 gulpfile.js
 ISSUE_TEMPLATE.md
-karma.conf.js
 package-lock.json
 tsconfig.json
 tslint.json

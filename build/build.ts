@@ -8,8 +8,9 @@ import * as path from 'path';
 const BASE_DIR = process.cwd();
 const DIST_DIR = path.join(BASE_DIR, 'dist');
 const NODE_MODULES = 'node_modules';
-const DIST_FILE_NAME = 'index.js';
 const LIB_NAME = 'aurelia-router';
+const DIST_FILE_NAME = `${LIB_NAME}.js`;
+const TYPE_DIST_FILE_NAME = `${LIB_NAME}.d.ts`;
 const ENTRY_PATH = 'src/index.ts';
 const EXTERNAL_LIBS = Object
   .keys({ ...packageJson.dependencies, ...packageJson.devDependencies })
@@ -87,18 +88,7 @@ if (args.dev) {
       generateDtsTO = setTimeout(() => {
         generateDts().then(() => {
           if (args.target) {
-            console.log('=============\nCopying to target\n=============');
-            targetFormats.forEach((targetFormat) => {
-              copy(
-                path.join(DIST_DIR, targetFormat, DIST_FILE_NAME),
-                path.join(BASE_DIR, args.target, NODE_MODULES, LIB_NAME, 'dist', targetFormat, DIST_FILE_NAME)
-              );
-            });
-            copy(
-              path.join(DIST_DIR, 'index.d.ts'),
-              path.join(BASE_DIR, args.target, NODE_MODULES, LIB_NAME, 'dist', 'index.d.ts')
-            );
-            console.log('=============\nCopied to target\n=============');
+            copyToTargetProject(targetFormats, args.target);
           }
         });
       }, 1000);
@@ -113,7 +103,27 @@ if (args.dev) {
       return build(target, { ...options, external: EXTERNAL_LIBS }, outputs as rollup.OutputOptionsFile[]);
     }))
     .then(() => generateDts())
+    .then(() => {
+      if (args.target) {
+        copyToTargetProject(targetFormats, args.target);
+      }
+    })
     .catch(ex => {
       console.log(ex);
     });
+}
+
+function copyToTargetProject(targetFormats: string[], targetProject: string) {
+  console.log('=============\nCopying to target\n=============');
+  targetFormats.forEach((targetFormat) => {
+    copy(
+      path.join(DIST_DIR, targetFormat, DIST_FILE_NAME),
+      path.join(BASE_DIR, targetProject, NODE_MODULES, LIB_NAME, 'dist', targetFormat, DIST_FILE_NAME)
+    );
+  });
+  copy(
+    path.join(DIST_DIR, TYPE_DIST_FILE_NAME),
+    path.join(BASE_DIR, targetProject, NODE_MODULES, LIB_NAME, 'dist', TYPE_DIST_FILE_NAME)
+  );
+  console.log('=============\nCopied to target\n=============');
 }
