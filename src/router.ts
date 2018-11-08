@@ -12,7 +12,6 @@ import {
 } from './util';
 import { RouteConfig, NavigationResult, RouteConfigSpecifier, ViewPort, ViewPortInstruction } from './interfaces';
 import { PipelineProvider } from './pipeline-provider';
-import { moduleIdPropName, viewModelPropName, PropName } from './constants';
 
 /**@internal */
 declare module 'aurelia-history' {
@@ -389,10 +388,10 @@ export class Router {
       let defaultViewPortConfig = {
         view: config.view
       } as RouteConfig;
-      if (PropName.moduleId in config) {
-        defaultViewPortConfig[PropName.moduleId] = config[PropName.moduleId];
+      if ('moduleId' in config) {
+        defaultViewPortConfig.moduleId = config.moduleId;
       } else {
-        defaultViewPortConfig[PropName.viewModel] = config[PropName.viewModel];
+        defaultViewPortConfig.viewModel = config.viewModel;
       }
       config.viewPorts = {
         'default': defaultViewPortConfig
@@ -700,7 +699,7 @@ export function validateRouteConfig(config: RouteConfig, routes?: Object[]): voi
     throw new Error(`Invalid Route Config for "${config.route}": You must specify a "moduleId:", "viewModel:", "redirect:", "navigationStrategy:", or "viewPorts:".`);
   }
 
-  if (PropName.moduleId in config && PropName.viewModel in config) {
+  if ('moduleId' in config && 'viewModel' in config) {
     throw new Error(`Invalid Route Config for "${config.route}". Both "moduleId" and "viewModel" specified.`);
   }
 }
@@ -715,12 +714,12 @@ export function evaluateNavigationStrategy(
     .resolve(evaluator.call(context, instruction))
     .then(() => {
       let routeConfig = instruction.config;
-      if (!(PropName.viewPorts in routeConfig)) {
+      if (!('viewPorts' in routeConfig)) {
         let defaultViewPortConfig = {} as RouteConfig;
-        if (PropName.moduleId in routeConfig) {
-          defaultViewPortConfig[PropName.moduleId] = routeConfig[PropName.moduleId];
+        if ('moduleId' in routeConfig) {
+          defaultViewPortConfig.moduleId = routeConfig.moduleId;
         } else {
-          defaultViewPortConfig[PropName.viewModel] = routeConfig[PropName.viewModel];
+          defaultViewPortConfig.viewModel = routeConfig.viewModel;
         }
         routeConfig.viewPorts = {
           'default': defaultViewPortConfig

@@ -7,6 +7,8 @@ import { isNavigationCommand } from './navigation-commands';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { NavigationInstruction } from './navigation-instruction';
 import { ViewPort, ConfiguresRouter, PipelineResult } from './interfaces';
+import { routerEvent as $routerEvent, noop } from './constants';
+import { PLATFORM } from 'aurelia-pal';
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {
@@ -26,11 +28,17 @@ export class AppRouter extends Router {
   static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
 
   events: EventAggregator;
-  /**@internal */
+  /**
+   * Number of retries this app router will perform in case of a navigation failure. Default to 10
+   */
   maxInstructionCount: number;
   /**@internal */
   _queue: NavigationInstruction[];
-  /**@internal */
+  /**
+   * @internal
+   * Active state of this app router. `true` means `.activate()` has been invoked
+   * False mean either `.activate()` has not been invoked, or `.deactivated()` has been invoked
+   */
   isActive: boolean;
 
   constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator) {
@@ -74,31 +82,57 @@ export class AppRouter extends Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  async registerViewPort(viewPort: any, name?: string): Promise<any> {
+  registerViewPort(viewPort: any, name?: string): Promise<PipelineResult | void> {
     super.registerViewPort(viewPort, name);
 
-    if (!this.isActive) {
-      const viewModel = this._findViewModel(viewPort);
-      if ('configureRouter' in viewModel) {
-        if (!this.isConfigured) {
-          const resolveConfiguredPromise = this._resolveConfiguredPromise;
-          // tslint:disable-next-line
-          this._resolveConfiguredPromise = () => { };
-          await this.configure(config => {
+    // NOTE: Implementation / inteface changed to better communicate what can be done from return value
+    // of this method. Old code still left around for better comparison before removing
+
+    if (this.isActive) {
+      return this._dequeueInstruction().then(noop);
+    }
+    const viewModel = this._findViewModel(viewPort);
+    if ('configureRouter' in viewModel) {
+      if (!this.isConfigured) {
+        const resolveConfiguredPromise = this._resolveConfiguredPromise;
+        // tslint:disable-next-line
+        this._resolveConfiguredPromise = () => { };
+        return this
+          .configure(config => {
             viewModel.configureRouter(config, this);
             return config;
-          });
-          this.activate();
-          resolveConfiguredPromise();
-        }
-      } else {
-        this.activate();
+          })
+          .then(() => this.activate())
+          .then(() => resolveConfiguredPromise());
+        // this.activate();
+        // resolveConfiguredPromise();
       }
-    } else {
-      this._dequeueInstruction();
+      return Promise.resolve();
     }
+    return this.activate();
 
-    return Promise.resolve();
+    // if (!this.isActive) {
+    //   const viewModel = this._findViewModel(viewPort);
+    //   if ('configureRouter' in viewModel) {
+    //     if (!this.isConfigured) {
+    //       const resolveConfiguredPromise = this._resolveConfiguredPromise;
+    //       // tslint:disable-next-line
+    //       this._resolveConfiguredPromise = () => { };
+    //       await this.configure(config => {
+    //         viewModel.configureRouter(config, this);
+    //         return config;
+    //       });
+    //       this.activate();
+    //       resolveConfiguredPromise();
+    //     }
+    //   } else {
+    //     this.activate();
+    //   }
+    // } else {
+    //   this._dequeueInstruction();
+    // }
+
+    // return Promise.resolve();
   }
 
   /**
@@ -106,9 +140,9 @@ export class AppRouter extends Router {
   *
   * @params options The set of options to activate the router with.
   */
-  activate(options?: NavigationOptions): void {
+  activate(options?: NavigationOptions): Promise<PipelineResult | void> {
     if (this.isActive) {
-      return;
+      return Promise.resolve();
     }
 
     this.isActive = true;
@@ -116,7 +150,7 @@ export class AppRouter extends Router {
     // the interface of aurelia-history isn't clear on this perspective
     this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
     this.history.activate(this.options);
-    this._dequeueInstruction();
+    return this._dequeueInstruction();
   }
 
   /**
@@ -137,7 +171,7 @@ export class AppRouter extends Router {
   }
 
   /**@internal */
-  async _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | undefined> {
+  async _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | void> {
     // keep the timing for backward compat
     await Promise.resolve();
     if (this.isNavigating && !instructionCount) {
@@ -169,7 +203,7 @@ export class AppRouter extends Router {
     this.currentNavigationTracker = navtracker;
     instruction.previousInstruction = this.currentInstruction;
     if (!instructionCount) {
-      this.events.publish('router:navigation:processing', { instruction });
+      this.events.publish($routerEvent.processing, { instruction });
     } else if (instructionCount === this.maxInstructionCount - 1) {
       logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
       restorePreviousLocation(this);
@@ -268,19 +302,19 @@ function resolveInstruction(
     let eventName: string;
 
     if (result.output instanceof Error) {
-      eventName = 'error';
+      eventName = $routerEvent.error;
     } else if (!result.completed) {
-      eventName = 'canceled';
+      eventName = $routerEvent.canceled;
     } else {
       let queryString = instruction.queryString ? ('?' + instruction.queryString) : '';
       router.history.previousLocation = instruction.fragment + queryString;
-      eventName = 'success';
+      eventName = $routerEvent.success;
     }
 
-    router.events.publish(`router:navigation:${eventName}`, eventArgs);
-    router.events.publish('router:navigation:complete', eventArgs);
+    router.events.publish(eventName, eventArgs);
+    router.events.publish($routerEvent.complete, eventArgs);
   } else {
-    router.events.publish('router:navigation:child:complete', eventArgs);
+    router.events.publish($routerEvent.childComplete, eventArgs);
   }
 
   return result;

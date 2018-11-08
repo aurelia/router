@@ -1,6 +1,20 @@
 import { Container } from 'aurelia-dependency-injection';
-import { SlottableStep, PipelineProvider, PipelineSlot } from '../../src/pipeline-provider';
+import { PipelineProvider, PipelineSlot } from '../../src/pipeline-provider';
 import { Pipeline, CanDeactivatePreviousStep } from '../../src';
+
+// copy paste here as rollup seems to preven TS from dropping the enum
+const enum SlottableStep {
+  authorize = 'authorize',
+  preActivate = 'preActivate',
+  preRender = 'preRender',
+  postRender = 'postRender',
+  // following are deliberately named in such way
+  // probably we will want to remove the alias in future
+  // as they are not as useful as expected
+  preActivate__or__modelbind = 'modelbind',
+  preRender__or__precommit = 'precommit',
+  postRender__or__postcomplete = 'postcomplete'
+}
 
 describe('PipelineProvider', function PipelineProvider__Tests() {
   let container: Container;

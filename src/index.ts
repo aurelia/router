@@ -1,4 +1,7 @@
 export {
+  routerEvent
+} from './constants';
+export {
   ActivationStrategy,
   RoutableComponentCanActivate,
   RoutableComponentActivate,

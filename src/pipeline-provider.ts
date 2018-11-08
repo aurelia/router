@@ -11,9 +11,9 @@ import {
 } from './activation';
 import { PipelineStep, IPipelineSlot, Constructable, StepRunnerFunction } from './interfaces';
 
-/**@internal exported for unit testing */
+
 // Constant enum to reduce amount of code generated
-export const enum SlottableStep {
+const enum SlottableStep {
   authorize = 'authorize',
   preActivate = 'preActivate',
   preRender = 'preRender',

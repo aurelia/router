@@ -3,9 +3,15 @@ import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
 import { Router } from './router';
-import { PropName } from './constants';
 
+/**
+ * Abstract class that is responsible for loading view / view model from a route config
+ * The default implementation can be found in aurelia-templating-router
+ */
 export class RouteLoader {
+  /**
+   * Load a route config based on its viewmodel / view configuration
+   */
   loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<ViewPortComponent> {
     throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }
@@ -119,7 +125,7 @@ interface ILoadingPlan {
     component
   } as ViewPortInstruction;
   if (config) {
-    if (PropName.moduleId in config) {
+    if ('moduleId' in config) {
       partialInstruction.moduleId = config.moduleId;
     } else {
       partialInstruction.viewModel = config.viewModel;

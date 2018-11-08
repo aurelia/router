@@ -2,7 +2,6 @@ import { ActivationStrategy, Next, RouteConfig, ViewPortPlan } from './interface
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { resolveViewModel } from './resolve-view-model';
-import { PropName } from './constants';
 
 /**
 * The strategy to use when activating modules during navigation.

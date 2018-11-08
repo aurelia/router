@@ -5,6 +5,7 @@ node_modules
 .circleci
 .vscode
 .rollupcache
+build
 doc
 src
 test

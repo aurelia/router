@@ -1,12 +1,11 @@
-import { PropName } from './constants';
 import { RouteConfig, ViewPortInstruction } from './interfaces';
 
 /**@internal exported for unit testing */
 export async function resolveViewModel(viewPortInstruction: ViewPortInstruction | RouteConfig): Promise<string | Function | null> {
-  if (PropName.moduleId in viewPortInstruction) {
+  if ('moduleId' in viewPortInstruction) {
     return viewPortInstruction.moduleId;
   }
-  if (PropName.viewModel in viewPortInstruction) {
+  if ('viewModel' in viewPortInstruction) {
     // to have undefined as context
     let vm = viewPortInstruction.viewModel;
     let $viewModel = await vm();

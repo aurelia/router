@@ -13,7 +13,8 @@ import {
   RouterConfiguration,
   ViewPortInstruction,
   ViewPort,
-  PipelineStep
+  PipelineStep,
+  PipelineResult
 } from '../../src';
 import { MockHistory, MockInstruction } from '../shared';
 import { EventAggregator } from 'aurelia-event-aggregator';
@@ -147,10 +148,11 @@ describe('app-router', function AppRouter_Tests() {
 
       router
         ._dequeueInstruction()
-        .then(result => {
-          expect(result.completed).toBe(true);
-          expect(result.status).toBe('completed');
-          expect(result.output).toBe(output);
+        .then((result) => {
+          const r = result as PipelineResult;
+          expect(r.completed).toBe(true);
+          expect(r.status).toBe('completed');
+          expect(r.output).toBe(output);
         })
         .catch(expectSuccess)
         .then(done);
@@ -176,9 +178,10 @@ describe('app-router', function AppRouter_Tests() {
 
       router._dequeueInstruction()
         .then(result => {
-          expect(result.completed).toBe(false);
-          expect(result.status).toBe('canceled');
-          expect(result.output).toBe(output);
+          const r = result as PipelineResult;
+          expect(r.completed).toBe(false);
+          expect(r.status).toBe('canceled');
+          expect(r.output).toBe(output);
         })
         .catch(expectSuccess)
         .then(done);
@@ -204,9 +207,10 @@ describe('app-router', function AppRouter_Tests() {
 
       router._dequeueInstruction()
         .then(result => {
-          expect(result.completed).toBe(false);
-          expect(result.status).toBe('rejected');
-          expect(result.output).toBe(output);
+          const r = result as PipelineResult;
+          expect(r.completed).toBe(false);
+          expect(r.status).toBe('rejected');
+          expect(r.output).toBe(output);
         })
         .catch(expectSuccess)
         .then(done);

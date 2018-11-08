@@ -1,7 +1,6 @@
 import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType, ViewPortComponent } from './interfaces';
 import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
-import { moduleIdPropName, viewModelPropName } from './constants';
 
 export interface NavigationInstructionInit {
   fragment: string;
@@ -163,9 +162,9 @@ export class NavigationInstruction {
         component: instructionOrStrategy.component,
         lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]]
       };
-      if (moduleIdPropName in instructionOrStrategy) {
+      if ('moduleId' in instructionOrStrategy) {
         viewportInstruction.moduleId = instructionOrStrategy.moduleId;
-      } else if (viewModelPropName in instructionOrStrategy) {
+      } else if ('viewModel' in instructionOrStrategy) {
         viewportInstruction.viewModel = instructionOrStrategy.viewModel;
       } else {
         throw new Error('Invalid instruction. No "moduleId" or "viewModel" found.');
