@@ -17,11 +17,11 @@ export type RouteCommand = { redirect: string } | { moduleId: string } | { viewM
 export type RouteConfigSpecifier = string | RouteCommand | ((instruction: NavigationInstruction) => string | RouteCommand | Promise<string | RouteCommand>);
 export type Constructable<T = any> = { new(...args: any[]): T };
 
-export type InstructionToRouteConfigProcessor<T extends RouteConfig = RouteConfig> = (instruction: NavigationInstruction) => (string | T | Promise<string | T>);
+export type InstructionToRouteConfigProcessor = (instruction: NavigationInstruction) => (string | RouteConfig | Promise<string | RouteConfig>);
 
-export type RouteConfigSpecifier<T extends RouteConfig = RouteConfig> = string | T | InstructionToRouteConfigProcessor<T>;
+export type RouteConfigSpecifier = string | RouteConfig | InstructionToRouteConfigProcessor;
 
-export type UnknownRouteConfigSpecifier = RouteConfigSpecifier<Partial<RouteConfig>>;
+export type UnknownRouteConfigSpecifier = RouteConfigSpecifier;
 
 export type ViewModelSpecifier = () => Function | Promise<Function | Record<string, any>>;
 
@@ -31,6 +31,7 @@ export type ViewModelSpecifier = () => Function | Promise<Function | Record<stri
 export interface RouteConfig {
   /**
   * The route pattern to match against incoming URL fragments, or an array of patterns.
+  * Required, only optional when this route config belongs to a viewport route config
   */
   route?: string | string[];
 

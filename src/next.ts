@@ -31,7 +31,10 @@ export function createNextFn(instruction: NavigationInstruction, steps: StepRunn
 
 /**@internal exported for unit testing */
 export function createCompletionHandler(next: Next, status: PipeLineStatusType) {
-  return (output: any) => {
-    return Promise.resolve({ status, output, completed: status === pipelineStatus.completed });
-  };
+  return (output: any) => Promise
+    .resolve({
+      status,
+      output,
+      completed: status === pipelineStatus.completed
+    });
 }

@@ -329,7 +329,7 @@ export class Router {
   * @param name The name of the route whose pattern should be used to generate the fragment.
   * @param params The route params to be used to populate the route pattern.
   * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
-  * @returns {string} A string containing the generated URL fragment.
+  * @returns A string containing the generated URL fragment.
   */
   generate(nameOrRoute: string | RouteConfig, params: any = {}, options: any = {}): string {
     // A child recognizer generates routes for potential child routes. Any potential child route is added
@@ -418,15 +418,15 @@ export class Router {
     if (path) {
       let settings = config.settings;
       delete config.settings;
-      let withChild = JSON.parse(JSON.stringify(config));
+      let withChild: RouteConfig = JSON.parse(JSON.stringify(config));
       config.settings = settings;
       withChild.route = `${path}/*childRoute`;
       withChild.hasChildRouter = true;
       this._childRecognizer.add({
         path: withChild.route,
-        handler: withChild,
+        handler: withChild as RouteHandler,
         caseSensitive: caseSensitive
-      });
+      } as ConfigurableRoute);
 
       withChild.navModel = navModel;
       withChild.settings = config.settings;

@@ -101,7 +101,7 @@ export class RouterConfiguration {
   */
   map(route: RouteConfig | RouteConfig[]): RouterConfiguration {
     if (Array.isArray(route)) {
-      route.forEach(this.map, this);
+      route.forEach(r => this.map(r));
       return this;
     }
 

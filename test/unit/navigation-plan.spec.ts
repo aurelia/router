@@ -130,7 +130,7 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
           done();
         });
     })
-    .catch(done.fail);
+      .catch(done.fail);
   });
 
   it('redirects and drops unused dynamic parameters', (done) => {
@@ -382,6 +382,67 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
     const from = { name: 'first', route: 'first/:id', redirect: 'second/:id' };
     const to = { name: 'second', route: 'second/:id', moduleId: './second' };
 
+    router.addRoute(base);
+    child.configure(config => config.map([from, to]));
+    router.navigate('home');
+    router._createNavigationInstruction(url).then((parentInstruction) => {
+      child._createNavigationInstruction(parentInstruction.getWildcardPath(), parentInstruction).then(childInstruction => {
+        step.run(childInstruction, state.next)
+          .then(e => {
+            expect(state.rejection).toBeTruthy();
+            expect(e instanceof Redirect).toBe(true);
+            expect(e.url).toBe(`#/home/second/1`);
+            done();
+          });
+      });
+    });
+  });
+  it('redirects from parents to children', (done) => {
+    const url = 'shortcut';
+    const one = { name: 'first', route: ['home', 'one'], moduleId: './one' };
+    const two = { name: 'second', route: 'two', moduleId: './two' };
+    const three = { name: 'third', route: 'three', moduleId: './three' };
+    const to = { name: 'shortcut', route: 'shortcut', redirect: 'one/two/three' };
+    router.addRoute(one);
+    router.addRoute(to);
+    child.addRoute(two);
+    grandchild.addRoute(three);
+    router.navigate('one');
+    router._createNavigationInstruction(url).then((instruction) => {
+      step.run(instruction, state.next)
+        .then(e => {
+          expect(state.rejection).toBeTruthy();
+          expect(e instanceof Redirect).toBe(true);
+          expect(e.url).toBe('#/one/two/three');
+          done();
+        });
+    });
+  });
+  it('redirects children with static parameters', (done) => {
+    const url = 'home/first/0';
+    const base = { name: 'home', route: 'home', moduleId: './home' };
+    const from = { name: 'first', route: 'first/:id', redirect: 'second/1' };
+    const to = { name: 'second', route: 'second/:id', moduleId: './second' };
+    router.addRoute(base);
+    child.configure(config => config.map([from, to]));
+    router.navigate('home');
+    router._createNavigationInstruction(url).then((parentInstruction) => {
+      child._createNavigationInstruction(parentInstruction.getWildcardPath(), parentInstruction).then(childInstruction => {
+        step.run(childInstruction, state.next)
+          .then(e => {
+            expect(state.rejection).toBeTruthy();
+            expect(e instanceof Redirect).toBe(true);
+            expect(e.url).toBe(`#/home/second/1`);
+            done();
+          });
+      });
+    });
+  });
+  it('redirects children with dynamic parameters', (done) => {
+    const url = 'home/first/1';
+    const base = { name: 'home', route: 'home', moduleId: './home' };
+    const from = { name: 'first', route: 'first/:id', redirect: 'second/:id' };
+    const to = { name: 'second', route: 'second/:id', moduleId: './second' };
     router.addRoute(base);
     child.configure(config => config.map([from, to]));
     router.navigate('home');

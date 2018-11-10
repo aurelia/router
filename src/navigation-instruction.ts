@@ -212,7 +212,7 @@ export class NavigationInstruction {
           route.route !== '';
       });
       if (nonEmptyRoute) {
-        fragment = nonEmptyRoute.route as any;
+        fragment = nonEmptyRoute.route as string;
       }
     }
 
