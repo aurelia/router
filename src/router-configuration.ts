@@ -1,4 +1,4 @@
-import { RouteConfig, PipelineStep, RouteConfigSpecifier, ViewPortInstruction } from './interfaces';
+import { RouteConfig, PipelineStep, RouteConfigSpecifier, ViewPortInstruction, UnknownRouteConfigSpecifier } from './interfaces';
 import { _ensureArrayWithSingleRoutePerConfig } from './util';
 import { Router } from './router';
 import { NavigationInstruction } from './navigation-instruction';
@@ -152,7 +152,7 @@ export class RouterConfiguration {
   *  [[NavigationInstruction]] and selects a moduleId to load.
   * @chainable
   */
-  mapUnknownRoutes(config: RouteConfigSpecifier): RouterConfiguration {
+  mapUnknownRoutes(config: UnknownRouteConfigSpecifier): RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }

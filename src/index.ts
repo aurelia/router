@@ -17,7 +17,10 @@ export {
   ViewPort,
   ViewPortPlan,
   ViewPortInstruction,
-  ViewPortComponent
+  ViewPortComponent,
+  RedirectRouteConfig,
+  RouteConfigSpecifier,
+  UnknownRouteConfigSpecifier
 } from './interfaces';
 export {
   ActivateNextStep,

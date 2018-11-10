@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2015",
     "module": "es2015",
+    "baseUrl": "src",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
     "moduleResolution": "node",

@@ -19,6 +19,18 @@ export type Constructable<T = any> = { new(...args: any[]): T };
 
 // export type RouteConfigSpecifier = string | RouteConfig | ((instruction: NavigationInstruction) => string | RouteConfig | Promise<string | RouteConfig>);
 
+export interface RedirectRouteConfig extends RouteConfig {
+  route?: string;
+  redirect: string;
+}
+
+export type UnknownRouteConfigSpecifier = string
+  | RedirectRouteConfig
+  | ((instruction: NavigationInstruction) => string
+    | RedirectRouteConfig
+    | Promise<string | RedirectRouteConfig>
+  );
+
 export type ViewModelSpecifier = () => Function | Promise<Function | Record<string, any>>;
 
 /**
