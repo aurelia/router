@@ -331,17 +331,16 @@ export class Router {
   * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
   * @returns {string} A string containing the generated URL fragment.
   */
-  generate(name: string, params?: any, options: any = {}): string {
+  generate(name: string, params: any = {}, options: any = {}): string {
     let hasRoute = this._recognizer.hasRoute(name);
-    if ((!this.isConfigured || !hasRoute) && this.parent) {
-      return this.parent.generate(name, params, options);
-    }
-
     if (!hasRoute) {
+      if (this.parent) {
+        return this.parent.generate(name, params, options);
+      }
       throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
     }
-
-    let path = this._recognizer.generate(name, params);
+    let recognizer = 'childRoute' in params ? this._childRecognizer : this._recognizer;
+    let path = recognizer.generate(name, params);
     let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
     return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
   }

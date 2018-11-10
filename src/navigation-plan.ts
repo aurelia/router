@@ -53,6 +53,11 @@ export function _buildNavigationPlan(
         }
         let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
 
+        // Special handling for child routes
+        for (let key in instruction.params) {
+          redirectLocation = redirectLocation.replace(`:${key}`, instruction.params[key]);
+        }
+
         if (instruction.queryString) {
           redirectLocation += '?' + instruction.queryString;
         }
