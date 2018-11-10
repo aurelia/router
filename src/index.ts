@@ -18,7 +18,6 @@ export {
   ViewPortPlan,
   ViewPortInstruction,
   ViewPortComponent,
-  RedirectRouteConfig,
   RouteConfigSpecifier,
   UnknownRouteConfigSpecifier
 } from './interfaces';

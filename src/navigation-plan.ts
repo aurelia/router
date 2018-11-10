@@ -2,6 +2,7 @@ import { ActivationStrategy, Next, RouteConfig, ViewPortPlan } from './interface
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { resolveViewModel } from './resolve-view-model';
+import { _resolveUrl } from './util';
 
 /**
 * The strategy to use when activating modules during navigation.
@@ -26,13 +27,13 @@ export class BuildNavigationPlanStep {
   }
 }
 
-export async function _buildNavigationPlan(
-  instruction: NavigationInstruction,
-  forceLifecycleMinimum?: boolean
-): Promise<Record<string, ViewPortPlan> | Redirect> {
-  let config = instruction.config;
-
-  if ('redirect' in config) {
+/**@internal exported for unit testing */
+export async function _buildRedirectPlan(
+  instruction: NavigationInstruction
+): Promise<Redirect> {
+  let redirectLocation: string;
+  const config = instruction.config;
+  if ('name' in config) {
     const router = instruction.router;
     const newInstruction = await router._createNavigationInstruction(config.redirect);
     const params: Record<string, any> = {};
@@ -49,11 +50,45 @@ export async function _buildNavigationPlan(
         params[key] = newInstruction.params[key];
       }
     }
-    let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
-    if (instruction.queryString) {
-      redirectLocation += '?' + instruction.queryString;
-    }
-    return new Redirect(redirectLocation);
+    redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
+  } else {
+    redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
+  }
+  if (instruction.queryString) {
+    redirectLocation += '?' + instruction.queryString;
+  }
+  return new Redirect(redirectLocation);
+}
+
+export async function _buildNavigationPlan(
+  instruction: NavigationInstruction,
+  forceLifecycleMinimum?: boolean
+): Promise<Record<string, ViewPortPlan> | Redirect> {
+  let config = instruction.config;
+
+  if ('redirect' in config) {
+    return _buildRedirectPlan(instruction);
+    // const router = instruction.router;
+    // const newInstruction = await router._createNavigationInstruction(config.redirect);
+    // const params: Record<string, any> = {};
+    // for (let key in newInstruction.params) {
+    //   // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
+    //   let val = newInstruction.params[key];
+    //   if (typeof val === 'string' && val[0] === ':') {
+    //     val = val.slice(1);
+    //     // And if that param is found on the original instruction then use it
+    //     if (val in instruction.params) {
+    //       params[key] = instruction.params[val];
+    //     }
+    //   } else {
+    //     params[key] = newInstruction.params[key];
+    //   }
+    // }
+    // let redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
+    // if (instruction.queryString) {
+    //   redirectLocation += '?' + instruction.queryString;
+    // }
+    // return new Redirect(redirectLocation);
   }
 
   const prev = instruction.previousInstruction;
@@ -191,4 +226,17 @@ export function hasDifferentParameterValues(prev: NavigationInstruction, next: N
   }
 
   return false;
+}
+
+function getInstructionBaseUrl(instruction: NavigationInstruction): string {
+  let instructionBaseUrlParts = [];
+  instruction = instruction.parentInstruction;
+
+  while (instruction) {
+    instructionBaseUrlParts.unshift(instruction.getBaseUrl());
+    instruction = instruction.parentInstruction;
+  }
+
+  instructionBaseUrlParts.unshift('/');
+  return instructionBaseUrlParts.join('');
 }

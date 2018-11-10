@@ -18,7 +18,7 @@ export class RouterConfiguration {
     hashChange?: boolean;
     silent?: boolean;
   } = {};
-  pipelineSteps: Array<{ name: string, step: Function | PipelineStep }> = [];
+  pipelineSteps: { name: string, step: Function | PipelineStep }[] = [];
   title: string;
   titleSeparator: string;
   unknownRouteConfig: RouteConfigSpecifier;
@@ -101,7 +101,7 @@ export class RouterConfiguration {
   */
   map(route: RouteConfig | RouteConfig[]): RouterConfiguration {
     if (Array.isArray(route)) {
-      route.forEach(this.map.bind(this));
+      route.forEach(this.map, this);
       return this;
     }
 
