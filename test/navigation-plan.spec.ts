@@ -77,6 +77,23 @@ describe('NavigationPlanStep', () => {
       });
   });
 
+  it('redirects to routes without names', (done) => {
+    const url = 'first/10?q=1';
+    const from = { route: 'first', redirect: 'second' };
+    const to = { route: 'second', moduleId: './second' };
+    router.addRoute(from);
+    router.addRoute(to);
+    router._createNavigationInstruction(url).then((instruction) => {
+      step.run(instruction, state.next)
+        .then(e => {
+          expect(state.rejection).toBeTruthy();
+          expect(e instanceof Redirect).toBe(true);
+          expect(e.url).toBe(`#/second?q=1`);
+          done();
+        });
+    });
+  });
+
   it('redirects to routes with static parameters', (done) => {
     const url = 'first/10?q=1';
     const from = { name: 'first', route: 'first/:id', redirect: 'second/0' };
@@ -172,6 +189,31 @@ describe('NavigationPlanStep', () => {
   });
 
   it('redirects from parents to children', (done) => {
+    const url = 'home/shortcut';
+    const one = { name: 'first', route: 'home', moduleId: './one' };
+    const two = { name: 'second', route: 'two', moduleId: './two' };
+    const three = { name: 'third', route: 'three', moduleId: './three' };
+    const to = { name: 'shortcut', route: 'shortcut', redirect: 'two/three' };
+
+    router.addRoute(one);
+    child.addRoute(two);
+    child.addRoute(to);
+    grandchild.addRoute(three);
+    router.navigate('home');
+    router._createNavigationInstruction(url).then((parentInstruction) => {
+      child._createNavigationInstruction(parentInstruction.getWildcardPath(), parentInstruction).then(childInstruction => {
+        step.run(childInstruction, state.next)
+          .then(e => {
+            expect(state.rejection).toBeTruthy();
+            expect(e instanceof Redirect).toBe(true);
+            expect(e.url).toBe('#/home/two/three');
+            done();
+          });
+      });
+    });
+  });
+
+  it('redirects from parents to grandchildren', (done) => {
     const url = 'shortcut';
     const one = { name: 'first', route: ['home', 'one'], moduleId: './one' };
     const two = { name: 'second', route: 'two', moduleId: './two' };
@@ -189,6 +231,52 @@ describe('NavigationPlanStep', () => {
           expect(state.rejection).toBeTruthy();
           expect(e instanceof Redirect).toBe(true);
           expect(e.url).toBe('#/one/two/three');
+          done();
+        });
+    });
+  });
+
+  it('redirects from parents to grandchildren with static params', (done) => {
+    const url = 'shortcut';
+    const one = { name: 'first', route: ['home', 'one'], moduleId: './one' };
+    const two = { name: 'second/:id', route: 'two', moduleId: './two' };
+    const three = { name: 'third/:id', route: 'three', moduleId: './three' };
+    const to = { name: 'shortcut', route: 'shortcut', redirect: 'one/two/2/three/3' };
+
+    router.addRoute(one);
+    router.addRoute(to);
+    child.addRoute(two);
+    grandchild.addRoute(three);
+    router.navigate('one');
+    router._createNavigationInstruction(url).then((instruction) => {
+      step.run(instruction, state.next)
+        .then(e => {
+          expect(state.rejection).toBeTruthy();
+          expect(e instanceof Redirect).toBe(true);
+          expect(e.url).toBe('#/one/two/2/three/3');
+          done();
+        });
+    });
+  });
+
+  it('redirects from parents to grandchildren with dynamic params', (done) => {
+    const url = 'shortcut/1/2';
+    const one = { name: 'first', route: ['home', 'one'], moduleId: './one' };
+    const two = { name: 'second/:id', route: 'two', moduleId: './two' };
+    const three = { name: 'third/:id', route: 'three', moduleId: './three' };
+    const to = { name: 'shortcut', route: 'shortcut/:second/:third', redirect: 'one/two/:second/three/:third' };
+
+    router.addRoute(one);
+    router.addRoute(to);
+    child.addRoute(two);
+    grandchild.addRoute(three);
+    router.navigate('one');
+    router._createNavigationInstruction(url).then((instruction) => {
+      step.run(instruction, state.next)
+        .then(e => {
+          expect(state.rejection).toBeTruthy();
+          expect(e instanceof Redirect).toBe(true);
+          expect(e.url).toBe('#/one/two/1/three/2');
           done();
         });
     });
