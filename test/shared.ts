@@ -11,6 +11,10 @@ export interface MockRouter extends Router {
 
 export class MockHistory extends History {
 
+  constructor(private _absoluteRoute: string = '') {
+    super();
+  }
+
   activate(opt?: NavigationOptions) {
     return false;
   }
@@ -28,7 +32,7 @@ export class MockHistory extends History {
   }
 
   getAbsoluteRoot() {
-    return '';
+    return this._absoluteRoute;
   }
 
   // tslint:disable-next-line

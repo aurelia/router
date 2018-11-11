@@ -62,7 +62,7 @@ export class NavigationInstruction {
   /**
   * The instruction being replaced by this instruction in the current router.
   */
-  previousInstruction: NavigationInstruction;
+  previousInstruction: NavigationInstruction | null;
 
   /**
   * viewPort instructions to used activation.
@@ -76,7 +76,7 @@ export class NavigationInstruction {
   /**
   * Navigation plans for view ports
   */
-  plan: Record<string, ViewPortPlan> = null;
+  plan: Record<string, ViewPortPlan> | null = null;
 
   options: Record<string, any> = {};
 
@@ -128,14 +128,14 @@ export class NavigationInstruction {
   * Previous instructions are no longer available after navigation completes.
   */
   getAllPreviousInstructions(): NavigationInstruction[] {
-    return this.getAllInstructions().map(c => c.previousInstruction).filter(c => c);
+    return this.getAllInstructions().map(c => c.previousInstruction!).filter(c => c);
   }
 
   /**
   * Adds a viewPort instruction.
   */
   addViewPortInstruction(name: string, instruction: ViewPortInstruction): ViewPortInstruction;
-  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): ViewPortInstruction;
+  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: ViewPortComponent): ViewPortInstruction;
   addViewPortInstruction(
     name: string,
     instructionOrStrategy: ViewPortInstruction | ActivationStrategyType,
@@ -150,8 +150,8 @@ export class NavigationInstruction {
         name: name,
         strategy: instructionOrStrategy,
         moduleId: moduleId,
-        component: component,
-        childRouter: component.childRouter,
+        component: component!,
+        childRouter: component!.childRouter,
         lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]]
       };
     } else {
@@ -180,7 +180,7 @@ export class NavigationInstruction {
   * Gets the name of the route pattern's wildcard parameter, if applicable.
   */
   getWildCardName(): string {
-    let wildcardIndex = this.config.route.lastIndexOf('*');
+    let wildcardIndex = (this.config.route as string).lastIndexOf('*');
     // Todo: make typings have more sense as it is confusing with string/ string[]
     return (this.config.route as string).substr(wildcardIndex + 1);
   }
@@ -236,10 +236,10 @@ export class NavigationInstruction {
     router.currentInstruction = this;
 
     if (this.previousInstruction) {
-      this.previousInstruction.config.navModel.isActive = false;
+      this.previousInstruction.config.navModel!.isActive = false;
     }
 
-    this.config.navModel.isActive = true;
+    this.config.navModel!.isActive = true;
 
     router.refreshNavigation();
 
@@ -295,9 +295,10 @@ export class NavigationInstruction {
   _buildTitle(separator: string = ' | '): string {
     let title = '';
     let childTitles = [];
+    let navModel = this.config.navModel;
 
-    if (this.config.navModel.title) {
-      title = this.router.transformTitle(this.config.navModel.title);
+    if (navModel && navModel!.title) {
+      title = this.router.transformTitle(navModel.title);
     }
 
     for (let viewPortName in this.viewPortInstructions) {

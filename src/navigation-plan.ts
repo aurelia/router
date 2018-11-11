@@ -44,11 +44,11 @@ export async function _buildNavigationPlan(
   // First navigation
   // Only needs to process current instruction without considering transition from previous instruction
   const viewPortPlans: Record<string, ViewPortPlan> = {};
-  const defaults = instruction.router.viewPortDefaults;
+  const defaultViewPorts = instruction.router.viewPortDefaults;
   for (let viewPortName in config.viewPorts) {
     let viewPortConfig = config.viewPorts[viewPortName];
     if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
-      viewPortConfig = defaults[viewPortName];
+      viewPortConfig = defaultViewPorts[viewPortName];
     }
     viewPortPlans[viewPortName] = {
       name: viewPortName,
@@ -113,6 +113,7 @@ export async function _buildTransitionPlan(
     let nextViewPortConfig: RouteConfig = viewPortName in config.viewPorts
       ? config.viewPorts[viewPortName]
       : prevViewPortInstruction;
+
     if (nextViewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
       nextViewPortConfig = defaults[viewPortName] as RouteConfig;
     }

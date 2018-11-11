@@ -1,4 +1,4 @@
-import { ActivateNextStep, activationStrategy, NavigationInstruction, RouteConfig, ViewPortInstruction } from '../../../src';
+import { ActivateNextStep, activationStrategy, NavigationInstruction, RouteConfig, ViewPortInstruction, ViewPortComponent } from '../../../src';
 import { createPipelineState, MockPipelineState } from '../../shared';
 
 describe('Activation -- ActivateNextStep', function _3_ActivateNextStep__Tests() {
@@ -24,7 +24,7 @@ describe('Activation -- ActivateNextStep', function _3_ActivateNextStep__Tests()
       }
     };
 
-    instruction.addViewPortInstruction('my-view-port', 'ignored' as any, 'ignored', { viewModel });
+    instruction.addViewPortInstruction('my-view-port', 'ignored' as any, 'ignored', { viewModel } as ViewPortComponent);
     step.run(instruction, state.next);
   });
 });

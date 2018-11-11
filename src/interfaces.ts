@@ -9,7 +9,7 @@ import { IObservable } from './activation';
 /**@internal */
 declare module 'aurelia-dependency-injection' {
   interface Container {
-    getChildRouter?: () => Router;
+    getChildRouter: () => Router;
   }
 }
 

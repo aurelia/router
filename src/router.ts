@@ -315,7 +315,7 @@ export class Router {
    * Creates a child router of the current router.
    *
    * @param container The [[Container]] to provide to the child router. Uses the current [[Router]]'s [[Container]] if unspecified.
-   * @returns {Router} The new child Router.
+   * @returns The new child Router.
    */
   createChild(container?: Container): Router {
     let childRouter = new Router(container || this.container.createChild(), this.history);
@@ -359,7 +359,8 @@ export class Router {
       'href' in config
         ? config.href
         // potential error when config.route is a string[] ?
-        : config.route as string);
+        : config.route as string
+    );
     navModel.title = config.title;
     navModel.order = config.nav;
     navModel.href = config.href;
@@ -398,13 +399,21 @@ export class Router {
       };
     }
 
+    this.routes.push(config);
+
     if (!navModel) {
       navModel = this.createNavModel(config);
     }
+    this.addNavModel(config, navModel);
+  }
 
-    this.routes.push(config);
-
-    let path = config.route;
+  /**
+   * @internal
+   *
+   * Create nav model based on route config. Invoked as part of adding new route
+   */
+  addNavModel(config: RouteConfig, navModel: NavModel): void {
+    let path = config.route as string;
     if (path.charAt(0) === '/') {
       path = path.substr(1);
     }
@@ -446,7 +455,7 @@ export class Router {
 
       this.navigation.push(navModel);
       // this is a potential error / inconsistency between browsers
-      this.navigation = this.navigation.sort((a, b) => <any>a.order - <any>b.order);
+      this.navigation = this.navigation.sort((a, b) => <number>a.order - <number>b.order);
     }
   }
 
@@ -527,9 +536,13 @@ export class Router {
   useViewPortDefaults(viewPortDefaults: Record<string, Partial<ViewPortInstruction>>): void {
     for (let viewPortName in viewPortDefaults) {
       let viewPortConfig = viewPortDefaults[viewPortName];
-      this.viewPortDefaults[viewPortName] = {
-        moduleId: viewPortConfig.moduleId
-      };
+      let newConfig = {} as RouteConfig;
+      if ('moduleId' in viewPortConfig) {
+        newConfig.moduleId = viewPortConfig.moduleId;
+      } else {
+        newConfig.viewModel = viewPortConfig.viewModel;
+      }
+      this.viewPortDefaults[viewPortName] = newConfig;
     }
   }
 
@@ -541,7 +554,7 @@ export class Router {
   }
 
   /**@internal */
-  _createNavigationInstruction(url: string = '', parentInstruction: NavigationInstruction = null): Promise<NavigationInstruction> {
+  _createNavigationInstruction(url: string = '', parentInstruction: NavigationInstruction | null = null): Promise<NavigationInstruction> {
     let fragment = url;
     let queryString = '';
 
@@ -620,7 +633,7 @@ export class Router {
   }
 
   /**@internal */
-  _findParentInstructionFromRouter(router: Router, instruction: NavigationInstruction): NavigationInstruction {
+  _findParentInstructionFromRouter(router: Router, instruction: NavigationInstruction): NavigationInstruction | undefined {
     if (instruction.router === router) {
       instruction.fragment = router.baseUrl; // need to change the fragment in case of a redirect instead of moduleId
       return instruction;
@@ -642,32 +655,37 @@ export class Router {
 
   /**
    * @internal
+   *
+   * Used to create route config from unknown route handler
    */
-  _createRouteConfig(
+  async _createRouteConfig(
     config: RouteConfigSpecifier,
     instruction: NavigationInstruction
-  ) {
-    return Promise.resolve(config)
-      .then(c => {
-        if (typeof c === 'string') {
-          return { moduleId: c } as RouteConfig;
-        } else if (typeof c === 'function') {
-          return c(instruction);
-        }
+  ): Promise<RouteConfig> {
 
-        return c;
-      })
-      .then(c => typeof c === 'string' ? { moduleId: c } as RouteConfig : c)
-      .then(c => {
-        c.route = instruction.params.path;
-        validateRouteConfig(c, this.routes);
+    let $config: string | RouteConfig;
 
-        if (!c.navModel) {
-          c.navModel = this.createNavModel(c);
-        }
+    config = await config;
+    if (typeof config === 'string') {
+      $config = { moduleId: config };
+    } else if (typeof config === 'function') {
+      $config = await config(instruction);
+    } else {
+      $config = config;
+    }
 
-        return c;
-      });
+    $config = typeof $config === 'string'
+      // config.mapUnknownRoutes(instruction => "some-module-id")
+      // config.mapUnknownRoutes(instruction => Promise.doStuff().then(() => "some-module-id"))
+      ? { moduleId: $config }
+      // $config.mapUnknownRoutes(instruction => ({ some route config }))
+      : $config;
+    $config.route = instruction.params.path;
+    validateRouteConfig($config, this.routes);
+    if (!$config.navModel) {
+      $config.navModel = this.createNavModel($config);
+    }
+    return $config;
   }
 }
 

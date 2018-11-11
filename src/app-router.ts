@@ -27,6 +27,16 @@ export class AppRouter extends Router {
   /**@internal */
   static inject() { return [Container, History, PipelineProvider, EventAggregator]; }
 
+  /**
+   * EventAggregator instance that will be used to notify router events as defined in ./constants.ts module
+   * There are 5 events:
+   * - router:navigation:processing
+   * - router:navigation:error
+   * - router:navigation:canceled
+   * - router:navigation:complete
+   * - router:navigation:success
+   * - router:navigation:child:complete
+   */
   events: EventAggregator;
   /**
    * Number of retries this app router will perform in case of a navigation failure. Default to 10
@@ -89,10 +99,15 @@ export class AppRouter extends Router {
     // of this method. Old code still left around for better comparison before removing
 
     if (this.isActive) {
-      return this._dequeueInstruction().then(noop);
+      return this._dequeueInstruction();
     }
     const viewModel = this._findViewModel(viewPort);
+    if (!viewModel) {
+      return Promise.resolve();
+    }
     if ('configureRouter' in viewModel) {
+      // `isConfigured` is used to guard against multiple viewports (aka <router-view/>) in the same app root
+      // to trigger application AppRouter all at once
       if (!this.isConfigured) {
         const resolveConfiguredPromise = this._resolveConfiguredPromise;
         // tslint:disable-next-line
@@ -104,8 +119,6 @@ export class AppRouter extends Router {
           })
           .then(() => this.activate())
           .then(() => resolveConfiguredPromise());
-        // this.activate();
-        // resolveConfiguredPromise();
       }
       return Promise.resolve();
     }
@@ -174,13 +187,14 @@ export class AppRouter extends Router {
   async _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | void> {
     // keep the timing for backward compat
     await Promise.resolve();
+    // protect against different navigation pipeline when one is processing?
     if (this.isNavigating && !instructionCount) {
-      return undefined;
+      return;
     }
     let instruction = this._queue.shift();
     this._queue.length = 0;
     if (!instruction) {
-      return undefined;
+      return;
     }
     this.isNavigating = true;
     let navtracker: number = this.history.getState('NavigationTracker');
@@ -211,8 +225,10 @@ export class AppRouter extends Router {
     } else if (instructionCount > this.maxInstructionCount) {
       throw new Error('Maximum navigation attempts exceeded. Giving up.');
     }
+
     let pipeline = this.pipelineProvider.createPipeline(!this.couldDeactivate);
     let result: PipelineResult;
+
     try {
       const $result = await pipeline.run(instruction);
       result = await processResult(instruction, $result, instructionCount, this);
@@ -256,7 +272,7 @@ async function processResult(
     result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
   }
 
-  let finalResult: PipelineResult = null;
+  let finalResult: PipelineResult | null = null;
   let navigationCommandResult = null;
   if (isNavigationCommand(result.output)) {
     navigationCommandResult = result.output.navigate(router);

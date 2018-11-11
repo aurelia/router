@@ -92,7 +92,7 @@ export async function clean(): Promise<void> {
 export async function generateDts(): Promise<void> {
   console.log('\n==============\nGenerating dts bundle...\n==============');
   return new Promise<void>(resolve => {
-    ChildProcess.exec('npm run bundle-dts', (err, stdout, stderr) => {
+    ChildProcess.exec('npm run build:dts', (err, stdout, stderr) => {
       if (err || stderr) {
         console.log('Generating dts error:');
         console.log(stderr);

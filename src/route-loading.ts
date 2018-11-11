@@ -34,7 +34,10 @@ export class LoadRouteStep {
   }
 }
 
-/*@internal*/export function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction): Promise<any[] | void> {
+/**
+ * @internal Exported for unit testing
+ */
+export function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction): Promise<any> {
   let toLoad = determineWhatToLoad(navigationInstruction);
   let loadPromises = toLoad.map((loadingPlan: ILoadingPlan) => loadRoute(
     routeLoader,
@@ -51,16 +54,22 @@ interface ILoadingPlan {
 }
 
 /**
+ * @internal Exported for unit testing
+ *
  * Determine what are needed to be loaded based on navigation instruction's plan
  * All determined loading plans will be added to 2nd parameter array
  * @param navigationInstruction
  * @param toLoad
  */
-/*@internal*/export function determineWhatToLoad(
+export function determineWhatToLoad(
   navigationInstruction: NavigationInstruction,
   toLoad: ILoadingPlan[] = []
 ): ILoadingPlan[] {
   let plans = navigationInstruction.plan;
+
+  if (plans === null) {
+    return toLoad; // or to throw?
+  }
 
   for (let viewPortName in plans) {
     let viewPortPlan = plans[viewPortName];
@@ -84,8 +93,11 @@ interface ILoadingPlan {
       let prevViewModel = viewPortPlan.prevViewModel;
 
       if (typeof prevViewModel === 'string' || prevViewModel === null) {
-        partialInstruction.moduleId = prevViewModel as string | null;
+        // TODO: adjust typings here. It is a bit hairy
+        // prevViewModel of a viewport can be null, but not a route view model.
+        partialInstruction.moduleId = prevViewModel as any;
       } else if (typeof prevViewModel === 'function') {
+        // turn the previous view model back into a resolver like
         partialInstruction.viewModel = () => prevViewModel as Function;
       } else {
         throw new Error('Invaid previous view model specification');
@@ -106,11 +118,14 @@ interface ILoadingPlan {
   return toLoad;
 }
 
-/*@internal*/export async function loadRoute(
+/**
+ * @internal Exproted for unit testing
+ */
+export async function loadRoute(
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   viewPortPlan: ViewPortPlan
-) {
+): Promise<ViewPortComponent | void> {
   let config = viewPortPlan.config;
   let component = await loadComponent(routeLoader, navigationInstruction, viewPortPlan.config);
   // let viewPortInstruction = navigationInstruction.addViewPortInstruction(
@@ -153,10 +168,13 @@ interface ILoadingPlan {
     return loadNewRoute(routeLoader, childInstruction);
   }
 
-  return undefined;
+  return;
 }
 
-/*@internal*/export async function loadComponent(
+/**
+ * @internal Exported for unit testing
+ */
+export async function loadComponent(
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   config: RouteConfig

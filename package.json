@@ -24,7 +24,7 @@
     "dev": "npm run build -- --dev",
     "prebuild": "rimraf dist",
     "build": "cross-env TS_NODE_PROJECT=build/tsconfig.json ts-node build/build.ts",
-    "bundle-dts": "dts-bundle-generator -o dist/aurelia-router.d.ts src/index.ts",
+    "build:dts": "dts-bundle-generator -o dist/aurelia-router.d.ts src/index.ts",
     "karma": "cross-env TS_NODE_PROJECT=test/.karma/tsconfig.json karma start test/.karma/karma.conf.ts",
     "test": "npm run karma -- --unit --integration --single-run --browsers ChromeHeadlessOpt",
     "test:watch": "npm run karma -- --unit --integration --coverage --browsers ChromeHeadlessOpt",
