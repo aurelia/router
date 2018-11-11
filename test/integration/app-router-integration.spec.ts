@@ -1,10 +1,9 @@
-// import { RouteLoader } from '../../src/route-loader';
+import '../setup.integration';
 import { bootstrap } from 'aurelia-bootstrapper';
-// import { bootstrap } from './bootstrap';
 import { RouteLoader, AppRouter, Router, RouterConfiguration } from '../../src/index';
 import { StageComponent, ComponentTester } from 'aurelia-testing';
 import { Aurelia, PLATFORM } from 'aurelia-framework';
-import '../shared';
+// import '../shared';
 
 describe('AppRouter - Integration', function AppRouter_Integration_Tests() {
   let component: ComponentTester;
@@ -39,7 +38,7 @@ function configure(component: ComponentTester) {
       .history()
       .router()
       // .developmentLogging() // too much logging
-    ;
+      ;
 
     aurelia.use.container.viewModel = {
       configureRouter: (config: RouterConfiguration, router: Router) => {

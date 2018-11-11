@@ -487,14 +487,12 @@ export class Router {
       throw new Error('Invalid unknown route handler');
     }
 
-    this.catchAllHandler = instruction => {
-      return this
-        ._createRouteConfig(config as RouteConfigSpecifier, instruction)
-        .then(c => {
-          instruction.config = c;
-          return instruction;
-        });
-    };
+    this.catchAllHandler = instruction => this
+      ._createRouteConfig(config as RouteConfigSpecifier, instruction)
+      .then(c => {
+        instruction.config = c;
+        return instruction;
+      });
   }
 
   /**
@@ -599,6 +597,8 @@ export class Router {
         result = Promise.resolve(instruction);
       }
     } else if (this.catchAllHandler) {
+      // if route not matched against anything and this router has been configured with
+      // mapUnknownRoutes
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
         queryParams: urlRecognizationResults ? urlRecognizationResults.queryParams : {},
@@ -707,7 +707,8 @@ export function validateRouteConfig(config: RouteConfig, routes?: Object[]): voi
 
   if (!(
     'redirect' in config
-    // TODO: does this handle moduleId: null case?
+    // only moduleId of a viewPort route config can be null, which will be handled differently
+    // which means this check is valid and will not be invalidated by viewPort: { name: { moduleId: null } }
     || config.moduleId
     || config.navigationStrategy
     || config.viewPorts
@@ -720,12 +721,16 @@ export function validateRouteConfig(config: RouteConfig, routes?: Object[]): voi
   if ('moduleId' in config && 'viewModel' in config) {
     throw new Error(`Invalid Route Config for "${config.route}". Both "moduleId" and "viewModel" specified.`);
   }
+
+  if ('viewModel' in config && typeof config.viewModel !== 'function') {
+    throw new Error(`Invalid Route Config for "${config.route}". "viewModel" is not a function`);
+  }
 }
 
 /* @internal exported for unit testing */
 export function evaluateNavigationStrategy(
   instruction: NavigationInstruction,
-  evaluator: Function,
+  evaluator: (instruction: NavigationInstruction) => NavigationInstruction | Promise<NavigationInstruction>,
   context?: any
 ): Promise<NavigationInstruction> {
   return Promise

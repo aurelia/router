@@ -2,7 +2,7 @@ import * as karma from 'karma';
 import * as path from 'path';
 import * as webpack from 'webpack';
 
-const BASE_DIR = path.resolve(__dirname, '../../');
+const BASE_DIR = process.cwd();
 
 export interface IKarmaConfig extends karma.Config, IKarmaConfigOptions {
   transpileOnly?: boolean;
@@ -59,11 +59,10 @@ export default function(config: IKarmaConfig) {
     basePath: BASE_DIR,
     frameworks: ['jasmine'],
     files: [
-      'test/setup.ts',
-      'test/setup.integration.ts'
+      'test/**/*.spec.ts'
     ],
     preprocessors: {
-      '**/*.ts': ['webpack', 'sourcemap']
+      'test/**/*.spec.ts': ['webpack', 'sourcemap']
     },
     webpack: webpackConfigs,
     mime: {
@@ -118,8 +117,8 @@ export default function(config: IKarmaConfig) {
       exclude: /(node_modules|\.spec\.ts$)/,
       loader: 'istanbul-instrumenter-loader',
       options: {
-        esModules: true
-        // produceSourceMap: true
+        esModules: true,
+        produceSourceMap: true
       },
       test: /src[\/\\].+\.ts$/
     });
@@ -149,7 +148,9 @@ function getWebpackConfigs(karmaConfig: IKarmaConfig): webpack.Configuration {
     mode: 'development',
     resolve: {
       extensions: ['.ts', '.js'],
-      modules: ['src', 'node_modules'],
+      modules: [
+        path.resolve(BASE_DIR, 'node_modules')
+      ],
       alias: {
         'aurelia-router': path.resolve(BASE_DIR, 'src', 'index')
       }
@@ -163,8 +164,11 @@ function getWebpackConfigs(karmaConfig: IKarmaConfig): webpack.Configuration {
           loader: 'ts-loader',
           exclude: /node_modules/,
           options: {
-            // load this relatively to each entry file
-            configFile: path.resolve(BASE_DIR, 'test', 'tsconfig.test.json')
+            configFile: path.resolve(BASE_DIR, 'test/tsconfig.json'),
+            compilerOptions: {
+              ...require('../../tsconfig.json').compilerOptions,
+              ...require('../tsconfig.json').compilerOptions
+            }
           }
         }
       ]
@@ -172,11 +176,13 @@ function getWebpackConfigs(karmaConfig: IKarmaConfig): webpack.Configuration {
     plugins: [
       new AureliaPlugin({
         aureliaApp: undefined,
+        dist: 'es2015',
         aureliaConfig: [
           'defaultBindingLanguage',
           'history',
           'defaultResources',
           'developmentLogging',
+          'eventAggregator',
           'router'
         ],
         noWebpackLoader: true

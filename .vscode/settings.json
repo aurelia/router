@@ -7,5 +7,6 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "tslint.autoFixOnSave": true,
-  "typescript.preferences.quoteStyle": "single"
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false
 }

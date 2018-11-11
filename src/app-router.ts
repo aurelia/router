@@ -8,7 +8,6 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import { NavigationInstruction } from './navigation-instruction';
 import { ViewPort, ConfiguresRouter, PipelineResult } from './interfaces';
 import { routerEvent as $routerEvent, noop } from './constants';
-import { PLATFORM } from 'aurelia-pal';
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {

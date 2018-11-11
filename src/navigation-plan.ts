@@ -34,7 +34,7 @@ export async function _buildNavigationPlan(
   let config = instruction.config;
 
   if ('redirect' in config) {
-    return _buildRedirectPlan(instruction);
+    return _buildRedirect(instruction);
   }
 
   if (instruction.previousInstruction) {
@@ -61,9 +61,7 @@ export async function _buildNavigationPlan(
 }
 
 /**@internal exported for unit testing */
-export async function _buildRedirectPlan(
-  instruction: NavigationInstruction
-): Promise<Redirect> {
+export async function _buildRedirect(instruction: NavigationInstruction): Promise<Redirect> {
   let redirectLocation: string;
   const config = instruction.config;
   // if ('name' in config) {
@@ -97,10 +95,15 @@ export async function _buildRedirectPlan(
   return new Redirect(redirectLocation);
 }
 
+/**
+ * @internal Exported for unit testing
+ *
+ * Build a record of viewport plans to describe instruction when navigating to a new route
+ */
 export async function _buildTransitionPlan(
   instruction: NavigationInstruction,
   forceLifecycleMinimum?: boolean
-) {
+): Promise<Record<string, ViewPortPlan>> {
   let config = instruction.config;
   let prev = instruction.previousInstruction;
   let defaults = instruction.router.viewPortDefaults;

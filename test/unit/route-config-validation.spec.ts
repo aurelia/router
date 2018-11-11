@@ -1,5 +1,5 @@
 import { validateRouteConfig } from '../../src/router';
-import { RouteConfig } from '../../src';
+import { RouteConfig } from '../../src/interfaces';
 
 describe('RouteConfig validation', () => {
   let routeConfig: RouteConfig;
@@ -44,8 +44,14 @@ describe('RouteConfig validation', () => {
 
     ['moduleId', 'viewModel', 'redirect', 'navigationStrategy', 'viewPorts'].forEach((prop: string) => {
       it(`does not throw when there is at least "${prop}"`, () => {
-        routeConfig[prop] = {};
+        routeConfig[prop] = prop === 'viewModel' ? function() { } : {};
         expect(() => validateRouteConfig(routeConfig)).not.toThrow();
+      });
+    });
+
+    it('throws when "viewModel" is not a function', () => {
+      [5, 'sad', Symbol(), {}, []].forEach((vm: any) => {
+        expect(() => validateRouteConfig({ route: '', viewModel: vm })).toThrowError(/"viewModel" is not a function/);
       });
     });
   });
