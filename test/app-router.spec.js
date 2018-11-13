@@ -1,8 +1,10 @@
-import {History} from 'aurelia-history';
+import {History,BrowserHistory,LinkHandler} from 'aurelia-history';
 import {Container} from 'aurelia-dependency-injection';
 import {AppRouter} from '../src/app-router';
 import {RouteLoader} from '../src/route-loading';
 import {Pipeline} from '../src/pipeline';
+import {PipelineProvider} from '../src/pipeline-provider';
+// import 'aurelia-polyfills';
 
 class MockHistory extends History {
   history;
@@ -17,6 +19,17 @@ class MockHistory extends History {
   }
   getState(key) {
     return this.history.getState(key);
+  }
+  getHistoryIndex() {
+    let historyIndex = this.getState('HistoryIndex');
+    if (historyIndex === undefined) {
+      historyIndex = this.history.length - 1;
+      this.setState('HistoryIndex', historyIndex);
+    }
+    return historyIndex;
+  };
+  go(movement) {
+    return this.history.go(movement);
   }
 }
 
@@ -53,7 +66,9 @@ class MockBrowserHistory {
 class MockLoader extends RouteLoader {
   loadRoute(router, config) {
     return Promise.resolve({
-      viewModel: {}
+      viewModel: {
+       canDeactivate: () => { console.log('canDeactivate'); return false; }
+      }
     });
   }
 }
@@ -244,7 +259,7 @@ describe('app-router', () => {
   describe('loadUrl', () => {
     it('restores previous location when route not found', (done) => {
       spyOn(history, 'navigate');
-      spyOn(history.history, 'go');
+      spyOn(history, 'go');
 
       router.history.previousLocation = router.history.history.location('prev');
 
@@ -254,7 +269,7 @@ describe('app-router', () => {
           expect(result).toBeFalsy();
           // Navigation is now restored through the browser history
           // expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
-          expect(history.history.go).toHaveBeenCalledWith(-1);
+          expect(history.go).toHaveBeenCalledWith(-1);
         })
         .catch(result => expect(true).toBeFalsy('should have succeeded'))
         .then(done);
@@ -276,7 +291,7 @@ describe('app-router', () => {
 
     it('restores previous location on error', (done) => {
       spyOn(history, 'navigate');
-      spyOn(history.history, 'go');
+      spyOn(history, 'go');
 
       router.history.previousLocation = router.history.history.location('prev');
 
@@ -293,11 +308,51 @@ describe('app-router', () => {
           expect(result).toBeFalsy();
           // Navigation is now restored through the browser history
           // expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
-          expect(router.history.history.go).toHaveBeenCalledWith(-1);
+          expect(router.history.go).toHaveBeenCalledWith(-1);
         })
         .catch(result => expect(true).toBeFalsy('should have succeeded'))
         .then(done);
     });
+
+    // NOT WORKING
+    it('restores previous location after history navigation', (done) => {
+      spyOn(history, 'navigate');
+      spyOn(history, 'go');
+
+      const provider = new PipelineProvider(container);
+      const router = new AppRouter(container, history, provider, ea);
+
+      router.activate();
+      router.configure(config => {
+        config.map([
+          { name: 'first', route: 'first', moduleId: './first' },
+          { name: 'second', route: 'second', moduleId: './second' },
+          { name: 'third', route: 'third', moduleId: './third' },
+        ]);
+      }).then(() => {
+        router.loadUrl(router.history.history.location('first'))
+        .then(() => router.loadUrl(router.history.history.location('second')))
+        .then(() => router.loadUrl(router.history.history.location('third')))
+        .then(result => {
+          expect(result).toBeTruthy();
+        })
+        .catch(result => expect(true).toBeFalsy('should have succeeded'))
+        .then(done);
+      });
+
+
+      // router.lastHistoryMovement = 1;
+      // router.loadUrl(router.history.history.location('next'))
+      //   .then(result => {
+      //     expect(result).toBeFalsy();
+      //     // Navigation is now restored through the browser history
+      //     // expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
+      //     expect(router.history.go).toHaveBeenCalledWith(-1);
+      //   })
+      //   .catch(result => expect(true).toBeFalsy('should have succeeded'))
+      //   .then(done);
+    });
+
   });
   describe('instruction completes as navigation command', () => {
     it('should complete instructions in order before terminating', done => {
