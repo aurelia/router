@@ -168,8 +168,8 @@ describe('NavigationPlanStep', () => {
 
   it('redirects unknown routes to statically configured routes', async (done) => {
     const url = 'nowhere';
-    const from = { name: 'first', route: 'first', moduleId: './first' };
-    const to = { name: 'second', route: 'second', moduleId: './second' };
+    const from = { route: 'first', moduleId: './first' };
+    const to = { route: 'second', moduleId: './second' };
 
     await router.configure((config) => config.map([from, to]).mapUnknownRoutes({ redirect: 'second' }));
     router.navigate('first');
@@ -183,8 +183,8 @@ describe('NavigationPlanStep', () => {
 
   it('redirects unknown routes to dynamically configured routes', async (done) => {
     const url = 'nowhere';
-    const from = { name: 'first', route: 'first', moduleId: './first' };
-    const to = { name: 'second', route: 'second', moduleId: './second' };
+    const from = { route: 'first', moduleId: './first' };
+    const to = { route: 'second', moduleId: './second' };
 
     await router.configure((config) => config.map([from, to]).mapUnknownRoutes(() => { return { redirect: 'second' }; }));
     router.navigate('first');
@@ -198,9 +198,9 @@ describe('NavigationPlanStep', () => {
 
   it('redirects unknown routes to statically configured child routes', async (done) => {
     const url = 'nowhere';
-    const base = { name: 'home', route: 'home', moduleId: './home' };
-    const from = { name: 'first', route: 'first', moduleId: './first' };
-    const to = { name: 'second', route: 'second', moduleId: './second' };
+    const base = { route: 'home', moduleId: './home' };
+    const from = { route: 'first', moduleId: './first' };
+    const to = { route: 'second', moduleId: './second' };
 
     await router.configure((config) => config.map([base]).mapUnknownRoutes({ redirect: 'home/second' }));
     child.configure(config => config.map([from, to]));
@@ -216,9 +216,9 @@ describe('NavigationPlanStep', () => {
 
   it('redirects unknown routes to dynamically configured child routes', async (done) => {
     const url = 'nowhere';
-    const base = { name: 'home', route: 'home', moduleId: './home' };
-    const from = { name: 'first', route: 'first', moduleId: './first' };
-    const to = { name: 'second', route: 'second', moduleId: './second' };
+    const base = { route: 'home', moduleId: './home' };
+    const from = { route: 'first', moduleId: './first' };
+    const to = { route: 'second', moduleId: './second' };
 
     await router.configure((config) => config.map([base]).mapUnknownRoutes(() => { return { redirect: 'home/second' }; }));
     child.configure(config => config.map([from, to]));
