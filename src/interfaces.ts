@@ -14,7 +14,8 @@ declare module 'aurelia-dependency-injection' {
   }
 }
 
-export type RouteConfigSpecifier = string | RouteConfig | ((instruction: NavigationInstruction) => string | RouteConfig | Promise<string | RouteConfig>);
+export type RouteCommand = { redirect: string } | { moduleId: string } | { viewModel: string };
+export type RouteConfigSpecifier = string | RouteCommand | ((instruction: NavigationInstruction) => string | RouteCommand | Promise<string | RouteCommand>);
 
 /**
 * A configuration object that describes a route.
