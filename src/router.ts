@@ -29,12 +29,6 @@ declare module 'aurelia-history' {
 
 /**@internal */
 declare module 'aurelia-route-recognizer' {
-  interface State {
-    types: {
-      dynamics: DynamicSegment;
-      stars: StarSegment;
-    };
-  }
 
   interface RouteHandler {
     navigationStrategy?: (instruction: NavigationInstruction) => any;
@@ -44,9 +38,17 @@ declare module 'aurelia-route-recognizer' {
     config?: RouteConfig;
     queryParams?: Record<string, any>;
   }
+
+  interface State {
+    types: {
+      statics: number;
+      stars: number;
+      dynamics: number;
+    };
+  }
 }
 
-type RouterConfigurationResolution = RouterConfiguration | ((cfg: RouterConfiguration) => void | RouterConfiguration | Promise<RouterConfiguration>);
+export type RouterConfigurationSpecifier = RouterConfiguration | ((cfg: RouterConfiguration) => RouterConfiguration | Promise<RouterConfiguration>);
 
 /**
 * The primary class responsible for handling routing and navigation.
@@ -78,7 +80,9 @@ export class Router {
   titleSeparator: string | undefined;
 
   /**
-  * True if the [[Router]] has been configured.
+  * True if the [[Router]] has been configured. Is typically used in multiple view port scenarios
+  * Where 2 viewports could trigger a router root configuration at the same time. Only the first viewport
+  * trigger is sufficient to process
   */
   isConfigured: boolean;
 
@@ -235,7 +239,7 @@ export class Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: any, name?: string): void {
+  registerViewPort(viewPort: ViewPort, name?: string): void {
     name = name || 'default';
     this.viewPorts[name] = viewPort;
   }
@@ -252,27 +256,25 @@ export class Router {
   *
   * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
   */
-  configure(callbackOrConfig: RouterConfiguration | ((config: RouterConfiguration) => RouterConfiguration)): Promise<void> {
+  async configure(callbackOrConfig: RouterConfigurationSpecifier): Promise<void> {
     this.isConfigured = true;
 
-    let result: RouterConfigurationResolution = callbackOrConfig as RouterConfiguration;
-    let config: RouterConfiguration;
+    let result: RouterConfiguration | Promise<RouterConfiguration>;
+    let config: RouterConfiguration = new RouterConfiguration();
+
     if (typeof callbackOrConfig === 'function') {
-      config = new RouterConfiguration();
       result = callbackOrConfig(config);
+    } else {
+      result = callbackOrConfig;
     }
 
-    return Promise
-      .resolve(result)
-      .then((c) => {
-        if (c && (c as RouterConfiguration).exportToRouter) {
-          config = c;
-        }
-
-        config.exportToRouter(this);
-        this.isConfigured = true;
-        this._resolveConfiguredPromise();
-      });
+    const c = await result;
+    if (c && c.exportToRouter) {
+      config = c;
+    }
+    config.exportToRouter(this);
+    this.isConfigured = true;
+    this._resolveConfiguredPromise();
   }
 
   /**
@@ -326,7 +328,10 @@ export class Router {
   /**
   * Generates a URL fragment matching the specified route pattern.
   *
-  * @param name The name of the route whose pattern should be used to generate the fragment.
+  * @param name Accepts
+  *
+  * - string: The name of the route whose pattern should be used to generate the fragment.
+  * - object: the route config object that should be used to generate the fragment
   * @param params The route params to be used to populate the route pattern.
   * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
   * @returns A string containing the generated URL fragment.
@@ -404,7 +409,7 @@ export class Router {
     if (!navModel) {
       navModel = this.createNavModel(config);
     }
-    this.addNavModel(config, navModel);
+    let state = this.addNavModel(config, navModel);
   }
 
   /**
@@ -412,7 +417,7 @@ export class Router {
    *
    * Create nav model based on route config. Invoked as part of adding new route
    */
-  addNavModel(config: RouteConfig, navModel: NavModel): void {
+  addNavModel(config: RouteConfig, navModel: NavModel): State {
     let path = config.route as string;
     if (path.charAt(0) === '/') {
       path = path.substr(1);
@@ -457,6 +462,8 @@ export class Router {
       // this is a potential error / inconsistency between browsers
       this.navigation = this.navigation.sort((a, b) => <number>a.order - <number>b.order);
     }
+
+    return state;
   }
 
   /**
@@ -582,7 +589,7 @@ export class Router {
     let result: Promise<NavigationInstruction>;
 
     if (urlRecognizationResults && urlRecognizationResults.length) {
-      let first = urlRecognizationResults[0];
+      let first = urlRecognizationResults[0]!;
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: first.params,
         queryParams: first.queryParams || urlRecognizationResults.queryParams,
@@ -607,7 +614,7 @@ export class Router {
 
       result = evaluateNavigationStrategy(instruction, this.catchAllHandler);
     } else if (this.parent) {
-      let router = this._parentCatchAllHandler(this.parent);
+      let router = this._useParentRouter(this.parent);
 
       if (router) {
         let newParentInstruction = this._findParentInstructionFromRouter(router, parentInstruction);
@@ -644,13 +651,13 @@ export class Router {
   }
 
   /**@internal */
-  _parentCatchAllHandler(router: Router): Router | false {
+  _useParentRouter(router: Router): Router | null {
     if (router.catchAllHandler) {
       return router;
     } else if (router.parent) {
-      return this._parentCatchAllHandler(router.parent);
+      return this._useParentRouter(router.parent);
     }
-    return false;
+    return null;
   }
 
   /**

@@ -66,17 +66,18 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
     } as NavigationInstructionInit);
   });
 
-  it('cancels on redirect configs', (done) => {
+  it('cancels on redirect configs', async () => {
     redirectInstruction.router.addRoute({ route: 'first', name: 'first', redirect: 'second' });
     redirectInstruction.router.addRoute({ route: 'second', name: 'second', redirect: 'second' });
-    step.run(redirectInstruction, state.next)
-      .then(e => {
-        expect(state.rejection).toBeTruthy();
-        expect(e instanceof Redirect).toBe(true);
-        expect(e.url).toBe('#/second?q=1');
-        done();
-      })
-      .catch(done.fail);
+    const e = await step.run(redirectInstruction, state.next);
+    // .then(e => {
+    expect(state.rejection).toBeTruthy();
+    console.log(e);
+    expect(e instanceof Redirect).toBe(true);
+    expect(e.url).toBe('#/second?q=1');
+    // done();
+    // })
+    // .catch(done.fail);
   });
 
   it('redirects to routes without names', (done) => {

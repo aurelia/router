@@ -91,12 +91,15 @@ export class AppRouter extends Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: any, name?: string): Promise<PipelineResult | void> {
+  registerViewPort(viewPort: ViewPort, name?: string): Promise<PipelineResult | void> {
     super.registerViewPort(viewPort, name);
 
     // NOTE: Implementation / inteface changed to better communicate what can be done from return value
     // of this method. Old code still left around for better comparison before removing
+    // -------------------------
 
+    // When the router is already active, and a viewport is registered with it is a rare case
+    // probably happen when during start of an aurelia application, developer activates it
     if (this.isActive) {
       return this._dequeueInstruction();
     }
@@ -104,47 +107,23 @@ export class AppRouter extends Router {
     if (!viewModel) {
       return Promise.resolve();
     }
-    if ('configureRouter' in viewModel) {
-      // `isConfigured` is used to guard against multiple viewports (aka <router-view/>) in the same app root
-      // to trigger application AppRouter all at once
-      if (!this.isConfigured) {
-        const resolveConfiguredPromise = this._resolveConfiguredPromise;
-        // tslint:disable-next-line
-        this._resolveConfiguredPromise = () => { };
-        return this
-          .configure(config => {
-            viewModel.configureRouter(config, this);
-            return config;
-          })
-          .then(() => this.activate())
-          .then(() => resolveConfiguredPromise());
-      }
+    if (!('configureRouter' in viewModel)) {
+      return this.activate();
+    }
+    // `isConfigured` is used to guard against multiple viewports (aka <router-view/>) in the same app root
+    // to trigger application AppRouter all at once
+    if (this.isConfigured) {
       return Promise.resolve();
     }
-    return this.activate();
-
-    // if (!this.isActive) {
-    //   const viewModel = this._findViewModel(viewPort);
-    //   if ('configureRouter' in viewModel) {
-    //     if (!this.isConfigured) {
-    //       const resolveConfiguredPromise = this._resolveConfiguredPromise;
-    //       // tslint:disable-next-line
-    //       this._resolveConfiguredPromise = () => { };
-    //       await this.configure(config => {
-    //         viewModel.configureRouter(config, this);
-    //         return config;
-    //       });
-    //       this.activate();
-    //       resolveConfiguredPromise();
-    //     }
-    //   } else {
-    //     this.activate();
-    //   }
-    // } else {
-    //   this._dequeueInstruction();
-    // }
-
-    // return Promise.resolve();
+    const resolveConfiguredPromise = this._resolveConfiguredPromise;
+    this._resolveConfiguredPromise = noop;
+    return this
+      .configure(async (config) => {
+        await viewModel.configureRouter(config, this);
+        return config;
+      })
+      .then(() => this.activate())
+      .then(() => resolveConfiguredPromise());
   }
 
   /**

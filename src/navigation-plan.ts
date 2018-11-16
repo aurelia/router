@@ -27,7 +27,7 @@ export class BuildNavigationPlanStep {
   }
 }
 
-export async function _buildNavigationPlan(
+export function _buildNavigationPlan(
   instruction: NavigationInstruction,
   forceLifecycleMinimum?: boolean
 ): Promise<Record<string, ViewPortPlan> | Redirect> {
@@ -38,7 +38,7 @@ export async function _buildNavigationPlan(
   }
 
   if (instruction.previousInstruction) {
-    return _buildTransitionPlan(instruction, forceLifecycleMinimum);
+    return _buildTransitionPlans(instruction, forceLifecycleMinimum);
   }
 
   // First navigation
@@ -57,7 +57,7 @@ export async function _buildNavigationPlan(
     };
   }
 
-  return viewPortPlans;
+  return Promise.resolve(viewPortPlans);
 }
 
 /**@internal exported for unit testing */
@@ -100,7 +100,7 @@ export async function _buildRedirect(instruction: NavigationInstruction): Promis
  *
  * Build a record of viewport plans to describe instruction when navigating to a new route
  */
-export async function _buildTransitionPlan(
+export async function _buildTransitionPlans(
   instruction: NavigationInstruction,
   forceLifecycleMinimum?: boolean
 ): Promise<Record<string, ViewPortPlan>> {
