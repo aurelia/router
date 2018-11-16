@@ -166,6 +166,72 @@ describe('NavigationPlanStep', () => {
     });
   });
 
+  it('redirects unknown routes to statically configured routes', async (done) => {
+    const url = 'nowhere';
+    const from = { name: 'first', route: 'first', moduleId: './first' };
+    const to = { name: 'second', route: 'second', moduleId: './second' };
+
+    await router.configure((config) => config.map([from, to]).mapUnknownRoutes({ redirect: 'second' }));
+    router.navigate('first');
+    const instruction = await router._createNavigationInstruction(url);
+    const result = await step.run(instruction, state.next);
+    expect(state.rejection).toBeTruthy();
+    expect(result instanceof Redirect).toBe(true);
+    expect(result.url).toBe(`#/second`);
+    done();
+  });
+
+  it('redirects unknown routes to dynamically configured routes', async (done) => {
+    const url = 'nowhere';
+    const from = { name: 'first', route: 'first', moduleId: './first' };
+    const to = { name: 'second', route: 'second', moduleId: './second' };
+
+    await router.configure((config) => config.map([from, to]).mapUnknownRoutes(() => { return { redirect: 'second' }; }));
+    router.navigate('first');
+    const instruction = await router._createNavigationInstruction(url);
+    const result = await step.run(instruction, state.next);
+    expect(state.rejection).toBeTruthy();
+    expect(result instanceof Redirect).toBe(true);
+    expect(result.url).toBe(`#/second`);
+    done();
+  });
+
+  it('redirects unknown routes to statically configured child routes', async (done) => {
+    const url = 'nowhere';
+    const base = { name: 'home', route: 'home', moduleId: './home' };
+    const from = { name: 'first', route: 'first', moduleId: './first' };
+    const to = { name: 'second', route: 'second', moduleId: './second' };
+
+    await router.configure((config) => config.map([base]).mapUnknownRoutes({ redirect: 'home/second' }));
+    child.configure(config => config.map([from, to]));
+    router.navigate('first');
+    const parentInstruction = await router._createNavigationInstruction(url);
+    const childInstruction = await child._createNavigationInstruction(parentInstruction.getWildcardPath(), parentInstruction);
+    const result = await step.run(childInstruction, state.next);
+    expect(state.rejection).toBeTruthy();
+    expect(result instanceof Redirect).toBe(true);
+    expect(result.url).toBe(`#/home/second`);
+    done();
+  });
+
+  it('redirects unknown routes to dynamically configured child routes', async (done) => {
+    const url = 'nowhere';
+    const base = { name: 'home', route: 'home', moduleId: './home' };
+    const from = { name: 'first', route: 'first', moduleId: './first' };
+    const to = { name: 'second', route: 'second', moduleId: './second' };
+
+    await router.configure((config) => config.map([base]).mapUnknownRoutes(() => { return { redirect: 'home/second' }; }));
+    child.configure(config => config.map([from, to]));
+    router.navigate('first');
+    const parentInstruction = await router._createNavigationInstruction(url);
+    const childInstruction = await child._createNavigationInstruction(parentInstruction.getWildcardPath(), parentInstruction);
+    const result = await step.run(childInstruction, state.next);
+    expect(state.rejection).toBeTruthy();
+    expect(result instanceof Redirect).toBe(true);
+    expect(result.url).toBe(`#/home/second`);
+    done();
+  });
+
   it('redirects children', (done) => {
     const url = 'home/first';
     const base = { name: 'home', route: 'home', moduleId: './home' };
