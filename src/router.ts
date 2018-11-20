@@ -332,6 +332,9 @@ export class Router {
   * @returns {string} A string containing the generated URL fragment.
   */
   generate(nameOrRoute: string | RouteConfig, params: any = {}, options: any = {}): string {
+    // A child recognizer generates routes for potential child routes. Any potential child route is added
+    // to the childRoute property of params for the childRouter to recognize. When generating routes, we
+    // use the childRecognizer when childRoute params are available to generate a child router enabled route.
     let recognizer = 'childRoute' in params ? this._childRecognizer : this._recognizer;
     let hasRoute = recognizer.hasRoute(nameOrRoute);
     if (!hasRoute) {
