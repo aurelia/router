@@ -331,17 +331,19 @@ export class Router {
   * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
   * @returns {string} A string containing the generated URL fragment.
   */
-  generate(name: string, params?: any, options: any = {}): string {
-    let hasRoute = this._recognizer.hasRoute(name);
-    if ((!this.isConfigured || !hasRoute) && this.parent) {
-      return this.parent.generate(name, params, options);
-    }
-
+  generate(nameOrRoute: string | RouteConfig, params: any = {}, options: any = {}): string {
+    // A child recognizer generates routes for potential child routes. Any potential child route is added
+    // to the childRoute property of params for the childRouter to recognize. When generating routes, we
+    // use the childRecognizer when childRoute params are available to generate a child router enabled route.
+    let recognizer = 'childRoute' in params ? this._childRecognizer : this._recognizer;
+    let hasRoute = recognizer.hasRoute(nameOrRoute);
     if (!hasRoute) {
-      throw new Error(`A route with name '${name}' could not be found. Check that \`name: '${name}'\` was specified in the route's config.`);
+      if (this.parent) {
+        return this.parent.generate(nameOrRoute, params, options);
+      }
+      throw new Error(`A route with name '${nameOrRoute}' could not be found. Check that \`name: '${nameOrRoute}'\` was specified in the route's config.`);
     }
-
-    let path = this._recognizer.generate(name, params);
+    let path = recognizer.generate(nameOrRoute, params);
     let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
     return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
   }
