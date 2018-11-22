@@ -43,8 +43,8 @@ export function _buildNavigationPlan(
 
   // First navigation
   // Only needs to process current instruction without considering transition from previous instruction
-  const viewPortPlans: Record<string, ViewPortPlan> = {};
-  const defaultViewPorts = instruction.router.viewPortDefaults;
+  let viewPortPlans: Record<string, ViewPortPlan> = {};
+  let defaultViewPorts = instruction.router.viewPortDefaults;
   for (let viewPortName in config.viewPorts) {
     let viewPortConfig = config.viewPorts[viewPortName];
     if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
@@ -62,12 +62,10 @@ export function _buildNavigationPlan(
 
 /**@internal exported for unit testing */
 export async function _buildRedirect(instruction: NavigationInstruction): Promise<Redirect> {
-  let redirectLocation: string;
-  const config = instruction.config;
-  // if ('name' in config) {
-  const router = instruction.router;
-  const newInstruction = await router._createNavigationInstruction(config.redirect);
-  const params: Record<string, any> = {};
+  let config = instruction.config;
+  let router = instruction.router;
+  let newInstruction = await router._createNavigationInstruction(config.redirect);
+  let params: Record<string, any> = {};
   for (let key in newInstruction.params) {
     // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
     let val = newInstruction.params[key];
@@ -81,14 +79,14 @@ export async function _buildRedirect(instruction: NavigationInstruction): Promis
       params[key] = newInstruction.params[key];
     }
   }
-  redirectLocation = router.generate(newInstruction.config.name, params, instruction.options);
+
+  let redirectLocation = router.generate(newInstruction.config, params, instruction.options);
+
   // Special handling for child routes
   for (let key in instruction.params) {
-    redirectLocation = redirectLocation.replace(`:${key}`, instruction.params[key]);
+    redirectLocation = redirectLocation.replace(new RegExp(`:${key}`, 'g'), instruction.params[key]);
   }
-  // } else {
-  // redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
-  // }
+
   if (instruction.queryString) {
     redirectLocation += '?' + instruction.queryString;
   }

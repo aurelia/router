@@ -10,6 +10,7 @@ export {
   RoutableComponentDetermineActivationStrategy,
   ConfiguresRouter,
   RouteConfig,
+  RouteCommand,
   NavigationResult,
   Next,
   PipelineResult,

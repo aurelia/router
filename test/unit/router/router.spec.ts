@@ -7,7 +7,8 @@ import {
   RouteConfig,
   PipelineProvider,
   AppRouter,
-  NavigationInstruction
+  NavigationInstruction,
+  RouteCommand
 } from '../../../src';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
@@ -371,7 +372,7 @@ describe('Router', function Router__Tests() {
       it('should use route config handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = { moduleId: 'test' } as RouteConfig;
+            config.unknownRouteConfig = { moduleId: 'test' } as RouteCommand;
             return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
@@ -383,7 +384,7 @@ describe('Router', function Router__Tests() {
       it('should use function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => ({ moduleId: 'test' } as RouteConfig);
+            config.unknownRouteConfig = instruction => ({ moduleId: 'test' } as RouteCommand);
             return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
@@ -395,7 +396,7 @@ describe('Router', function Router__Tests() {
       it('should use async function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' } as RouteConfig);
+            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' } as RouteCommand);
             return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
@@ -412,7 +413,7 @@ describe('Router', function Router__Tests() {
               expect(instruction.queryString).toBe('bar=456');
               expect(instruction.config).toBe(null);
 
-              return { moduleId: 'test' } as RouteConfig;
+              return { moduleId: 'test' } as RouteCommand;
             };
             return config;
           })

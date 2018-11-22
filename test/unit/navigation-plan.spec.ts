@@ -356,6 +356,27 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
     });
   });
 
+  it('redirects from parents to grandchildren with dynamic params that is used more than once', async () => {
+    const url = 'shortcut/1/2';
+    const one = { name: 'first', route: ['home', 'one'], moduleId: './one' };
+    const two = { name: 'second/:id', route: 'two', moduleId: './two' };
+    const three = { name: 'third/:id', route: 'three', moduleId: './three' };
+    const to = { name: 'shortcut', route: 'shortcut/:second/:third', redirect: 'one/two/:second/three/:third/:second' };
+
+    router.addRoute(one);
+    router.addRoute(to);
+    child.addRoute(two);
+    grandchild.addRoute(three);
+    router.navigate('one');
+    const instruction = await router._createNavigationInstruction(url);
+    const e = await step.run(instruction, state.next);
+
+    expect(state.rejection).toBeTruthy();
+    expect(e instanceof Redirect).toBe(true);
+    expect(e.url).toBe('#/one/two/1/three/2/1');
+  });
+
+
   it('redirects children with static parameters', (done) => {
     const url = 'home/first/0';
     const base = { name: 'home', route: 'home', moduleId: './home' };

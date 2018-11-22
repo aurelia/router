@@ -1,4 +1,4 @@
-import { RouteConfig, PipelineStep, RouteConfigSpecifier, ViewPortInstruction, UnknownRouteConfigSpecifier } from './interfaces';
+import { RouteConfig, PipelineStep, RouteConfigSpecifier, ViewPortInstruction, UnknownRouteConfigSpecifier, RouteCommand } from './interfaces';
 import { _ensureArrayWithSingleRoutePerConfig } from './util';
 import { Router } from './router';
 import { NavigationInstruction } from './navigation-instruction';
@@ -21,7 +21,7 @@ export class RouterConfiguration {
   pipelineSteps: { name: string, step: Function | PipelineStep }[] = [];
   title: string;
   titleSeparator: string;
-  unknownRouteConfig: RouteConfigSpecifier;
+  unknownRouteConfig: RouteConfigSpecifier<RouteCommand>;
   viewPortDefaults: Record<string, Partial<ViewPortInstruction>>;
 
   /**@internal */
@@ -177,7 +177,7 @@ export class RouterConfiguration {
     }
 
     if (this.unknownRouteConfig) {
-      router.handleUnknownRoutes(this.unknownRouteConfig);
+      router.handleUnknownRoutes(this.unknownRouteConfig as RouteConfigSpecifier<RouteConfig>);
     }
 
     if (this._fallbackRoute) {

@@ -10,7 +10,7 @@ import {
   _createRootedPath,
   _resolveUrl
 } from './util';
-import { RouteConfig, NavigationResult, RouteConfigSpecifier, ViewPort, ViewPortInstruction } from './interfaces';
+import { RouteConfig, NavigationResult, RouteConfigSpecifier, ViewPort, ViewPortInstruction, RouteCommand } from './interfaces';
 import { PipelineProvider } from './pipeline-provider';
 
 /**@internal */
@@ -341,14 +341,14 @@ export class Router {
     // to the childRoute property of params for the childRouter to recognize. When generating routes, we
     // use the childRecognizer when childRoute params are available to generate a child router enabled route.
     let recognizer = 'childRoute' in params ? this._childRecognizer : this._recognizer;
-    let hasRoute = recognizer.hasRoute(nameOrRoute);
+    let hasRoute = recognizer.hasRoute(nameOrRoute as RouteHandler);
     if (!hasRoute) {
       if (this.parent) {
         return this.parent.generate(nameOrRoute, params, options);
       }
       throw new Error(`A route with name '${nameOrRoute}' could not be found. Check that \`name: '${nameOrRoute}'\` was specified in the route's config.`);
     }
-    let path = recognizer.generate(nameOrRoute, params);
+    let path = recognizer.generate(nameOrRoute as RouteHandler, params);
     let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
     return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
   }
@@ -489,13 +489,13 @@ export class Router {
   *
   * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
   */
-  handleUnknownRoutes(config?: string | Function | RouteConfig): void {
+  handleUnknownRoutes(config?: RouteConfigSpecifier<RouteConfig>): void {
     if (!config) {
       throw new Error('Invalid unknown route handler');
     }
 
     this.catchAllHandler = instruction => this
-      ._createRouteConfig(config as RouteConfigSpecifier, instruction)
+      ._createRouteConfig(config, instruction)
       .then(c => {
         instruction.config = c;
         return instruction;
@@ -666,7 +666,7 @@ export class Router {
    * Used to create route config from unknown route handler
    */
   async _createRouteConfig(
-    config: RouteConfigSpecifier,
+    config: RouteConfigSpecifier<RouteConfig>,
     instruction: NavigationInstruction
   ): Promise<RouteConfig> {
 
