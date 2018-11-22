@@ -13,7 +13,7 @@ declare module 'aurelia-dependency-injection' {
   }
 }
 
-export type RouteCommand = { redirect: string } | { moduleId: string } | { viewModel: string };
+export type RouteCommand = { redirect: string } | { moduleId: string } | { viewModel: ViewModelSpecifier };
 // tslint:disable-next-line:max-line-length
 export type RouteConfigSpecifier<T extends RouteCommand | RouteConfig> = string | T | ((instruction: NavigationInstruction) => string | T | Promise<string | T>);
 export type Constructable<T = any> = { new(...args: any[]): T };

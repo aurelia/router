@@ -70,31 +70,24 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
     redirectInstruction.router.addRoute({ route: 'first', name: 'first', redirect: 'second' });
     redirectInstruction.router.addRoute({ route: 'second', name: 'second', redirect: 'second' });
     const e = await step.run(redirectInstruction, state.next);
-    // .then(e => {
     expect(state.rejection).toBeTruthy();
-    console.log(e);
     expect(e instanceof Redirect).toBe(true);
     expect(e.url).toBe('#/second?q=1');
-    // done();
-    // })
-    // .catch(done.fail);
   });
 
-  it('redirects to routes without names', (done) => {
+  it('redirects to routes without names', async () => {
     const url = 'first/10?q=1';
     const from = { route: 'first', redirect: 'second' };
     const to = { route: 'second', moduleId: './second' };
     router.addRoute(from);
     router.addRoute(to);
-    router._createNavigationInstruction(url).then((instruction) => {
-      step.run(instruction, state.next)
-        .then(e => {
-          expect(state.rejection).toBeTruthy();
-          expect(e instanceof Redirect).toBe(true);
-          expect(e.url).toBe(`#/second?q=1`);
-          done();
-        });
-    });
+
+    const instruction = await router._createNavigationInstruction(url);
+    const e = await step.run(instruction, state.next);
+
+    expect(state.rejection).toBeTruthy();
+    expect(e instanceof Redirect).toBe(true);
+    expect(e.url).toBe(`#/second?q=1`);
   });
 
   it('redirects to routes with static parameters', (done) => {
@@ -173,7 +166,7 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
     });
   });
 
-  it('redirects unknown routes to statically configured routes', async (done) => {
+  it('redirects unknown routes to statically configured routes', async () => {
     const url = 'nowhere';
     const from = { route: 'first', moduleId: './first' };
     const to = { route: 'second', moduleId: './second' };
@@ -185,7 +178,6 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
     expect(state.rejection).toBeTruthy();
     expect(result instanceof Redirect).toBe(true);
     expect(result.url).toBe(`#/second`);
-    done();
   });
 
   it('redirects unknown routes to dynamically configured routes', async (done) => {
@@ -193,7 +185,11 @@ describe('NavigationPlanStep', function NavigationPlanStep_Tests() {
     const from = { route: 'first', moduleId: './first' };
     const to = { route: 'second', moduleId: './second' };
 
-    await router.configure((config) => config.map([from, to]).mapUnknownRoutes(() => { return { redirect: 'second' }; }));
+    await router.configure((config) => {
+      return config
+        .map([from, to])
+        .mapUnknownRoutes(() => { return { redirect: 'second' }; });
+    });
     router.navigate('first');
     const instruction = await router._createNavigationInstruction(url);
     const result = await step.run(instruction, state.next);
