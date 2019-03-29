@@ -50,9 +50,9 @@ function build() {
   console.log('\n==============\nBuidling...\n==============');
   return Promise.all([
     {
-      input: 'src/index.ts',
+      input: `src/${LIB_NAME}.ts`,
       output: [
-        { file: 'dist/es2015/index.js', format: 'es' }
+        { file: `dist/es2015/${LIB_NAME}.js`, format: 'es' }
       ],
       external: externalLibs,
       plugins: [
@@ -67,11 +67,11 @@ function build() {
       ]
     },
     {
-      input: 'src/index.ts',
+      input: `src/${LIB_NAME}.ts`,
       output: [
-        { file: 'dist/commonjs/index.js', format: 'cjs' },
-        { file: 'dist/amd/index.js', format: 'amd', amd: { id: LIB_NAME } },
-        { file: 'dist/native-modules/index.js', format: 'es' }
+        { file: `dist/commonjs/${LIB_NAME}.js`, format: 'cjs' },
+        { file: `dist/amd/${LIB_NAME}.js`, format: 'amd', amd: { id: LIB_NAME } },
+        { file: `dist/native-modules/${LIB_NAME}.js`, format: 'es' }
       ],
       external: externalLibs,
       plugins: [

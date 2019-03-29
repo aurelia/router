@@ -5,6 +5,7 @@ import { NavModel } from './nav-model';
 import { RouterConfiguration } from './router-configuration';
 import { NavigationCommand } from './navigation-commands';
 import { IObservable } from './activation';
+import { PipelineStatus } from './pipeline-status';
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {
@@ -233,6 +234,14 @@ export interface PipelineStep {
 }
 
 /**
+ * A multi-step pipeline step that helps enable multiple hooks to the pipeline
+ */
+export interface IPipelineSlot {
+  /**@internal */
+  getSteps(): (StepRunnerFunction | IPipelineSlot | PipelineStep)[];
+}
+
+/**
 * The result of a pipeline run.
 */
 export interface PipelineResult {
@@ -301,7 +310,7 @@ export type LifecycleArguments = [Record<string, string>, RouteConfig, Navigatio
 * A callback to indicate when pipeline processing should advance to the next step
 * or be aborted.
 */
-export interface Next {
+export interface Next<T = any> {
   /**
   * Indicates the successful completion of the pipeline step.
   */
@@ -309,17 +318,31 @@ export interface Next {
   /**
   * Indicates the successful completion of the entire pipeline.
   */
-  complete: (result?: any) => Promise<any>;
+  complete: NextCompletionHandler<T>;
 
   /**
   * Indicates that the pipeline should cancel processing.
   */
-  cancel: (result?: any) => Promise<any>;
+  cancel: NextCompletionHandler<T>;
 
   /**
   * Indicates that pipeline processing has failed and should be stopped.
   */
-  reject: (result?: any) => Promise<any>;
+  reject: NextCompletionHandler<T>;
 }
+
+/**
+ * Next Completion result. Comprises of final status, output (could be value/error) and flag `completed`
+ */
+export interface NextCompletionResult<T = any> {
+  status: PipelineStatus;
+  output: T;
+  completed: boolean;
+}
+
+/**
+ * Handler for resolving `NextCompletionResult`
+ */
+export type NextCompletionHandler<T = any> = (output?: T) => Promise<NextCompletionResult<T>>;
 
 export type StepRunnerFunction = <TThis = any>(this: TThis, instruction: NavigationInstruction, next: Next) => any;

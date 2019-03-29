@@ -4,49 +4,73 @@ import { NavigationInstruction } from './navigation-instruction';
 import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
 import { Router } from './router';
 
+/**
+ * Loading plan calculated based on a navigration-instruction and a viewport plan
+ */
+interface ILoadingPlan {
+  viewPortPlan: ViewPortPlan;
+  navigationInstruction: NavigationInstruction;
+}
+
+/**
+ * Abstract class that is responsible for loading view / view model from a route config
+ * The default implementation can be found in `aurelia-templating-router`
+ */
 export class RouteLoader {
+  /**
+   * Load a route config based on its viewmodel / view configuration
+   */
   loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<ViewPortComponent> {
-    throw Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
+    throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }
 }
 
+/**
+ * A pipeline step responsible for loading a route config of a navigation instruction
+ */
 export class LoadRouteStep {
   /**@internal */
   static inject() { return [RouteLoader]; }
-  /**@internal */
+  /**
+   * Route loader isntance that will handle loading route config
+   * @internal
+   */
   routeLoader: RouteLoader;
 
   constructor(routeLoader: RouteLoader) {
     this.routeLoader = routeLoader;
   }
 
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return loadNewRoute(this.routeLoader, navigationInstruction)
-      .then(next)
-      .catch(next.cancel);
+      .then(next, next.cancel);
   }
 }
 
-function loadNewRoute(routeLoader: RouteLoader, navigationInstruction: NavigationInstruction): Promise<any[] | void> {
+/**
+ * @internal Exported for unit testing
+ */
+export const loadNewRoute = (
+  routeLoader: RouteLoader,
+  navigationInstruction: NavigationInstruction
+): Promise<any[] | void> => {
   let toLoad = determineWhatToLoad(navigationInstruction);
-  let loadPromises = toLoad.map((current) => loadRoute(
+  let loadPromises = toLoad.map((loadingPlan: ILoadingPlan) => loadRoute(
     routeLoader,
-    current.navigationInstruction,
-    current.viewPortPlan
+    loadingPlan.navigationInstruction,
+    loadingPlan.viewPortPlan
   ));
 
   return Promise.all(loadPromises);
-}
+};
 
-interface ILoadingPlan {
-  viewPortPlan: ViewPortPlan;
-  navigationInstruction: NavigationInstruction;
-}
-
-function determineWhatToLoad(
+/**
+ * @internal Exported for unit testing
+ */
+export const determineWhatToLoad = (
   navigationInstruction: NavigationInstruction,
   toLoad: ILoadingPlan[] = []
-): ILoadingPlan[] {
+): ILoadingPlan[] => {
   let plan = navigationInstruction.plan;
 
   for (let viewPortName in plan) {
@@ -73,13 +97,16 @@ function determineWhatToLoad(
   }
 
   return toLoad;
-}
+};
 
-function loadRoute(
+/**
+ * @internal Exported for unit testing
+ */
+export const loadRoute = (
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   viewPortPlan: ViewPortPlan
-) {
+): Promise<any> => {
   let moduleId = viewPortPlan.config ? viewPortPlan.config.moduleId : null;
 
   return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config)
@@ -94,7 +121,8 @@ function loadRoute(
       if (childRouter) {
         let path = navigationInstruction.getWildcardPath();
 
-        return childRouter._createNavigationInstruction(path, navigationInstruction)
+        return childRouter
+          ._createNavigationInstruction(path, navigationInstruction)
           .then((childInstruction) => {
             viewPortPlan.childNavigationInstruction = childInstruction;
 
@@ -110,21 +138,24 @@ function loadRoute(
               });
           });
       }
-
-      return undefined;
+      // ts complains without this, though they are same
+      return void 0;
     });
-}
+};
 
-function loadComponent(
+/**
+ * Load a routed-component based on navigation instruction and route config
+ */
+export const loadComponent = (
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction,
   config: RouteConfig
-): Promise<ViewPortComponent> {
+): Promise<ViewPortComponent> => {
   let router = navigationInstruction.router;
   let lifecycleArgs = navigationInstruction.lifecycleArgs;
 
-  return routeLoader
-    .loadRoute(router, config, navigationInstruction)
+  return Promise.resolve()
+    .then(() => routeLoader.loadRoute(router, config, navigationInstruction))
     .then((component) => {
       let { viewModel, childContainer } = component;
       component.router = router;
@@ -135,10 +166,10 @@ function loadComponent(
         component.childRouter = childRouter;
 
         return childRouter
-          .configure(c => viewModel.configureRouter(c, childRouter, ...lifecycleArgs))
+          .configure(c => viewModel.configureRouter(c, childRouter, lifecycleArgs[0], lifecycleArgs[1], lifecycleArgs[2]))
           .then(() => component);
       }
 
       return component;
     });
-}
+};

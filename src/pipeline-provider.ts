@@ -9,7 +9,7 @@ import {
   DeactivatePreviousStep,
   ActivateNextStep
 } from './activation';
-import { PipelineStep } from './interfaces';
+import { PipelineStep, StepRunnerFunction, IPipelineSlot } from './interfaces';
 
 
 class PipelineSlot {
@@ -29,7 +29,7 @@ class PipelineSlot {
     this.slotAlias = alias;
   }
 
-  getSteps(): PipelineStep[] {
+  getSteps(): (StepRunnerFunction | IPipelineSlot | PipelineStep)[] {
     return this.steps.map(x => this.container.get(x));
   }
 }

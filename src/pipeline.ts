@@ -1,4 +1,4 @@
-import { PipelineStep, PipelineResult, Next, StepRunnerFunction } from './interfaces';
+import { PipelineStep, PipelineResult, Next, StepRunnerFunction, IPipelineSlot } from './interfaces';
 import { NavigationInstruction } from './navigation-instruction';
 import { createNextFn } from './next';
 
@@ -17,12 +17,14 @@ export class Pipeline {
   *
   * @param step The pipeline step.
   */
-  addStep(step: PipelineStep): Pipeline {
+  addStep(step: StepRunnerFunction | PipelineStep | IPipelineSlot): Pipeline {
     let run;
 
     if (typeof step === 'function') {
       run = step;
     } else if (typeof step.getSteps === 'function') {
+      // getSteps is to enable support open slots
+      // where devs can add multiple steps into the same slot name
       let steps = step.getSteps();
       for (let i = 0, l = steps.length; i < l; i++) {
         this.addStep(steps[i]);
@@ -30,7 +32,7 @@ export class Pipeline {
 
       return this;
     } else {
-      run = step.run.bind(step);
+      run = (step as PipelineStep).run.bind(step);
     }
 
     this.steps.push(run);

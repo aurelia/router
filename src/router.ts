@@ -382,7 +382,7 @@ export class Router {
       return;
     }
 
-    validateRouteConfig(config, this.routes);
+    validateRouteConfig(config);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
       config.viewPorts = {
@@ -655,7 +655,7 @@ export class Router {
       .then((c: string | RouteConfig) => typeof c === 'string' ? { moduleId: c } as RouteConfig : c)
       .then((c: RouteConfig) => {
         c.route = instruction.params.path;
-        validateRouteConfig(c, this.routes);
+        validateRouteConfig(c);
 
         if (!c.navModel) {
           c.navModel = this.createNavModel(c);
@@ -666,11 +666,13 @@ export class Router {
   }
 }
 
-function generateBaseUrl(router: Router, instruction: NavigationInstruction) {
+/* @internal exported for unit testing */
+export const generateBaseUrl = (router: Router, instruction: NavigationInstruction): string => {
   return `${router.baseUrl || ''}${instruction.getBaseUrl() || ''}`;
-}
+};
 
-function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
+/* @internal exported for unit testing */
+export const validateRouteConfig = (config: RouteConfig): void => {
   if (typeof config !== 'object') {
     throw new Error('Invalid Route Config');
   }
@@ -683,13 +685,14 @@ function validateRouteConfig(config: RouteConfig, routes: Array<Object>): void {
   if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
     throw new Error('Invalid Route Config for "' + config.route + '": You must specify a "moduleId:", "redirect:", "navigationStrategy:", or "viewPorts:".');
   }
-}
+};
 
-function evaluateNavigationStrategy(
+/* @internal exported for unit testing */
+export const evaluateNavigationStrategy = (
   instruction: NavigationInstruction,
   evaluator: Function,
   context?: any
-): Promise<NavigationInstruction> {
+): Promise<NavigationInstruction> => {
   return Promise.resolve(evaluator.call(context, instruction)).then(() => {
     if (!('viewPorts' in instruction.config)) {
       instruction.config.viewPorts = {
@@ -701,7 +704,7 @@ function evaluateNavigationStrategy(
 
     return instruction;
   });
-}
+};
 
 interface IRouteRecognizationResults extends Array<RecognizedRoute> {
   queryParams: Record<string, any>;
