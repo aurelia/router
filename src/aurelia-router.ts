@@ -8,6 +8,7 @@ export {
   ConfiguresRouter,
   RouteConfig,
   NavigationResult,
+  Next,
   PipelineResult,
   PipelineStep,
   ViewPort,
@@ -32,8 +33,17 @@ export {
   NavigationInstruction,
   NavigationInstructionInit
 } from './navigation-instruction';
+
+// export {
+//   PipelineStatus
+// } from './pipeline-status';
+
+export {
+  RouterEvent
+} from './router-events';
+
 export { PipelineProvider } from './pipeline-provider';
-export { Pipeline, Next, pipelineStatus } from './pipeline';
+export { Pipeline } from './pipeline';
 export { RouteLoader, LoadRouteStep } from './route-loading';
 export { RouterConfiguration } from './router-configuration';
 export { Router } from './router';

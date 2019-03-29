@@ -1,4 +1,4 @@
-import { Router, Next, NavigationInstruction } from '../src';
+import { Router, Next, NavigationInstruction } from '../src/aurelia-router';
 import { NavigationOptions, History } from 'aurelia-history';
 
 export type ValueOf<T> = T[keyof T];

@@ -1,9 +1,8 @@
-import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
-import { NavigationInstruction } from './navigation-instruction';
-import { ViewPortInstruction, RouteConfig, ViewPortComponent, ViewPortPlan } from './interfaces';
+import { Next, RouteConfig, ViewPortComponent, ViewPortPlan } from './interfaces';
 import { Redirect } from './navigation-commands';
+import { NavigationInstruction } from './navigation-instruction';
+import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
 import { Router } from './router';
-import { Next } from './pipeline';
 
 export class RouteLoader {
   loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<ViewPortComponent> {

@@ -10,7 +10,7 @@ import {
   ActivateNextStep,
   NavigationInstructionInit,
   ViewPortPlan
-} from '../src';
+} from '../src/aurelia-router';
 import { ValueOf, createPipelineState, MockPipelineState, MockInstruction } from './shared';
 
 describe('activation', () => {

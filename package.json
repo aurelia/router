@@ -14,7 +14,7 @@
   "author": "Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)",
   "main": "dist/commonjs/aurelia-router.js",
   "module": "dist/es2015/aurelia-router.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/aurelia-router.d.ts",
   "repository": {
     "type": "git",
     "url": "http://github.com/aurelia/router"
@@ -23,8 +23,10 @@
     "start": "npm run dev -- --format es2015",
     "dev": "node build/scripts/dev",
     "build": "node build/scripts/build",
-    "bundle-dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
-    "test": "karma start",
+    "build:dts": "dts-bundle-generator -o dist/aurelia-router.d.ts src/aurelia-router.ts",
+    "test": "karma start --single-run",
+    "test:watch": "karma start",
+    "test:debugger": "karma ",
     "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --force"
   },
   "jspm": {
@@ -58,7 +60,7 @@
     "aurelia-history": "^1.1.0",
     "aurelia-logging": "^1.0.0",
     "aurelia-path": "^1.0.0",
-    "aurelia-route-recognizer": "^1.2.0"
+    "aurelia-route-recognizer": "^1.3.2"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.8",

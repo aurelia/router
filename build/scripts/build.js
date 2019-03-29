@@ -33,7 +33,7 @@ function generateDts() {
   console.log('\n==============\nGenerating dts bundle...\n==============');
   return new Promise(resolve => {
     const ChildProcess = require('child_process');
-    ChildProcess.exec('npm run bundle-dts', (err, stdout, stderr) => {
+    ChildProcess.exec('npm run build:dts', (err, stdout, stderr) => {
       if (err || stderr) {
         console.log('Generating dts error:');
         console.log(stderr);

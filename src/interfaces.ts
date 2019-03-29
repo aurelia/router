@@ -4,7 +4,6 @@ import { Router } from './router';
 import { NavModel } from './nav-model';
 import { RouterConfiguration } from './router-configuration';
 import { NavigationCommand } from './navigation-commands';
-import { Next } from './pipeline';
 import { IObservable } from './activation';
 
 /**@internal */
@@ -297,3 +296,30 @@ export interface ViewPortInstruction {
 export type NavigationResult = boolean | Promise<PipelineResult | boolean>;
 
 export type LifecycleArguments = [Record<string, string>, RouteConfig, NavigationInstruction];
+
+/**
+* A callback to indicate when pipeline processing should advance to the next step
+* or be aborted.
+*/
+export interface Next {
+  /**
+  * Indicates the successful completion of the pipeline step.
+  */
+  (): Promise<any>;
+  /**
+  * Indicates the successful completion of the entire pipeline.
+  */
+  complete: (result?: any) => Promise<any>;
+
+  /**
+  * Indicates that the pipeline should cancel processing.
+  */
+  cancel: (result?: any) => Promise<any>;
+
+  /**
+  * Indicates that pipeline processing has failed and should be stopped.
+  */
+  reject: (result?: any) => Promise<any>;
+}
+
+export type StepRunnerFunction = <TThis = any>(this: TThis, instruction: NavigationInstruction, next: Next) => any;

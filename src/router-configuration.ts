@@ -177,7 +177,7 @@ export class RouterConfiguration {
     }
 
     if (this.unknownRouteConfig) {
-      router.handleUnknownRoutes(this.unknownRouteConfig);
+      router.handleUnknownRoutes(this.unknownRouteConfig as any);
     }
 
     if (this._fallbackRoute) {

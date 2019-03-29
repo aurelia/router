@@ -7,7 +7,7 @@ import {
   ViewPortInstruction,
   RouterConfiguration,
   PipelineProvider
-} from '../src';
+} from '../src/aurelia-router';
 
 const absoluteRoot = 'http://aurelia.io/docs/';
 

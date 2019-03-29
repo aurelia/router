@@ -1,7 +1,6 @@
+import { ActivationStrategy, Next, ViewPortPlan } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { ActivationStrategy, ViewPortPlan } from './interfaces';
-import { Next } from './pipeline';
 
 /**
 * The strategy to use when activating modules during navigation.

@@ -336,14 +336,14 @@ export class Router {
     // to the childRoute property of params for the childRouter to recognize. When generating routes, we
     // use the childRecognizer when childRoute params are available to generate a child router enabled route.
     let recognizer = 'childRoute' in params ? this._childRecognizer : this._recognizer;
-    let hasRoute = recognizer.hasRoute(nameOrRoute);
+    let hasRoute = recognizer.hasRoute(nameOrRoute as string | RouteHandler);
     if (!hasRoute) {
       if (this.parent) {
         return this.parent.generate(nameOrRoute, params, options);
       }
       throw new Error(`A route with name '${nameOrRoute}' could not be found. Check that \`name: '${nameOrRoute}'\` was specified in the route's config.`);
     }
-    let path = recognizer.generate(nameOrRoute, params);
+    let path = recognizer.generate(nameOrRoute as string | RouteHandler, params);
     let rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
     return options.absolute ? `${this.history.getAbsoluteRoot()}${rootedPath}` : rootedPath;
   }
@@ -643,7 +643,7 @@ export class Router {
     instruction: NavigationInstruction
   ) {
     return Promise.resolve(config)
-      .then(c => {
+      .then((c: any) => {
         if (typeof c === 'string') {
           return { moduleId: c } as RouteConfig;
         } else if (typeof c === 'function') {
@@ -652,8 +652,8 @@ export class Router {
 
         return c;
       })
-      .then(c => typeof c === 'string' ? { moduleId: c } as RouteConfig : c)
-      .then(c => {
+      .then((c: string | RouteConfig) => typeof c === 'string' ? { moduleId: c } as RouteConfig : c)
+      .then((c: RouteConfig) => {
         c.route = instruction.params.path;
         validateRouteConfig(c, this.routes);
 

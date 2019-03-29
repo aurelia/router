@@ -14,7 +14,7 @@ import {
   ViewPortInstruction,
   ViewPort,
   PipelineStep
-} from '../src';
+} from '../src/aurelia-router';
 import { MockHistory, MockInstruction } from './shared';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { History } from 'aurelia-history';
