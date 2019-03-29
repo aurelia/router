@@ -7,6 +7,16 @@ import { isNavigationCommand } from './navigation-commands';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { NavigationInstruction } from './navigation-instruction';
 import { ViewPort, ConfiguresRouter, PipelineResult } from './interfaces';
+import { RouterEvent } from './router-events';
+
+const {
+  canceled: RE$canceled,
+  childComplete: RE$childComplete,
+  complete: RE$complete,
+  error: RE$error,
+  processing: RE$processing,
+  success: RE$success
+} = RouterEvent;
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {
@@ -176,7 +186,7 @@ export class AppRouter extends Router {
       instruction.previousInstruction = this.currentInstruction;
 
       if (!instructionCount) {
-        this.events.publish('router:navigation:processing', { instruction });
+        this.events.publish(RE$processing, { instruction });
       } else if (instructionCount === this.maxInstructionCount - 1) {
         logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
         restorePreviousLocation(this);
@@ -275,19 +285,19 @@ function resolveInstruction(
     let eventName: string;
 
     if (result.output instanceof Error) {
-      eventName = 'error';
+      eventName = RE$error;
     } else if (!result.completed) {
-      eventName = 'canceled';
+      eventName = RE$canceled;
     } else {
       let queryString = instruction.queryString ? ('?' + instruction.queryString) : '';
       router.history.previousLocation = instruction.fragment + queryString;
-      eventName = 'success';
+      eventName = RE$success;
     }
 
-    router.events.publish(`router:navigation:${eventName}`, eventArgs);
-    router.events.publish('router:navigation:complete', eventArgs);
+    router.events.publish(eventName, eventArgs);
+    router.events.publish(RE$complete, eventArgs);
   } else {
-    router.events.publish('router:navigation:child:complete', eventArgs);
+    router.events.publish(RE$childComplete, eventArgs);
   }
 
   return result;
