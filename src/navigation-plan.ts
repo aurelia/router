@@ -12,7 +12,7 @@ export const activationStrategy: ActivationStrategy = {
 };
 
 export class BuildNavigationPlanStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return _buildNavigationPlan(navigationInstruction)
       .then(plan => {
         if (plan instanceof Redirect) {

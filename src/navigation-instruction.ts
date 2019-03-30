@@ -1,4 +1,4 @@
-import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType } from './interfaces';
+import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ActivationStrategyType } from './interfaces';
 import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
 

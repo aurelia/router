@@ -282,7 +282,6 @@ export interface PipelineResult {
 
 /**
  * The component responsible for routing
- * @internal
  */
 export interface ViewPortComponent {
   viewModel: any;
@@ -298,7 +297,6 @@ export interface ViewPortComponent {
 
 /**
  * A viewport used by a Router to render a route config
- * @internal
  */
 export interface ViewPort {
   /**@internal */
@@ -309,7 +307,6 @@ export interface ViewPort {
 
 /**
  * A viewport plan to create/update a viewport.
- * @internal
  */
 export interface ViewPortPlan {
   name: string;
@@ -321,9 +318,6 @@ export interface ViewPortPlan {
   childNavigationInstruction?: NavigationInstruction;
 }
 
-/**
- * @internal
- */
 export interface ViewPortInstruction {
 
   name?: string;
