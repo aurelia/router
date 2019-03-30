@@ -1,4 +1,4 @@
 {
-  "typescript.tsdk": "aurelia-router/node_modules/typescript/lib",
+  "typescript.tsdk": "node_modules/typescript/lib",
   "tslint.autoFixOnSave": true
 }
