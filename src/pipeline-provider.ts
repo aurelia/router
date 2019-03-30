@@ -12,7 +12,7 @@ import {
 import { PipelineStep, StepRunnerFunction, IPipelineSlot } from './interfaces';
 
 
-class PipelineSlot {
+class PipelineSlot implements IPipelineSlot {
 
   /**@internal */
   container: Container;
@@ -39,6 +39,7 @@ class PipelineSlot {
 */
 export class PipelineProvider {
 
+  /**@internal */
   static inject() { return [Container]; }
   /**@internal */
   container: Container;

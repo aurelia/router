@@ -20,7 +20,9 @@ export class RouteLoader {
   /**
    * Load a route config based on its viewmodel / view configuration
    */
-  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<ViewPortComponent> {
+  // return typing: return typings used to be never
+  // as it was a throw. Changing it to Promise<any> should not cause any issues
+  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<any> {
     throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }
 }
@@ -71,7 +73,7 @@ export const determineWhatToLoad = (
   navigationInstruction: NavigationInstruction,
   toLoad: ILoadingPlan[] = []
 ): ILoadingPlan[] => {
-  let plan = navigationInstruction.plan;
+  let plan: Record<string, ViewPortPlan> = navigationInstruction.plan;
 
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
@@ -145,6 +147,7 @@ export const loadRoute = (
 
 /**
  * Load a routed-component based on navigation instruction and route config
+ * @internal exported for unit testing only
  */
 export const loadComponent = (
   routeLoader: RouteLoader,
@@ -156,7 +159,12 @@ export const loadComponent = (
 
   return Promise.resolve()
     .then(() => routeLoader.loadRoute(router, config, navigationInstruction))
-    .then((component) => {
+    .then(
+      /**
+       * @param component an object carrying information about loaded route
+       * typically contains information about view model, childContainer, view and router
+       */
+      (component: ViewPortComponent) => {
       let { viewModel, childContainer } = component;
       component.router = router;
       component.config = config;

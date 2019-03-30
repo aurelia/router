@@ -105,7 +105,7 @@ export function _buildNavigationPlan(
         const task: Promise<void> = prevViewPortInstruction
           .childRouter
           ._createNavigationInstruction(path, instruction)
-          .then(childInstruction => {
+          .then((childInstruction: any) => {
             viewPortPlan.childNavigationInstruction = childInstruction;
 
             return _buildNavigationPlan(

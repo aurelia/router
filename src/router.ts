@@ -152,7 +152,7 @@ export class Router {
   /**
   * The defaults used when a viewport lacks specified content
   */
-  viewPortDefaults: Record<string, Partial<ViewPortInstruction>> = {};
+  viewPortDefaults: Record<string, any> = {};
 
   /**@internal */
   catchAllHandler: (instruction: NavigationInstruction) => NavigationInstruction | Promise<NavigationInstruction>;
@@ -430,7 +430,9 @@ export class Router {
 
     config.navModel = navModel;
 
-    if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
+    let navigation = this.navigation;
+
+    if ((navModel.order || navModel.order === 0) && navigation.indexOf(navModel) === -1) {
       if ((!navModel.href && navModel.href !== '') && (state.types.dynamics || state.types.stars)) {
         throw new Error('Invalid route config for "' + config.route + '" : dynamic routes must specify an "href:" to be included in the navigation model.');
       }
@@ -439,9 +441,15 @@ export class Router {
         navModel.order = ++this._fallbackOrder;
       }
 
-      this.navigation.push(navModel);
+      navigation.push(navModel);
       // this is a potential error / inconsistency between browsers
-      this.navigation = this.navigation.sort((a, b) => <any>a.order - <any>b.order);
+      //
+      // MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+      // If compareFunction(a, b) returns 0, leave a and b unchanged with respect to each other,
+      // but sorted with respect to all different elements.
+      // Note: the ECMAscript standard does not guarantee this behaviour,
+      // and thus not all browsers (e.g. Mozilla versions dating back to at least 2003) respect this.
+      navigation.sort((a, b) => <any>a.order - <any>b.order);
     }
   }
 
@@ -468,14 +476,14 @@ export class Router {
   *
   * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
   */
-  handleUnknownRoutes(config?: string | Function | RouteConfig): void {
+  handleUnknownRoutes(config?: RouteConfigSpecifier): void {
     if (!config) {
       throw new Error('Invalid unknown route handler');
     }
 
     this.catchAllHandler = instruction => {
       return this
-        ._createRouteConfig(config as RouteConfigSpecifier, instruction)
+        ._createRouteConfig(config, instruction)
         .then(c => {
           instruction.config = c;
           return instruction;
@@ -487,12 +495,14 @@ export class Router {
   * Updates the document title using the current navigation instruction.
   */
   updateTitle(): void {
-    if (this.parent) {
-      return this.parent.updateTitle();
+    let parentRouter = this.parent;
+    if (parentRouter) {
+      return parentRouter.updateTitle();
     }
 
-    if (this.currentInstruction) {
-      this.currentInstruction._updateTitle();
+    let currentInstruction = this.currentInstruction;
+    if (currentInstruction) {
+      currentInstruction._updateTitle();
     }
     return undefined;
   }
@@ -519,7 +529,9 @@ export class Router {
    *  populate a view port for which no module is specified. The default is
    *  an empty view/view-model pair.
    */
-  useViewPortDefaults(viewPortDefaults: Record<string, Partial<ViewPortInstruction>>) {
+  useViewPortDefaults($viewPortDefaults: Record<string, any>) {
+    // a workaround to have strong typings while not requiring to expose interface ViewPortInstruction
+    let viewPortDefaults: Record<string, ViewPortInstruction> = $viewPortDefaults;
     for (let viewPortName in viewPortDefaults) {
       let viewPortConfig = viewPortDefaults[viewPortName];
       this.viewPortDefaults[viewPortName] = {
@@ -530,8 +542,9 @@ export class Router {
 
   /**@internal */
   _refreshBaseUrl(): void {
-    if (this.parent) {
-      this.baseUrl = generateBaseUrl(this.parent, this.parent.currentInstruction);
+    let parentRouter = this.parent;
+    if (parentRouter) {
+      this.baseUrl = generateBaseUrl(parentRouter, parentRouter.currentInstruction);
     }
   }
 
@@ -638,11 +651,9 @@ export class Router {
   /**
    * @internal
    */
-  _createRouteConfig(
-    config: RouteConfigSpecifier,
-    instruction: NavigationInstruction
-  ) {
-    return Promise.resolve(config)
+  _createRouteConfig(config: RouteConfigSpecifier, instruction: NavigationInstruction): Promise<RouteConfig> {
+    return Promise
+      .resolve(config)
       .then((c: any) => {
         if (typeof c === 'string') {
           return { moduleId: c } as RouteConfig;
@@ -652,6 +663,9 @@ export class Router {
 
         return c;
       })
+      // typing here could be either RouteConfig or RedirectConfig
+      // but temporarily treat both as RouteConfig
+      // todo: improve typings precision
       .then((c: string | RouteConfig) => typeof c === 'string' ? { moduleId: c } as RouteConfig : c)
       .then((c: RouteConfig) => {
         c.route = instruction.params.path;

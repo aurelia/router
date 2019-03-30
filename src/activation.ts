@@ -5,25 +5,25 @@ import { activationStrategy } from './navigation-plan';
 import { Router } from './router';
 
 export class CanDeactivatePreviousStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return processDeactivatable(navigationInstruction, 'canDeactivate', next);
   }
 }
 
 export class CanActivateNextStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return processActivatable(navigationInstruction, 'canActivate', next);
   }
 }
 
 export class DeactivatePreviousStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return processDeactivatable(navigationInstruction, 'deactivate', next, true);
   }
 }
 
 export class ActivateNextStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return processActivatable(navigationInstruction, 'activate', next, true);
   }
 }
@@ -38,7 +38,7 @@ function processDeactivatable(
   next: Next,
   ignoreResult?: boolean
 ): Promise<any> {
-  const plan = navigationInstruction.plan;
+  let plan: Record<string, ViewPortPlan> = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
   let i = infos.length; // query from inside out
 
@@ -173,7 +173,7 @@ function findActivatable(
   list: IActivatableInfo[] = [],
   router?: Router
 ): IActivatableInfo[] {
-  let plan = navigationInstruction.plan;
+  let plan: Record<string, ViewPortPlan> = navigationInstruction.plan;
 
   Object
     .keys(plan)

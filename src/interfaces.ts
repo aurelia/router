@@ -14,8 +14,30 @@ declare module 'aurelia-dependency-injection' {
   }
 }
 
-export type RouteCommand = { redirect: string } | { moduleId: string } | { viewModel: string };
-export type RouteConfigSpecifier = string | RouteCommand | ((instruction: NavigationInstruction) => string | RouteCommand | Promise<string | RouteCommand>);
+/**
+ * A configuration object that describes a route for redirection
+ */
+export interface RedirectConfig {
+  /**
+   * path that will be redirected to. This is relative to currently in process router
+   */
+  redirect: string;
+}
+
+/**
+ * A more generic RouteConfig for unknown route. Either a redirect config or a `RouteConfig`
+ * Redirect config is generally used in `mapUnknownRoutes` of `RouterConfiguration`
+ */
+export type RouteOrRedirectConfig = RouteConfig | RedirectConfig;
+
+/**
+ * A RouteConfig specifier. Could be a string, or an object with `RouteConfig` interface shape,
+ * or could be an object with redirect interface shape
+ */
+export type RouteConfigSpecifier =
+  string
+  | RouteOrRedirectConfig
+  | ((instruction: NavigationInstruction) => string | RouteOrRedirectConfig | Promise<string | RouteOrRedirectConfig>);
 
 /**
 * A configuration object that describes a route.
