@@ -234,6 +234,9 @@ export interface ActivationStrategy {
   replace: 'replace';
 }
 
+/**
+ * Enum like type for activation strategy built-in values
+ */
 export type ActivationStrategyType = ActivationStrategy[keyof ActivationStrategy];
 
 /**
@@ -275,6 +278,7 @@ export interface PipelineResult {
 
 /**
  * The component responsible for routing
+ * @internal
  */
 export interface ViewPortComponent {
   viewModel: any;
@@ -288,6 +292,10 @@ export interface ViewPortComponent {
   [key: string]: any;
 }
 
+/**
+ * A viewport used by a Router to render a route config
+ * @internal
+ */
 export interface ViewPort {
   /**@internal */
   container: Container;
@@ -295,6 +303,10 @@ export interface ViewPort {
   process(viewportInstruction: ViewPortInstruction, waitToSwap?: boolean): Promise<void>;
 }
 
+/**
+ * A viewport plan to create/update a viewport.
+ * @internal
+ */
 export interface ViewPortPlan {
   name: string;
   config: RouteConfig;
@@ -305,6 +317,9 @@ export interface ViewPortPlan {
   childNavigationInstruction?: NavigationInstruction;
 }
 
+/**
+ * @internal
+ */
 export interface ViewPortInstruction {
 
   name?: string;

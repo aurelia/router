@@ -162,8 +162,10 @@ export class NavigationInstruction {
   * Gets the name of the route pattern's wildcard parameter, if applicable.
   */
   getWildCardName(): string {
-    let wildcardIndex = this.config.route.lastIndexOf('*');
-    return (this.config.route as string).substr(wildcardIndex + 1);
+    // todo: potential issue, or at least unsafe typings
+    let configRoute = this.config.route as string;
+    let wildcardIndex = configRoute.lastIndexOf('*');
+    return configRoute.substr(wildcardIndex + 1);
   }
 
   /**

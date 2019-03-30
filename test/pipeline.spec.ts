@@ -2,14 +2,14 @@ import { Pipeline, PipelineStep, Next, NavigationInstruction } from '../src/aure
 import { PipelineStatus } from '../src/pipeline-status';
 import { IPipelineSlot, StepRunnerFunction } from '../src/interfaces';
 
-describe('Pipeline', function Pipeline__Tests() {
+describe('Pipeline', function() {
   let pipeline: Pipeline;
 
   beforeEach(function() {
     pipeline = new Pipeline();
   });
 
-  describe('addStep', function _1_addStep__Tests() {
+  describe('addStep', function() {
     it('adds function', () => {
       const runnerFn = function(...args: any[]) {/**/} as StepRunnerFunction;
       pipeline.addStep(runnerFn);
@@ -83,7 +83,7 @@ describe('Pipeline', function Pipeline__Tests() {
     });
   });
 
-  describe('run', function _2_run__Tests() {
+  describe('run', function() {
     let navInstruction: NavigationInstruction;
 
     beforeEach(() => {

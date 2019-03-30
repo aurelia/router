@@ -27,7 +27,9 @@
     "test": "karma start --single-run",
     "test:watch": "karma start",
     "test:debugger": "karma start --browsers ChromeDebugging",
-    "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --force"
+    "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --force",
+    "precut-release": "npm run test",
+    "cut-release": "standard-version -t \"\" -i doc/CHANGELOG.md && npm run build"
   },
   "jspm": {
     "registry": "npm",
@@ -76,14 +78,15 @@
     "karma-jasmine": "^1.1.2",
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^3.0.0",
+    "karma-webpack": "^3.0.5",
     "rimraf": "^2.6.2",
     "rollup": "^1.7.4",
     "rollup-plugin-typescript2": "^0.20.1",
+    "standard-version": "^5.0.2",
     "ts-loader": "^4.4.2",
     "tslib": "^1.9.3",
-    "tslint": "^5.11.0",
-    "typescript": "^3.4.1",
+    "tslint": "^5.14.0",
+    "typescript": "^3.3.4000",
     "webpack": "^4.16.5",
     "yargs": "^4.8.1"
   },

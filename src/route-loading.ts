@@ -43,6 +43,9 @@ export class LoadRouteStep {
     this.routeLoader = routeLoader;
   }
 
+  /**
+   * Run the internal to load route config of a navigation instruction to prepare for next steps in the pipeline
+   */
   run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return loadNewRoute(this.routeLoader, navigationInstruction)
       .then(next, next.cancel);

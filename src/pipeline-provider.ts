@@ -89,7 +89,8 @@ export class PipelineProvider {
   addStep(name: string, step: PipelineStep | Function): void {
     let found = this._findStep(name);
     if (found) {
-      if (!found.steps.includes(step)) { // prevent duplicates
+      // prevent duplicates
+      if (!found.steps.includes(step)) {
         found.steps.push(step);
       }
     } else {
@@ -103,7 +104,8 @@ export class PipelineProvider {
   removeStep(name: string, step: PipelineStep): void {
     let slot = this._findStep(name);
     if (slot) {
-      slot.steps.splice(slot.steps.indexOf(step), 1);
+      let steps = slot.steps;
+      steps.splice(steps.indexOf(step), 1);
     }
   }
 

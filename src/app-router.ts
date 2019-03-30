@@ -53,7 +53,7 @@ export class AppRouter extends Router {
   * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
   * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
   */
-  reset() {
+  reset(): void {
     super.reset();
     this.maxInstructionCount = 10;
     if (!this._queue) {
@@ -81,19 +81,29 @@ export class AppRouter extends Router {
   /**
   * Registers a viewPort to be used as a rendering target for activated routes.
   *
-  * @param viewPort The viewPort.
+  * @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: any, name?: string): Promise<any> {
-    super.registerViewPort(viewPort, name);
+  registerViewPort(viewPort: /*ViewPort*/ any, name?: string): Promise<any> {
+    // having strong typing without changing public API
+    const $viewPort: ViewPort = viewPort;
+    super.registerViewPort($viewPort, name);
 
+    // beside adding viewport to the registry of this instance
+    // AppRouter also configure routing/history to start routing functionality
+    // There are situation where there are more than 1 <router-view/> element at root view
+    // in that case, still only activate once via the following guard
     if (!this.isActive) {
-      const viewModel = this._findViewModel(viewPort);
+      const viewModel = this._findViewModel($viewPort);
       if ('configureRouter' in viewModel) {
+        // If there are more than one <router-view/> element at root view
+        // use this flag to guard against configure method being invoked multiple times
+        // this flag is set inside method configure
         if (!this.isConfigured) {
+          // replace the real resolve with a noop to guarantee that any action in base class Router
+          // won't resolve the configurePromise prematurely
           const resolveConfiguredPromise = this._resolveConfiguredPromise;
-          // tslint:disable-next-line
-          this._resolveConfiguredPromise = () => { };
+          this._resolveConfiguredPromise = () => {/**/};
           return this
             .configure(config => {
               viewModel.configureRouter(config, this);
@@ -107,7 +117,10 @@ export class AppRouter extends Router {
       } else {
         this.activate();
       }
-    } else {
+    }
+    // when a viewport is added dynamically to a root view that is already activated
+    // just process the navigation instruction
+    else {
       this._dequeueInstruction();
     }
 
@@ -150,17 +163,19 @@ export class AppRouter extends Router {
   }
 
   /**@internal */
-  _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | undefined> {
+  _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | void> {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
-        return undefined;
+        // ts complains about inconsistent returns without void 0
+        return void 0;
       }
 
       let instruction = this._queue.shift();
       this._queue.length = 0;
 
       if (!instruction) {
-        return undefined;
+        // ts complains about inconsistent returns without void 0
+        return void 0;
       }
 
       this.isNavigating = true;
@@ -230,12 +245,12 @@ export class AppRouter extends Router {
   }
 }
 
-function processResult(
+const processResult = (
   instruction: NavigationInstruction,
   result: PipelineResult,
   instructionCount: number,
   router: AppRouter
-) {
+): Promise<PipelineResult> => {
   if (!(result && 'completed' in result && 'output' in result)) {
     result = result || {} as PipelineResult;
     result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
@@ -260,14 +275,14 @@ function processResult(
   return Promise.resolve(navigationCommandResult)
     .then(_ => router._dequeueInstruction(instructionCount + 1))
     .then(innerResult => finalResult || innerResult || result);
-}
+};
 
-function resolveInstruction(
+const resolveInstruction = (
   instruction: NavigationInstruction,
   result: PipelineResult,
   isInnerInstruction: boolean,
   router: AppRouter
-) {
+): PipelineResult => {
   instruction.resolve(result);
 
   let eventArgs = { instruction, result };
@@ -301,9 +316,9 @@ function resolveInstruction(
   }
 
   return result;
-}
+};
 
-function restorePreviousLocation(router: AppRouter) {
+const restorePreviousLocation = (router: AppRouter): void => {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
     router.navigate(router.history.previousLocation, { trigger: false, replace: true });
@@ -312,4 +327,4 @@ function restorePreviousLocation(router: AppRouter) {
   } else {
     logger.error('Router navigation failed, and no previous location or fallbackRoute could be restored.');
   }
-}
+};

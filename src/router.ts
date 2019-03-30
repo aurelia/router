@@ -49,15 +49,18 @@ declare module 'aurelia-route-recognizer' {
 type RouterConfigurationResolution = RouterConfiguration | ((cfg: RouterConfiguration) => void | RouterConfiguration | Promise<RouterConfiguration>);
 
 /**
-* The primary class responsible for handling routing and navigation.
-*
-* @class Router
-* @constructor
-*/
+ * The primary class responsible for handling routing and navigation.
+ */
 export class Router {
 
+  /**
+   * Container associated with this router. Also used to create child container for creating child router.
+   */
   container: Container;
 
+  /**
+   * History instance of Aurelia abstract class for wrapping platform history global object
+   */
   history: History;
 
   /**
@@ -244,7 +247,7 @@ export class Router {
   * @param viewPort The viewPort.
   * @param name The name of the viewPort. 'default' if unspecified.
   */
-  registerViewPort(viewPort: any, name?: string): void {
+  registerViewPort(viewPort: /*ViewPort*/any, name?: string): void {
     name = name || 'default';
     this.viewPorts[name] = viewPort;
   }
@@ -290,7 +293,7 @@ export class Router {
   * @param fragment The URL fragment to use as the navigation destination.
   * @param options The navigation options.
   */
-  navigate(fragment: string, options?: NavigationOptions): NavigationResult {
+  navigate(fragment: string, options?: NavigationOptions): boolean {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -307,7 +310,7 @@ export class Router {
   * @param params The route parameters to be used when populating the route pattern.
   * @param options The navigation options.
   */
-  navigateToRoute(route: string, params?: any, options?: NavigationOptions): NavigationResult {
+  navigateToRoute(route: string, params?: any, options?: NavigationOptions): boolean {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
@@ -387,6 +390,7 @@ export class Router {
   addRoute(config: RouteConfig, navModel?: NavModel): void {
     if (Array.isArray(config.route)) {
       let routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
+      // the following is wrong. todo: fix this after TS refactoring release
       routeConfigs.forEach(this.addRoute.bind(this));
       return;
     }
@@ -538,7 +542,7 @@ export class Router {
    *  populate a view port for which no module is specified. The default is
    *  an empty view/view-model pair.
    */
-  useViewPortDefaults($viewPortDefaults: Record<string, any>) {
+  useViewPortDefaults($viewPortDefaults: Record<string, any>): void {
     // a workaround to have strong typings while not requiring to expose interface ViewPortInstruction
     let viewPortDefaults: Record<string, ViewPortInstruction> = $viewPortDefaults;
     for (let viewPortName in viewPortDefaults) {

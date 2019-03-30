@@ -15,7 +15,7 @@ module.exports = function(config) {
       entry: 'test/setup.ts',
       resolve: {
         extensions: [".ts", ".js"],
-        modules: ["src", "node_modules"],
+        modules: ["node_modules"],
         alias: {
           src: path.resolve(__dirname, 'src'),
           test: path.resolve(__dirname, 'test')
