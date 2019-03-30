@@ -5,7 +5,7 @@ import { NavigationInstruction, Next, PipelineResult, activationStrategy, RouteC
 import { createNextFn } from '../../src/next';
 import { PipelineStatus } from '../../src/pipeline-status';
 
-describe('RouteLoading -- LoadRouteStep', function _2_LoadRouteStep__Tests() {
+describe('RouteLoading -- LoadRouteStep', function() {
   let container: Container;
   let navInstruction: NavigationInstruction;
   let loadRouteStep: LoadRouteStep;

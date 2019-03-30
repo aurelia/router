@@ -4,10 +4,13 @@ import { MockHistory } from './shared';
 import {
   AppRouter,
   Router,
-  ViewPortInstruction,
   RouterConfiguration,
   PipelineProvider
 } from '../src/aurelia-router';
+
+import {
+  ViewPortInstruction
+} from '../src/interfaces';
 
 const absoluteRoot = 'http://aurelia.io/docs/';
 

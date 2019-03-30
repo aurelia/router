@@ -55,11 +55,20 @@ type RouterConfigurationResolution = RouterConfiguration | ((cfg: RouterConfigur
 * @constructor
 */
 export class Router {
+
   container: Container;
+
   history: History;
 
-  viewPorts: Record<string, ViewPort>;
+  /**
+   * A registry of registered viewport. Will be used to handle process navigation instruction route loading
+   * and dom swapping
+   */
+  viewPorts: Record<string, any>;
 
+  /**
+   * List of route configs registered with this router
+   */
   routes: RouteConfig[];
 
   /**

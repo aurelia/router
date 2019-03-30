@@ -8,15 +8,17 @@ module.exports = function(config) {
     frameworks: ["jasmine"],
     files: ["test/**/*.spec.ts"],
     preprocessors: {
-      "test/**/*.spec.ts": ["webpack"]
+      "test/**/*.spec.ts": ["webpack", 'sourcemap']
     },
     webpack: {
       mode: "development",
+      entry: 'test/setup.ts',
       resolve: {
         extensions: [".ts", ".js"],
         modules: ["src", "node_modules"],
         alias: {
-          src: path.resolve(__dirname, "src")
+          src: path.resolve(__dirname, 'src'),
+          test: path.resolve(__dirname, 'test')
         }
       },
       devtool: browsers.includes('ChromeDebugging') ? 'eval-source-map' : 'inline-source-map',
@@ -35,21 +37,14 @@ module.exports = function(config) {
     },
     reporters: ["mocha"],
     webpackServer: { noInfo: config.noInfo },
-    browsers: Array.isArray(browsers) && browsers.length > 0 ? browsers : ['ChromeHeadlessOpt'],
+    browsers: Array.isArray(browsers) && browsers.length > 0 ? browsers : ['ChromeHeadless'],
     customLaunchers: {
       ChromeDebugging: {
         base: 'Chrome',
         flags: [
-          ...commonChromeFlags,
           '--remote-debugging-port=9333'
         ],
         debug: true
-      },
-      ChromeHeadlessOpt: {
-        base: 'ChromeHeadless',
-        flags: [
-          ...commonChromeFlags
-        ]
       }
     },
     mochaReporter: {
@@ -58,28 +53,3 @@ module.exports = function(config) {
     singleRun: false
   });
 };
-
-const commonChromeFlags = [
-  '--no-default-browser-check',
-  '--no-first-run',
-  '--no-managed-user-acknowledgment-check',
-  '--no-pings',
-  '--no-sandbox',
-  '--no-wifi',
-  '--no-zygote',
-  '--disable-background-networking',
-  '--disable-background-timer-throttling',
-  '--disable-backing-store-limit',
-  '--disable-boot-animation',
-  '--disable-breakpad',
-  '--disable-cache',
-  '--disable-clear-browsing-data-counters',
-  '--disable-cloud-import',
-  '--disable-component-extensions-with-background-pages',
-  '--disable-contextual-search',
-  '--disable-default-apps',
-  '--disable-extensions',
-  '--disable-infobars',
-  '--disable-translate',
-  '--disable-sync'
-];

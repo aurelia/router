@@ -12,7 +12,7 @@ export interface NavigationInstructionInit {
   previousInstruction?: NavigationInstruction;
   router: Router;
   options?: Object;
-  plan?: Record<string, ViewPortInstruction>;
+  plan?: Record<string, /*ViewPortInstruction*/any>;
 }
 
 /**
@@ -73,7 +73,7 @@ export class NavigationInstruction {
   /**
   * viewPort instructions to used activation.
   */
-  viewPortInstructions: Record<string, any>;
+  viewPortInstructions: Record<string, /*ViewPortInstruction*/any>;
 
   /**
     * The router instance.
@@ -83,7 +83,7 @@ export class NavigationInstruction {
   /**
    * Current built viewport plan of this nav instruction
    */
-  plan: Record<string, any> = null;
+  plan: Record<string, /*ViewPortPlan*/any> = null;
 
   options: Record<string, any> = {};
 
@@ -141,9 +141,9 @@ export class NavigationInstruction {
   }
 
   /**
-  * Adds a viewPort instruction.
+  * Adds a viewPort instruction. Returns the newly created instruction based on parameters
   */
-  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): ViewPortInstruction {
+  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): /*ViewPortInstruction*/ any {
     const lifecycleArgs = this.lifecycleArgs;
     const config: RouteConfig = Object.assign({}, lifecycleArgs[1], { currentViewPort: name });
     const viewportInstruction = this.viewPortInstructions[name] = {

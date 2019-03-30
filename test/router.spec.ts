@@ -435,7 +435,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(() => fail('should have rejected'))
-          .catch(done);
+          .catch(() => done());
       });
     });
   });

@@ -7,17 +7,19 @@ import {
   RouteLoader,
   Pipeline,
   NavigationInstruction,
-  ViewPortComponent,
   NavigationCommand,
   Next,
   RouterConfiguration,
-  ViewPortInstruction,
-  ViewPort,
   PipelineStep
 } from '../src/aurelia-router';
 import { MockHistory, MockInstruction } from './shared';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { History } from 'aurelia-history';
+import {
+  ViewPortComponent,
+  ViewPortInstruction,
+  ViewPort
+} from '../src/interfaces';
 
 declare module 'aurelia-history' {
   interface History {

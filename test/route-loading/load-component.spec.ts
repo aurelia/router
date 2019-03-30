@@ -1,9 +1,15 @@
 import '../setup';
 import { Container } from 'aurelia-dependency-injection';
-import { NavigationInstruction, RouteConfig, Router, RouterConfiguration, ViewPortComponent } from '../../src/aurelia-router';
+import { NavigationInstruction, RouteConfig, Router, RouterConfiguration } from '../../src/aurelia-router';
 import { loadComponent, RouteLoader } from '../../src/route-loading';
+import {
+  ViewPortComponent,
+  ViewPortInstruction,
+  ViewPort,
+  ViewPortPlan
+} from '../../src/interfaces';
 
-describe('RouteLoading -- loadComponent()', function loadComponent__Tests() {
+describe('RouteLoading -- loadComponent()', function() {
   let container: Container;
   let router: Router;
   let routeLoader: RouteLoader;
@@ -11,7 +17,7 @@ describe('RouteLoading -- loadComponent()', function loadComponent__Tests() {
   let config: RouteConfig;
   let vpComponent: ViewPortComponent;
 
-  beforeEach(function __setup__() {
+  beforeEach(function() {
     routeLoader = {
       loadRoute(router: Router, config: RouteConfig, nav: NavigationInstruction): Promise<ViewPortComponent> {
         return Promise.resolve(vpComponent);

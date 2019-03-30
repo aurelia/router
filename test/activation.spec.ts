@@ -3,14 +3,18 @@ import {
   activationStrategy,
   ActivationStrategy,
   NavigationInstruction,
-  ViewPortInstruction,
   RouteConfig,
   CanDeactivatePreviousStep,
   CanActivateNextStep,
   ActivateNextStep,
-  NavigationInstructionInit,
-  ViewPortPlan
+  NavigationInstructionInit
 } from '../src/aurelia-router';
+import {
+  ViewPortComponent,
+  ViewPortInstruction,
+  ViewPort,
+  ViewPortPlan
+} from '../src/interfaces';
 import { ValueOf, createPipelineState, MockPipelineState, MockInstruction } from './shared';
 
 describe('activation', () => {

@@ -1,4 +1,4 @@
-import { Next, RouteConfig, ViewPortComponent, ViewPortPlan } from './interfaces';
+import { Next, RouteConfig, ViewPortComponent, ViewPortPlan, ViewPortInstruction } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
@@ -77,23 +77,25 @@ export const determineWhatToLoad = (
 
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
+    let child_nav_instruction = viewPortPlan.childNavigationInstruction;
 
     if (viewPortPlan.strategy === activationStrategy.replace) {
       toLoad.push({ viewPortPlan, navigationInstruction } as ILoadingPlan);
 
-      if (viewPortPlan.childNavigationInstruction) {
-        determineWhatToLoad(viewPortPlan.childNavigationInstruction, toLoad);
+      if (child_nav_instruction) {
+        determineWhatToLoad(child_nav_instruction, toLoad);
       }
     } else {
       let viewPortInstruction = navigationInstruction.addViewPortInstruction(
         viewPortName,
         viewPortPlan.strategy,
         viewPortPlan.prevModuleId,
-        viewPortPlan.prevComponent);
+        viewPortPlan.prevComponent
+      ) as ViewPortInstruction;
 
-      if (viewPortPlan.childNavigationInstruction) {
-        viewPortInstruction.childNavigationInstruction = viewPortPlan.childNavigationInstruction;
-        determineWhatToLoad(viewPortPlan.childNavigationInstruction, toLoad);
+      if (child_nav_instruction) {
+        viewPortInstruction.childNavigationInstruction = child_nav_instruction;
+        determineWhatToLoad(child_nav_instruction, toLoad);
       }
     }
   }
@@ -117,7 +119,8 @@ export const loadRoute = (
         viewPortPlan.name,
         viewPortPlan.strategy,
         moduleId,
-        component);
+        component
+      ) as ViewPortInstruction;
 
       let childRouter = component.childRouter;
       if (childRouter) {

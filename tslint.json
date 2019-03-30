@@ -1,4 +1,9 @@
 {
+  "linterOptions": {
+    "exclude": [
+      "dist/aurelia-router.d.ts"
+    ]
+  },
   "rules": {
     "class-name": true,
     "comment-format": [
