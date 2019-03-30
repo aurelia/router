@@ -22,6 +22,10 @@ export interface RedirectConfig {
    * path that will be redirected to. This is relative to currently in process router
    */
   redirect: string;
+  /**
+   * A backward compat interface. Should be ignored in new code
+   */
+  [key: string]: any;
 }
 
 /**
