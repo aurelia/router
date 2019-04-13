@@ -12,7 +12,9 @@ import {
 import { PipelineStep, StepRunnerFunction, IPipelineSlot } from './interfaces';
 import { PipelineSlotName } from './pipeline-slot-name';
 
-
+/**
+ * A multi-slots Pipeline Placeholder Step for hooking into a pipeline execution
+ */
 class PipelineSlot implements IPipelineSlot {
 
   /**@internal */
