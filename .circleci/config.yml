@@ -18,9 +18,11 @@ orbs:
 workflows:
   main:
     jobs:
-      - v1/build_test
+      - v1/build_test:
+          use_jspm: false
       - v1/build_merge:
           <<: *filter_only_develop
+          use_jspm: false
           requires:
             - v1/build_test
       - v1/npm_publish:
