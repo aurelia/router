@@ -29,12 +29,12 @@ export class RouterConfiguration {
   _fallbackRoute: string;
 
   /**
-  * Adds a step to be run during the [[Router]]'s navigation pipeline.
-  *
-  * @param name The name of the pipeline slot to insert the step into.
-  * @param step The pipeline step.
-  * @chainable
-  */
+   * Adds a step to be run during the [[Router]]'s navigation pipeline.
+   *
+   * @param name The name of the pipeline slot to insert the step into.
+   * @param step The pipeline step.
+   * @chainable
+   */
   addPipelineStep(name: string, step: Function | PipelineStep): RouterConfiguration {
     if (step === null || step === undefined) {
       throw new Error('Pipeline step cannot be null or undefined.');
@@ -44,62 +44,62 @@ export class RouterConfiguration {
   }
 
   /**
-  * Adds a step to be run during the [[Router]]'s authorize pipeline slot.
-  *
-  * @param step The pipeline step.
-  * @chainable
-  */
+   * Adds a step to be run during the [[Router]]'s authorize pipeline slot.
+   *
+   * @param step The pipeline step.
+   * @chainable
+   */
   addAuthorizeStep(step: Function | PipelineStep): RouterConfiguration {
     return this.addPipelineStep(PipelineSlotName.Authorize, step);
   }
 
   /**
-  * Adds a step to be run during the [[Router]]'s preActivate pipeline slot.
-  *
-  * @param step The pipeline step.
-  * @chainable
-  */
+   * Adds a step to be run during the [[Router]]'s preActivate pipeline slot.
+   *
+   * @param step The pipeline step.
+   * @chainable
+   */
   addPreActivateStep(step: Function | PipelineStep): RouterConfiguration {
     return this.addPipelineStep(PipelineSlotName.PreActivate, step);
   }
 
   /**
-  * Adds a step to be run during the [[Router]]'s preRender pipeline slot.
-  *
-  * @param step The pipeline step.
-  * @chainable
-  */
+   * Adds a step to be run during the [[Router]]'s preRender pipeline slot.
+   *
+   * @param step The pipeline step.
+   * @chainable
+   */
   addPreRenderStep(step: Function | PipelineStep): RouterConfiguration {
     return this.addPipelineStep(PipelineSlotName.PreRender, step);
   }
 
   /**
-  * Adds a step to be run during the [[Router]]'s postRender pipeline slot.
-  *
-  * @param step The pipeline step.
-  * @chainable
-  */
+   * Adds a step to be run during the [[Router]]'s postRender pipeline slot.
+   *
+   * @param step The pipeline step.
+   * @chainable
+   */
   addPostRenderStep(step: Function | PipelineStep): RouterConfiguration {
     return this.addPipelineStep(PipelineSlotName.PostRender, step);
   }
 
   /**
-  * Configures a route that will be used if there is no previous location available on navigation cancellation.
-  *
-  * @param fragment The URL fragment to use as the navigation destination.
-  * @chainable
-  */
+   * Configures a route that will be used if there is no previous location available on navigation cancellation.
+   *
+   * @param fragment The URL fragment to use as the navigation destination.
+   * @chainable
+   */
   fallbackRoute(fragment: string): RouterConfiguration {
     this._fallbackRoute = fragment;
     return this;
   }
 
   /**
-  * Maps one or more routes to be registered with the router.
-  *
-  * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
-  * @chainable
-  */
+   * Maps one or more routes to be registered with the router.
+   *
+   * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
+   * @chainable
+   */
   map(route: RouteConfig | RouteConfig[]): RouterConfiguration {
     if (Array.isArray(route)) {
       route.forEach(this.map.bind(this));
@@ -122,11 +122,11 @@ export class RouterConfiguration {
   }
 
   /**
-  * Maps a single route to be registered with the router.
-  *
-  * @param route The [[RouteConfig]] to map.
-  * @chainable
-  */
+   * Maps a single route to be registered with the router.
+   *
+   * @param route The [[RouteConfig]] to map.
+   * @chainable
+   */
   mapRoute(config: RouteConfig): RouterConfiguration {
     this.instructions.push(router => {
       let routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
@@ -147,22 +147,22 @@ export class RouterConfiguration {
   }
 
   /**
-  * Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
-  *
-  * @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
-  *  [[NavigationInstruction]] and selects a moduleId to load.
-  * @chainable
-  */
+   * Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
+   *
+   * @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
+   *  [[NavigationInstruction]] and selects a moduleId to load.
+   * @chainable
+   */
   mapUnknownRoutes(config: RouteConfigSpecifier): RouterConfiguration {
     this.unknownRouteConfig = config;
     return this;
   }
 
   /**
-  * Applies the current configuration to the specified [[Router]].
-  *
-  * @param router The [[Router]] to apply the configuration to.
-  */
+   * Applies the current configuration to the specified [[Router]].
+   *
+   * @param router The [[Router]] to apply the configuration to.
+   */
   exportToRouter(router: Router): void {
     let instructions = this.instructions;
     for (let i = 0, ii = instructions.length; i < ii; ++i) {
@@ -192,13 +192,14 @@ export class RouterConfiguration {
     Object.assign(router.options, this.options);
 
     let pipelineSteps = this.pipelineSteps;
-    if (pipelineSteps.length) {
+    let pipelineStepCount = pipelineSteps.length;
+    if (pipelineStepCount) {
       if (!router.isRoot) {
         throw new Error('Pipeline steps can only be added to the root router');
       }
 
       let pipelineProvider = router.pipelineProvider;
-      for (let i = 0, ii = pipelineSteps.length; i < ii; ++i) {
+      for (let i = 0, ii = pipelineStepCount; i < ii; ++i) {
         let { name, step } = pipelineSteps[i];
         pipelineProvider.addStep(name, step);
       }

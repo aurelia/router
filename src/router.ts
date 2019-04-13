@@ -10,7 +10,7 @@ import {
   _createRootedPath,
   _resolveUrl
 } from './util';
-import { RouteConfig, NavigationResult, RouteConfigSpecifier, ViewPort, ViewPortInstruction } from './interfaces';
+import { RouteConfig, RouteConfigSpecifier, ViewPortInstruction } from './interfaces';
 import { PipelineProvider } from './pipeline-provider';
 
 /**@internal */

@@ -4,8 +4,9 @@ import { Router } from './router';
 import { NavModel } from './nav-model';
 import { RouterConfiguration } from './router-configuration';
 import { NavigationCommand } from './navigation-commands';
-import { IObservable } from './activation';
+import { IObservable } from './utilities-activation';
 import { PipelineStatus } from './pipeline-status';
+import { ActivationStrategyType } from './activation-strategy';
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {
@@ -145,6 +146,11 @@ export interface RouteConfig {
    */
   layoutModel?: any;
 
+  /**
+   * @internal
+   */
+  hasChildRouter: boolean;
+
   [x: string]: any;
 }
 
@@ -220,28 +226,6 @@ export interface ConfiguresRouter {
   configureRouter(config: RouterConfiguration, router: Router): Promise<void> | PromiseLike<void> | void;
 }
 
-/**
-* An optional interface describing the available activation strategies.
-*/
-export interface ActivationStrategy {
-  /**
-  * Reuse the existing view model, without invoking Router lifecycle hooks.
-  */
-  noChange: 'no-change';
-  /**
-  * Reuse the existing view model, invoking Router lifecycle hooks.
-  */
-  invokeLifecycle: 'invoke-lifecycle';
-  /**
-  * Replace the existing view model, invoking Router lifecycle hooks.
-  */
-  replace: 'replace';
-}
-
-/**
- * Enum like type for activation strategy built-in values
- */
-export type ActivationStrategyType = ActivationStrategy[keyof ActivationStrategy];
 
 /**
 * A step to be run during processing of the pipeline.

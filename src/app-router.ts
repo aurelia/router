@@ -172,16 +172,18 @@ export class AppRouter extends Router {
       this.isNavigating = true;
 
       let navtracker: number = this.history.getState('NavigationTracker');
-      if (!navtracker && !this.currentNavigationTracker) {
+      let currentNavTracker = this.currentNavigationTracker;
+
+      if (!navtracker && !currentNavTracker) {
         this.isNavigatingFirst = true;
         this.isNavigatingNew = true;
       } else if (!navtracker) {
         this.isNavigatingNew = true;
-      } else if (!this.currentNavigationTracker) {
+      } else if (!currentNavTracker) {
         this.isNavigatingRefresh = true;
-      } else if (this.currentNavigationTracker < navtracker) {
+      } else if (currentNavTracker < navtracker) {
         this.isNavigatingForward = true;
-      } else if (this.currentNavigationTracker > navtracker) {
+      } else if (currentNavTracker > navtracker) {
         this.isNavigatingBack = true;
       } if (!navtracker) {
         navtracker = Date.now();
@@ -191,13 +193,15 @@ export class AppRouter extends Router {
 
       instruction.previousInstruction = this.currentInstruction;
 
+      let maxInstructionCount = this.maxInstructionCount;
+
       if (!instructionCount) {
         this.events.publish(RouterEvent.Processing, { instruction });
-      } else if (instructionCount === this.maxInstructionCount - 1) {
+      } else if (instructionCount === maxInstructionCount - 1) {
         logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
         restorePreviousLocation(this);
         return this._dequeueInstruction(instructionCount + 1);
-      } else if (instructionCount > this.maxInstructionCount) {
+      } else if (instructionCount > maxInstructionCount) {
         throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 

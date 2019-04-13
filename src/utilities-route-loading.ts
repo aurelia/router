@@ -1,8 +1,9 @@
-import { Next, RouteConfig, ViewPortComponent, ViewPortPlan, ViewPortInstruction } from './interfaces';
+import { RouteConfig, ViewPortComponent, ViewPortPlan, ViewPortInstruction } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { activationStrategy, _buildNavigationPlan } from './navigation-plan';
+import { _buildNavigationPlan } from './navigation-plan';
 import { Router } from './router';
+import { activationStrategy, InternalActivationStrategy } from './activation-strategy';
 
 /**
  * Loading plan calculated based on a navigration-instruction and a viewport plan
@@ -24,31 +25,6 @@ export class RouteLoader {
   // as it was a throw. Changing it to Promise<any> should not cause any issues
   loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<any> {
     throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
-  }
-}
-
-/**
- * A pipeline step responsible for loading a route config of a navigation instruction
- */
-export class LoadRouteStep {
-  /**@internal */
-  static inject() { return [RouteLoader]; }
-  /**
-   * Route loader isntance that will handle loading route config
-   * @internal
-   */
-  routeLoader: RouteLoader;
-
-  constructor(routeLoader: RouteLoader) {
-    this.routeLoader = routeLoader;
-  }
-
-  /**
-   * Run the internal to load route config of a navigation instruction to prepare for next steps in the pipeline
-   */
-  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
-    return loadNewRoute(this.routeLoader, navigationInstruction)
-      .then(next, next.cancel);
   }
 }
 
@@ -82,7 +58,7 @@ export const determineWhatToLoad = (
     let viewPortPlan = plan[viewPortName];
     let child_nav_instruction = viewPortPlan.childNavigationInstruction;
 
-    if (viewPortPlan.strategy === activationStrategy.replace) {
+    if (viewPortPlan.strategy === InternalActivationStrategy.Replace) {
       toLoad.push({ viewPortPlan, navigationInstruction } as ILoadingPlan);
 
       if (child_nav_instruction) {

@@ -1,6 +1,6 @@
-import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ActivationStrategyType } from './interfaces';
+import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments } from './interfaces';
 import { Router } from './router';
-import { activationStrategy } from './navigation-plan';
+import { activationStrategy, ActivationStrategyType } from './activation-strategy';
 
 /**
  * Initialization options for a navigation instruction
@@ -16,20 +16,6 @@ export interface NavigationInstructionInit {
   router: Router;
   options?: Object;
   plan?: Record<string, /*ViewPortInstruction*/any>;
-}
-
-/**
- * A pipeline step for instructing a piepline to commit changes on a navigation instruction
- */
-export class CommitChangesStep {
-  run(navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
-    return navigationInstruction
-      ._commitChanges(/*wait to swap?*/true)
-      .then(() => {
-        navigationInstruction._updateTitle();
-        return next();
-      });
-  }
 }
 
 /**
@@ -149,7 +135,7 @@ export class NavigationInstruction {
   addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): /*ViewPortInstruction*/ any {
     const lifecycleArgs = this.lifecycleArgs;
     const config: RouteConfig = Object.assign({}, lifecycleArgs[1], { currentViewPort: name });
-    const viewportInstruction = this.viewPortInstructions[name] = {
+    const viewportInstruction: ViewPortInstruction = this.viewPortInstructions[name] = {
       name: name,
       strategy: strategy,
       moduleId: moduleId,
