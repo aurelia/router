@@ -38,9 +38,9 @@ export {
   NavigationInstructionInit
 } from './navigation-instruction';
 
-// export {
-//   PipelineStatus
-// } from './pipeline-status';
+export {
+  PipelineStatus
+} from './pipeline-status';
 
 export {
   RouterEvent
