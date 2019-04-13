@@ -1,7 +1,7 @@
 import '../setup';
 import { Container } from 'aurelia-dependency-injection';
 import { NavigationInstruction, RouteConfig, Router, RouterConfiguration } from '../../src/aurelia-router';
-import { loadComponent, RouteLoader } from '../../src/route-loading';
+import { loadComponent, RouteLoader } from '../../src/utilities-route-loading';
 import {
   ViewPortComponent,
   ViewPortInstruction,
