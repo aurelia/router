@@ -19,6 +19,9 @@
     "type": "git",
     "url": "http://github.com/aurelia/router"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "npm run dev -- --format es2015",
     "dev": "node build/scripts/dev",
