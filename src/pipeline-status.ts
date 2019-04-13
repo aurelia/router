@@ -1,9 +1,9 @@
 /**
 * The status of a Pipeline.
 */
-export enum PipelineStatus {
-  completed = 'completed',
-  canceled = 'canceled',
-  rejected = 'rejected',
-  running = 'running'
+export const enum PipelineStatus {
+  Completed = 'completed',
+  Canceled = 'canceled',
+  Rejected = 'rejected',
+  Running = 'running'
 }

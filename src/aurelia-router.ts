@@ -44,7 +44,11 @@ export {
 
 export {
   RouterEvent
-} from './router-events';
+} from './router-event';
+
+export {
+  PipelineSlotName
+} from './pipeline-slot-name';
 
 export { PipelineProvider } from './pipeline-provider';
 export { Pipeline } from './pipeline';

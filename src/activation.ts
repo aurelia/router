@@ -1,4 +1,4 @@
-import { Next, ViewPortComponent, ViewPortPlan } from './interfaces';
+import { Next, ViewPortComponent, ViewPortPlan, ViewPortInstruction, LifecycleArguments } from './interfaces';
 import { isNavigationCommand } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { activationStrategy } from './navigation-plan';
@@ -46,7 +46,7 @@ export class ActivateNextStep {
  */
 const processDeactivatable = (
   navigationInstruction: NavigationInstruction,
-  callbackName: string,
+  callbackName: 'canDeactivate' | 'deactivate',
   next: Next,
   ignoreResult?: boolean
 ): Promise<any> => {
@@ -139,7 +139,7 @@ const addPreviousDeactivatable = (
 
 const processActivatable = (
   navigationInstruction: NavigationInstruction,
-  callbackName: string,
+  callbackName: 'canActivate' | 'activate',
   next: Next,
   ignoreResult?: boolean
 ): Promise<any> => {
@@ -176,7 +176,7 @@ const processActivatable = (
 
 interface IActivatableInfo {
   viewModel: any;
-  lifecycleArgs: any[];
+  lifecycleArgs: LifecycleArguments;
   router: Router;
 }
 
@@ -185,7 +185,7 @@ interface IActivatableInfo {
  */
 const findActivatable = (
   navigationInstruction: NavigationInstruction,
-  callbackName: string,
+  callbackName: 'canActivate' | 'activate',
   list: IActivatableInfo[] = [],
   router?: Router
 ): IActivatableInfo[] => {
@@ -195,8 +195,9 @@ const findActivatable = (
     .keys(plan)
     .forEach((viewPortName) => {
       let viewPortPlan = plan[viewPortName];
-      let viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
-      let viewModel = viewPortInstruction.component.viewModel;
+      let viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName] as ViewPortInstruction;
+      let viewPortComponent = viewPortInstruction.component;
+      let viewModel = viewPortComponent.viewModel;
 
       if (
         (viewPortPlan.strategy === activationStrategy.invokeLifecycle
@@ -211,12 +212,14 @@ const findActivatable = (
         });
       }
 
-      if (viewPortPlan.childNavigationInstruction) {
+      let childNavInstruction = viewPortPlan.childNavigationInstruction;
+
+      if (childNavInstruction) {
         findActivatable(
-          viewPortPlan.childNavigationInstruction,
+          childNavInstruction,
           callbackName,
           list,
-          viewPortInstruction.component.childRouter || router
+          viewPortComponent.childRouter || router
         );
       }
     });
@@ -297,11 +300,19 @@ class SafeSubscription {
   }
 }
 
+/**
+ * A function to process return value from `activate`/`canActivate` steps
+ * Supports observable/promise
+ *
+ * For observable, resolve at first next() or on complete()
+ */
 const processPotential = (obj: any, resolve: (val?: any) => any, reject: (err?: any) => any): any => {
+  // if promise like
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
   }
 
+  // if observable
   if (obj && typeof obj.subscribe === 'function') {
     let obs: IObservable = obj;
     return new SafeSubscription(sub => obs.subscribe({
@@ -326,6 +337,7 @@ const processPotential = (obj: any, resolve: (val?: any) => any, reject: (err?: 
     }));
   }
 
+  // else just resolve
   try {
     return resolve(obj);
   } catch (error) {

@@ -21,9 +21,9 @@ export const createNextFn = (instruction: NavigationInstruction, steps: StepRunn
     }
   } as Next;
 
-  next.complete = createCompletionHandler(next, PipelineStatus.completed);
-  next.cancel = createCompletionHandler(next, PipelineStatus.canceled);
-  next.reject = createCompletionHandler(next, PipelineStatus.rejected);
+  next.complete = createCompletionHandler(next, PipelineStatus.Completed);
+  next.cancel = createCompletionHandler(next, PipelineStatus.Canceled);
+  next.reject = createCompletionHandler(next, PipelineStatus.Rejected);
 
   return next;
 };
@@ -34,6 +34,6 @@ export const createCompletionHandler = (next: Next, status: PipelineStatus): Nex
     .resolve({
       status,
       output,
-      completed: status === PipelineStatus.completed
+      completed: status === PipelineStatus.Completed
     });
 };

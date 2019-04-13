@@ -10,6 +10,7 @@ import {
   ActivateNextStep
 } from './activation';
 import { PipelineStep, StepRunnerFunction, IPipelineSlot } from './interfaces';
+import { PipelineSlotName } from './pipeline-slot-name';
 
 
 class PipelineSlot implements IPipelineSlot {
@@ -52,15 +53,15 @@ export class PipelineProvider {
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, // optional
       LoadRouteStep,
-      this._createPipelineSlot('authorize'),
+      this._createPipelineSlot(PipelineSlotName.Authorize),
       CanActivateNextStep, // optional
-      this._createPipelineSlot('preActivate', 'modelbind'),
+      this._createPipelineSlot(PipelineSlotName.PreActivate, 'modelbind'),
       // NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, // optional
       ActivateNextStep, // optional
-      this._createPipelineSlot('preRender', 'precommit'),
+      this._createPipelineSlot(PipelineSlotName.PreRender, 'precommit'),
       CommitChangesStep,
-      this._createPipelineSlot('postRender', 'postcomplete')
+      this._createPipelineSlot(PipelineSlotName.PostRender, 'postcomplete')
     ];
   }
 

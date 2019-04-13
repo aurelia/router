@@ -11,6 +11,10 @@ export const activationStrategy: ActivationStrategy = {
   replace: 'replace'
 };
 
+/**
+ * Transform a navigation instruction into viewport plan record object,
+ * or a redirect request if user viewmodel demands
+ */
 export class BuildNavigationPlanStep {
   run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return _buildNavigationPlan(navigationInstruction)
@@ -31,6 +35,7 @@ export function _buildNavigationPlan(
 ): Promise<Record<string, ViewPortPlan> | Redirect> {
   let config = instruction.config;
 
+  // todo: separate and export for unit tests
   if ('redirect' in config) {
     const router = instruction.router;
     return router

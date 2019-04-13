@@ -2,6 +2,9 @@ import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, Activat
 import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
 
+/**
+ * Initialization options for a navigation instruction
+ */
 export interface NavigationInstructionInit {
   fragment: string;
   queryString?: string;

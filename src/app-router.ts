@@ -7,16 +7,7 @@ import { isNavigationCommand } from './navigation-commands';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { NavigationInstruction } from './navigation-instruction';
 import { ViewPort, ConfiguresRouter, PipelineResult } from './interfaces';
-import { RouterEvent } from './router-events';
-
-const {
-  canceled: RE$canceled,
-  childComplete: RE$childComplete,
-  complete: RE$complete,
-  error: RE$error,
-  processing: RE$processing,
-  success: RE$success
-} = RouterEvent;
+import { RouterEvent } from './router-event';
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {
@@ -201,7 +192,7 @@ export class AppRouter extends Router {
       instruction.previousInstruction = this.currentInstruction;
 
       if (!instructionCount) {
-        this.events.publish(RE$processing, { instruction });
+        this.events.publish(RouterEvent.Processing, { instruction });
       } else if (instructionCount === this.maxInstructionCount - 1) {
         logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
         restorePreviousLocation(this);
@@ -300,19 +291,19 @@ const resolveInstruction = (
     let eventName: string;
 
     if (result.output instanceof Error) {
-      eventName = RE$error;
+      eventName = RouterEvent.Error;
     } else if (!result.completed) {
-      eventName = RE$canceled;
+      eventName = RouterEvent.Canceled;
     } else {
       let queryString = instruction.queryString ? ('?' + instruction.queryString) : '';
       router.history.previousLocation = instruction.fragment + queryString;
-      eventName = RE$success;
+      eventName = RouterEvent.Success;
     }
 
     router.events.publish(eventName, eventArgs);
-    router.events.publish(RE$complete, eventArgs);
+    router.events.publish(RouterEvent.Complete, eventArgs);
   } else {
-    router.events.publish(RE$childComplete, eventArgs);
+    router.events.publish(RouterEvent.ChildComplete, eventArgs);
   }
 
   return result;
