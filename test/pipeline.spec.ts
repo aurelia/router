@@ -93,7 +93,7 @@ describe('Pipeline', function() {
     // { status, output, completed: status === pipelineStatus.completed }
     it('runs to "completed" when there is no step', async () => {
       let result = await pipeline.run(navInstruction);
-      expect(result.status).toBe(PipelineStatus.completed);
+      expect(result.status).toBe(PipelineStatus.Completed);
       expect(result.completed).toBe(true);
     });
 
@@ -108,7 +108,7 @@ describe('Pipeline', function() {
       pipeline.addStep(step);
       const result = await pipeline.run(navInstruction);
       expect(navInstruction.fragment).toBe(fragment);
-      expect(result.status).toBe(PipelineStatus.completed);
+      expect(result.status).toBe(PipelineStatus.Completed);
       expect(result.completed).toBe(true);
     });
 
@@ -144,7 +144,7 @@ describe('Pipeline', function() {
         expect(firstCalled).toBe(1);
         expect(secondCalled).toBe(1);
         expect(thirdCalled).toBe(0);
-        expect(result.status).toBe(PipelineStatus.rejected);
+        expect(result.status).toBe(PipelineStatus.Rejected);
       });
 
       it('completes with "rejected" status when a step invokes reject()', async () => {
@@ -178,7 +178,7 @@ describe('Pipeline', function() {
         expect(firstCalled).toBe(1);
         expect(secondCalled).toBe(1);
         expect(thirdCalled).toBe(0);
-        expect(result.status).toBe(PipelineStatus.rejected);
+        expect(result.status).toBe(PipelineStatus.Rejected);
         expect(result.output.toString()).toContain('Invalid abcdef ắếốộ');
       });
 
@@ -213,7 +213,7 @@ describe('Pipeline', function() {
         expect(firstCalled).toBe(1);
         expect(secondCalled).toBe(0);
         expect(thirdCalled).toBe(0);
-        expect(result.status).toBe(PipelineStatus.completed);
+        expect(result.status).toBe(PipelineStatus.Completed);
         expect(result.output.toString()).toBe(new Error('Valid ắếốộắếốộắếốộ').toString());
       });
 
@@ -248,7 +248,7 @@ describe('Pipeline', function() {
         expect(firstCalled).toBe(1);
         expect(secondCalled).toBe(0);
         expect(thirdCalled).toBe(0);
-        expect(result.status).toBe(PipelineStatus.canceled);
+        expect(result.status).toBe(PipelineStatus.Canceled);
         expect(result.output.toString()).toBe(new Error('Valid ắếốộắếốộắếốộ').toString());
       });
     });

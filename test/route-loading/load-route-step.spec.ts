@@ -35,7 +35,7 @@ describe('RouteLoading -- LoadRouteStep', function() {
 
   it('without RouteLoader implementation -- wrapped in Promise', async () => {
     const result: PipelineResult = await loadRouteStep.run(navInstruction, next);
-    expect(result.status).toBe(PipelineStatus.canceled);
+    expect(result.status).toBe(PipelineStatus.Canceled);
     expect(result.output.toString()).toBe(new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".').toString());
   });
 });

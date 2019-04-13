@@ -156,6 +156,9 @@ describe('app-router', () => {
       router
         ._dequeueInstruction()
         .then(result => {
+          if (!result) {
+            throw new Error('Invalid instruction processing');
+          }
           expect(result.completed).toBe(true);
           expect(result.status).toBe('completed');
           expect(result.output).toBe(output);
@@ -184,6 +187,9 @@ describe('app-router', () => {
 
       router._dequeueInstruction()
         .then(result => {
+          if (!result) {
+            throw new Error('Invalid instruction processing');
+          }
           expect(result.completed).toBe(false);
           expect(result.status).toBe('canceled');
           expect(result.output).toBe(output);
@@ -212,6 +218,9 @@ describe('app-router', () => {
 
       router._dequeueInstruction()
         .then(result => {
+          if (!result) {
+            throw new Error('Invalid instruction processing');
+          }
           expect(result.completed).toBe(false);
           expect(result.status).toBe('rejected');
           expect(result.output).toBe(output);
