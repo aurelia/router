@@ -1,4 +1,4 @@
-import { ViewPortPlan, ViewPortInstruction } from './interfaces';
+import { ViewPortPlan, ViewPortInstruction, RouteConfig, ViewPort } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { InternalActivationStrategy, ActivationStrategyType } from './activation-strategy';
@@ -98,7 +98,7 @@ export const buildTransitionPlans = (
 ): Promise<ViewPortPlansRecord> => {
 
   let newInstructionConfig = currentInstruction.config;
-  let newParams = hasDifferentParameterValues(previousInstruction, currentInstruction);
+  let hasNewParams = hasDifferentParameterValues(previousInstruction, currentInstruction);
   let pending: Promise<void>[] = [];
   let previousViewPortInstructions = previousInstruction.viewPortInstructions as Record<string, ViewPortInstruction>;
 
@@ -106,37 +106,38 @@ export const buildTransitionPlans = (
 
     const prevViewPortInstruction = previousViewPortInstructions[viewPortName];
     const prevViewPortComponent = prevViewPortInstruction.component;
-    const prevViewPortViewModel = prevViewPortComponent.viewModel;
+    const newInstructionViewPortConfigs = newInstructionConfig.viewPorts as Record<string, RouteConfig>;
 
-    let nextViewPortConfig = viewPortName in newInstructionConfig.viewPorts ? newInstructionConfig.viewPorts[viewPortName] : prevViewPortInstruction;
+    // if this is invoked on a viewport without any changes, based on new url,
+    // newViewPortConfig will be the existing viewport instruction
+    let nextViewPortConfig = viewPortName in newInstructionViewPortConfigs
+      ? newInstructionViewPortConfigs[viewPortName]
+      : prevViewPortInstruction;
 
     if (nextViewPortConfig.moduleId === null && viewPortName in defaultViewPortConfigs) {
       nextViewPortConfig = defaultViewPortConfigs[viewPortName];
     }
 
+    const viewPortActivationStrategy = determineActivationStrategy(
+      currentInstruction,
+      prevViewPortInstruction,
+      nextViewPortConfig,
+      hasNewParams,
+      forceLifecycleMinimum
+    );
     const viewPortPlan = viewPortPlans[viewPortName] = {
       name: viewPortName,
-      config: nextViewPortConfig,
+      // ViewPortInstruction can quack like a RouteConfig
+      config: nextViewPortConfig as RouteConfig,
       prevComponent: prevViewPortComponent,
-      prevModuleId: prevViewPortInstruction.moduleId
+      prevModuleId: prevViewPortInstruction.moduleId,
+      strategy: viewPortActivationStrategy
     } as ViewPortPlan;
 
-    let viewPortPlanStrategy: ActivationStrategyType;
-
-    if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
-      viewPortPlanStrategy = InternalActivationStrategy.Replace;
-    } else if ('determineActivationStrategy' in prevViewPortViewModel) {
-      viewPortPlanStrategy = prevViewPortViewModel.determineActivationStrategy(...currentInstruction.lifecycleArgs);
-    } else if (newInstructionConfig.activationStrategy) {
-      viewPortPlanStrategy = newInstructionConfig.activationStrategy;
-    } else if (newParams || forceLifecycleMinimum) {
-      viewPortPlanStrategy = InternalActivationStrategy.InvokeLifecycle;
-    } else {
-      viewPortPlanStrategy = InternalActivationStrategy.NoChange;
-    }
-    viewPortPlan.strategy = viewPortPlanStrategy;
-
-    if (viewPortPlanStrategy !== InternalActivationStrategy.Replace && prevViewPortInstruction.childRouter) {
+    // recursively build nav plans for all existing child routers/viewports of this viewport
+    // this is possible because existing child viewports and routers already have necessary information
+    // to process the wildcard path from parent instruction
+    if (viewPortActivationStrategy !== InternalActivationStrategy.Replace && prevViewPortInstruction.childRouter) {
       const path = currentInstruction.getWildcardPath();
       const task: Promise<void> = prevViewPortInstruction
         .childRouter
@@ -166,6 +167,37 @@ export const buildTransitionPlans = (
   }
 
   return Promise.all(pending).then(() => viewPortPlans);
+};
+
+/**
+ * @param newViewPortConfig if this is invoked on a viewport without any changes, based on new url, newViewPortConfig will be the existing viewport instruction
+ * @internal exported for unit testing
+ */
+export const determineActivationStrategy = (
+  currentNavInstruction: NavigationInstruction,
+  prevViewPortInstruction: ViewPortInstruction,
+  newViewPortConfig: RouteConfig | ViewPortInstruction,
+  // indicates whether there is difference between old and new url params
+  hasNewParams: boolean,
+  forceLifecycleMinimum?: boolean
+): ActivationStrategyType => {
+
+  let newInstructionConfig = currentNavInstruction.config;
+  let prevViewPortViewModel = prevViewPortInstruction.component.viewModel;
+  let viewPortPlanStrategy: ActivationStrategyType;
+
+  if (prevViewPortInstruction.moduleId !== newViewPortConfig.moduleId) {
+    viewPortPlanStrategy = InternalActivationStrategy.Replace;
+  } else if ('determineActivationStrategy' in prevViewPortViewModel) {
+    viewPortPlanStrategy = prevViewPortViewModel.determineActivationStrategy(...currentNavInstruction.lifecycleArgs);
+  } else if (newInstructionConfig.activationStrategy) {
+    viewPortPlanStrategy = newInstructionConfig.activationStrategy;
+  } else if (hasNewParams || forceLifecycleMinimum) {
+    viewPortPlanStrategy = InternalActivationStrategy.InvokeLifecycle;
+  } else {
+    viewPortPlanStrategy = InternalActivationStrategy.NoChange;
+  }
+  return viewPortPlanStrategy;
 };
 
 /**@internal exported for unit testing */
