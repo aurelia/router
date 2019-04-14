@@ -33,8 +33,8 @@ class PipelineSlot implements IPipelineSlot {
 }
 
 /**
-* Class responsible for creating the navigation pipeline.
-*/
+ * Class responsible for creating the navigation pipeline.
+ */
 export class PipelineProvider {
 
   /**@internal */
@@ -50,15 +50,15 @@ export class PipelineProvider {
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, // optional
       LoadRouteStep,
-      this._createPipelineSlot(PipelineSlotName.Authorize),
+      createPipelineSlot(container, PipelineSlotName.Authorize),
       CanActivateNextStep, // optional
-      this._createPipelineSlot(PipelineSlotName.PreActivate, 'modelbind'),
+      createPipelineSlot(container, PipelineSlotName.PreActivate, 'modelbind'),
       // NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, // optional
       ActivateNextStep, // optional
-      this._createPipelineSlot(PipelineSlotName.PreRender, 'precommit'),
+      createPipelineSlot(container, PipelineSlotName.PreRender, 'precommit'),
       CommitChangesStep,
-      this._createPipelineSlot(PipelineSlotName.PostRender, 'postcomplete')
+      createPipelineSlot(container, PipelineSlotName.PostRender, 'postcomplete')
     ];
   }
 
@@ -128,9 +128,9 @@ export class PipelineProvider {
     this._clearSteps(PipelineSlotName.PreRender);
     this._clearSteps(PipelineSlotName.PostRender);
   }
-
-  /**@internal */
-  _createPipelineSlot(name: string, alias?: string): PipelineSlot {
-    return new PipelineSlot(this.container, name, alias);
-  }
 }
+
+/**@internal */
+const createPipelineSlot = (container: Container, name: string, alias?: string): PipelineSlot => {
+  return new PipelineSlot(container, name, alias);
+};

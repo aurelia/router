@@ -1,6 +1,6 @@
-import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments } from './interfaces';
+import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortComponent } from './interfaces';
 import { Router } from './router';
-import { activationStrategy, ActivationStrategyType } from './activation-strategy';
+import { ActivationStrategyType, InternalActivationStrategy } from './activation-strategy';
 
 /**
  * Initialization options for a navigation instruction
@@ -18,55 +18,62 @@ export interface NavigationInstructionInit {
   plan?: Record<string, /*ViewPortInstruction*/any>;
 }
 
+export interface ViewPortInstructionInit {
+  name: string;
+  strategy: ActivationStrategyType;
+  moduleId: string;
+  component: ViewPortComponent;
+}
+
 /**
-* Class used to represent an instruction during a navigation.
-*/
+ * Class used to represent an instruction during a navigation.
+ */
 export class NavigationInstruction {
   /**
-  * The URL fragment.
-  */
+   * The URL fragment.
+   */
   fragment: string;
 
   /**
-  * The query string.
-  */
+   * The query string.
+   */
   queryString: string;
 
   /**
-  * Parameters extracted from the route pattern.
-  */
+   * Parameters extracted from the route pattern.
+   */
   params: any;
 
   /**
-  * Parameters extracted from the query string.
-  */
+   * Parameters extracted from the query string.
+   */
   queryParams: any;
 
   /**
-  * The route config for the route matching this instruction.
-  */
+   * The route config for the route matching this instruction.
+   */
   config: RouteConfig;
 
   /**
-  * The parent instruction, if this instruction was created by a child router.
-  */
+   * The parent instruction, if this instruction was created by a child router.
+   */
   parentInstruction: NavigationInstruction;
 
   parentCatchHandler: any;
 
   /**
-  * The instruction being replaced by this instruction in the current router.
-  */
+   * The instruction being replaced by this instruction in the current router.
+   */
   previousInstruction: NavigationInstruction;
 
   /**
-  * viewPort instructions to used activation.
-  */
+   * viewPort instructions to used activation.
+   */
   viewPortInstructions: Record<string, /*ViewPortInstruction*/any>;
 
   /**
-    * The router instance.
-  */
+   * The router instance.
+   */
   router: Router;
 
   /**
@@ -105,8 +112,8 @@ export class NavigationInstruction {
   }
 
   /**
-  * Gets an array containing this instruction and all child instructions for the current navigation.
-  */
+   * Gets an array containing this instruction and all child instructions for the current navigation.
+   */
   getAllInstructions(): Array<NavigationInstruction> {
     let instructions: NavigationInstruction[] = [this];
     let viewPortInstructions: Record<string, ViewPortInstruction> = this.viewPortInstructions;
@@ -122,34 +129,56 @@ export class NavigationInstruction {
   }
 
   /**
-  * Gets an array containing the instruction and all child instructions for the previous navigation.
-  * Previous instructions are no longer available after navigation completes.
-  */
+   * Gets an array containing the instruction and all child instructions for the previous navigation.
+   * Previous instructions are no longer available after navigation completes.
+   */
   getAllPreviousInstructions(): Array<NavigationInstruction> {
     return this.getAllInstructions().map(c => c.previousInstruction).filter(c => c);
   }
 
   /**
-  * Adds a viewPort instruction. Returns the newly created instruction based on parameters
-  */
-  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): /*ViewPortInstruction*/ any {
-    const lifecycleArgs = this.lifecycleArgs;
-    const config: RouteConfig = Object.assign({}, lifecycleArgs[1], { currentViewPort: name });
-    const viewportInstruction: ViewPortInstruction = this.viewPortInstructions[name] = {
-      name: name,
-      strategy: strategy,
-      moduleId: moduleId,
-      component: component,
-      childRouter: component.childRouter,
-      lifecycleArgs: [].concat(lifecycleArgs[0], config, lifecycleArgs[2]) as LifecycleArguments
-    };
+   * Adds a viewPort instruction. Returns the newly created instruction based on parameters
+   */
+  addViewPortInstruction(initOptions: ViewPortInstructionInit): /*ViewPortInstruction*/ any;
+  addViewPortInstruction(viewPortName: string, strategy: ActivationStrategyType, moduleId: string, component: any): /*ViewPortInstruction*/ any;
+  addViewPortInstruction(
+    nameOrInitOptions: string | ViewPortInstructionInit,
+    strategy?: ActivationStrategyType,
+    moduleId?: string,
+    component?: any
+  ): /*ViewPortInstruction*/ any {
 
-    return viewportInstruction;
+    let viewPortInstruction: ViewPortInstruction;
+    let viewPortName = typeof nameOrInitOptions === 'string' ? nameOrInitOptions : nameOrInitOptions.name;
+    const lifecycleArgs = this.lifecycleArgs;
+    const config: RouteConfig = Object.assign({}, lifecycleArgs[1], { currentViewPort: viewPortName });
+
+    if (typeof nameOrInitOptions === 'string') {
+      viewPortInstruction = {
+        name: nameOrInitOptions,
+        strategy: strategy,
+        moduleId: moduleId,
+        component: component,
+        childRouter: component.childRouter,
+        lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]] as LifecycleArguments
+      };
+    } else {
+      viewPortInstruction = {
+        name: viewPortName,
+        strategy: nameOrInitOptions.strategy,
+        component: nameOrInitOptions.component,
+        moduleId: nameOrInitOptions.moduleId,
+        childRouter: nameOrInitOptions.component.childRouter,
+        lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]] as LifecycleArguments
+      };
+    }
+
+    return this.viewPortInstructions[viewPortName] = viewPortInstruction;
   }
 
   /**
-  * Gets the name of the route pattern's wildcard parameter, if applicable.
-  */
+   * Gets the name of the route pattern's wildcard parameter, if applicable.
+   */
   getWildCardName(): string {
     // todo: potential issue, or at least unsafe typings
     let configRoute = this.config.route as string;
@@ -158,9 +187,9 @@ export class NavigationInstruction {
   }
 
   /**
-  * Gets the path and query string created by filling the route
-  * pattern's wildcard parameter with the matching param.
-  */
+   * Gets the path and query string created by filling the route
+   * pattern's wildcard parameter with the matching param.
+   */
   getWildcardPath(): string {
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
@@ -174,8 +203,8 @@ export class NavigationInstruction {
   }
 
   /**
-  * Gets the instruction's base URL, accounting for wildcard route parameters.
-  */
+   * Gets the instruction's base URL, accounting for wildcard route parameters.
+   */
   getBaseUrl(): string {
     let $encodeURI = encodeURI;
     let fragment = decodeURI(this.fragment);
@@ -204,7 +233,10 @@ export class NavigationInstruction {
     return $encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
   }
 
-  /**@internal */
+  /**
+   * Finalize a viewport instruction
+   * @internal
+   */
   _commitChanges(waitToSwap: boolean): Promise<void> {
     let router = this.router;
     router.currentInstruction = this;
@@ -230,10 +262,10 @@ export class NavigationInstruction {
         throw new Error(`There was no router-view found in the view for ${viewPortInstruction.moduleId}.`);
       }
 
-      let child_nav_instruction = viewPortInstruction.childNavigationInstruction;
-      if (viewPortInstruction.strategy === activationStrategy.replace) {
-        if (child_nav_instruction && child_nav_instruction.parentCatchHandler) {
-          loads.push(child_nav_instruction._commitChanges(waitToSwap));
+      let childNavInstruction = viewPortInstruction.childNavigationInstruction;
+      if (viewPortInstruction.strategy === InternalActivationStrategy.Replace) {
+        if (childNavInstruction && childNavInstruction.parentCatchHandler) {
+          loads.push(childNavInstruction._commitChanges(waitToSwap));
         } else {
           if (waitToSwap) {
             delaySwaps.push({ viewPort, viewPortInstruction });
@@ -241,15 +273,15 @@ export class NavigationInstruction {
           loads.push(
             viewPort
               .process(viewPortInstruction, waitToSwap)
-              .then(() => child_nav_instruction
-                ? child_nav_instruction._commitChanges(waitToSwap)
+              .then(() => childNavInstruction
+                ? childNavInstruction._commitChanges(waitToSwap)
                 : Promise.resolve()
               )
           );
         }
       } else {
-        if (child_nav_instruction) {
-          loads.push(child_nav_instruction._commitChanges(waitToSwap));
+        if (childNavInstruction) {
+          loads.push(childNavInstruction._commitChanges(waitToSwap));
         }
       }
     }

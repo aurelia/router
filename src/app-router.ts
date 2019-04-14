@@ -280,6 +280,7 @@ const resolveInstruction = (
 ): PipelineResult => {
   instruction.resolve(result);
 
+  let eventAggregator = router.events;
   let eventArgs = { instruction, result };
   if (!isInnerInstruction) {
     router.isNavigating = false;
@@ -304,10 +305,10 @@ const resolveInstruction = (
       eventName = RouterEvent.Success;
     }
 
-    router.events.publish(eventName, eventArgs);
-    router.events.publish(RouterEvent.Complete, eventArgs);
+    eventAggregator.publish(eventName, eventArgs);
+    eventAggregator.publish(RouterEvent.Complete, eventArgs);
   } else {
-    router.events.publish(RouterEvent.ChildComplete, eventArgs);
+    eventAggregator.publish(RouterEvent.ChildComplete, eventArgs);
   }
 
   return result;
@@ -316,7 +317,7 @@ const resolveInstruction = (
 const restorePreviousLocation = (router: AppRouter): void => {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
-    router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+    router.navigate(previousLocation, { trigger: false, replace: true });
   } else if (router.fallbackRoute) {
     router.navigate(router.fallbackRoute, { trigger: true, replace: true });
   } else {

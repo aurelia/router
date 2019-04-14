@@ -1,6 +1,7 @@
 import { Next } from './interfaces';
 import { NavigationInstruction } from './navigation-instruction';
 import { processDeactivatable, processActivatable } from './utilities-activation';
+
 /**
  * A pipeline step responsible for finding and activating method `canDeactivate` on a view model of a route
  */

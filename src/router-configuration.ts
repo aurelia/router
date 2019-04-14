@@ -102,7 +102,7 @@ export class RouterConfiguration {
    */
   map(route: RouteConfig | RouteConfig[]): RouterConfiguration {
     if (Array.isArray(route)) {
-      route.forEach(this.map.bind(this));
+      route.forEach(r => this.map(r));
       return this;
     }
 
@@ -169,24 +169,26 @@ export class RouterConfiguration {
       instructions[i](router);
     }
 
-    if (this.title) {
-      router.title = this.title;
+    let { title, titleSeparator, unknownRouteConfig, _fallbackRoute, viewPortDefaults } = this;
+
+    if (title) {
+      router.title = title;
     }
 
-    if (this.titleSeparator) {
-      router.titleSeparator = this.titleSeparator;
+    if (titleSeparator) {
+      router.titleSeparator = titleSeparator;
     }
 
-    if (this.unknownRouteConfig) {
-      router.handleUnknownRoutes(this.unknownRouteConfig);
+    if (unknownRouteConfig) {
+      router.handleUnknownRoutes(unknownRouteConfig);
     }
 
-    if (this._fallbackRoute) {
-      router.fallbackRoute = this._fallbackRoute;
+    if (_fallbackRoute) {
+      router.fallbackRoute = _fallbackRoute;
     }
 
-    if (this.viewPortDefaults) {
-      router.useViewPortDefaults(this.viewPortDefaults);
+    if (viewPortDefaults) {
+      router.useViewPortDefaults(viewPortDefaults);
     }
 
     Object.assign(router.options, this.options);

@@ -110,7 +110,7 @@ export const buildTransitionPlans = (
 
     let nextViewPortConfig = viewPortName in newInstructionConfig.viewPorts ? newInstructionConfig.viewPorts[viewPortName] : prevViewPortInstruction;
 
-    if (nextViewPortConfig.moduleId === null && viewPortName in currentInstruction.router.viewPortDefaults) {
+    if (nextViewPortConfig.moduleId === null && viewPortName in defaultViewPortConfigs) {
       nextViewPortConfig = defaultViewPortConfigs[viewPortName];
     }
 

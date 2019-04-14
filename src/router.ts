@@ -361,10 +361,10 @@ export class Router {
   }
 
   /**
-  * Creates a [[NavModel]] for the specified route config.
-  *
-  * @param config The route config.
-  */
+   * Creates a [[NavModel]] for the specified route config.
+   *
+   * @param config The route config.
+   */
   createNavModel(config: RouteConfig): NavModel {
     let navModel = new NavModel(
       this,
@@ -382,11 +382,11 @@ export class Router {
   }
 
   /**
-  * Registers a new route with the router.
-  *
-  * @param config The [[RouteConfig]].
-  * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
-  */
+   * Registers a new route with the router.
+   *
+   * @param config The [[RouteConfig]].
+   * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
+   */
   addRoute(config: RouteConfig, navModel?: NavModel): void {
     if (Array.isArray(config.route)) {
       let routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
@@ -467,28 +467,28 @@ export class Router {
   }
 
   /**
-  * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
-  *
-  * @param name The name of the route to check.
-  */
+   * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
+   *
+   * @param name The name of the route to check.
+   */
   hasRoute(name: string): boolean {
     return !!(this._recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
   }
 
   /**
-  * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
-  *
-  * @param name The name of the route to check.
-  */
+   * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
+   *
+   * @param name The name of the route to check.
+   */
   hasOwnRoute(name: string): boolean {
     return this._recognizer.hasRoute(name);
   }
 
   /**
-  * Register a handler to use when the incoming URL fragment doesn't match any registered routes.
-  *
-  * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
-  */
+   * Register a handler to use when the incoming URL fragment doesn't match any registered routes.
+   *
+   * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
+   */
   handleUnknownRoutes(config?: RouteConfigSpecifier): void {
     if (!config) {
       throw new Error('Invalid unknown route handler');
@@ -505,8 +505,8 @@ export class Router {
   }
 
   /**
-  * Updates the document title using the current navigation instruction.
-  */
+   * Updates the document title using the current navigation instruction.
+   */
   updateTitle(): void {
     let parentRouter = this.parent;
     if (parentRouter) {
@@ -521,9 +521,9 @@ export class Router {
   }
 
   /**
-  * Updates the navigation routes with hrefs relative to the current location.
-  * Note: This method will likely move to a plugin in a future release.
-  */
+   * Updates the navigation routes with hrefs relative to the current location.
+   * Note: This method will likely move to a plugin in a future release.
+   */
   refreshNavigation(): void {
     let nav = this.navigation;
 
