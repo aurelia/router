@@ -90,80 +90,80 @@ export class Router {
   titleSeparator: string | undefined;
 
   /**
-  * True if the [[Router]] has been configured.
-  */
+   * True if the [[Router]] has been configured.
+   */
   isConfigured: boolean;
 
   /**
-  * True if the [[Router]] is currently processing a navigation.
-  */
+   * True if the [[Router]] is currently processing a navigation.
+   */
   isNavigating: boolean;
 
   /**
-  * True if the [[Router]] is navigating due to explicit call to navigate function(s).
-  */
+   * True if the [[Router]] is navigating due to explicit call to navigate function(s).
+   */
   isExplicitNavigation: boolean;
 
   /**
-  * True if the [[Router]] is navigating due to explicit call to navigateBack function.
-  */
+   * True if the [[Router]] is navigating due to explicit call to navigateBack function.
+   */
   isExplicitNavigationBack: boolean;
 
   /**
-  * True if the [[Router]] is navigating into the app for the first time in the browser session.
-  */
+   * True if the [[Router]] is navigating into the app for the first time in the browser session.
+   */
   isNavigatingFirst: boolean;
 
   /**
-  * True if the [[Router]] is navigating to a page instance not in the browser session history.
-  */
+   * True if the [[Router]] is navigating to a page instance not in the browser session history.
+   */
   isNavigatingNew: boolean;
 
   /**
-  * True if the [[Router]] is navigating forward in the browser session history.
-  */
+   * True if the [[Router]] is navigating forward in the browser session history.
+   */
   isNavigatingForward: boolean;
 
   /**
-  * True if the [[Router]] is navigating back in the browser session history.
-  */
+   * True if the [[Router]] is navigating back in the browser session history.
+   */
   isNavigatingBack: boolean;
 
   /**
-  * True if the [[Router]] is navigating due to a browser refresh.
-  */
+   * True if the [[Router]] is navigating due to a browser refresh.
+   */
   isNavigatingRefresh: boolean;
 
   /**
-  * True if the previous instruction successfully completed the CanDeactivatePreviousStep in the current navigation.
-  */
+   * True if the previous instruction successfully completed the CanDeactivatePreviousStep in the current navigation.
+   */
   couldDeactivate: boolean;
 
   /**
-  * The currently active navigation tracker.
-  */
+   * The currently active navigation tracker.
+   */
   currentNavigationTracker: number;
 
   /**
-  * The navigation models for routes that specified [[RouteConfig.nav]].
-  */
+   * The navigation models for routes that specified [[RouteConfig.nav]].
+   */
   navigation: NavModel[];
 
   /**
-  * The currently active navigation instruction.
-  */
+   * The currently active navigation instruction.
+   */
   currentInstruction: NavigationInstruction;
 
   /**
-  * The parent router, or null if this instance is not a child router.
-  */
+   * The parent router, or null if this instance is not a child router.
+   */
   parent: Router = null;
 
   options: any = {};
 
   /**
-  * The defaults used when a viewport lacks specified content
-  */
+   * The defaults used when a viewport lacks specified content
+   */
   viewPortDefaults: Record<string, any> = {};
 
   /**@internal */
@@ -184,10 +184,10 @@ export class Router {
   _resolveConfiguredPromise: (value?: any) => void;
 
   /**
-  * Extension point to transform the document title before it is built and displayed.
-  * By default, child routers delegate to the parent router, and the app router
-  * returns the title unchanged.
-  */
+   * Extension point to transform the document title before it is built and displayed.
+   * By default, child routers delegate to the parent router, and the app router
+   * returns the title unchanged.
+   */
   transformTitle: (title: string) => string = (title: string) => {
     if (this.parent) {
       return this.parent.transformTitle(title);
@@ -196,9 +196,9 @@ export class Router {
   }
 
   /**
-  * @param container The [[Container]] to use when child routers.
-  * @param history The [[History]] implementation to delegate navigation requests to.
-  */
+   * @param container The [[Container]] to use when child routers.
+   * @param history The [[History]] implementation to delegate navigation requests to.
+   */
   constructor(container: Container, history: History) {
     this.container = container;
     this.history = history;
@@ -206,9 +206,9 @@ export class Router {
   }
 
   /**
-  * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
-  * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
-  */
+   * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+   * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+   */
   reset() {
     this.viewPorts = {};
     this.routes = [];
@@ -235,35 +235,35 @@ export class Router {
   }
 
   /**
-  * Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
-  */
+   * Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
+   */
   get isRoot(): boolean {
     return !this.parent;
   }
 
   /**
-  * Registers a viewPort to be used as a rendering target for activated routes.
-  *
-  * @param viewPort The viewPort.
-  * @param name The name of the viewPort. 'default' if unspecified.
-  */
+   * Registers a viewPort to be used as a rendering target for activated routes.
+   *
+   * @param viewPort The viewPort.
+   * @param name The name of the viewPort. 'default' if unspecified.
+   */
   registerViewPort(viewPort: /*ViewPort*/any, name?: string): void {
     name = name || 'default';
     this.viewPorts[name] = viewPort;
   }
 
   /**
-  * Returns a Promise that resolves when the router is configured.
-  */
+   * Returns a Promise that resolves when the router is configured.
+   */
   ensureConfigured(): Promise<void> {
     return this._configuredPromise;
   }
 
   /**
-  * Configures the router.
-  *
-  * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
-  */
+   * Configures the router.
+   *
+   * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
+   */
   configure(callbackOrConfig: RouterConfiguration | ((config: RouterConfiguration) => RouterConfiguration)): Promise<void> {
     this.isConfigured = true;
 
@@ -288,11 +288,11 @@ export class Router {
   }
 
   /**
-  * Navigates to a new location.
-  *
-  * @param fragment The URL fragment to use as the navigation destination.
-  * @param options The navigation options.
-  */
+   * Navigates to a new location.
+   *
+   * @param fragment The URL fragment to use as the navigation destination.
+   * @param options The navigation options.
+   */
   navigate(fragment: string, options?: NavigationOptions): boolean {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
@@ -303,21 +303,21 @@ export class Router {
   }
 
   /**
-  * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
-  * by [[Router.navigate]].
-  *
-  * @param route The name of the route to use when generating the navigation location.
-  * @param params The route parameters to be used when populating the route pattern.
-  * @param options The navigation options.
-  */
+   * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
+   * by [[Router.navigate]].
+   *
+   * @param route The name of the route to use when generating the navigation location.
+   * @param params The route parameters to be used when populating the route pattern.
+   * @param options The navigation options.
+   */
   navigateToRoute(route: string, params?: any, options?: NavigationOptions): boolean {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }
 
   /**
-  * Navigates back to the most recent location in history.
-  */
+   * Navigates back to the most recent location in history.
+   */
   navigateBack(): void {
     this.isExplicitNavigationBack = true;
     this.history.navigateBack();
@@ -336,13 +336,13 @@ export class Router {
   }
 
   /**
-  * Generates a URL fragment matching the specified route pattern.
-  *
-  * @param name The name of the route whose pattern should be used to generate the fragment.
-  * @param params The route params to be used to populate the route pattern.
-  * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
-  * @returns {string} A string containing the generated URL fragment.
-  */
+   * Generates a URL fragment matching the specified route pattern.
+   *
+   * @param name The name of the route whose pattern should be used to generate the fragment.
+   * @param params The route params to be used to populate the route pattern.
+   * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
+   * @returns {string} A string containing the generated URL fragment.
+   */
   generate(nameOrRoute: string | RouteConfig, params: any = {}, options: any = {}): string {
     // A child recognizer generates routes for potential child routes. Any potential child route is added
     // to the childRoute property of params for the childRouter to recognize. When generating routes, we
@@ -720,17 +720,19 @@ export const evaluateNavigationStrategy = (
   evaluator: Function,
   context?: any
 ): Promise<NavigationInstruction> => {
-  return Promise.resolve(evaluator.call(context, instruction)).then(() => {
-    if (!('viewPorts' in instruction.config)) {
-      instruction.config.viewPorts = {
-        'default': {
-          moduleId: instruction.config.moduleId
-        }
-      };
-    }
+  return Promise
+    .resolve(evaluator.call(context, instruction))
+    .then(() => {
+      if (!('viewPorts' in instruction.config)) {
+        instruction.config.viewPorts = {
+          'default': {
+            moduleId: instruction.config.moduleId
+          }
+        };
+      }
 
-    return instruction;
-  });
+      return instruction;
+    });
 };
 
 interface IRouteRecognizationResults extends Array<RecognizedRoute> {

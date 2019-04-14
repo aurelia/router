@@ -131,6 +131,6 @@ export class PipelineProvider {
 }
 
 /**@internal */
-const createPipelineSlot = (container: Container, name: string, alias?: string): PipelineSlot => {
+const createPipelineSlot = (container: Container, name: PipelineSlotName, alias?: string): PipelineSlot => {
   return new PipelineSlot(container, name, alias);
 };

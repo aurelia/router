@@ -55,19 +55,19 @@ export class Redirect implements NavigationCommand {
   }
 
   /**
-  * Called by the activation system to set the child router.
-  *
-  * @param router The router.
-  */
+   * Called by the activation system to set the child router.
+   *
+   * @param router The router.
+   */
   setRouter(router: Router): void {
     this.router = router;
   }
 
   /**
-  * Called by the navigation pipeline to navigate.
-  *
-  * @param appRouter The router to be redirected.
-  */
+   * Called by the navigation pipeline to navigate.
+   *
+   * @param appRouter The router to be redirected.
+   */
   navigate(appRouter: Router): void {
     let navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
     navigatingRouter.navigate(this.url, this.options);
@@ -75,8 +75,8 @@ export class Redirect implements NavigationCommand {
 }
 
 /**
-* Used during the activation lifecycle to cause a redirect to a named route.
-*/
+ * Used during the activation lifecycle to cause a redirect to a named route.
+ */
 export class RedirectToRoute implements NavigationCommand {
 
   route: string;
@@ -103,19 +103,19 @@ export class RedirectToRoute implements NavigationCommand {
   }
 
   /**
-  * Called by the activation system to set the child router.
-  *
-  * @param router The router.
-  */
+   * Called by the activation system to set the child router.
+   *
+   * @param router The router.
+   */
   setRouter(router: Router): void {
     this.router = router;
   }
 
   /**
-  * Called by the navigation pipeline to navigate.
-  *
-  * @param appRouter The router to be redirected.
-  */
+   * Called by the navigation pipeline to navigate.
+   *
+   * @param appRouter The router to be redirected.
+   */
   navigate(appRouter: Router): void {
     let navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
     navigatingRouter.navigateToRoute(this.route, this.params, this.options);
