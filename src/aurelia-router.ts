@@ -62,6 +62,6 @@ export {
 
 export { PipelineProvider } from './pipeline-provider';
 export { Pipeline } from './pipeline';
-export { RouteLoader } from './utilities-route-loading';
+export { RouteLoader } from './route-loader';
 export { RouterConfiguration } from './router-configuration';
 export { Router } from './router';

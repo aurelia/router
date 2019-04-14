@@ -2,8 +2,8 @@ import { RouteConfig, ViewPortComponent, ViewPortPlan, ViewPortInstruction } fro
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { _buildNavigationPlan } from './navigation-plan';
-import { Router } from './router';
-import { activationStrategy, InternalActivationStrategy } from './activation-strategy';
+import { InternalActivationStrategy } from './activation-strategy';
+import { RouteLoader } from './route-loader';
 
 /**
  * Loading plan calculated based on a navigration-instruction and a viewport plan
@@ -11,21 +11,6 @@ import { activationStrategy, InternalActivationStrategy } from './activation-str
 interface ILoadingPlan {
   viewPortPlan: ViewPortPlan;
   navigationInstruction: NavigationInstruction;
-}
-
-/**
- * Abstract class that is responsible for loading view / view model from a route config
- * The default implementation can be found in `aurelia-templating-router`
- */
-export class RouteLoader {
-  /**
-   * Load a route config based on its viewmodel / view configuration
-   */
-  // return typing: return typings used to be never
-  // as it was a throw. Changing it to Promise<any> should not cause any issues
-  loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<any> {
-    throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
-  }
 }
 
 /**

@@ -1,6 +1,6 @@
 import '../setup';
 import { Container } from 'aurelia-dependency-injection';
-import { RouteLoader } from '../../src/utilities-route-loading';
+import { RouteLoader } from '../../src/route-loader';
 import { LoadRouteStep } from '../../src/step-load-route';
 import { NavigationInstruction, Next, PipelineResult, activationStrategy, RouteConfig } from '../../src/aurelia-router';
 import { createNextFn } from '../../src/next';

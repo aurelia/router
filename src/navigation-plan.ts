@@ -19,15 +19,17 @@ export function _buildNavigationPlan(
   }
 
   const prevInstruction = instruction.previousInstruction;
-  const viewPortPlans: ViewPortPlansRecord = {};
   const defaultViewPortConfigs = instruction.router.viewPortDefaults;
 
   if (prevInstruction) {
-    return buildTransitionPlans(instruction, prevInstruction, viewPortPlans, defaultViewPortConfigs, forceLifecycleMinimum);
+    return buildTransitionPlans(instruction, prevInstruction, defaultViewPortConfigs, forceLifecycleMinimum);
   }
 
-  for (let viewPortName in config.viewPorts) {
-    let viewPortConfig = config.viewPorts[viewPortName];
+  // first navigation, only need to prepare a few information for each viewport plan
+  const viewPortPlans: ViewPortPlansRecord = {};
+  let viewPortConfigs = config.viewPorts;
+  for (let viewPortName in viewPortConfigs) {
+    let viewPortConfig = viewPortConfigs[viewPortName];
     if (viewPortConfig.moduleId === null && viewPortName in defaultViewPortConfigs) {
       viewPortConfig = defaultViewPortConfigs[viewPortName];
     }
@@ -92,11 +94,11 @@ export const buildRedirectPlan = (instruction: NavigationInstruction) => {
 export const buildTransitionPlans = (
   currentInstruction: NavigationInstruction,
   previousInstruction: NavigationInstruction,
-  viewPortPlans: ViewPortPlansRecord,
   defaultViewPortConfigs: Record<string, ViewPortInstruction>,
   forceLifecycleMinimum?: boolean
 ): Promise<ViewPortPlansRecord> => {
 
+  let viewPortPlans: ViewPortPlansRecord = {};
   let newInstructionConfig = currentInstruction.config;
   let hasNewParams = hasDifferentParameterValues(previousInstruction, currentInstruction);
   let pending: Promise<void>[] = [];

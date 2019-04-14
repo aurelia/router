@@ -1,6 +1,7 @@
 import { Next } from './interfaces';
 import { NavigationInstruction } from './navigation-instruction';
-import { RouteLoader, loadNewRoute } from './utilities-route-loading';
+import { loadNewRoute } from './utilities-route-loading';
+import { RouteLoader } from './route-loader';
 /**
  * A pipeline step responsible for loading a route config of a navigation instruction
  */
