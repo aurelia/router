@@ -1,1 +1,0 @@
-export * from 'aurelia-router/aurelia-router';
