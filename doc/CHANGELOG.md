@@ -1,3 +1,20 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [1.6.4](https://github.com/aurelia/router/compare/1.6.3...1.6.4) (2019-04-15)
+
+
+### Bug Fixes
+
+* **app-router.spec:** Change RoutingComponent to ViewPortComponent ([85c28c2](https://github.com/aurelia/router/commit/85c28c2))
+* **redirects:** Leverage a childRecognizer ([cdf4b06](https://github.com/aurelia/router/commit/cdf4b06))
+* **router:** Accept name or route config for generate ([875bcc8](https://github.com/aurelia/router/commit/875bcc8))
+* **typings:** adjust typings ([0dcfdf1](https://github.com/aurelia/router/commit/0dcfdf1))
+* **typings:** adjust typings for backward-compat ([26466ff](https://github.com/aurelia/router/commit/26466ff))
+
+
+
 <a name="1.6.3"></a>
 ## [1.6.3](https://github.com/aurelia/router/compare/1.6.2...1.6.3) (2018-09-27)
 
