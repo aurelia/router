@@ -8,7 +8,7 @@ import {
   PipelineProvider,
   AppRouter,
   NavigationInstruction
-} from '../src';
+} from '../src/aurelia-router';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 
@@ -370,7 +370,7 @@ describe('the router', () => {
       it('should use route config handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = { moduleId: 'test' } as RouteConfig;
+            config.unknownRouteConfig = { moduleId: 'test' } as RouteConfig as any;
             return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
@@ -382,7 +382,7 @@ describe('the router', () => {
       it('should use function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => ({ moduleId: 'test' } as RouteConfig);
+            config.unknownRouteConfig = instruction => ({ moduleId: 'test' } as RouteConfig) as any;
             return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
@@ -394,7 +394,7 @@ describe('the router', () => {
       it('should use async function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' } as RouteConfig);
+            config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' } as RouteConfig) as any;
             return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
@@ -406,13 +406,13 @@ describe('the router', () => {
       it('should pass instruction to function handler', (done) => {
         router
           .configure(config => {
-            config.unknownRouteConfig = instruction => {
+            config.unknownRouteConfig = ((instruction: NavigationInstruction) => {
               expect(instruction.fragment).toBe('foo/123');
               expect(instruction.queryString).toBe('bar=456');
               expect(instruction.config).toBe(null);
 
               return { moduleId: 'test' } as RouteConfig;
-            };
+            }) as any;
             return config;
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
@@ -435,7 +435,7 @@ describe('the router', () => {
           })
           .then(() => router._createNavigationInstruction('foo/123?bar=456'))
           .then(() => fail('should have rejected'))
-          .catch(done);
+          .catch(() => done());
       });
     });
   });

@@ -1,7 +1,8 @@
-import { RouteConfig, PipelineStep, RouteConfigSpecifier, ViewPortInstruction } from './interfaces';
+import { RouteConfig, PipelineStep, RouteConfigSpecifier } from './interfaces';
 import { _ensureArrayWithSingleRoutePerConfig } from './util';
 import { Router } from './router';
 import { NavigationInstruction } from './navigation-instruction';
+import { PipelineSlotName } from './pipeline-slot-name';
 
 /**
  * Class used to configure a [[Router]] instance.
@@ -22,7 +23,7 @@ export class RouterConfiguration {
   title: string;
   titleSeparator: string;
   unknownRouteConfig: RouteConfigSpecifier;
-  viewPortDefaults: Record<string, Partial<ViewPortInstruction>>;
+  viewPortDefaults: Record<string, any>;
 
   /**@internal */
   _fallbackRoute: string;
@@ -49,7 +50,7 @@ export class RouterConfiguration {
   * @chainable
   */
   addAuthorizeStep(step: Function | PipelineStep): RouterConfiguration {
-    return this.addPipelineStep('authorize', step);
+    return this.addPipelineStep(PipelineSlotName.Authorize, step);
   }
 
   /**
@@ -59,7 +60,7 @@ export class RouterConfiguration {
   * @chainable
   */
   addPreActivateStep(step: Function | PipelineStep): RouterConfiguration {
-    return this.addPipelineStep('preActivate', step);
+    return this.addPipelineStep(PipelineSlotName.PreActivate, step);
   }
 
   /**
@@ -69,7 +70,7 @@ export class RouterConfiguration {
   * @chainable
   */
   addPreRenderStep(step: Function | PipelineStep): RouterConfiguration {
-    return this.addPipelineStep('preRender', step);
+    return this.addPipelineStep(PipelineSlotName.PreRender, step);
   }
 
   /**
@@ -79,7 +80,7 @@ export class RouterConfiguration {
   * @chainable
   */
   addPostRenderStep(step: Function | PipelineStep): RouterConfiguration {
-    return this.addPipelineStep('postRender', step);
+    return this.addPipelineStep(PipelineSlotName.PostRender, step);
   }
 
   /**

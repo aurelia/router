@@ -3,7 +3,7 @@ import {
   RedirectToRoute,
   isNavigationCommand,
   NavigationCommand
-} from '../src';
+} from '../src/aurelia-router';
 import { MockRouter } from './shared';
 
 describe('isNavigationCommand', () => {

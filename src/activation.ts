@@ -1,30 +1,41 @@
-import { activationStrategy } from './navigation-plan';
+import { Next, ViewPortComponent, ViewPortPlan, ViewPortInstruction, LifecycleArguments } from './interfaces';
 import { isNavigationCommand } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { Next } from './pipeline';
+import { activationStrategy } from './navigation-plan';
 import { Router } from './router';
-import { ViewPortComponent, ViewPortPlan } from './interfaces';
 
+/**
+ * A pipeline step responsible for finding and activating method `canDeactivate` on a view model of a route
+ */
 export class CanDeactivatePreviousStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return processDeactivatable(navigationInstruction, 'canDeactivate', next);
   }
 }
 
+/**
+ * A pipeline step responsible for finding and activating method `canActivate` on a view model of a route
+ */
 export class CanActivateNextStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return processActivatable(navigationInstruction, 'canActivate', next);
   }
 }
 
+/**
+ * A pipeline step responsible for finding and activating method `deactivate` on a view model of a route
+ */
 export class DeactivatePreviousStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return processDeactivatable(navigationInstruction, 'deactivate', next, true);
   }
 }
 
+/**
+ * A pipeline step responsible for finding and activating method `activate` on a view model of a route
+ */
 export class ActivateNextStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return processActivatable(navigationInstruction, 'activate', next, true);
   }
 }
@@ -33,13 +44,13 @@ export class ActivateNextStep {
  * Recursively find list of deactivate-able view models
  * and invoke the either 'canDeactivate' or 'deactivate' on each
  */
-function processDeactivatable(
+const processDeactivatable = (
   navigationInstruction: NavigationInstruction,
-  callbackName: string,
+  callbackName: 'canDeactivate' | 'deactivate',
   next: Next,
   ignoreResult?: boolean
-): Promise<any> {
-  const plan = navigationInstruction.plan;
+): Promise<any> => {
+  let plan: Record<string, ViewPortPlan> = navigationInstruction.plan;
   let infos = findDeactivatable(plan, callbackName);
   let i = infos.length; // query from inside out
 
@@ -68,16 +79,16 @@ function processDeactivatable(
   }
 
   return iterate();
-}
+};
 
 /**
  * Recursively find and returns a list of deactivate-able view models
  */
-function findDeactivatable(
+const findDeactivatable = (
   plan: Record<string, ViewPortPlan>,
   callbackName: string,
   list: IActivatableInfo[] = []
-): any[] {
+): any[] => {
   for (let viewPortName in plan) {
     let viewPortPlan = plan[viewPortName];
     let prevComponent = viewPortPlan.prevComponent;
@@ -100,9 +111,13 @@ function findDeactivatable(
   }
 
   return list;
-}
+};
 
-function addPreviousDeactivatable(component: ViewPortComponent, callbackName: string, list: IActivatableInfo[]): void {
+const addPreviousDeactivatable = (
+  component: ViewPortComponent,
+  callbackName: string,
+  list: IActivatableInfo[]
+): void => {
   let childRouter = component.childRouter;
 
   if (childRouter && childRouter.currentInstruction) {
@@ -120,14 +135,14 @@ function addPreviousDeactivatable(component: ViewPortComponent, callbackName: st
       addPreviousDeactivatable(prevComponent, callbackName, list);
     }
   }
-}
+};
 
-function processActivatable(
+const processActivatable = (
   navigationInstruction: NavigationInstruction,
-  callbackName: string,
+  callbackName: 'canActivate' | 'activate',
   next: Next,
   ignoreResult?: boolean
-) {
+): Promise<any> => {
   let infos = findActivatable(navigationInstruction, callbackName);
   let length = infos.length;
   let i = -1; // query from top down
@@ -157,31 +172,32 @@ function processActivatable(
   }
 
   return iterate();
-}
+};
 
 interface IActivatableInfo {
   viewModel: any;
-  lifecycleArgs: any[];
+  lifecycleArgs: LifecycleArguments;
   router: Router;
 }
 
 /**
  * Find list of activatable view model and add to list (3rd parameter)
  */
-function findActivatable(
+const findActivatable = (
   navigationInstruction: NavigationInstruction,
-  callbackName: string,
+  callbackName: 'canActivate' | 'activate',
   list: IActivatableInfo[] = [],
   router?: Router
-): IActivatableInfo[] {
-  let plan = navigationInstruction.plan;
+): IActivatableInfo[] => {
+  let plan: Record<string, ViewPortPlan> = navigationInstruction.plan;
 
   Object
     .keys(plan)
     .forEach((viewPortName) => {
       let viewPortPlan = plan[viewPortName];
-      let viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
-      let viewModel = viewPortInstruction.component.viewModel;
+      let viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName] as ViewPortInstruction;
+      let viewPortComponent = viewPortInstruction.component;
+      let viewModel = viewPortComponent.viewModel;
 
       if (
         (viewPortPlan.strategy === activationStrategy.invokeLifecycle
@@ -196,20 +212,22 @@ function findActivatable(
         });
       }
 
-      if (viewPortPlan.childNavigationInstruction) {
+      let childNavInstruction = viewPortPlan.childNavigationInstruction;
+
+      if (childNavInstruction) {
         findActivatable(
-          viewPortPlan.childNavigationInstruction,
+          childNavInstruction,
           callbackName,
           list,
-          viewPortInstruction.component.childRouter || router
+          viewPortComponent.childRouter || router
         );
       }
     });
 
   return list;
-}
+};
 
-function shouldContinue(output: any, router?: Router) {
+const shouldContinue = <T = any>(output: T, router?: Router): boolean | T => {
   if (output instanceof Error) {
     return false;
   }
@@ -227,7 +245,7 @@ function shouldContinue(output: any, router?: Router) {
   }
 
   return output;
-}
+};
 
 /**
  * A basic interface for an Observable type
@@ -282,11 +300,19 @@ class SafeSubscription {
   }
 }
 
-function processPotential(obj: any, resolve: (val?: any) => any, reject: (err?: any) => any) {
+/**
+ * A function to process return value from `activate`/`canActivate` steps
+ * Supports observable/promise
+ *
+ * For observable, resolve at first next() or on complete()
+ */
+const processPotential = (obj: any, resolve: (val?: any) => any, reject: (err?: any) => any): any => {
+  // if promise like
   if (obj && typeof obj.then === 'function') {
     return Promise.resolve(obj).then(resolve).catch(reject);
   }
 
+  // if observable
   if (obj && typeof obj.subscribe === 'function') {
     let obs: IObservable = obj;
     return new SafeSubscription(sub => obs.subscribe({
@@ -311,9 +337,10 @@ function processPotential(obj: any, resolve: (val?: any) => any, reject: (err?: 
     }));
   }
 
+  // else just resolve
   try {
     return resolve(obj);
   } catch (error) {
     return reject(error);
   }
-}
+};

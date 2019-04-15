@@ -7,17 +7,19 @@ import {
   RouteLoader,
   Pipeline,
   NavigationInstruction,
-  ViewPortComponent,
   NavigationCommand,
   Next,
   RouterConfiguration,
-  ViewPortInstruction,
-  ViewPort,
   PipelineStep
-} from '../src';
+} from '../src/aurelia-router';
 import { MockHistory, MockInstruction } from './shared';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { History } from 'aurelia-history';
+import {
+  ViewPortComponent,
+  ViewPortInstruction,
+  ViewPort
+} from '../src/interfaces';
 
 declare module 'aurelia-history' {
   interface History {
@@ -154,6 +156,9 @@ describe('app-router', () => {
       router
         ._dequeueInstruction()
         .then(result => {
+          if (!result) {
+            throw new Error('Invalid instruction processing');
+          }
           expect(result.completed).toBe(true);
           expect(result.status).toBe('completed');
           expect(result.output).toBe(output);
@@ -182,6 +187,9 @@ describe('app-router', () => {
 
       router._dequeueInstruction()
         .then(result => {
+          if (!result) {
+            throw new Error('Invalid instruction processing');
+          }
           expect(result.completed).toBe(false);
           expect(result.status).toBe('canceled');
           expect(result.output).toBe(output);
@@ -210,6 +218,9 @@ describe('app-router', () => {
 
       router._dequeueInstruction()
         .then(result => {
+          if (!result) {
+            throw new Error('Invalid instruction processing');
+          }
           expect(result.completed).toBe(false);
           expect(result.status).toBe('rejected');
           expect(result.output).toBe(output);

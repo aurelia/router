@@ -9,10 +9,13 @@ import {
   DeactivatePreviousStep,
   ActivateNextStep
 } from './activation';
-import { PipelineStep } from './interfaces';
+import { PipelineStep, StepRunnerFunction, IPipelineSlot } from './interfaces';
+import { PipelineSlotName } from './pipeline-slot-name';
 
-
-class PipelineSlot {
+/**
+ * A multi-slots Pipeline Placeholder Step for hooking into a pipeline execution
+ */
+class PipelineSlot implements IPipelineSlot {
 
   /**@internal */
   container: Container;
@@ -29,7 +32,7 @@ class PipelineSlot {
     this.slotAlias = alias;
   }
 
-  getSteps(): PipelineStep[] {
+  getSteps(): (StepRunnerFunction | IPipelineSlot | PipelineStep)[] {
     return this.steps.map(x => this.container.get(x));
   }
 }
@@ -39,6 +42,7 @@ class PipelineSlot {
 */
 export class PipelineProvider {
 
+  /**@internal */
   static inject() { return [Container]; }
   /**@internal */
   container: Container;
@@ -51,15 +55,15 @@ export class PipelineProvider {
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, // optional
       LoadRouteStep,
-      this._createPipelineSlot('authorize'),
+      this._createPipelineSlot(PipelineSlotName.Authorize),
       CanActivateNextStep, // optional
-      this._createPipelineSlot('preActivate', 'modelbind'),
+      this._createPipelineSlot(PipelineSlotName.PreActivate, 'modelbind'),
       // NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, // optional
       ActivateNextStep, // optional
-      this._createPipelineSlot('preRender', 'precommit'),
+      this._createPipelineSlot(PipelineSlotName.PreRender, 'precommit'),
       CommitChangesStep,
-      this._createPipelineSlot('postRender', 'postcomplete')
+      this._createPipelineSlot(PipelineSlotName.PostRender, 'postcomplete')
     ];
   }
 
@@ -88,7 +92,8 @@ export class PipelineProvider {
   addStep(name: string, step: PipelineStep | Function): void {
     let found = this._findStep(name);
     if (found) {
-      if (!found.steps.includes(step)) { // prevent duplicates
+      // prevent duplicates
+      if (!found.steps.includes(step)) {
         found.steps.push(step);
       }
     } else {
@@ -102,7 +107,8 @@ export class PipelineProvider {
   removeStep(name: string, step: PipelineStep): void {
     let slot = this._findStep(name);
     if (slot) {
-      slot.steps.splice(slot.steps.indexOf(step), 1);
+      let steps = slot.steps;
+      steps.splice(steps.indexOf(step), 1);
     }
   }
 

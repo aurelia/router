@@ -1,7 +1,6 @@
+import { ActivationStrategy, Next, ViewPortPlan } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { ActivationStrategy, ViewPortPlan } from './interfaces';
-import { Next } from './pipeline';
 
 /**
 * The strategy to use when activating modules during navigation.
@@ -12,8 +11,12 @@ export const activationStrategy: ActivationStrategy = {
   replace: 'replace'
 };
 
+/**
+ * Transform a navigation instruction into viewport plan record object,
+ * or a redirect request if user viewmodel demands
+ */
 export class BuildNavigationPlanStep {
-  run(navigationInstruction: NavigationInstruction, next: Next) {
+  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return _buildNavigationPlan(navigationInstruction)
       .then(plan => {
         if (plan instanceof Redirect) {
@@ -32,6 +35,7 @@ export function _buildNavigationPlan(
 ): Promise<Record<string, ViewPortPlan> | Redirect> {
   let config = instruction.config;
 
+  // todo: separate and export for unit tests
   if ('redirect' in config) {
     const router = instruction.router;
     return router
@@ -106,7 +110,7 @@ export function _buildNavigationPlan(
         const task: Promise<void> = prevViewPortInstruction
           .childRouter
           ._createNavigationInstruction(path, instruction)
-          .then(childInstruction => {
+          .then((childInstruction: any) => {
             viewPortPlan.childNavigationInstruction = childInstruction;
 
             return _buildNavigationPlan(

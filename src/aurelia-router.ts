@@ -8,12 +8,17 @@ export {
   ConfiguresRouter,
   RouteConfig,
   NavigationResult,
+  Next,
   PipelineResult,
-  PipelineStep,
-  ViewPort,
-  ViewPortPlan,
-  ViewPortInstruction,
-  ViewPortComponent
+  PipelineStep
+  // following are excluded and wait for more proper chance to be introduced for stronger typings story
+  // this is to avoid any typings issue for a long delayed release
+  /**
+   * ViewPort
+   * ViewPortPlan
+   * ViewPortInstruction
+   * ViewPortComponent
+   */
 } from './interfaces';
 export {
   ActivateNextStep,
@@ -32,8 +37,21 @@ export {
   NavigationInstruction,
   NavigationInstructionInit
 } from './navigation-instruction';
+
+export {
+  PipelineStatus
+} from './pipeline-status';
+
+export {
+  RouterEvent
+} from './router-event';
+
+export {
+  PipelineSlotName
+} from './pipeline-slot-name';
+
 export { PipelineProvider } from './pipeline-provider';
-export { Pipeline, Next, pipelineStatus } from './pipeline';
+export { Pipeline } from './pipeline';
 export { RouteLoader, LoadRouteStep } from './route-loading';
 export { RouterConfiguration } from './router-configuration';
 export { Router } from './router';

@@ -4,8 +4,8 @@ import { Router } from './router';
 import { NavModel } from './nav-model';
 import { RouterConfiguration } from './router-configuration';
 import { NavigationCommand } from './navigation-commands';
-import { Next } from './pipeline';
 import { IObservable } from './activation';
+import { PipelineStatus } from './pipeline-status';
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {
@@ -14,8 +14,34 @@ declare module 'aurelia-dependency-injection' {
   }
 }
 
-export type RouteCommand = { redirect: string } | { moduleId: string } | { viewModel: string };
-export type RouteConfigSpecifier = string | RouteCommand | ((instruction: NavigationInstruction) => string | RouteCommand | Promise<string | RouteCommand>);
+/**
+ * A configuration object that describes a route for redirection
+ */
+export interface RedirectConfig {
+  /**
+   * path that will be redirected to. This is relative to currently in process router
+   */
+  redirect: string;
+  /**
+   * A backward compat interface. Should be ignored in new code
+   */
+  [key: string]: any;
+}
+
+/**
+ * A more generic RouteConfig for unknown route. Either a redirect config or a `RouteConfig`
+ * Redirect config is generally used in `mapUnknownRoutes` of `RouterConfiguration`
+ */
+export type RouteOrRedirectConfig = RouteConfig | RedirectConfig;
+
+/**
+ * A RouteConfig specifier. Could be a string, or an object with `RouteConfig` interface shape,
+ * or could be an object with redirect interface shape
+ */
+export type RouteConfigSpecifier =
+  string
+  | RouteOrRedirectConfig
+  | ((instruction: NavigationInstruction) => string | RouteOrRedirectConfig | Promise<string | RouteOrRedirectConfig>);
 
 /**
 * A configuration object that describes a route.
@@ -212,6 +238,9 @@ export interface ActivationStrategy {
   replace: 'replace';
 }
 
+/**
+ * Enum like type for activation strategy built-in values
+ */
 export type ActivationStrategyType = ActivationStrategy[keyof ActivationStrategy];
 
 /**
@@ -231,6 +260,14 @@ export interface PipelineStep {
    * @internal
    */
   getSteps?(): any[];
+}
+
+/**
+ * A multi-step pipeline step that helps enable multiple hooks to the pipeline
+ */
+export interface IPipelineSlot {
+  /**@internal */
+  getSteps(): (StepRunnerFunction | IPipelineSlot | PipelineStep)[];
 }
 
 /**
@@ -258,6 +295,9 @@ export interface ViewPortComponent {
   [key: string]: any;
 }
 
+/**
+ * A viewport used by a Router to render a route config
+ */
 export interface ViewPort {
   /**@internal */
   container: Container;
@@ -265,6 +305,9 @@ export interface ViewPort {
   process(viewportInstruction: ViewPortInstruction, waitToSwap?: boolean): Promise<void>;
 }
 
+/**
+ * A viewport plan to create/update a viewport.
+ */
 export interface ViewPortPlan {
   name: string;
   config: RouteConfig;
@@ -297,3 +340,44 @@ export interface ViewPortInstruction {
 export type NavigationResult = boolean | Promise<PipelineResult | boolean>;
 
 export type LifecycleArguments = [Record<string, string>, RouteConfig, NavigationInstruction];
+
+/**
+* A callback to indicate when pipeline processing should advance to the next step
+* or be aborted.
+*/
+export interface Next<T = any> {
+  /**
+  * Indicates the successful completion of the pipeline step.
+  */
+  (): Promise<any>;
+  /**
+  * Indicates the successful completion of the entire pipeline.
+  */
+  complete: NextCompletionHandler<T>;
+
+  /**
+  * Indicates that the pipeline should cancel processing.
+  */
+  cancel: NextCompletionHandler<T>;
+
+  /**
+  * Indicates that pipeline processing has failed and should be stopped.
+  */
+  reject: NextCompletionHandler<T>;
+}
+
+/**
+ * Next Completion result. Comprises of final status, output (could be value/error) and flag `completed`
+ */
+export interface NextCompletionResult<T = any> {
+  status: PipelineStatus;
+  output: T;
+  completed: boolean;
+}
+
+/**
+ * Handler for resolving `NextCompletionResult`
+ */
+export type NextCompletionHandler<T = any> = (output?: T) => Promise<NextCompletionResult<T>>;
+
+export type StepRunnerFunction = <TThis = any>(this: TThis, instruction: NavigationInstruction, next: Next) => any;

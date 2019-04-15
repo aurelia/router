@@ -8,7 +8,7 @@ import {
   NavigationInstructionInit,
   BuildNavigationPlanStep,
   RouteConfig
-} from '../src';
+} from '../src/aurelia-router';
 import { MockHistory, createPipelineState, MockPipelineState } from './shared';
 
 describe('NavigationPlanStep', () => {

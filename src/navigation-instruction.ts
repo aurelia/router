@@ -1,7 +1,10 @@
-import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ViewPortPlan, ActivationStrategyType } from './interfaces';
+import { ViewPortInstruction, RouteConfig, ViewPort, LifecycleArguments, ActivationStrategyType } from './interfaces';
 import { Router } from './router';
 import { activationStrategy } from './navigation-plan';
 
+/**
+ * Initialization options for a navigation instruction
+ */
 export interface NavigationInstructionInit {
   fragment: string;
   queryString?: string;
@@ -12,15 +15,20 @@ export interface NavigationInstructionInit {
   previousInstruction?: NavigationInstruction;
   router: Router;
   options?: Object;
-  plan?: Record<string, ViewPortInstruction>;
+  plan?: Record<string, /*ViewPortInstruction*/any>;
 }
 
+/**
+ * A pipeline step for instructing a piepline to commit changes on a navigation instruction
+ */
 export class CommitChangesStep {
-  run(navigationInstruction: NavigationInstruction, next: Function) {
-    return navigationInstruction._commitChanges(true).then(() => {
-      navigationInstruction._updateTitle();
-      return next();
-    });
+  run(navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+    return navigationInstruction
+      ._commitChanges(/*wait to swap?*/true)
+      .then(() => {
+        navigationInstruction._updateTitle();
+        return next();
+      });
   }
 }
 
@@ -68,14 +76,17 @@ export class NavigationInstruction {
   /**
   * viewPort instructions to used activation.
   */
-  viewPortInstructions: Record<string, ViewPortInstruction>;
+  viewPortInstructions: Record<string, /*ViewPortInstruction*/any>;
 
   /**
     * The router instance.
   */
   router: Router;
 
-  plan: Record<string, ViewPortPlan> = null;
+  /**
+   * Current built viewport plan of this nav instruction
+   */
+  plan: Record<string, /*ViewPortPlan*/any> = null;
 
   options: Record<string, any> = {};
 
@@ -112,8 +123,10 @@ export class NavigationInstruction {
   */
   getAllInstructions(): Array<NavigationInstruction> {
     let instructions: NavigationInstruction[] = [this];
-    for (let key in this.viewPortInstructions) {
-      let childInstruction = this.viewPortInstructions[key].childNavigationInstruction;
+    let viewPortInstructions: Record<string, ViewPortInstruction> = this.viewPortInstructions;
+
+    for (let key in viewPortInstructions) {
+      let childInstruction = viewPortInstructions[key].childNavigationInstruction;
       if (childInstruction) {
         instructions.push(...childInstruction.getAllInstructions());
       }
@@ -131,17 +144,18 @@ export class NavigationInstruction {
   }
 
   /**
-  * Adds a viewPort instruction.
+  * Adds a viewPort instruction. Returns the newly created instruction based on parameters
   */
-  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): ViewPortInstruction {
-    const config: RouteConfig = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: name });
+  addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): /*ViewPortInstruction*/ any {
+    const lifecycleArgs = this.lifecycleArgs;
+    const config: RouteConfig = Object.assign({}, lifecycleArgs[1], { currentViewPort: name });
     const viewportInstruction = this.viewPortInstructions[name] = {
       name: name,
       strategy: strategy,
       moduleId: moduleId,
       component: component,
       childRouter: component.childRouter,
-      lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2]) as LifecycleArguments
+      lifecycleArgs: [].concat(lifecycleArgs[0], config, lifecycleArgs[2]) as LifecycleArguments
     };
 
     return viewportInstruction;
@@ -151,8 +165,10 @@ export class NavigationInstruction {
   * Gets the name of the route pattern's wildcard parameter, if applicable.
   */
   getWildCardName(): string {
-    let wildcardIndex = this.config.route.lastIndexOf('*');
-    return (this.config.route as string).substr(wildcardIndex + 1);
+    // todo: potential issue, or at least unsafe typings
+    let configRoute = this.config.route as string;
+    let wildcardIndex = configRoute.lastIndexOf('*');
+    return configRoute.substr(wildcardIndex + 1);
   }
 
   /**
@@ -162,9 +178,10 @@ export class NavigationInstruction {
   getWildcardPath(): string {
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
+    let queryString = this.queryString;
 
-    if (this.queryString) {
-      path += '?' + this.queryString;
+    if (queryString) {
+      path += '?' + queryString;
     }
 
     return path;
@@ -174,6 +191,7 @@ export class NavigationInstruction {
   * Gets the instruction's base URL, accounting for wildcard route parameters.
   */
   getBaseUrl(): string {
+    let $encodeURI = encodeURI;
     let fragment = decodeURI(this.fragment);
 
     if (fragment === '') {
@@ -187,17 +205,17 @@ export class NavigationInstruction {
     }
 
     if (!this.params) {
-      return encodeURI(fragment);
+      return $encodeURI(fragment);
     }
 
     let wildcardName = this.getWildCardName();
     let path = this.params[wildcardName] || '';
 
     if (!path) {
-      return encodeURI(fragment);
+      return $encodeURI(fragment);
     }
 
-    return encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
+    return $encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
   }
 
   /**@internal */
@@ -205,8 +223,9 @@ export class NavigationInstruction {
     let router = this.router;
     router.currentInstruction = this;
 
-    if (this.previousInstruction) {
-      this.previousInstruction.config.navModel.isActive = false;
+    const previousInstruction = this.previousInstruction;
+    if (previousInstruction) {
+      previousInstruction.config.navModel.isActive = false;
     }
 
     this.config.navModel.isActive = true;
@@ -215,34 +234,36 @@ export class NavigationInstruction {
 
     let loads: Promise<void>[] = [];
     let delaySwaps: ISwapPlan[] = [];
+    let viewPortInstructions: Record<string, ViewPortInstruction> = this.viewPortInstructions;
 
-    for (let viewPortName in this.viewPortInstructions) {
-      let viewPortInstruction = this.viewPortInstructions[viewPortName];
+    for (let viewPortName in viewPortInstructions) {
+      let viewPortInstruction = viewPortInstructions[viewPortName];
       let viewPort = router.viewPorts[viewPortName];
 
       if (!viewPort) {
         throw new Error(`There was no router-view found in the view for ${viewPortInstruction.moduleId}.`);
       }
 
+      let child_nav_instruction = viewPortInstruction.childNavigationInstruction;
       if (viewPortInstruction.strategy === activationStrategy.replace) {
-        if (viewPortInstruction.childNavigationInstruction && viewPortInstruction.childNavigationInstruction.parentCatchHandler) {
-          loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
+        if (child_nav_instruction && child_nav_instruction.parentCatchHandler) {
+          loads.push(child_nav_instruction._commitChanges(waitToSwap));
         } else {
           if (waitToSwap) {
             delaySwaps.push({ viewPort, viewPortInstruction });
           }
-          loads.push(viewPort
-            .process(viewPortInstruction, waitToSwap)
-            .then(() => {
-              if (viewPortInstruction.childNavigationInstruction) {
-                return viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap);
-              }
-              return Promise.resolve();
-            }));
+          loads.push(
+            viewPort
+              .process(viewPortInstruction, waitToSwap)
+              .then(() => child_nav_instruction
+                ? child_nav_instruction._commitChanges(waitToSwap)
+                : Promise.resolve()
+              )
+          );
         }
       } else {
-        if (viewPortInstruction.childNavigationInstruction) {
-          loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
+        if (child_nav_instruction) {
+          loads.push(child_nav_instruction._commitChanges(waitToSwap));
         }
       }
     }
@@ -258,9 +279,10 @@ export class NavigationInstruction {
 
   /**@internal */
   _updateTitle(): void {
-    let title = this._buildTitle(this.router.titleSeparator);
+    let router = this.router;
+    let title = this._buildTitle(router.titleSeparator);
     if (title) {
-      this.router.history.setTitle(title);
+      router.history.setTitle(title);
     }
   }
 
@@ -268,16 +290,20 @@ export class NavigationInstruction {
   _buildTitle(separator: string = ' | '): string {
     let title = '';
     let childTitles = [];
+    let navModelTitle = this.config.navModel.title;
+    let instructionRouter = this.router;
+    let viewPortInstructions: Record<string, ViewPortInstruction> = this.viewPortInstructions;
 
-    if (this.config.navModel.title) {
-      title = this.router.transformTitle(this.config.navModel.title);
+    if (navModelTitle) {
+      title = instructionRouter.transformTitle(navModelTitle);
     }
 
-    for (let viewPortName in this.viewPortInstructions) {
-      let viewPortInstruction = this.viewPortInstructions[viewPortName];
+    for (let viewPortName in viewPortInstructions) {
+      let viewPortInstruction = viewPortInstructions[viewPortName];
+      let child_nav_instruction = viewPortInstruction.childNavigationInstruction;
 
-      if (viewPortInstruction.childNavigationInstruction) {
-        let childTitle = viewPortInstruction.childNavigationInstruction._buildTitle(separator);
+      if (child_nav_instruction) {
+        let childTitle = child_nav_instruction._buildTitle(separator);
         if (childTitle) {
           childTitles.push(childTitle);
         }
@@ -288,18 +314,18 @@ export class NavigationInstruction {
       title = childTitles.join(separator) + (title ? separator : '') + title;
     }
 
-    if (this.router.title) {
-      title += (title ? separator : '') + this.router.transformTitle(this.router.title);
+    if (instructionRouter.title) {
+      title += (title ? separator : '') + instructionRouter.transformTitle(instructionRouter.title);
     }
 
     return title;
   }
 }
 
-function prune(instruction: NavigationInstruction) {
+const prune = (instruction: NavigationInstruction): void => {
   instruction.previousInstruction = null;
   instruction.plan = null;
-}
+};
 
 interface ISwapPlan {
   viewPort: ViewPort;

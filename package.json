@@ -14,18 +14,25 @@
   "author": "Rob Eisenberg <rob@bluespire.com> (http://robeisenberg.com/)",
   "main": "dist/commonjs/aurelia-router.js",
   "module": "dist/es2015/aurelia-router.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/aurelia-router.d.ts",
   "repository": {
     "type": "git",
     "url": "http://github.com/aurelia/router"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "npm run dev -- --format es2015",
     "dev": "node build/scripts/dev",
     "build": "node build/scripts/build",
-    "bundle-dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
-    "test": "karma start",
-    "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --force"
+    "build:dts": "dts-bundle-generator -o dist/aurelia-router.d.ts src/aurelia-router.ts",
+    "test": "karma start --single-run",
+    "test:watch": "karma start",
+    "test:debugger": "karma start --browsers ChromeDebugging",
+    "lint": "tslint -c tslint.json '{src,test}/**/*.ts' --force",
+    "precut-release": "npm run test",
+    "cut-release": "standard-version -t \"\" -i doc/CHANGELOG.md && npm run build"
   },
   "jspm": {
     "registry": "npm",
@@ -41,7 +48,7 @@
       "aurelia-history": "^1.1.0",
       "aurelia-logging": "^1.0.0",
       "aurelia-path": "^1.0.0",
-      "aurelia-route-recognizer": "^1.0.0"
+      "aurelia-route-recognizer": "^1.3.2"
     },
     "dependencies": {
       "aurelia-dependency-injection": "^1.0.0",
@@ -49,7 +56,7 @@
       "aurelia-history": "^1.1.0",
       "aurelia-logging": "^1.0.0",
       "aurelia-path": "^1.0.0",
-      "aurelia-route-recognizer": "^1.2.0"
+      "aurelia-route-recognizer": "^1.3.2"
     }
   },
   "dependencies": {
@@ -58,41 +65,35 @@
     "aurelia-history": "^1.1.0",
     "aurelia-logging": "^1.0.0",
     "aurelia-path": "^1.0.0",
-    "aurelia-route-recognizer": "^1.2.0"
+    "aurelia-route-recognizer": "^1.3.2"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.8",
+    "aurelia-framework": "^1.3.1",
+    "aurelia-pal-browser": "^1.8.1",
+    "aurelia-polyfills": "^1.3.4",
     "aurelia-tools": "0.2.4",
     "dts-bundle-generator": "^1.6.1",
     "gulp-watch": "^5.0.1",
-    "jasmine-core": "^2.4.1",
+    "jasmine-core": "^3.3.0",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.2",
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^3.0.0",
+    "karma-webpack": "^3.0.5",
     "rimraf": "^2.6.2",
-    "rollup": "^0.64.1",
-    "rollup-plugin-typescript2": "^0.16.1",
+    "rollup": "^1.7.4",
+    "rollup-plugin-typescript2": "^0.20.1",
+    "standard-version": "^5.0.2",
     "ts-loader": "^4.4.2",
     "tslib": "^1.9.3",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.1",
+    "tslint": "^5.14.0",
+    "typescript": "^3.3.4000",
     "webpack": "^4.16.5",
     "yargs": "^4.8.1"
   },
   "peerDependencies": {
     "aurelia-history": "^1.1.0"
-  },
-  "aurelia": {
-    "documentation": {
-      "articles": [
-        {
-          "title": "Router Configuration",
-          "href": "doc/article/en-US/router-configuration.md"
-        }
-      ]
-    }
   }
 }

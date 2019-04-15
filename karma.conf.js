@@ -1,24 +1,27 @@
 const path = require('path');
 
 module.exports = function(config) {
+  const browsers = config.browsers;
   config.set({
 
     basePath: '',
     frameworks: ["jasmine"],
-    files: ["test/*.spec.ts"],
+    files: ["test/**/*.spec.ts"],
     preprocessors: {
-      "**/*.ts": ["webpack"]
+      "test/**/*.spec.ts": ["webpack", 'sourcemap']
     },
     webpack: {
       mode: "development",
+      entry: 'test/setup.ts',
       resolve: {
         extensions: [".ts", ".js"],
-        modules: ["src", "node_modules"],
+        modules: ["node_modules"],
         alias: {
-          src: path.resolve(__dirname, "src")
+          src: path.resolve(__dirname, 'src'),
+          test: path.resolve(__dirname, 'test')
         }
       },
-      devtool: "cheap-module-eval-source-map",
+      devtool: browsers.includes('ChromeDebugging') ? 'eval-source-map' : 'inline-source-map',
       module: {
         rules: [
           {
@@ -32,15 +35,20 @@ module.exports = function(config) {
     mime: {
       "text/x-typescript": ["ts"]
     },
-    reporters: ["mocha", "progress"],
+    reporters: ["mocha"],
     webpackServer: { noInfo: config.noInfo },
-    browsers: ["Chrome"],
+    browsers: Array.isArray(browsers) && browsers.length > 0 ? browsers : ['ChromeHeadless'],
     customLaunchers: {
       ChromeDebugging: {
-        base: "Chrome",
-        flags: ["--remote-debugging-port=9333"],
+        base: 'Chrome',
+        flags: [
+          '--remote-debugging-port=9333'
+        ],
         debug: true
       }
+    },
+    mochaReporter: {
+      ignoreSkipped: true
     },
     singleRun: false
   });
