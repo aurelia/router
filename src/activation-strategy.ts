@@ -32,16 +32,16 @@ export const activationStrategy: ActivationStrategy = {
  */
 export interface ActivationStrategy {
   /**
-  * Reuse the existing view model, without invoking Router lifecycle hooks.
-  */
+   * Reuse the existing view model, without invoking Router lifecycle hooks.
+   */
   noChange: 'no-change';
   /**
-  * Reuse the existing view model, invoking Router lifecycle hooks.
-  */
+   * Reuse the existing view model, invoking Router lifecycle hooks.
+   */
   invokeLifecycle: 'invoke-lifecycle';
   /**
-  * Replace the existing view model, invoking Router lifecycle hooks.
-  */
+   * Replace the existing view model, invoking Router lifecycle hooks.
+   */
   replace: 'replace';
 }
 

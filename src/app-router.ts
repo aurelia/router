@@ -19,8 +19,8 @@ declare module 'aurelia-dependency-injection' {
 const logger = LogManager.getLogger('app-router');
 
 /**
-* The main application router.
-*/
+ * The main application router.
+ */
 export class AppRouter extends Router {
 
   /**@internal */
@@ -41,9 +41,9 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
-  * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
-  */
+   * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+   * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+   */
   reset(): void {
     super.reset();
     this.maxInstructionCount = 10;
@@ -55,10 +55,10 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Loads the specified URL.
-  *
-  * @param url The URL fragment to load.
-  */
+   * Loads the specified URL.
+   *
+   * @param url The URL fragment to load.
+   */
   loadUrl(url: string): Promise<NavigationInstruction> {
     return this
       ._createNavigationInstruction(url)
@@ -70,11 +70,11 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Registers a viewPort to be used as a rendering target for activated routes.
-  *
-  * @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
-  * @param name The name of the viewPort. 'default' if unspecified.
-  */
+   * Registers a viewPort to be used as a rendering target for activated routes.
+   *
+   * @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
+   * @param name The name of the viewPort. 'default' if unspecified.
+   */
   registerViewPort(viewPort: /*ViewPort*/ any, name?: string): Promise<any> {
     // having strong typing without changing public API
     const $viewPort: ViewPort = viewPort;
@@ -119,10 +119,10 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
-  *
-  * @params options The set of options to activate the router with.
-  */
+   * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
+   *
+   * @params options The set of options to activate the router with.
+   */
   activate(options?: NavigationOptions): void {
     if (this.isActive) {
       return;
@@ -137,8 +137,8 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Deactivates the router.
-  */
+   * Deactivates the router.
+   */
   deactivate(): void {
     this.isActive = false;
     this.history.deactivate();

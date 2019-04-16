@@ -20,8 +20,8 @@ export const loadNewRoute = (
   routeLoader: RouteLoader,
   navigationInstruction: NavigationInstruction
 ): Promise<any[] | void> => {
-  let toLoad = determineWhatToLoad(navigationInstruction);
-  let loadPromises = toLoad.map((loadingPlan: ILoadingPlan) => loadRoute(
+  let loadingPlans = determineLoadingPlans(navigationInstruction);
+  let loadPromises = loadingPlans.map((loadingPlan: ILoadingPlan) => loadRoute(
     routeLoader,
     loadingPlan.navigationInstruction,
     loadingPlan.viewPortPlan
@@ -33,38 +33,38 @@ export const loadNewRoute = (
 /**
  * @internal Exported for unit testing
  */
-export const determineWhatToLoad = (
+export const determineLoadingPlans = (
   navigationInstruction: NavigationInstruction,
-  toLoad: ILoadingPlan[] = []
+  loadingPlans: ILoadingPlan[] = []
 ): ILoadingPlan[] => {
-  let plan: Record<string, ViewPortPlan> = navigationInstruction.plan;
+  let viewPortPlans: Record<string, ViewPortPlan> = navigationInstruction.plan;
 
-  for (let viewPortName in plan) {
-    let viewPortPlan = plan[viewPortName];
-    let child_nav_instruction = viewPortPlan.childNavigationInstruction;
+  for (let viewPortName in viewPortPlans) {
+    let viewPortPlan = viewPortPlans[viewPortName];
+    let childNavInstruction = viewPortPlan.childNavigationInstruction;
 
     if (viewPortPlan.strategy === InternalActivationStrategy.Replace) {
-      toLoad.push({ viewPortPlan, navigationInstruction } as ILoadingPlan);
+      loadingPlans.push({ viewPortPlan, navigationInstruction } as ILoadingPlan);
 
-      if (child_nav_instruction) {
-        determineWhatToLoad(child_nav_instruction, toLoad);
+      if (childNavInstruction) {
+        determineLoadingPlans(childNavInstruction, loadingPlans);
       }
     } else {
-      let viewPortInstruction = navigationInstruction.addViewPortInstruction(
-        viewPortName,
-        viewPortPlan.strategy,
-        viewPortPlan.prevModuleId,
-        viewPortPlan.prevComponent
-      ) as ViewPortInstruction;
+      let viewPortInstruction = navigationInstruction.addViewPortInstruction({
+        name: viewPortName,
+        strategy: viewPortPlan.strategy,
+        moduleId: viewPortPlan.prevModuleId,
+        component: viewPortPlan.prevComponent
+      }) as ViewPortInstruction;
 
-      if (child_nav_instruction) {
-        viewPortInstruction.childNavigationInstruction = child_nav_instruction;
-        determineWhatToLoad(child_nav_instruction, toLoad);
+      if (childNavInstruction) {
+        viewPortInstruction.childNavigationInstruction = childNavInstruction;
+        determineLoadingPlans(childNavInstruction, loadingPlans);
       }
     }
   }
 
-  return toLoad;
+  return loadingPlans;
 };
 
 /**
@@ -75,16 +75,17 @@ export const loadRoute = (
   navigationInstruction: NavigationInstruction,
   viewPortPlan: ViewPortPlan
 ): Promise<any> => {
-  let moduleId = viewPortPlan.config ? viewPortPlan.config.moduleId : null;
+  let planConfig = viewPortPlan.config;
+  let moduleId = planConfig ? planConfig.moduleId : null;
 
-  return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config)
+  return loadComponent(routeLoader, navigationInstruction, planConfig)
     .then((component) => {
-      let viewPortInstruction = navigationInstruction.addViewPortInstruction(
-        viewPortPlan.name,
-        viewPortPlan.strategy,
-        moduleId,
-        component
-      ) as ViewPortInstruction;
+      let viewPortInstruction = navigationInstruction.addViewPortInstruction({
+        name: viewPortPlan.name,
+        strategy: viewPortPlan.strategy,
+        moduleId: moduleId,
+        component: component
+      }) as ViewPortInstruction;
 
       let childRouter = component.childRouter;
       if (childRouter) {
@@ -132,19 +133,20 @@ export const loadComponent = (
        * typically contains information about view model, childContainer, view and router
        */
       (component: ViewPortComponent) => {
-      let { viewModel, childContainer } = component;
-      component.router = router;
-      component.config = config;
+        let { viewModel, childContainer } = component;
+        component.router = router;
+        component.config = config;
 
-      if ('configureRouter' in viewModel) {
-        let childRouter = childContainer.getChildRouter();
-        component.childRouter = childRouter;
+        if ('configureRouter' in viewModel) {
+          let childRouter = childContainer.getChildRouter();
+          component.childRouter = childRouter;
 
-        return childRouter
-          .configure(c => viewModel.configureRouter(c, childRouter, lifecycleArgs[0], lifecycleArgs[1], lifecycleArgs[2]))
-          .then(() => component);
+          return childRouter
+            .configure(c => viewModel.configureRouter(c, childRouter, lifecycleArgs[0], lifecycleArgs[1], lifecycleArgs[2]))
+            .then(() => component);
+        }
+
+        return component;
       }
-
-      return component;
-    });
+    );
 };
