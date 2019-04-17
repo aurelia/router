@@ -1,14 +1,9 @@
 import { Container } from 'aurelia-dependency-injection';
 import { Pipeline } from './pipeline';
-import { BuildNavigationPlanStep } from './navigation-plan';
-import { LoadRouteStep } from './route-loading';
-import { CommitChangesStep } from './navigation-instruction';
-import {
-  CanDeactivatePreviousStep,
-  CanActivateNextStep,
-  DeactivatePreviousStep,
-  ActivateNextStep
-} from './activation';
+import { BuildNavigationPlanStep } from './step-build-navigation-plan';
+import { LoadRouteStep } from './step-load-route';
+import { CommitChangesStep } from './step-commit-changes';
+import { CanDeactivatePreviousStep, CanActivateNextStep, DeactivatePreviousStep, ActivateNextStep } from './step-activation';
 import { PipelineStep, StepRunnerFunction, IPipelineSlot } from './interfaces';
 import { PipelineSlotName } from './pipeline-slot-name';
 
@@ -38,8 +33,8 @@ class PipelineSlot implements IPipelineSlot {
 }
 
 /**
-* Class responsible for creating the navigation pipeline.
-*/
+ * Class responsible for creating the navigation pipeline.
+ */
 export class PipelineProvider {
 
   /**@internal */
@@ -55,21 +50,21 @@ export class PipelineProvider {
       BuildNavigationPlanStep,
       CanDeactivatePreviousStep, // optional
       LoadRouteStep,
-      this._createPipelineSlot(PipelineSlotName.Authorize),
+      createPipelineSlot(container, PipelineSlotName.Authorize),
       CanActivateNextStep, // optional
-      this._createPipelineSlot(PipelineSlotName.PreActivate, 'modelbind'),
+      createPipelineSlot(container, PipelineSlotName.PreActivate, 'modelbind'),
       // NOTE: app state changes start below - point of no return
       DeactivatePreviousStep, // optional
       ActivateNextStep, // optional
-      this._createPipelineSlot(PipelineSlotName.PreRender, 'precommit'),
+      createPipelineSlot(container, PipelineSlotName.PreRender, 'precommit'),
       CommitChangesStep,
-      this._createPipelineSlot(PipelineSlotName.PostRender, 'postcomplete')
+      createPipelineSlot(container, PipelineSlotName.PostRender, 'postcomplete')
     ];
   }
 
   /**
-  * Create the navigation pipeline.
-  */
+   * Create the navigation pipeline.
+   */
   createPipeline(useCanDeactivateStep: boolean = true): Pipeline {
     let pipeline = new Pipeline();
     this.steps.forEach(step => {
@@ -87,14 +82,15 @@ export class PipelineProvider {
   }
 
   /**
-  * Adds a step into the pipeline at a known slot location.
-  */
+   * Adds a step into the pipeline at a known slot location.
+   */
   addStep(name: string, step: PipelineStep | Function): void {
     let found = this._findStep(name);
     if (found) {
+      let slotSteps = found.steps;
       // prevent duplicates
-      if (!found.steps.includes(step)) {
-        found.steps.push(step);
+      if (!slotSteps.includes(step)) {
+        slotSteps.push(step);
       }
     } else {
       throw new Error(`Invalid pipeline slot name: ${name}.`);
@@ -107,14 +103,14 @@ export class PipelineProvider {
   removeStep(name: string, step: PipelineStep): void {
     let slot = this._findStep(name);
     if (slot) {
-      let steps = slot.steps;
-      steps.splice(steps.indexOf(step), 1);
+      let slotSteps = slot.steps;
+      slotSteps.splice(slotSteps.indexOf(step), 1);
     }
   }
 
   /**
-   * @internal
    * Clears all steps from a slot in the pipeline
+   * @internal
    */
   _clearSteps(name: string = ''): void {
     let slot = this._findStep(name);
@@ -127,14 +123,14 @@ export class PipelineProvider {
    * Resets all pipeline slots
    */
   reset(): void {
-    this._clearSteps('authorize');
-    this._clearSteps('preActivate');
-    this._clearSteps('preRender');
-    this._clearSteps('postRender');
-  }
-
-  /**@internal */
-  _createPipelineSlot(name: string, alias?: string): PipelineSlot {
-    return new PipelineSlot(this.container, name, alias);
+    this._clearSteps(PipelineSlotName.Authorize);
+    this._clearSteps(PipelineSlotName.PreActivate);
+    this._clearSteps(PipelineSlotName.PreRender);
+    this._clearSteps(PipelineSlotName.PostRender);
   }
 }
+
+/**@internal */
+const createPipelineSlot = (container: Container, name: PipelineSlotName, alias?: string): PipelineSlot => {
+  return new PipelineSlot(container, name, alias);
+};

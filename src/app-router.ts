@@ -19,8 +19,8 @@ declare module 'aurelia-dependency-injection' {
 const logger = LogManager.getLogger('app-router');
 
 /**
-* The main application router.
-*/
+ * The main application router.
+ */
 export class AppRouter extends Router {
 
   /**@internal */
@@ -41,9 +41,9 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
-  * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
-  */
+   * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+   * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+   */
   reset(): void {
     super.reset();
     this.maxInstructionCount = 10;
@@ -55,10 +55,10 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Loads the specified URL.
-  *
-  * @param url The URL fragment to load.
-  */
+   * Loads the specified URL.
+   *
+   * @param url The URL fragment to load.
+   */
   loadUrl(url: string): Promise<NavigationInstruction> {
     return this
       ._createNavigationInstruction(url)
@@ -70,11 +70,11 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Registers a viewPort to be used as a rendering target for activated routes.
-  *
-  * @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
-  * @param name The name of the viewPort. 'default' if unspecified.
-  */
+   * Registers a viewPort to be used as a rendering target for activated routes.
+   *
+   * @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
+   * @param name The name of the viewPort. 'default' if unspecified.
+   */
   registerViewPort(viewPort: /*ViewPort*/ any, name?: string): Promise<any> {
     // having strong typing without changing public API
     const $viewPort: ViewPort = viewPort;
@@ -119,10 +119,10 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
-  *
-  * @params options The set of options to activate the router with.
-  */
+   * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
+   *
+   * @params options The set of options to activate the router with.
+   */
   activate(options?: NavigationOptions): void {
     if (this.isActive) {
       return;
@@ -137,8 +137,8 @@ export class AppRouter extends Router {
   }
 
   /**
-  * Deactivates the router.
-  */
+   * Deactivates the router.
+   */
   deactivate(): void {
     this.isActive = false;
     this.history.deactivate();
@@ -172,16 +172,18 @@ export class AppRouter extends Router {
       this.isNavigating = true;
 
       let navtracker: number = this.history.getState('NavigationTracker');
-      if (!navtracker && !this.currentNavigationTracker) {
+      let currentNavTracker = this.currentNavigationTracker;
+
+      if (!navtracker && !currentNavTracker) {
         this.isNavigatingFirst = true;
         this.isNavigatingNew = true;
       } else if (!navtracker) {
         this.isNavigatingNew = true;
-      } else if (!this.currentNavigationTracker) {
+      } else if (!currentNavTracker) {
         this.isNavigatingRefresh = true;
-      } else if (this.currentNavigationTracker < navtracker) {
+      } else if (currentNavTracker < navtracker) {
         this.isNavigatingForward = true;
-      } else if (this.currentNavigationTracker > navtracker) {
+      } else if (currentNavTracker > navtracker) {
         this.isNavigatingBack = true;
       } if (!navtracker) {
         navtracker = Date.now();
@@ -191,13 +193,15 @@ export class AppRouter extends Router {
 
       instruction.previousInstruction = this.currentInstruction;
 
+      let maxInstructionCount = this.maxInstructionCount;
+
       if (!instructionCount) {
         this.events.publish(RouterEvent.Processing, { instruction });
-      } else if (instructionCount === this.maxInstructionCount - 1) {
+      } else if (instructionCount === maxInstructionCount - 1) {
         logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
         restorePreviousLocation(this);
         return this._dequeueInstruction(instructionCount + 1);
-      } else if (instructionCount > this.maxInstructionCount) {
+      } else if (instructionCount > maxInstructionCount) {
         throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 
@@ -276,6 +280,7 @@ const resolveInstruction = (
 ): PipelineResult => {
   instruction.resolve(result);
 
+  let eventAggregator = router.events;
   let eventArgs = { instruction, result };
   if (!isInnerInstruction) {
     router.isNavigating = false;
@@ -300,10 +305,10 @@ const resolveInstruction = (
       eventName = RouterEvent.Success;
     }
 
-    router.events.publish(eventName, eventArgs);
-    router.events.publish(RouterEvent.Complete, eventArgs);
+    eventAggregator.publish(eventName, eventArgs);
+    eventAggregator.publish(RouterEvent.Complete, eventArgs);
   } else {
-    router.events.publish(RouterEvent.ChildComplete, eventArgs);
+    eventAggregator.publish(RouterEvent.ChildComplete, eventArgs);
   }
 
   return result;
@@ -312,7 +317,7 @@ const resolveInstruction = (
 const restorePreviousLocation = (router: AppRouter): void => {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
-    router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+    router.navigate(previousLocation, { trigger: false, replace: true });
   } else if (router.fallbackRoute) {
     router.navigate(router.fallbackRoute, { trigger: true, replace: true });
   } else {

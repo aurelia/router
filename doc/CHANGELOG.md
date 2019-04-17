@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.7.0-beta.1](https://github.com/aurelia/router/compare/1.6.3...1.7.0) (2019-04-16)
+## [1.6.4](https://github.com/aurelia/router/compare/1.6.3...1.6.4) (2019-04-17)
 
 
 ### Bug Fixes

@@ -1,50 +1,15 @@
 import { Next, ViewPortComponent, ViewPortPlan, ViewPortInstruction, LifecycleArguments } from './interfaces';
 import { isNavigationCommand } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
-import { activationStrategy } from './navigation-plan';
+import { activationStrategy } from './activation-strategy';
 import { Router } from './router';
-
-/**
- * A pipeline step responsible for finding and activating method `canDeactivate` on a view model of a route
- */
-export class CanDeactivatePreviousStep {
-  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
-    return processDeactivatable(navigationInstruction, 'canDeactivate', next);
-  }
-}
-
-/**
- * A pipeline step responsible for finding and activating method `canActivate` on a view model of a route
- */
-export class CanActivateNextStep {
-  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
-    return processActivatable(navigationInstruction, 'canActivate', next);
-  }
-}
-
-/**
- * A pipeline step responsible for finding and activating method `deactivate` on a view model of a route
- */
-export class DeactivatePreviousStep {
-  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
-    return processDeactivatable(navigationInstruction, 'deactivate', next, true);
-  }
-}
-
-/**
- * A pipeline step responsible for finding and activating method `activate` on a view model of a route
- */
-export class ActivateNextStep {
-  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
-    return processActivatable(navigationInstruction, 'activate', next, true);
-  }
-}
 
 /**
  * Recursively find list of deactivate-able view models
  * and invoke the either 'canDeactivate' or 'deactivate' on each
+ * @internal exported for unit testing
  */
-const processDeactivatable = (
+export const processDeactivatable = (
   navigationInstruction: NavigationInstruction,
   callbackName: 'canDeactivate' | 'deactivate',
   next: Next,
@@ -83,8 +48,9 @@ const processDeactivatable = (
 
 /**
  * Recursively find and returns a list of deactivate-able view models
+ * @internal exported for unit testing
  */
-const findDeactivatable = (
+export const findDeactivatable = (
   plan: Record<string, ViewPortPlan>,
   callbackName: string,
   list: IActivatableInfo[] = []
@@ -113,7 +79,10 @@ const findDeactivatable = (
   return list;
 };
 
-const addPreviousDeactivatable = (
+/**
+ * @internal exported for unit testing
+ */
+export const addPreviousDeactivatable = (
   component: ViewPortComponent,
   callbackName: string,
   list: IActivatableInfo[]
@@ -137,7 +106,10 @@ const addPreviousDeactivatable = (
   }
 };
 
-const processActivatable = (
+/**
+ * @internal exported for unit testing
+ */
+export const processActivatable = (
   navigationInstruction: NavigationInstruction,
   callbackName: 'canActivate' | 'activate',
   next: Next,
@@ -182,8 +154,9 @@ interface IActivatableInfo {
 
 /**
  * Find list of activatable view model and add to list (3rd parameter)
+ * @internal exported for unit testing
  */
-const findActivatable = (
+export const findActivatable = (
   navigationInstruction: NavigationInstruction,
   callbackName: 'canActivate' | 'activate',
   list: IActivatableInfo[] = [],

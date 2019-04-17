@@ -3,20 +3,20 @@ import { NavigationInstruction } from './navigation-instruction';
 import { createNextFn } from './next';
 
 /**
-* The class responsible for managing and processing the navigation pipeline.
-*/
+ * The class responsible for managing and processing the navigation pipeline.
+ */
 export class Pipeline {
   /**
-  * The pipeline steps. And steps added via addStep will be converted to a function
-  * The actualy running functions with correct step contexts of this pipeline
-  */
+   * The pipeline steps. And steps added via addStep will be converted to a function
+   * The actualy running functions with correct step contexts of this pipeline
+   */
   steps: StepRunnerFunction[] = [];
 
   /**
-  * Adds a step to the pipeline.
-  *
-  * @param step The pipeline step.
-  */
+   * Adds a step to the pipeline.
+   *
+   * @param step The pipeline step.
+   */
   addStep(step: StepRunnerFunction | PipelineStep | IPipelineSlot): Pipeline {
     let run;
 
@@ -41,10 +41,10 @@ export class Pipeline {
   }
 
   /**
-  * Runs the pipeline.
-  *
-  * @param instruction The navigation instruction to process.
-  */
+   * Runs the pipeline.
+   *
+   * @param instruction The navigation instruction to process.
+   */
   run(instruction: NavigationInstruction): Promise<PipelineResult> {
     const nextFn = createNextFn(instruction, this.steps);
     return nextFn();
