@@ -1,5 +1,4 @@
 export {
-  ActivationStrategy,
   RoutableComponentCanActivate,
   RoutableComponentActivate,
   RoutableComponentCanDeactivate,
@@ -21,22 +20,33 @@ export {
    */
 } from './interfaces';
 export {
-  ActivateNextStep,
-  CanActivateNextStep,
-  CanDeactivatePreviousStep,
-  DeactivatePreviousStep,
   IObservable,
   IObservableConfig
-} from './activation';
+} from './utilities-activation';
 export { AppRouter } from './app-router';
 export { NavModel } from './nav-model';
 export { Redirect, RedirectToRoute, NavigationCommand, isNavigationCommand } from './navigation-commands';
-export { activationStrategy, BuildNavigationPlanStep } from './navigation-plan';
+
 export {
-  CommitChangesStep,
   NavigationInstruction,
   NavigationInstructionInit
 } from './navigation-instruction';
+
+export {
+  ActivateNextStep,
+  CanActivateNextStep,
+  CanDeactivatePreviousStep,
+  DeactivatePreviousStep
+} from './step-activation';
+
+export { CommitChangesStep } from './step-commit-changes';
+export { BuildNavigationPlanStep } from './step-build-navigation-plan';
+export { LoadRouteStep } from './step-load-route';
+
+export {
+  ActivationStrategy,
+  activationStrategy
+} from './activation-strategy';
 
 export {
   PipelineStatus
@@ -52,6 +62,6 @@ export {
 
 export { PipelineProvider } from './pipeline-provider';
 export { Pipeline } from './pipeline';
-export { RouteLoader, LoadRouteStep } from './route-loading';
+export { RouteLoader } from './route-loader';
 export { RouterConfiguration } from './router-configuration';
 export { Router } from './router';

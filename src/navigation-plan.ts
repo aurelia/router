@@ -1,155 +1,209 @@
-import { ActivationStrategy, Next, ViewPortPlan } from './interfaces';
+import { ViewPortPlan, ViewPortInstruction, RouteConfig, ViewPort } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
+import { InternalActivationStrategy, ActivationStrategyType } from './activation-strategy';
+
+type ViewPortPlansRecord = Record<string, ViewPortPlan>;
 
 /**
-* The strategy to use when activating modules during navigation.
-*/
-export const activationStrategy: ActivationStrategy = {
-  noChange: 'no-change',
-  invokeLifecycle: 'invoke-lifecycle',
-  replace: 'replace'
-};
-
-/**
- * Transform a navigation instruction into viewport plan record object,
- * or a redirect request if user viewmodel demands
+ * @internal exported for unit testing
  */
-export class BuildNavigationPlanStep {
-  run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
-    return _buildNavigationPlan(navigationInstruction)
-      .then(plan => {
-        if (plan instanceof Redirect) {
-          return next.cancel(plan);
-        }
-        navigationInstruction.plan = plan;
-        return next();
-      })
-      .catch(next.cancel);
-  }
-}
-
 export function _buildNavigationPlan(
   instruction: NavigationInstruction,
   forceLifecycleMinimum?: boolean
-): Promise<Record<string, ViewPortPlan> | Redirect> {
+): Promise<ViewPortPlansRecord | Redirect> {
   let config = instruction.config;
 
-  // todo: separate and export for unit tests
   if ('redirect' in config) {
-    const router = instruction.router;
-    return router
-      ._createNavigationInstruction(config.redirect)
-      .then(newInstruction => {
-        const params: Record<string, any> = {};
-        for (let key in newInstruction.params) {
-          // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
-          let val = newInstruction.params[key];
-          if (typeof val === 'string' && val[0] === ':') {
-            val = val.slice(1);
-            // And if that param is found on the original instruction then use it
-            if (val in instruction.params) {
-              params[key] = instruction.params[val];
-            }
-          } else {
-            params[key] = newInstruction.params[key];
-          }
-        }
-        let redirectLocation = router.generate(newInstruction.config, params, instruction.options);
-
-        // Special handling for child routes
-        for (let key in instruction.params) {
-          redirectLocation = redirectLocation.replace(`:${key}`, instruction.params[key]);
-        }
-
-        if (instruction.queryString) {
-          redirectLocation += '?' + instruction.queryString;
-        }
-
-        return Promise.resolve(new Redirect(redirectLocation));
-      });
+    return buildRedirectPlan(instruction);
   }
 
-  const prev = instruction.previousInstruction;
-  const plan: Record<string, ViewPortPlan> = {};
-  const defaults = instruction.router.viewPortDefaults;
+  const prevInstruction = instruction.previousInstruction;
+  const defaultViewPortConfigs = instruction.router.viewPortDefaults;
 
-  if (prev) {
-    let newParams = hasDifferentParameterValues(prev, instruction);
-    let pending: Promise<void>[] = [];
-
-    for (let viewPortName in prev.viewPortInstructions) {
-      const prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
-      let nextViewPortConfig = viewPortName in config.viewPorts ? config.viewPorts[viewPortName] : prevViewPortInstruction;
-      if (nextViewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
-        nextViewPortConfig = defaults[viewPortName];
-      }
-
-      const viewPortPlan = plan[viewPortName] = {
-        name: viewPortName,
-        config: nextViewPortConfig,
-        prevComponent: prevViewPortInstruction.component,
-        prevModuleId: prevViewPortInstruction.moduleId
-      } as ViewPortPlan;
-
-      if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
-        viewPortPlan.strategy = activationStrategy.replace;
-      } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
-        viewPortPlan.strategy = prevViewPortInstruction.component.viewModel
-          .determineActivationStrategy(...instruction.lifecycleArgs);
-      } else if (config.activationStrategy) {
-        viewPortPlan.strategy = config.activationStrategy;
-      } else if (newParams || forceLifecycleMinimum) {
-        viewPortPlan.strategy = activationStrategy.invokeLifecycle;
-      } else {
-        viewPortPlan.strategy = activationStrategy.noChange;
-      }
-
-      if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
-        const path = instruction.getWildcardPath();
-        const task: Promise<void> = prevViewPortInstruction
-          .childRouter
-          ._createNavigationInstruction(path, instruction)
-          .then((childInstruction: any) => {
-            viewPortPlan.childNavigationInstruction = childInstruction;
-
-            return _buildNavigationPlan(
-              childInstruction,
-              viewPortPlan.strategy === activationStrategy.invokeLifecycle
-            )
-              .then(childPlan => {
-                if (childPlan instanceof Redirect) {
-                  return Promise.reject(childPlan);
-                }
-                childInstruction.plan = childPlan;
-                // for bluebird ?
-                return null;
-              });
-          });
-
-        pending.push(task);
-      }
-    }
-
-    return Promise.all(pending).then(() => plan);
+  if (prevInstruction) {
+    return buildTransitionPlans(instruction, prevInstruction, defaultViewPortConfigs, forceLifecycleMinimum);
   }
 
-  for (let viewPortName in config.viewPorts) {
-    let viewPortConfig = config.viewPorts[viewPortName];
-    if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
-      viewPortConfig = defaults[viewPortName];
+  // first navigation, only need to prepare a few information for each viewport plan
+  const viewPortPlans: ViewPortPlansRecord = {};
+  let viewPortConfigs = config.viewPorts;
+  for (let viewPortName in viewPortConfigs) {
+    let viewPortConfig = viewPortConfigs[viewPortName];
+    if (viewPortConfig.moduleId === null && viewPortName in defaultViewPortConfigs) {
+      viewPortConfig = defaultViewPortConfigs[viewPortName];
     }
-    plan[viewPortName] = {
+    viewPortPlans[viewPortName] = {
       name: viewPortName,
-      strategy: activationStrategy.replace,
+      strategy: InternalActivationStrategy.Replace,
       config: viewPortConfig
     };
   }
 
-  return Promise.resolve(plan);
+  return Promise.resolve(viewPortPlans);
 }
 
-function hasDifferentParameterValues(prev: NavigationInstruction, next: NavigationInstruction): boolean {
+/**
+ * Build redirect plan based on config of a navigation instruction
+ * @internal exported for unit testing
+ */
+export const buildRedirectPlan = (instruction: NavigationInstruction) => {
+  const config = instruction.config;
+  const router = instruction.router;
+  return router
+    ._createNavigationInstruction(config.redirect)
+    .then(redirectInstruction => {
+
+      const params: Record<string, any> = {};
+      const originalInstructionParams = instruction.params;
+      const redirectInstructionParams = redirectInstruction.params;
+
+      for (let key in redirectInstructionParams) {
+        // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
+        let val = redirectInstructionParams[key];
+        if (typeof val === 'string' && val[0] === ':') {
+          val = val.slice(1);
+          // And if that param is found on the original instruction then use it
+          if (val in originalInstructionParams) {
+            params[key] = originalInstructionParams[val];
+          }
+        } else {
+          params[key] = redirectInstructionParams[key];
+        }
+      }
+      let redirectLocation = router.generate(redirectInstruction.config, params, instruction.options);
+
+      // Special handling for child routes
+      for (let key in originalInstructionParams) {
+        redirectLocation = redirectLocation.replace(`:${key}`, originalInstructionParams[key]);
+      }
+
+      let queryString = instruction.queryString;
+      if (queryString) {
+        redirectLocation += '?' + queryString;
+      }
+
+      return Promise.resolve(new Redirect(redirectLocation));
+    });
+};
+
+/**
+ * @param viewPortPlans the Plan record that holds information about built plans
+ * @internal exported for unit testing
+ */
+export const buildTransitionPlans = (
+  currentInstruction: NavigationInstruction,
+  previousInstruction: NavigationInstruction,
+  defaultViewPortConfigs: Record<string, ViewPortInstruction>,
+  forceLifecycleMinimum?: boolean
+): Promise<ViewPortPlansRecord> => {
+
+  let viewPortPlans: ViewPortPlansRecord = {};
+  let newInstructionConfig = currentInstruction.config;
+  let hasNewParams = hasDifferentParameterValues(previousInstruction, currentInstruction);
+  let pending: Promise<void>[] = [];
+  let previousViewPortInstructions = previousInstruction.viewPortInstructions as Record<string, ViewPortInstruction>;
+
+  for (let viewPortName in previousViewPortInstructions) {
+
+    const prevViewPortInstruction = previousViewPortInstructions[viewPortName];
+    const prevViewPortComponent = prevViewPortInstruction.component;
+    const newInstructionViewPortConfigs = newInstructionConfig.viewPorts as Record<string, RouteConfig>;
+
+    // if this is invoked on a viewport without any changes, based on new url,
+    // newViewPortConfig will be the existing viewport instruction
+    let nextViewPortConfig = viewPortName in newInstructionViewPortConfigs
+      ? newInstructionViewPortConfigs[viewPortName]
+      : prevViewPortInstruction;
+
+    if (nextViewPortConfig.moduleId === null && viewPortName in defaultViewPortConfigs) {
+      nextViewPortConfig = defaultViewPortConfigs[viewPortName];
+    }
+
+    const viewPortActivationStrategy = determineActivationStrategy(
+      currentInstruction,
+      prevViewPortInstruction,
+      nextViewPortConfig,
+      hasNewParams,
+      forceLifecycleMinimum
+    );
+    const viewPortPlan = viewPortPlans[viewPortName] = {
+      name: viewPortName,
+      // ViewPortInstruction can quack like a RouteConfig
+      config: nextViewPortConfig as RouteConfig,
+      prevComponent: prevViewPortComponent,
+      prevModuleId: prevViewPortInstruction.moduleId,
+      strategy: viewPortActivationStrategy
+    } as ViewPortPlan;
+
+    // recursively build nav plans for all existing child routers/viewports of this viewport
+    // this is possible because existing child viewports and routers already have necessary information
+    // to process the wildcard path from parent instruction
+    if (viewPortActivationStrategy !== InternalActivationStrategy.Replace && prevViewPortInstruction.childRouter) {
+      const path = currentInstruction.getWildcardPath();
+      const task: Promise<void> = prevViewPortInstruction
+        .childRouter
+        ._createNavigationInstruction(path, currentInstruction)
+        .then((childInstruction: NavigationInstruction) => {
+          viewPortPlan.childNavigationInstruction = childInstruction;
+
+          return _buildNavigationPlan(
+            childInstruction,
+            // is it safe to assume viewPortPlan has not been changed from previous assignment?
+            // if so, can just use local variable viewPortPlanStrategy
+            // there could be user code modifying viewport plan during _createNavigationInstruction?
+            viewPortPlan.strategy === InternalActivationStrategy.InvokeLifecycle
+          )
+            .then(childPlan => {
+              if (childPlan instanceof Redirect) {
+                return Promise.reject(childPlan);
+              }
+              childInstruction.plan = childPlan;
+              // for bluebird ?
+              return null;
+            });
+        });
+
+      pending.push(task);
+    }
+  }
+
+  return Promise.all(pending).then(() => viewPortPlans);
+};
+
+/**
+ * @param newViewPortConfig if this is invoked on a viewport without any changes, based on new url, newViewPortConfig will be the existing viewport instruction
+ * @internal exported for unit testing
+ */
+export const determineActivationStrategy = (
+  currentNavInstruction: NavigationInstruction,
+  prevViewPortInstruction: ViewPortInstruction,
+  newViewPortConfig: RouteConfig | ViewPortInstruction,
+  // indicates whether there is difference between old and new url params
+  hasNewParams: boolean,
+  forceLifecycleMinimum?: boolean
+): ActivationStrategyType => {
+
+  let newInstructionConfig = currentNavInstruction.config;
+  let prevViewPortViewModel = prevViewPortInstruction.component.viewModel;
+  let viewPortPlanStrategy: ActivationStrategyType;
+
+  if (prevViewPortInstruction.moduleId !== newViewPortConfig.moduleId) {
+    viewPortPlanStrategy = InternalActivationStrategy.Replace;
+  } else if ('determineActivationStrategy' in prevViewPortViewModel) {
+    viewPortPlanStrategy = prevViewPortViewModel.determineActivationStrategy(...currentNavInstruction.lifecycleArgs);
+  } else if (newInstructionConfig.activationStrategy) {
+    viewPortPlanStrategy = newInstructionConfig.activationStrategy;
+  } else if (hasNewParams || forceLifecycleMinimum) {
+    viewPortPlanStrategy = InternalActivationStrategy.InvokeLifecycle;
+  } else {
+    viewPortPlanStrategy = InternalActivationStrategy.NoChange;
+  }
+  return viewPortPlanStrategy;
+};
+
+/**@internal exported for unit testing */
+export const hasDifferentParameterValues = (prev: NavigationInstruction, next: NavigationInstruction): boolean => {
   let prevParams = prev.params;
   let nextParams = next.params;
   let nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
@@ -193,4 +247,4 @@ function hasDifferentParameterValues(prev: NavigationInstruction, next: Navigati
   }
 
   return false;
-}
+};
