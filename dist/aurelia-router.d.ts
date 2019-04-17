@@ -69,54 +69,54 @@ export declare class RouterConfiguration {
 	unknownRouteConfig: RouteConfigSpecifier;
 	viewPortDefaults: Record<string, any>;
 	/**
-	* Adds a step to be run during the [[Router]]'s navigation pipeline.
-	*
-	* @param name The name of the pipeline slot to insert the step into.
-	* @param step The pipeline step.
-	* @chainable
-	*/
+	 * Adds a step to be run during the [[Router]]'s navigation pipeline.
+	 *
+	 * @param name The name of the pipeline slot to insert the step into.
+	 * @param step The pipeline step.
+	 * @chainable
+	 */
 	addPipelineStep(name: string, step: Function | PipelineStep): RouterConfiguration;
 	/**
-	* Adds a step to be run during the [[Router]]'s authorize pipeline slot.
-	*
-	* @param step The pipeline step.
-	* @chainable
-	*/
+	 * Adds a step to be run during the [[Router]]'s authorize pipeline slot.
+	 *
+	 * @param step The pipeline step.
+	 * @chainable
+	 */
 	addAuthorizeStep(step: Function | PipelineStep): RouterConfiguration;
 	/**
-	* Adds a step to be run during the [[Router]]'s preActivate pipeline slot.
-	*
-	* @param step The pipeline step.
-	* @chainable
-	*/
+	 * Adds a step to be run during the [[Router]]'s preActivate pipeline slot.
+	 *
+	 * @param step The pipeline step.
+	 * @chainable
+	 */
 	addPreActivateStep(step: Function | PipelineStep): RouterConfiguration;
 	/**
-	* Adds a step to be run during the [[Router]]'s preRender pipeline slot.
-	*
-	* @param step The pipeline step.
-	* @chainable
-	*/
+	 * Adds a step to be run during the [[Router]]'s preRender pipeline slot.
+	 *
+	 * @param step The pipeline step.
+	 * @chainable
+	 */
 	addPreRenderStep(step: Function | PipelineStep): RouterConfiguration;
 	/**
-	* Adds a step to be run during the [[Router]]'s postRender pipeline slot.
-	*
-	* @param step The pipeline step.
-	* @chainable
-	*/
+	 * Adds a step to be run during the [[Router]]'s postRender pipeline slot.
+	 *
+	 * @param step The pipeline step.
+	 * @chainable
+	 */
 	addPostRenderStep(step: Function | PipelineStep): RouterConfiguration;
 	/**
-	* Configures a route that will be used if there is no previous location available on navigation cancellation.
-	*
-	* @param fragment The URL fragment to use as the navigation destination.
-	* @chainable
-	*/
+	 * Configures a route that will be used if there is no previous location available on navigation cancellation.
+	 *
+	 * @param fragment The URL fragment to use as the navigation destination.
+	 * @chainable
+	 */
 	fallbackRoute(fragment: string): RouterConfiguration;
 	/**
-	* Maps one or more routes to be registered with the router.
-	*
-	* @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
-	* @chainable
-	*/
+	 * Maps one or more routes to be registered with the router.
+	 *
+	 * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
+	 * @chainable
+	 */
 	map(route: RouteConfig | RouteConfig[]): RouterConfiguration;
 	/**
 	 * Configures defaults to use for any view ports.
@@ -130,25 +130,25 @@ export declare class RouterConfiguration {
 		moduleId: string;
 	}>): RouterConfiguration;
 	/**
-	* Maps a single route to be registered with the router.
-	*
-	* @param route The [[RouteConfig]] to map.
-	* @chainable
-	*/
+	 * Maps a single route to be registered with the router.
+	 *
+	 * @param route The [[RouteConfig]] to map.
+	 * @chainable
+	 */
 	mapRoute(config: RouteConfig): RouterConfiguration;
 	/**
-	* Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
-	*
-	* @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
-	*  [[NavigationInstruction]] and selects a moduleId to load.
-	* @chainable
-	*/
+	 * Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
+	 *
+	 * @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
+	 *  [[NavigationInstruction]] and selects a moduleId to load.
+	 * @chainable
+	 */
 	mapUnknownRoutes(config: RouteConfigSpecifier): RouterConfiguration;
 	/**
-	* Applies the current configuration to the specified [[Router]].
-	*
-	* @param router The [[Router]] to apply the configuration to.
-	*/
+	 * Applies the current configuration to the specified [[Router]].
+	 *
+	 * @param router The [[Router]] to apply the configuration to.
+	 */
 	exportToRouter(router: Router): void;
 }
 /**
@@ -185,122 +185,122 @@ export declare class Router {
 	 */
 	titleSeparator: string | undefined;
 	/**
-	* True if the [[Router]] has been configured.
-	*/
+	 * True if the [[Router]] has been configured.
+	 */
 	isConfigured: boolean;
 	/**
-	* True if the [[Router]] is currently processing a navigation.
-	*/
+	 * True if the [[Router]] is currently processing a navigation.
+	 */
 	isNavigating: boolean;
 	/**
-	* True if the [[Router]] is navigating due to explicit call to navigate function(s).
-	*/
+	 * True if the [[Router]] is navigating due to explicit call to navigate function(s).
+	 */
 	isExplicitNavigation: boolean;
 	/**
-	* True if the [[Router]] is navigating due to explicit call to navigateBack function.
-	*/
+	 * True if the [[Router]] is navigating due to explicit call to navigateBack function.
+	 */
 	isExplicitNavigationBack: boolean;
 	/**
-	* True if the [[Router]] is navigating into the app for the first time in the browser session.
-	*/
+	 * True if the [[Router]] is navigating into the app for the first time in the browser session.
+	 */
 	isNavigatingFirst: boolean;
 	/**
-	* True if the [[Router]] is navigating to a page instance not in the browser session history.
-	*/
+	 * True if the [[Router]] is navigating to a page instance not in the browser session history.
+	 */
 	isNavigatingNew: boolean;
 	/**
-	* True if the [[Router]] is navigating forward in the browser session history.
-	*/
+	 * True if the [[Router]] is navigating forward in the browser session history.
+	 */
 	isNavigatingForward: boolean;
 	/**
-	* True if the [[Router]] is navigating back in the browser session history.
-	*/
+	 * True if the [[Router]] is navigating back in the browser session history.
+	 */
 	isNavigatingBack: boolean;
 	/**
-	* True if the [[Router]] is navigating due to a browser refresh.
-	*/
+	 * True if the [[Router]] is navigating due to a browser refresh.
+	 */
 	isNavigatingRefresh: boolean;
 	/**
-	* True if the previous instruction successfully completed the CanDeactivatePreviousStep in the current navigation.
-	*/
+	 * True if the previous instruction successfully completed the CanDeactivatePreviousStep in the current navigation.
+	 */
 	couldDeactivate: boolean;
 	/**
-	* The currently active navigation tracker.
-	*/
+	 * The currently active navigation tracker.
+	 */
 	currentNavigationTracker: number;
 	/**
-	* The navigation models for routes that specified [[RouteConfig.nav]].
-	*/
+	 * The navigation models for routes that specified [[RouteConfig.nav]].
+	 */
 	navigation: NavModel[];
 	/**
-	* The currently active navigation instruction.
-	*/
+	 * The currently active navigation instruction.
+	 */
 	currentInstruction: NavigationInstruction;
 	/**
-	* The parent router, or null if this instance is not a child router.
-	*/
+	 * The parent router, or null if this instance is not a child router.
+	 */
 	parent: Router;
 	options: any;
 	/**
-	* The defaults used when a viewport lacks specified content
-	*/
+	 * The defaults used when a viewport lacks specified content
+	 */
 	viewPortDefaults: Record<string, any>;
 	/**
-	* Extension point to transform the document title before it is built and displayed.
-	* By default, child routers delegate to the parent router, and the app router
-	* returns the title unchanged.
-	*/
+	 * Extension point to transform the document title before it is built and displayed.
+	 * By default, child routers delegate to the parent router, and the app router
+	 * returns the title unchanged.
+	 */
 	transformTitle: (title: string) => string;
 	/**
-	* @param container The [[Container]] to use when child routers.
-	* @param history The [[History]] implementation to delegate navigation requests to.
-	*/
+	 * @param container The [[Container]] to use when child routers.
+	 * @param history The [[History]] implementation to delegate navigation requests to.
+	 */
 	constructor(container: Container, history: History);
 	/**
-	* Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
-	* Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
-	*/
+	 * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+	 * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+	 */
 	reset(): void;
 	/**
-	* Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
-	*/
+	 * Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
+	 */
 	readonly isRoot: boolean;
 	/**
-	* Registers a viewPort to be used as a rendering target for activated routes.
-	*
-	* @param viewPort The viewPort.
-	* @param name The name of the viewPort. 'default' if unspecified.
-	*/
+	 * Registers a viewPort to be used as a rendering target for activated routes.
+	 *
+	 * @param viewPort The viewPort.
+	 * @param name The name of the viewPort. 'default' if unspecified.
+	 */
 	registerViewPort(viewPort: any, name?: string): void;
 	/**
-	* Returns a Promise that resolves when the router is configured.
-	*/
+	 * Returns a Promise that resolves when the router is configured.
+	 */
 	ensureConfigured(): Promise<void>;
 	/**
-	* Configures the router.
-	*
-	* @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
-	*/
+	 * Configures the router.
+	 *
+	 * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
+	 */
 	configure(callbackOrConfig: RouterConfiguration | ((config: RouterConfiguration) => RouterConfiguration)): Promise<void>;
 	/**
-	* Navigates to a new location.
-	*
-	* @param fragment The URL fragment to use as the navigation destination.
-	* @param options The navigation options.
-	*/
+	 * Navigates to a new location.
+	 *
+	 * @param fragment The URL fragment to use as the navigation destination.
+	 * @param options The navigation options.
+	 */
 	navigate(fragment: string, options?: NavigationOptions): boolean;
 	/**
-	* Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
-	* by [[Router.navigate]].
-	*
-	* @param route The name of the route to use when generating the navigation location.
-	* @param params The route parameters to be used when populating the route pattern.
-	* @param options The navigation options.
-	*/
+	 * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
+	 * by [[Router.navigate]].
+	 *
+	 * @param route The name of the route to use when generating the navigation location.
+	 * @param params The route parameters to be used when populating the route pattern.
+	 * @param options The navigation options.
+	 */
 	navigateToRoute(route: string, params?: any, options?: NavigationOptions): boolean;
 	/**
-	* Navigates back to the most recent location in history.
-	*/
+	 * Navigates back to the most recent location in history.
+	 */
 	navigateBack(): void;
 	/**
 	 * Creates a child router of the current router.
@@ -310,53 +310,53 @@ export declare class Router {
 	 */
 	createChild(container?: Container): Router;
 	/**
-	* Generates a URL fragment matching the specified route pattern.
-	*
-	* @param name The name of the route whose pattern should be used to generate the fragment.
-	* @param params The route params to be used to populate the route pattern.
-	* @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
-	* @returns {string} A string containing the generated URL fragment.
-	*/
+	 * Generates a URL fragment matching the specified route pattern.
+	 *
+	 * @param name The name of the route whose pattern should be used to generate the fragment.
+	 * @param params The route params to be used to populate the route pattern.
+	 * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
+	 * @returns {string} A string containing the generated URL fragment.
+	 */
 	generate(nameOrRoute: string | RouteConfig, params?: any, options?: any): string;
 	/**
-	* Creates a [[NavModel]] for the specified route config.
-	*
-	* @param config The route config.
-	*/
+	 * Creates a [[NavModel]] for the specified route config.
+	 *
+	 * @param config The route config.
+	 */
 	createNavModel(config: RouteConfig): NavModel;
 	/**
-	* Registers a new route with the router.
-	*
-	* @param config The [[RouteConfig]].
-	* @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
-	*/
+	 * Registers a new route with the router.
+	 *
+	 * @param config The [[RouteConfig]].
+	 * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
+	 */
 	addRoute(config: RouteConfig, navModel?: NavModel): void;
 	/**
-	* Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
-	*
-	* @param name The name of the route to check.
-	*/
+	 * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
+	 *
+	 * @param name The name of the route to check.
+	 */
 	hasRoute(name: string): boolean;
 	/**
-	* Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
-	*
-	* @param name The name of the route to check.
-	*/
+	 * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
+	 *
+	 * @param name The name of the route to check.
+	 */
 	hasOwnRoute(name: string): boolean;
 	/**
-	* Register a handler to use when the incoming URL fragment doesn't match any registered routes.
-	*
-	* @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
-	*/
+	 * Register a handler to use when the incoming URL fragment doesn't match any registered routes.
+	 *
+	 * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
+	 */
 	handleUnknownRoutes(config?: RouteConfigSpecifier): void;
 	/**
-	* Updates the document title using the current navigation instruction.
-	*/
+	 * Updates the document title using the current navigation instruction.
+	 */
 	updateTitle(): void;
 	/**
-	* Updates the navigation routes with hrefs relative to the current location.
-	* Note: This method will likely move to a plugin in a future release.
-	*/
+	 * Updates the navigation routes with hrefs relative to the current location.
+	 * Note: This method will likely move to a plugin in a future release.
+	 */
 	refreshNavigation(): void;
 	/**
 	 * Sets the default configuration for the view ports. This specifies how to
@@ -365,6 +365,31 @@ export declare class Router {
 	 */
 	useViewPortDefaults($viewPortDefaults: Record<string, any>): void;
 }
+/**
+ * The strategy to use when activating modules during navigation.
+ */
+export declare const activationStrategy: ActivationStrategy;
+/**
+ * An optional interface describing the available activation strategies.
+ */
+export interface ActivationStrategy {
+	/**
+	 * Reuse the existing view model, without invoking Router lifecycle hooks.
+	 */
+	noChange: 'no-change';
+	/**
+	 * Reuse the existing view model, invoking Router lifecycle hooks.
+	 */
+	invokeLifecycle: 'invoke-lifecycle';
+	/**
+	 * Replace the existing view model, invoking Router lifecycle hooks.
+	 */
+	replace: 'replace';
+}
+/**
+ * Enum like type for activation strategy built-in values
+ */
+export declare type ActivationStrategyType = ActivationStrategy[keyof ActivationStrategy];
 /**
  * Initialization options for a navigation instruction
  */
@@ -380,52 +405,52 @@ export interface NavigationInstructionInit {
 	options?: Object;
 	plan?: Record<string, /*ViewPortInstruction*/ any>;
 }
-/**
- * A pipeline step for instructing a piepline to commit changes on a navigation instruction
- */
-export declare class CommitChangesStep {
-	run(navigationInstruction: NavigationInstruction, next: Function): Promise<any>;
+export interface ViewPortInstructionInit {
+	name: string;
+	strategy: ActivationStrategyType;
+	moduleId: string;
+	component: ViewPortComponent;
 }
 /**
-* Class used to represent an instruction during a navigation.
-*/
+ * Class used to represent an instruction during a navigation.
+ */
 export declare class NavigationInstruction {
 	/**
-	* The URL fragment.
-	*/
+	 * The URL fragment.
+	 */
 	fragment: string;
 	/**
-	* The query string.
-	*/
+	 * The query string.
+	 */
 	queryString: string;
 	/**
-	* Parameters extracted from the route pattern.
-	*/
+	 * Parameters extracted from the route pattern.
+	 */
 	params: any;
 	/**
-	* Parameters extracted from the query string.
-	*/
+	 * Parameters extracted from the query string.
+	 */
 	queryParams: any;
 	/**
-	* The route config for the route matching this instruction.
-	*/
+	 * The route config for the route matching this instruction.
+	 */
 	config: RouteConfig;
 	/**
-	* The parent instruction, if this instruction was created by a child router.
-	*/
+	 * The parent instruction, if this instruction was created by a child router.
+	 */
 	parentInstruction: NavigationInstruction;
 	parentCatchHandler: any;
 	/**
-	* The instruction being replaced by this instruction in the current router.
-	*/
+	 * The instruction being replaced by this instruction in the current router.
+	 */
 	previousInstruction: NavigationInstruction;
 	/**
-	* viewPort instructions to used activation.
-	*/
+	 * viewPort instructions to used activation.
+	 */
 	viewPortInstructions: Record<string, /*ViewPortInstruction*/ any>;
 	/**
-	  * The router instance.
-	*/
+	 * The router instance.
+	 */
 	router: Router;
 	/**
 	 * Current built viewport plan of this nav instruction
@@ -434,30 +459,31 @@ export declare class NavigationInstruction {
 	options: Record<string, any>;
 	constructor(init: NavigationInstructionInit);
 	/**
-	* Gets an array containing this instruction and all child instructions for the current navigation.
-	*/
+	 * Gets an array containing this instruction and all child instructions for the current navigation.
+	 */
 	getAllInstructions(): Array<NavigationInstruction>;
 	/**
-	* Gets an array containing the instruction and all child instructions for the previous navigation.
-	* Previous instructions are no longer available after navigation completes.
-	*/
+	 * Gets an array containing the instruction and all child instructions for the previous navigation.
+	 * Previous instructions are no longer available after navigation completes.
+	 */
 	getAllPreviousInstructions(): Array<NavigationInstruction>;
 	/**
-	* Adds a viewPort instruction. Returns the newly created instruction based on parameters
-	*/
-	addViewPortInstruction(name: string, strategy: ActivationStrategyType, moduleId: string, component: any): any;
+	 * Adds a viewPort instruction. Returns the newly created instruction based on parameters
+	 */
+	addViewPortInstruction(initOptions: ViewPortInstructionInit): any;
+	addViewPortInstruction(viewPortName: string, strategy: ActivationStrategyType, moduleId: string, component: any): any;
 	/**
-	* Gets the name of the route pattern's wildcard parameter, if applicable.
-	*/
+	 * Gets the name of the route pattern's wildcard parameter, if applicable.
+	 */
 	getWildCardName(): string;
 	/**
-	* Gets the path and query string created by filling the route
-	* pattern's wildcard parameter with the matching param.
-	*/
+	 * Gets the path and query string created by filling the route
+	 * pattern's wildcard parameter with the matching param.
+	 */
 	getWildcardPath(): string;
 	/**
-	* Gets the instruction's base URL, accounting for wildcard route parameters.
-	*/
+	 * Gets the instruction's base URL, accounting for wildcard route parameters.
+	 */
 	getBaseUrl(): string;
 }
 /**
@@ -487,21 +513,21 @@ export declare class Redirect implements NavigationCommand {
 	 */
 	constructor(url: string, options?: NavigationOptions);
 	/**
-	* Called by the activation system to set the child router.
-	*
-	* @param router The router.
-	*/
+	 * Called by the activation system to set the child router.
+	 *
+	 * @param router The router.
+	 */
 	setRouter(router: Router): void;
 	/**
-	* Called by the navigation pipeline to navigate.
-	*
-	* @param appRouter The router to be redirected.
-	*/
+	 * Called by the navigation pipeline to navigate.
+	 *
+	 * @param appRouter The router to be redirected.
+	 */
 	navigate(appRouter: Router): void;
 }
 /**
-* Used during the activation lifecycle to cause a redirect to a named route.
-*/
+ * Used during the activation lifecycle to cause a redirect to a named route.
+ */
 export declare class RedirectToRoute implements NavigationCommand {
 	route: string;
 	params: any;
@@ -512,41 +538,17 @@ export declare class RedirectToRoute implements NavigationCommand {
 	 */
 	constructor(route: string, params?: any, options?: NavigationOptions);
 	/**
-	* Called by the activation system to set the child router.
-	*
-	* @param router The router.
-	*/
+	 * Called by the activation system to set the child router.
+	 *
+	 * @param router The router.
+	 */
 	setRouter(router: Router): void;
 	/**
-	* Called by the navigation pipeline to navigate.
-	*
-	* @param appRouter The router to be redirected.
-	*/
+	 * Called by the navigation pipeline to navigate.
+	 *
+	 * @param appRouter The router to be redirected.
+	 */
 	navigate(appRouter: Router): void;
-}
-/**
- * A pipeline step responsible for finding and activating method `canDeactivate` on a view model of a route
- */
-export declare class CanDeactivatePreviousStep {
-	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
-}
-/**
- * A pipeline step responsible for finding and activating method `canActivate` on a view model of a route
- */
-export declare class CanActivateNextStep {
-	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
-}
-/**
- * A pipeline step responsible for finding and activating method `deactivate` on a view model of a route
- */
-export declare class DeactivatePreviousStep {
-	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
-}
-/**
- * A pipeline step responsible for finding and activating method `activate` on a view model of a route
- */
-export declare class ActivateNextStep {
-	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
 }
 /**
  * A basic interface for an Observable type
@@ -598,77 +600,77 @@ export declare type RouteOrRedirectConfig = RouteConfig | RedirectConfig;
  */
 export declare type RouteConfigSpecifier = string | RouteOrRedirectConfig | ((instruction: NavigationInstruction) => string | RouteOrRedirectConfig | Promise<string | RouteOrRedirectConfig>);
 /**
-* A configuration object that describes a route.
-*/
+ * A configuration object that describes a route.
+ */
 export interface RouteConfig {
 	/**
-	* The route pattern to match against incoming URL fragments, or an array of patterns.
-	*/
+	 * The route pattern to match against incoming URL fragments, or an array of patterns.
+	 */
 	route: string | string[];
 	/**
-	* A unique name for the route that may be used to identify the route when generating URL fragments.
-	* Required when this route should support URL generation, such as with [[Router.generate]] or
-	* the route-href custom attribute.
-	*/
+	 * A unique name for the route that may be used to identify the route when generating URL fragments.
+	 * Required when this route should support URL generation, such as with [[Router.generate]] or
+	 * the route-href custom attribute.
+	 */
 	name?: string;
 	/**
-	* The moduleId of the view model that should be activated for this route.
-	*/
+	 * The moduleId of the view model that should be activated for this route.
+	 */
 	moduleId?: string;
 	/**
-	* A URL fragment to redirect to when this route is matched.
-	*/
+	 * A URL fragment to redirect to when this route is matched.
+	 */
 	redirect?: string;
 	/**
-	* A function that can be used to dynamically select the module or modules to activate.
-	* The function is passed the current [[NavigationInstruction]], and should configure
-	* instruction.config with the desired moduleId, viewPorts, or redirect.
-	*/
+	 * A function that can be used to dynamically select the module or modules to activate.
+	 * The function is passed the current [[NavigationInstruction]], and should configure
+	 * instruction.config with the desired moduleId, viewPorts, or redirect.
+	 */
 	navigationStrategy?: (instruction: NavigationInstruction) => Promise<void> | void;
 	/**
-	* The view ports to target when activating this route. If unspecified, the target moduleId is loaded
-	* into the default viewPort (the viewPort with name 'default'). The viewPorts object should have keys
-	* whose property names correspond to names used by <router-view> elements. The values should be objects
-	* specifying the moduleId to load into that viewPort.  The values may optionally include properties related to layout:
-	* `layoutView`, `layoutViewModel` and `layoutModel`.
-	*/
+	 * The view ports to target when activating this route. If unspecified, the target moduleId is loaded
+	 * into the default viewPort (the viewPort with name 'default'). The viewPorts object should have keys
+	 * whose property names correspond to names used by <router-view> elements. The values should be objects
+	 * specifying the moduleId to load into that viewPort.  The values may optionally include properties related to layout:
+	 * `layoutView`, `layoutViewModel` and `layoutModel`.
+	 */
 	viewPorts?: any;
 	/**
-	* When specified, this route will be included in the [[Router.navigation]] nav model. Useful for
-	* dynamically generating menus or other navigation elements. When a number is specified, that value
-	* will be used as a sort order.
-	*/
+	 * When specified, this route will be included in the [[Router.navigation]] nav model. Useful for
+	 * dynamically generating menus or other navigation elements. When a number is specified, that value
+	 * will be used as a sort order.
+	 */
 	nav?: boolean | number;
 	/**
-	* The URL fragment to use in nav models. If unspecified, the [[RouteConfig.route]] will be used.
-	* However, if the [[RouteConfig.route]] contains dynamic segments, this property must be specified.
-	*/
+	 * The URL fragment to use in nav models. If unspecified, the [[RouteConfig.route]] will be used.
+	 * However, if the [[RouteConfig.route]] contains dynamic segments, this property must be specified.
+	 */
 	href?: string;
 	/**
-	* Indicates that when route generation is done for this route, it should just take the literal value of the href property.
-	*/
+	 * Indicates that when route generation is done for this route, it should just take the literal value of the href property.
+	 */
 	generationUsesHref?: boolean;
 	/**
-	* The document title to set when this route is active.
-	*/
+	 * The document title to set when this route is active.
+	 */
 	title?: string;
 	/**
-	* Arbitrary data to attach to the route. This can be used to attached custom data needed by components
-	* like pipeline steps and activated modules.
-	*/
+	 * Arbitrary data to attach to the route. This can be used to attached custom data needed by components
+	 * like pipeline steps and activated modules.
+	 */
 	settings?: any;
 	/**
-	* The navigation model for storing and interacting with the route's navigation settings.
-	*/
+	 * The navigation model for storing and interacting with the route's navigation settings.
+	 */
 	navModel?: NavModel;
 	/**
-	* When true is specified, this route will be case sensitive.
-	*/
+	 * When true is specified, this route will be case sensitive.
+	 */
 	caseSensitive?: boolean;
 	/**
-	* Add to specify an activation strategy if it is always the same and you do not want that
-	* to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
-	*/
+	 * Add to specify an activation strategy if it is always the same and you do not want that
+	 * to be in your view-model code. Available values are 'replace' and 'invoke-lifecycle'.
+	 */
 	activationStrategy?: ActivationStrategyType;
 	/**
 	 * specifies the file name of a layout view to use.
@@ -685,91 +687,70 @@ export interface RouteConfig {
 	[x: string]: any;
 }
 /**
-* An optional interface describing the canActivate convention.
-*/
+ * An optional interface describing the canActivate convention.
+ */
 export interface RoutableComponentCanActivate {
 	/**
-	* Implement this hook if you want to control whether or not your view-model can be navigated to.
-	* Return a boolean value, a promise for a boolean value, or a navigation command.
-	*/
+	 * Implement this hook if you want to control whether or not your view-model can be navigated to.
+	 * Return a boolean value, a promise for a boolean value, or a navigation command.
+	 */
 	canActivate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): boolean | Promise<boolean> | PromiseLike<boolean> | NavigationCommand | Promise<NavigationCommand> | PromiseLike<NavigationCommand>;
 }
 /**
-* An optional interface describing the activate convention.
-*/
+ * An optional interface describing the activate convention.
+ */
 export interface RoutableComponentActivate {
 	/**
-	* Implement this hook if you want to perform custom logic just before your view-model is displayed.
-	* You can optionally return a promise to tell the router to wait to bind and attach the view until
-	* after you finish your work.
-	*/
+	 * Implement this hook if you want to perform custom logic just before your view-model is displayed.
+	 * You can optionally return a promise to tell the router to wait to bind and attach the view until
+	 * after you finish your work.
+	 */
 	activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): Promise<void> | PromiseLike<void> | IObservable | void;
 }
 /**
-* An optional interface describing the canDeactivate convention.
-*/
+ * An optional interface describing the canDeactivate convention.
+ */
 export interface RoutableComponentCanDeactivate {
 	/**
-	* Implement this hook if you want to control whether or not the router can navigate away from your
-	* view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
-	* or a navigation command.
-	*/
+	 * Implement this hook if you want to control whether or not the router can navigate away from your
+	 * view-model when moving to a new route. Return a boolean value, a promise for a boolean value,
+	 * or a navigation command.
+	 */
 	canDeactivate: () => boolean | Promise<boolean> | PromiseLike<boolean> | NavigationCommand;
 }
 /**
-* An optional interface describing the deactivate convention.
-*/
+ * An optional interface describing the deactivate convention.
+ */
 export interface RoutableComponentDeactivate {
 	/**
-	* Implement this hook if you want to perform custom logic when your view-model is being
-	* navigated away from. You can optionally return a promise to tell the router to wait until
-	* after you finish your work.
-	*/
+	 * Implement this hook if you want to perform custom logic when your view-model is being
+	 * navigated away from. You can optionally return a promise to tell the router to wait until
+	 * after you finish your work.
+	 */
 	deactivate: () => Promise<void> | PromiseLike<void> | IObservable | void;
 }
 /**
-* An optional interface describing the determineActivationStrategy convention.
-*/
+ * An optional interface describing the determineActivationStrategy convention.
+ */
 export interface RoutableComponentDetermineActivationStrategy {
 	/**
-	* Implement this hook if you want to give hints to the router about the activation strategy, when reusing
-	* a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
-	*/
+	 * Implement this hook if you want to give hints to the router about the activation strategy, when reusing
+	 * a view model for different routes. Available values are 'replace' and 'invoke-lifecycle'.
+	 */
 	determineActivationStrategy(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): ActivationStrategyType;
 }
 /**
-* An optional interface describing the router configuration convention.
-*/
+ * An optional interface describing the router configuration convention.
+ */
 export interface ConfiguresRouter {
 	/**
-	* Implement this hook if you want to configure a router.
-	*/
+	 * Implement this hook if you want to configure a router.
+	 */
 	configureRouter(config: RouterConfiguration, router: Router): Promise<void> | PromiseLike<void> | void;
 }
 /**
-* An optional interface describing the available activation strategies.
-*/
-export interface ActivationStrategy {
-	/**
-	* Reuse the existing view model, without invoking Router lifecycle hooks.
-	*/
-	noChange: 'no-change';
-	/**
-	* Reuse the existing view model, invoking Router lifecycle hooks.
-	*/
-	invokeLifecycle: 'invoke-lifecycle';
-	/**
-	* Replace the existing view model, invoking Router lifecycle hooks.
-	*/
-	replace: 'replace';
-}
-/**
- * Enum like type for activation strategy built-in values
+ * A step to be run during processing of the pipeline.
  */
-export declare type ActivationStrategyType = ActivationStrategy[keyof ActivationStrategy];
-/**
-* A step to be run during processing of the pipeline.
-*/
 export interface PipelineStep {
 	/**
 	 * Execute the pipeline step. The step should invoke next(), next.complete(),
@@ -786,35 +767,49 @@ export interface PipelineStep {
 export interface IPipelineSlot {
 }
 /**
-* The result of a pipeline run.
-*/
+ * The result of a pipeline run.
+ */
 export interface PipelineResult {
 	status: string;
 	instruction: NavigationInstruction;
 	output: any;
 	completed: boolean;
 }
+/**
+ * The component responsible for routing
+ */
+export interface ViewPortComponent {
+	viewModel: any;
+	childContainer?: Container;
+	router: Router;
+	config?: RouteConfig;
+	childRouter?: Router;
+	/**
+	 * This is for backward compat, when moving from any to a more strongly typed interface
+	 */
+	[key: string]: any;
+}
 export declare type NavigationResult = boolean | Promise<PipelineResult | boolean>;
 /**
-* A callback to indicate when pipeline processing should advance to the next step
-* or be aborted.
-*/
+ * A callback to indicate when pipeline processing should advance to the next step
+ * or be aborted.
+ */
 export interface Next<T = any> {
 	/**
-	* Indicates the successful completion of the pipeline step.
-	*/
+	 * Indicates the successful completion of the pipeline step.
+	 */
 	(): Promise<any>;
 	/**
-	* Indicates the successful completion of the entire pipeline.
-	*/
+	 * Indicates the successful completion of the entire pipeline.
+	 */
 	complete: NextCompletionHandler<T>;
 	/**
-	* Indicates that the pipeline should cancel processing.
-	*/
+	 * Indicates that the pipeline should cancel processing.
+	 */
 	cancel: NextCompletionHandler<T>;
 	/**
-	* Indicates that pipeline processing has failed and should be stopped.
-	*/
+	 * Indicates that pipeline processing has failed and should be stopped.
+	 */
 	reject: NextCompletionHandler<T>;
 }
 /**
@@ -831,39 +826,39 @@ export interface NextCompletionResult<T = any> {
 export declare type NextCompletionHandler<T = any> = (output?: T) => Promise<NextCompletionResult<T>>;
 export declare type StepRunnerFunction = <TThis = any>(this: TThis, instruction: NavigationInstruction, next: Next) => any;
 /**
-* The class responsible for managing and processing the navigation pipeline.
-*/
+ * The class responsible for managing and processing the navigation pipeline.
+ */
 export declare class Pipeline {
 	/**
-	* The pipeline steps. And steps added via addStep will be converted to a function
-	* The actualy running functions with correct step contexts of this pipeline
-	*/
+	 * The pipeline steps. And steps added via addStep will be converted to a function
+	 * The actualy running functions with correct step contexts of this pipeline
+	 */
 	steps: StepRunnerFunction[];
 	/**
-	* Adds a step to the pipeline.
-	*
-	* @param step The pipeline step.
-	*/
+	 * Adds a step to the pipeline.
+	 *
+	 * @param step The pipeline step.
+	 */
 	addStep(step: StepRunnerFunction | PipelineStep | IPipelineSlot): Pipeline;
 	/**
-	* Runs the pipeline.
-	*
-	* @param instruction The navigation instruction to process.
-	*/
+	 * Runs the pipeline.
+	 *
+	 * @param instruction The navigation instruction to process.
+	 */
 	run(instruction: NavigationInstruction): Promise<PipelineResult>;
 }
 /**
-* Class responsible for creating the navigation pipeline.
-*/
+ * Class responsible for creating the navigation pipeline.
+ */
 export declare class PipelineProvider {
 	constructor(container: Container);
 	/**
-	* Create the navigation pipeline.
-	*/
+	 * Create the navigation pipeline.
+	 */
 	createPipeline(useCanDeactivateStep?: boolean): Pipeline;
 	/**
-	* Adds a step into the pipeline at a known slot location.
-	*/
+	 * Adds a step into the pipeline at a known slot location.
+	 */
 	addStep(name: string, step: PipelineStep | Function): void;
 	/**
 	 * Removes a step from a slot in the pipeline
@@ -875,49 +870,95 @@ export declare class PipelineProvider {
 	reset(): void;
 }
 /**
-* The main application router.
-*/
+ * The main application router.
+ */
 export declare class AppRouter extends Router {
 	events: EventAggregator;
 	constructor(container: Container, history: History, pipelineProvider: PipelineProvider, events: EventAggregator);
 	/**
-	* Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
-	* Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
-	*/
+	 * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+	 * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+	 */
 	reset(): void;
 	/**
-	* Loads the specified URL.
-	*
-	* @param url The URL fragment to load.
-	*/
+	 * Loads the specified URL.
+	 *
+	 * @param url The URL fragment to load.
+	 */
 	loadUrl(url: string): Promise<NavigationInstruction>;
 	/**
-	* Registers a viewPort to be used as a rendering target for activated routes.
-	*
-	* @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
-	* @param name The name of the viewPort. 'default' if unspecified.
-	*/
+	 * Registers a viewPort to be used as a rendering target for activated routes.
+	 *
+	 * @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
+	 * @param name The name of the viewPort. 'default' if unspecified.
+	 */
 	registerViewPort(viewPort: any, name?: string): Promise<any>;
 	/**
-	* Activates the router. This instructs the router to begin listening for history changes and processing instructions.
-	*
-	* @params options The set of options to activate the router with.
-	*/
+	 * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
+	 *
+	 * @params options The set of options to activate the router with.
+	 */
 	activate(options?: NavigationOptions): void;
 	/**
-	* Deactivates the router.
-	*/
+	 * Deactivates the router.
+	 */
 	deactivate(): void;
 }
 /**
-* The strategy to use when activating modules during navigation.
-*/
-export declare const activationStrategy: ActivationStrategy;
+ * A pipeline step responsible for finding and activating method `canDeactivate` on a view model of a route
+ */
+export declare class CanDeactivatePreviousStep {
+	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
+}
+/**
+ * A pipeline step responsible for finding and activating method `canActivate` on a view model of a route
+ */
+export declare class CanActivateNextStep {
+	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
+}
+/**
+ * A pipeline step responsible for finding and activating method `deactivate` on a view model of a route
+ */
+export declare class DeactivatePreviousStep {
+	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
+}
+/**
+ * A pipeline step responsible for finding and activating method `activate` on a view model of a route
+ */
+export declare class ActivateNextStep {
+	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
+}
+/**
+ * A pipeline step for instructing a piepline to commit changes on a navigation instruction
+ */
+export declare class CommitChangesStep {
+	run(navigationInstruction: NavigationInstruction, next: Function): Promise<any>;
+}
 /**
  * Transform a navigation instruction into viewport plan record object,
  * or a redirect request if user viewmodel demands
  */
 export declare class BuildNavigationPlanStep {
+	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
+}
+/**
+ * Abstract class that is responsible for loading view / view model from a route config
+ * The default implementation can be found in `aurelia-templating-router`
+ */
+export declare class RouteLoader {
+	/**
+	 * Load a route config based on its viewmodel / view configuration
+	 */
+	loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise</*ViewPortInstruction*/ any>;
+}
+/**
+ * A pipeline step responsible for loading a route config of a navigation instruction
+ */
+export declare class LoadRouteStep {
+	constructor(routeLoader: RouteLoader);
+	/**
+	 * Run the internal to load route config of a navigation instruction to prepare for next steps in the pipeline
+	 */
 	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
 }
 /**
@@ -961,24 +1002,4 @@ export declare const enum PipelineSlotName {
 	 * Post-render slot. Invoked last in the pipeline
 	 */
 	PostRender = "postRender"
-}
-/**
- * Abstract class that is responsible for loading view / view model from a route config
- * The default implementation can be found in `aurelia-templating-router`
- */
-export declare class RouteLoader {
-	/**
-	 * Load a route config based on its viewmodel / view configuration
-	 */
-	loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise<any>;
-}
-/**
- * A pipeline step responsible for loading a route config of a navigation instruction
- */
-export declare class LoadRouteStep {
-	constructor(routeLoader: RouteLoader);
-	/**
-	 * Run the internal to load route config of a navigation instruction to prepare for next steps in the pipeline
-	 */
-	run(navigationInstruction: NavigationInstruction, next: Next): Promise<any>;
 }

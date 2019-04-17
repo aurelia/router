@@ -8,512 +8,6 @@ var aureliaHistory = require('aurelia-history');
 var aureliaRouteRecognizer = require('aurelia-route-recognizer');
 var aureliaEventAggregator = require('aurelia-event-aggregator');
 
-/**
-* Determines if the provided object is a navigation command.
-* A navigation command is anything with a navigate method.
-*
-* @param obj The object to check.
-*/
-function isNavigationCommand(obj) {
-    return obj && typeof obj.navigate === 'function';
-}
-/**
-* Used during the activation lifecycle to cause a redirect.
-*/
-var Redirect = /** @class */ (function () {
-    /**
-     * @param url The URL fragment to use as the navigation destination.
-     * @param options The navigation options.
-     */
-    function Redirect(url, options) {
-        if (options === void 0) { options = {}; }
-        this.url = url;
-        this.options = Object.assign({ trigger: true, replace: true }, options);
-        this.shouldContinueProcessing = false;
-    }
-    /**
-    * Called by the activation system to set the child router.
-    *
-    * @param router The router.
-    */
-    Redirect.prototype.setRouter = function (router) {
-        this.router = router;
-    };
-    /**
-    * Called by the navigation pipeline to navigate.
-    *
-    * @param appRouter The router to be redirected.
-    */
-    Redirect.prototype.navigate = function (appRouter) {
-        var navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
-        navigatingRouter.navigate(this.url, this.options);
-    };
-    return Redirect;
-}());
-/**
-* Used during the activation lifecycle to cause a redirect to a named route.
-*/
-var RedirectToRoute = /** @class */ (function () {
-    /**
-     * @param route The name of the route.
-     * @param params The parameters to be sent to the activation method.
-     * @param options The options to use for navigation.
-     */
-    function RedirectToRoute(route, params, options) {
-        if (params === void 0) { params = {}; }
-        if (options === void 0) { options = {}; }
-        this.route = route;
-        this.params = params;
-        this.options = Object.assign({ trigger: true, replace: true }, options);
-        this.shouldContinueProcessing = false;
-    }
-    /**
-    * Called by the activation system to set the child router.
-    *
-    * @param router The router.
-    */
-    RedirectToRoute.prototype.setRouter = function (router) {
-        this.router = router;
-    };
-    /**
-    * Called by the navigation pipeline to navigate.
-    *
-    * @param appRouter The router to be redirected.
-    */
-    RedirectToRoute.prototype.navigate = function (appRouter) {
-        var navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
-        navigatingRouter.navigateToRoute(this.route, this.params, this.options);
-    };
-    return RedirectToRoute;
-}());
-
-/**
-* The strategy to use when activating modules during navigation.
-*/
-var activationStrategy = {
-    noChange: 'no-change',
-    invokeLifecycle: 'invoke-lifecycle',
-    replace: 'replace'
-};
-/**
- * Transform a navigation instruction into viewport plan record object,
- * or a redirect request if user viewmodel demands
- */
-var BuildNavigationPlanStep = /** @class */ (function () {
-    function BuildNavigationPlanStep() {
-    }
-    BuildNavigationPlanStep.prototype.run = function (navigationInstruction, next) {
-        return _buildNavigationPlan(navigationInstruction)
-            .then(function (plan) {
-            if (plan instanceof Redirect) {
-                return next.cancel(plan);
-            }
-            navigationInstruction.plan = plan;
-            return next();
-        })
-            .catch(next.cancel);
-    };
-    return BuildNavigationPlanStep;
-}());
-function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
-    var config = instruction.config;
-    // todo: separate and export for unit tests
-    if ('redirect' in config) {
-        var router_1 = instruction.router;
-        return router_1
-            ._createNavigationInstruction(config.redirect)
-            .then(function (newInstruction) {
-            var params = {};
-            for (var key in newInstruction.params) {
-                // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
-                var val = newInstruction.params[key];
-                if (typeof val === 'string' && val[0] === ':') {
-                    val = val.slice(1);
-                    // And if that param is found on the original instruction then use it
-                    if (val in instruction.params) {
-                        params[key] = instruction.params[val];
-                    }
-                }
-                else {
-                    params[key] = newInstruction.params[key];
-                }
-            }
-            var redirectLocation = router_1.generate(newInstruction.config, params, instruction.options);
-            // Special handling for child routes
-            for (var key in instruction.params) {
-                redirectLocation = redirectLocation.replace(":" + key, instruction.params[key]);
-            }
-            if (instruction.queryString) {
-                redirectLocation += '?' + instruction.queryString;
-            }
-            return Promise.resolve(new Redirect(redirectLocation));
-        });
-    }
-    var prev = instruction.previousInstruction;
-    var plan = {};
-    var defaults = instruction.router.viewPortDefaults;
-    if (prev) {
-        var newParams = hasDifferentParameterValues(prev, instruction);
-        var pending_1 = [];
-        var _loop_1 = function (viewPortName) {
-            var _a;
-            var prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
-            var nextViewPortConfig = viewPortName in config.viewPorts ? config.viewPorts[viewPortName] : prevViewPortInstruction;
-            if (nextViewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
-                nextViewPortConfig = defaults[viewPortName];
-            }
-            var viewPortPlan = plan[viewPortName] = {
-                name: viewPortName,
-                config: nextViewPortConfig,
-                prevComponent: prevViewPortInstruction.component,
-                prevModuleId: prevViewPortInstruction.moduleId
-            };
-            if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
-                viewPortPlan.strategy = activationStrategy.replace;
-            }
-            else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
-                viewPortPlan.strategy = (_a = prevViewPortInstruction.component.viewModel).determineActivationStrategy.apply(_a, instruction.lifecycleArgs);
-            }
-            else if (config.activationStrategy) {
-                viewPortPlan.strategy = config.activationStrategy;
-            }
-            else if (newParams || forceLifecycleMinimum) {
-                viewPortPlan.strategy = activationStrategy.invokeLifecycle;
-            }
-            else {
-                viewPortPlan.strategy = activationStrategy.noChange;
-            }
-            if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
-                var path = instruction.getWildcardPath();
-                var task = prevViewPortInstruction
-                    .childRouter
-                    ._createNavigationInstruction(path, instruction)
-                    .then(function (childInstruction) {
-                    viewPortPlan.childNavigationInstruction = childInstruction;
-                    return _buildNavigationPlan(childInstruction, viewPortPlan.strategy === activationStrategy.invokeLifecycle)
-                        .then(function (childPlan) {
-                        if (childPlan instanceof Redirect) {
-                            return Promise.reject(childPlan);
-                        }
-                        childInstruction.plan = childPlan;
-                        // for bluebird ?
-                        return null;
-                    });
-                });
-                pending_1.push(task);
-            }
-        };
-        for (var viewPortName in prev.viewPortInstructions) {
-            _loop_1(viewPortName);
-        }
-        return Promise.all(pending_1).then(function () { return plan; });
-    }
-    for (var viewPortName in config.viewPorts) {
-        var viewPortConfig = config.viewPorts[viewPortName];
-        if (viewPortConfig.moduleId === null && viewPortName in instruction.router.viewPortDefaults) {
-            viewPortConfig = defaults[viewPortName];
-        }
-        plan[viewPortName] = {
-            name: viewPortName,
-            strategy: activationStrategy.replace,
-            config: viewPortConfig
-        };
-    }
-    return Promise.resolve(plan);
-}
-function hasDifferentParameterValues(prev, next) {
-    var prevParams = prev.params;
-    var nextParams = next.params;
-    var nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
-    for (var key in nextParams) {
-        if (key === nextWildCardName) {
-            continue;
-        }
-        if (prevParams[key] !== nextParams[key]) {
-            return true;
-        }
-    }
-    for (var key in prevParams) {
-        if (key === nextWildCardName) {
-            continue;
-        }
-        if (prevParams[key] !== nextParams[key]) {
-            return true;
-        }
-    }
-    if (!next.options.compareQueryParams) {
-        return false;
-    }
-    var prevQueryParams = prev.queryParams;
-    var nextQueryParams = next.queryParams;
-    for (var key in nextQueryParams) {
-        if (prevQueryParams[key] !== nextQueryParams[key]) {
-            return true;
-        }
-    }
-    for (var key in prevQueryParams) {
-        if (prevQueryParams[key] !== nextQueryParams[key]) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * A pipeline step responsible for finding and activating method `canDeactivate` on a view model of a route
- */
-var CanDeactivatePreviousStep = /** @class */ (function () {
-    function CanDeactivatePreviousStep() {
-    }
-    CanDeactivatePreviousStep.prototype.run = function (navigationInstruction, next) {
-        return processDeactivatable(navigationInstruction, 'canDeactivate', next);
-    };
-    return CanDeactivatePreviousStep;
-}());
-/**
- * A pipeline step responsible for finding and activating method `canActivate` on a view model of a route
- */
-var CanActivateNextStep = /** @class */ (function () {
-    function CanActivateNextStep() {
-    }
-    CanActivateNextStep.prototype.run = function (navigationInstruction, next) {
-        return processActivatable(navigationInstruction, 'canActivate', next);
-    };
-    return CanActivateNextStep;
-}());
-/**
- * A pipeline step responsible for finding and activating method `deactivate` on a view model of a route
- */
-var DeactivatePreviousStep = /** @class */ (function () {
-    function DeactivatePreviousStep() {
-    }
-    DeactivatePreviousStep.prototype.run = function (navigationInstruction, next) {
-        return processDeactivatable(navigationInstruction, 'deactivate', next, true);
-    };
-    return DeactivatePreviousStep;
-}());
-/**
- * A pipeline step responsible for finding and activating method `activate` on a view model of a route
- */
-var ActivateNextStep = /** @class */ (function () {
-    function ActivateNextStep() {
-    }
-    ActivateNextStep.prototype.run = function (navigationInstruction, next) {
-        return processActivatable(navigationInstruction, 'activate', next, true);
-    };
-    return ActivateNextStep;
-}());
-/**
- * Recursively find list of deactivate-able view models
- * and invoke the either 'canDeactivate' or 'deactivate' on each
- */
-var processDeactivatable = function (navigationInstruction, callbackName, next, ignoreResult) {
-    var plan = navigationInstruction.plan;
-    var infos = findDeactivatable(plan, callbackName);
-    var i = infos.length; // query from inside out
-    function inspect(val) {
-        if (ignoreResult || shouldContinue(val)) {
-            return iterate();
-        }
-        return next.cancel(val);
-    }
-    function iterate() {
-        if (i--) {
-            try {
-                var viewModel = infos[i];
-                var result = viewModel[callbackName](navigationInstruction);
-                return processPotential(result, inspect, next.cancel);
-            }
-            catch (error) {
-                return next.cancel(error);
-            }
-        }
-        navigationInstruction.router.couldDeactivate = true;
-        return next();
-    }
-    return iterate();
-};
-/**
- * Recursively find and returns a list of deactivate-able view models
- */
-var findDeactivatable = function (plan, callbackName, list) {
-    if (list === void 0) { list = []; }
-    for (var viewPortName in plan) {
-        var viewPortPlan = plan[viewPortName];
-        var prevComponent = viewPortPlan.prevComponent;
-        if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace)
-            && prevComponent) {
-            var viewModel = prevComponent.viewModel;
-            if (callbackName in viewModel) {
-                list.push(viewModel);
-            }
-        }
-        if (viewPortPlan.strategy === activationStrategy.replace && prevComponent) {
-            addPreviousDeactivatable(prevComponent, callbackName, list);
-        }
-        else if (viewPortPlan.childNavigationInstruction) {
-            findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
-        }
-    }
-    return list;
-};
-var addPreviousDeactivatable = function (component, callbackName, list) {
-    var childRouter = component.childRouter;
-    if (childRouter && childRouter.currentInstruction) {
-        var viewPortInstructions = childRouter.currentInstruction.viewPortInstructions;
-        for (var viewPortName in viewPortInstructions) {
-            var viewPortInstruction = viewPortInstructions[viewPortName];
-            var prevComponent = viewPortInstruction.component;
-            var prevViewModel = prevComponent.viewModel;
-            if (callbackName in prevViewModel) {
-                list.push(prevViewModel);
-            }
-            addPreviousDeactivatable(prevComponent, callbackName, list);
-        }
-    }
-};
-var processActivatable = function (navigationInstruction, callbackName, next, ignoreResult) {
-    var infos = findActivatable(navigationInstruction, callbackName);
-    var length = infos.length;
-    var i = -1; // query from top down
-    function inspect(val, router) {
-        if (ignoreResult || shouldContinue(val, router)) {
-            return iterate();
-        }
-        return next.cancel(val);
-    }
-    function iterate() {
-        var _a;
-        i++;
-        if (i < length) {
-            try {
-                var current_1 = infos[i];
-                var result = (_a = current_1.viewModel)[callbackName].apply(_a, current_1.lifecycleArgs);
-                return processPotential(result, function (val) { return inspect(val, current_1.router); }, next.cancel);
-            }
-            catch (error) {
-                return next.cancel(error);
-            }
-        }
-        return next();
-    }
-    return iterate();
-};
-/**
- * Find list of activatable view model and add to list (3rd parameter)
- */
-var findActivatable = function (navigationInstruction, callbackName, list, router) {
-    if (list === void 0) { list = []; }
-    var plan = navigationInstruction.plan;
-    Object
-        .keys(plan)
-        .forEach(function (viewPortName) {
-        var viewPortPlan = plan[viewPortName];
-        var viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
-        var viewPortComponent = viewPortInstruction.component;
-        var viewModel = viewPortComponent.viewModel;
-        if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle
-            || viewPortPlan.strategy === activationStrategy.replace)
-            && callbackName in viewModel) {
-            list.push({
-                viewModel: viewModel,
-                lifecycleArgs: viewPortInstruction.lifecycleArgs,
-                router: router
-            });
-        }
-        var childNavInstruction = viewPortPlan.childNavigationInstruction;
-        if (childNavInstruction) {
-            findActivatable(childNavInstruction, callbackName, list, viewPortComponent.childRouter || router);
-        }
-    });
-    return list;
-};
-var shouldContinue = function (output, router) {
-    if (output instanceof Error) {
-        return false;
-    }
-    if (isNavigationCommand(output)) {
-        if (typeof output.setRouter === 'function') {
-            output.setRouter(router);
-        }
-        return !!output.shouldContinueProcessing;
-    }
-    if (output === undefined) {
-        return true;
-    }
-    return output;
-};
-/**
- * wraps a subscription, allowing unsubscribe calls even if
- * the first value comes synchronously
- */
-var SafeSubscription = /** @class */ (function () {
-    function SafeSubscription(subscriptionFunc) {
-        this._subscribed = true;
-        this._subscription = subscriptionFunc(this);
-        if (!this._subscribed) {
-            this.unsubscribe();
-        }
-    }
-    Object.defineProperty(SafeSubscription.prototype, "subscribed", {
-        get: function () {
-            return this._subscribed;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    SafeSubscription.prototype.unsubscribe = function () {
-        if (this._subscribed && this._subscription) {
-            this._subscription.unsubscribe();
-        }
-        this._subscribed = false;
-    };
-    return SafeSubscription;
-}());
-/**
- * A function to process return value from `activate`/`canActivate` steps
- * Supports observable/promise
- *
- * For observable, resolve at first next() or on complete()
- */
-var processPotential = function (obj, resolve, reject) {
-    // if promise like
-    if (obj && typeof obj.then === 'function') {
-        return Promise.resolve(obj).then(resolve).catch(reject);
-    }
-    // if observable
-    if (obj && typeof obj.subscribe === 'function') {
-        var obs_1 = obj;
-        return new SafeSubscription(function (sub) { return obs_1.subscribe({
-            next: function () {
-                if (sub.subscribed) {
-                    sub.unsubscribe();
-                    resolve(obj);
-                }
-            },
-            error: function (error) {
-                if (sub.subscribed) {
-                    sub.unsubscribe();
-                    reject(error);
-                }
-            },
-            complete: function () {
-                if (sub.subscribed) {
-                    sub.unsubscribe();
-                    resolve(obj);
-                }
-            }
-        }); });
-    }
-    // else just resolve
-    try {
-        return resolve(obj);
-    }
-    catch (error) {
-        return reject(error);
-    }
-};
-
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -544,24 +38,8 @@ function __extends(d, b) {
 }
 
 /**
- * A pipeline step for instructing a piepline to commit changes on a navigation instruction
+ * Class used to represent an instruction during a navigation.
  */
-var CommitChangesStep = /** @class */ (function () {
-    function CommitChangesStep() {
-    }
-    CommitChangesStep.prototype.run = function (navigationInstruction, next) {
-        return navigationInstruction
-            ._commitChanges(/*wait to swap?*/ true)
-            .then(function () {
-            navigationInstruction._updateTitle();
-            return next();
-        });
-    };
-    return CommitChangesStep;
-}());
-/**
-* Class used to represent an instruction during a navigation.
-*/
 var NavigationInstruction = /** @class */ (function () {
     function NavigationInstruction(init) {
         /**
@@ -587,8 +65,8 @@ var NavigationInstruction = /** @class */ (function () {
         this.lifecycleArgs = [allParams, this.config, this];
     }
     /**
-    * Gets an array containing this instruction and all child instructions for the current navigation.
-    */
+     * Gets an array containing this instruction and all child instructions for the current navigation.
+     */
     NavigationInstruction.prototype.getAllInstructions = function () {
         var instructions = [this];
         var viewPortInstructions = this.viewPortInstructions;
@@ -601,31 +79,42 @@ var NavigationInstruction = /** @class */ (function () {
         return instructions;
     };
     /**
-    * Gets an array containing the instruction and all child instructions for the previous navigation.
-    * Previous instructions are no longer available after navigation completes.
-    */
+     * Gets an array containing the instruction and all child instructions for the previous navigation.
+     * Previous instructions are no longer available after navigation completes.
+     */
     NavigationInstruction.prototype.getAllPreviousInstructions = function () {
         return this.getAllInstructions().map(function (c) { return c.previousInstruction; }).filter(function (c) { return c; });
     };
-    /**
-    * Adds a viewPort instruction. Returns the newly created instruction based on parameters
-    */
-    NavigationInstruction.prototype.addViewPortInstruction = function (name, strategy, moduleId, component) {
+    NavigationInstruction.prototype.addViewPortInstruction = function (nameOrInitOptions, strategy, moduleId, component) {
+        var viewPortInstruction;
+        var viewPortName = typeof nameOrInitOptions === 'string' ? nameOrInitOptions : nameOrInitOptions.name;
         var lifecycleArgs = this.lifecycleArgs;
-        var config = Object.assign({}, lifecycleArgs[1], { currentViewPort: name });
-        var viewportInstruction = this.viewPortInstructions[name] = {
-            name: name,
-            strategy: strategy,
-            moduleId: moduleId,
-            component: component,
-            childRouter: component.childRouter,
-            lifecycleArgs: [].concat(lifecycleArgs[0], config, lifecycleArgs[2])
-        };
-        return viewportInstruction;
+        var config = Object.assign({}, lifecycleArgs[1], { currentViewPort: viewPortName });
+        if (typeof nameOrInitOptions === 'string') {
+            viewPortInstruction = {
+                name: nameOrInitOptions,
+                strategy: strategy,
+                moduleId: moduleId,
+                component: component,
+                childRouter: component.childRouter,
+                lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]]
+            };
+        }
+        else {
+            viewPortInstruction = {
+                name: viewPortName,
+                strategy: nameOrInitOptions.strategy,
+                component: nameOrInitOptions.component,
+                moduleId: nameOrInitOptions.moduleId,
+                childRouter: nameOrInitOptions.component.childRouter,
+                lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]]
+            };
+        }
+        return this.viewPortInstructions[viewPortName] = viewPortInstruction;
     };
     /**
-    * Gets the name of the route pattern's wildcard parameter, if applicable.
-    */
+     * Gets the name of the route pattern's wildcard parameter, if applicable.
+     */
     NavigationInstruction.prototype.getWildCardName = function () {
         // todo: potential issue, or at least unsafe typings
         var configRoute = this.config.route;
@@ -633,9 +122,9 @@ var NavigationInstruction = /** @class */ (function () {
         return configRoute.substr(wildcardIndex + 1);
     };
     /**
-    * Gets the path and query string created by filling the route
-    * pattern's wildcard parameter with the matching param.
-    */
+     * Gets the path and query string created by filling the route
+     * pattern's wildcard parameter with the matching param.
+     */
     NavigationInstruction.prototype.getWildcardPath = function () {
         var wildcardName = this.getWildCardName();
         var path = this.params[wildcardName] || '';
@@ -646,8 +135,8 @@ var NavigationInstruction = /** @class */ (function () {
         return path;
     };
     /**
-    * Gets the instruction's base URL, accounting for wildcard route parameters.
-    */
+     * Gets the instruction's base URL, accounting for wildcard route parameters.
+     */
     NavigationInstruction.prototype.getBaseUrl = function () {
         var _this = this;
         var $encodeURI = encodeURI;
@@ -671,7 +160,10 @@ var NavigationInstruction = /** @class */ (function () {
         }
         return $encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
     };
-    /**@internal */
+    /**
+     * Finalize a viewport instruction
+     * @internal
+     */
     NavigationInstruction.prototype._commitChanges = function (waitToSwap) {
         var _this = this;
         var router = this.router;
@@ -691,10 +183,10 @@ var NavigationInstruction = /** @class */ (function () {
             if (!viewPort) {
                 throw new Error("There was no router-view found in the view for " + viewPortInstruction.moduleId + ".");
             }
-            var child_nav_instruction = viewPortInstruction.childNavigationInstruction;
-            if (viewPortInstruction.strategy === activationStrategy.replace) {
-                if (child_nav_instruction && child_nav_instruction.parentCatchHandler) {
-                    loads.push(child_nav_instruction._commitChanges(waitToSwap));
+            var childNavInstruction = viewPortInstruction.childNavigationInstruction;
+            if (viewPortInstruction.strategy === "replace" /* Replace */) {
+                if (childNavInstruction && childNavInstruction.parentCatchHandler) {
+                    loads.push(childNavInstruction._commitChanges(waitToSwap));
                 }
                 else {
                     if (waitToSwap) {
@@ -702,14 +194,14 @@ var NavigationInstruction = /** @class */ (function () {
                     }
                     loads.push(viewPort
                         .process(viewPortInstruction, waitToSwap)
-                        .then(function () { return child_nav_instruction
-                        ? child_nav_instruction._commitChanges(waitToSwap)
+                        .then(function () { return childNavInstruction
+                        ? childNavInstruction._commitChanges(waitToSwap)
                         : Promise.resolve(); }));
                 }
             }
             else {
-                if (child_nav_instruction) {
-                    loads.push(child_nav_instruction._commitChanges(waitToSwap));
+                if (childNavInstruction) {
+                    loads.push(childNavInstruction._commitChanges(waitToSwap));
                 }
             }
         };
@@ -878,12 +370,12 @@ var RouterConfiguration = /** @class */ (function () {
         this.pipelineSteps = [];
     }
     /**
-    * Adds a step to be run during the [[Router]]'s navigation pipeline.
-    *
-    * @param name The name of the pipeline slot to insert the step into.
-    * @param step The pipeline step.
-    * @chainable
-    */
+     * Adds a step to be run during the [[Router]]'s navigation pipeline.
+     *
+     * @param name The name of the pipeline slot to insert the step into.
+     * @param step The pipeline step.
+     * @chainable
+     */
     RouterConfiguration.prototype.addPipelineStep = function (name, step) {
         if (step === null || step === undefined) {
             throw new Error('Pipeline step cannot be null or undefined.');
@@ -892,60 +384,61 @@ var RouterConfiguration = /** @class */ (function () {
         return this;
     };
     /**
-    * Adds a step to be run during the [[Router]]'s authorize pipeline slot.
-    *
-    * @param step The pipeline step.
-    * @chainable
-    */
+     * Adds a step to be run during the [[Router]]'s authorize pipeline slot.
+     *
+     * @param step The pipeline step.
+     * @chainable
+     */
     RouterConfiguration.prototype.addAuthorizeStep = function (step) {
         return this.addPipelineStep("authorize" /* Authorize */, step);
     };
     /**
-    * Adds a step to be run during the [[Router]]'s preActivate pipeline slot.
-    *
-    * @param step The pipeline step.
-    * @chainable
-    */
+     * Adds a step to be run during the [[Router]]'s preActivate pipeline slot.
+     *
+     * @param step The pipeline step.
+     * @chainable
+     */
     RouterConfiguration.prototype.addPreActivateStep = function (step) {
         return this.addPipelineStep("preActivate" /* PreActivate */, step);
     };
     /**
-    * Adds a step to be run during the [[Router]]'s preRender pipeline slot.
-    *
-    * @param step The pipeline step.
-    * @chainable
-    */
+     * Adds a step to be run during the [[Router]]'s preRender pipeline slot.
+     *
+     * @param step The pipeline step.
+     * @chainable
+     */
     RouterConfiguration.prototype.addPreRenderStep = function (step) {
         return this.addPipelineStep("preRender" /* PreRender */, step);
     };
     /**
-    * Adds a step to be run during the [[Router]]'s postRender pipeline slot.
-    *
-    * @param step The pipeline step.
-    * @chainable
-    */
+     * Adds a step to be run during the [[Router]]'s postRender pipeline slot.
+     *
+     * @param step The pipeline step.
+     * @chainable
+     */
     RouterConfiguration.prototype.addPostRenderStep = function (step) {
         return this.addPipelineStep("postRender" /* PostRender */, step);
     };
     /**
-    * Configures a route that will be used if there is no previous location available on navigation cancellation.
-    *
-    * @param fragment The URL fragment to use as the navigation destination.
-    * @chainable
-    */
+     * Configures a route that will be used if there is no previous location available on navigation cancellation.
+     *
+     * @param fragment The URL fragment to use as the navigation destination.
+     * @chainable
+     */
     RouterConfiguration.prototype.fallbackRoute = function (fragment) {
         this._fallbackRoute = fragment;
         return this;
     };
     /**
-    * Maps one or more routes to be registered with the router.
-    *
-    * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
-    * @chainable
-    */
+     * Maps one or more routes to be registered with the router.
+     *
+     * @param route The [[RouteConfig]] to map, or an array of [[RouteConfig]] to map.
+     * @chainable
+     */
     RouterConfiguration.prototype.map = function (route) {
+        var _this = this;
         if (Array.isArray(route)) {
-            route.forEach(this.map.bind(this));
+            route.forEach(function (r) { return _this.map(r); });
             return this;
         }
         return this.mapRoute(route);
@@ -962,11 +455,11 @@ var RouterConfiguration = /** @class */ (function () {
         return this;
     };
     /**
-    * Maps a single route to be registered with the router.
-    *
-    * @param route The [[RouteConfig]] to map.
-    * @chainable
-    */
+     * Maps a single route to be registered with the router.
+     *
+     * @param route The [[RouteConfig]] to map.
+     * @chainable
+     */
     RouterConfiguration.prototype.mapRoute = function (config) {
         this.instructions.push(function (router) {
             var routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
@@ -983,50 +476,52 @@ var RouterConfiguration = /** @class */ (function () {
         return this;
     };
     /**
-    * Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
-    *
-    * @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
-    *  [[NavigationInstruction]] and selects a moduleId to load.
-    * @chainable
-    */
+     * Registers an unknown route handler to be run when the URL fragment doesn't match any registered routes.
+     *
+     * @param config A string containing a moduleId to load, or a [[RouteConfig]], or a function that takes the
+     *  [[NavigationInstruction]] and selects a moduleId to load.
+     * @chainable
+     */
     RouterConfiguration.prototype.mapUnknownRoutes = function (config) {
         this.unknownRouteConfig = config;
         return this;
     };
     /**
-    * Applies the current configuration to the specified [[Router]].
-    *
-    * @param router The [[Router]] to apply the configuration to.
-    */
+     * Applies the current configuration to the specified [[Router]].
+     *
+     * @param router The [[Router]] to apply the configuration to.
+     */
     RouterConfiguration.prototype.exportToRouter = function (router) {
         var instructions = this.instructions;
         for (var i = 0, ii = instructions.length; i < ii; ++i) {
             instructions[i](router);
         }
-        if (this.title) {
-            router.title = this.title;
+        var _a = this, title = _a.title, titleSeparator = _a.titleSeparator, unknownRouteConfig = _a.unknownRouteConfig, _fallbackRoute = _a._fallbackRoute, viewPortDefaults = _a.viewPortDefaults;
+        if (title) {
+            router.title = title;
         }
-        if (this.titleSeparator) {
-            router.titleSeparator = this.titleSeparator;
+        if (titleSeparator) {
+            router.titleSeparator = titleSeparator;
         }
-        if (this.unknownRouteConfig) {
-            router.handleUnknownRoutes(this.unknownRouteConfig);
+        if (unknownRouteConfig) {
+            router.handleUnknownRoutes(unknownRouteConfig);
         }
-        if (this._fallbackRoute) {
-            router.fallbackRoute = this._fallbackRoute;
+        if (_fallbackRoute) {
+            router.fallbackRoute = _fallbackRoute;
         }
-        if (this.viewPortDefaults) {
-            router.useViewPortDefaults(this.viewPortDefaults);
+        if (viewPortDefaults) {
+            router.useViewPortDefaults(viewPortDefaults);
         }
         Object.assign(router.options, this.options);
         var pipelineSteps = this.pipelineSteps;
-        if (pipelineSteps.length) {
+        var pipelineStepCount = pipelineSteps.length;
+        if (pipelineStepCount) {
             if (!router.isRoot) {
                 throw new Error('Pipeline steps can only be added to the root router');
             }
             var pipelineProvider = router.pipelineProvider;
-            for (var i = 0, ii = pipelineSteps.length; i < ii; ++i) {
-                var _a = pipelineSteps[i], name_1 = _a.name, step = _a.step;
+            for (var i = 0, ii = pipelineStepCount; i < ii; ++i) {
+                var _b = pipelineSteps[i], name_1 = _b.name, step = _b.step;
                 pipelineProvider.addStep(name_1, step);
             }
         }
@@ -1039,25 +534,25 @@ var RouterConfiguration = /** @class */ (function () {
  */
 var Router = /** @class */ (function () {
     /**
-    * @param container The [[Container]] to use when child routers.
-    * @param history The [[History]] implementation to delegate navigation requests to.
-    */
+     * @param container The [[Container]] to use when child routers.
+     * @param history The [[History]] implementation to delegate navigation requests to.
+     */
     function Router(container, history) {
         var _this = this;
         /**
-        * The parent router, or null if this instance is not a child router.
-        */
+         * The parent router, or null if this instance is not a child router.
+         */
         this.parent = null;
         this.options = {};
         /**
-        * The defaults used when a viewport lacks specified content
-        */
+         * The defaults used when a viewport lacks specified content
+         */
         this.viewPortDefaults = {};
         /**
-        * Extension point to transform the document title before it is built and displayed.
-        * By default, child routers delegate to the parent router, and the app router
-        * returns the title unchanged.
-        */
+         * Extension point to transform the document title before it is built and displayed.
+         * By default, child routers delegate to the parent router, and the app router
+         * returns the title unchanged.
+         */
         this.transformTitle = function (title) {
             if (_this.parent) {
                 return _this.parent.transformTitle(title);
@@ -1069,9 +564,9 @@ var Router = /** @class */ (function () {
         this.reset();
     }
     /**
-    * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
-    * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
-    */
+     * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+     * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+     */
     Router.prototype.reset = function () {
         var _this = this;
         this.viewPorts = {};
@@ -1099,8 +594,8 @@ var Router = /** @class */ (function () {
     };
     Object.defineProperty(Router.prototype, "isRoot", {
         /**
-        * Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
-        */
+         * Gets a value indicating whether or not this [[Router]] is the root in the router tree. I.e., it has no parent.
+         */
         get: function () {
             return !this.parent;
         },
@@ -1108,26 +603,26 @@ var Router = /** @class */ (function () {
         configurable: true
     });
     /**
-    * Registers a viewPort to be used as a rendering target for activated routes.
-    *
-    * @param viewPort The viewPort.
-    * @param name The name of the viewPort. 'default' if unspecified.
-    */
+     * Registers a viewPort to be used as a rendering target for activated routes.
+     *
+     * @param viewPort The viewPort.
+     * @param name The name of the viewPort. 'default' if unspecified.
+     */
     Router.prototype.registerViewPort = function (viewPort, name) {
         name = name || 'default';
         this.viewPorts[name] = viewPort;
     };
     /**
-    * Returns a Promise that resolves when the router is configured.
-    */
+     * Returns a Promise that resolves when the router is configured.
+     */
     Router.prototype.ensureConfigured = function () {
         return this._configuredPromise;
     };
     /**
-    * Configures the router.
-    *
-    * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
-    */
+     * Configures the router.
+     *
+     * @param callbackOrConfig The [[RouterConfiguration]] or a callback that takes a [[RouterConfiguration]].
+     */
     Router.prototype.configure = function (callbackOrConfig) {
         var _this = this;
         this.isConfigured = true;
@@ -1149,11 +644,11 @@ var Router = /** @class */ (function () {
         });
     };
     /**
-    * Navigates to a new location.
-    *
-    * @param fragment The URL fragment to use as the navigation destination.
-    * @param options The navigation options.
-    */
+     * Navigates to a new location.
+     *
+     * @param fragment The URL fragment to use as the navigation destination.
+     * @param options The navigation options.
+     */
     Router.prototype.navigate = function (fragment, options) {
         if (!this.isConfigured && this.parent) {
             return this.parent.navigate(fragment, options);
@@ -1162,20 +657,20 @@ var Router = /** @class */ (function () {
         return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
     };
     /**
-    * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
-    * by [[Router.navigate]].
-    *
-    * @param route The name of the route to use when generating the navigation location.
-    * @param params The route parameters to be used when populating the route pattern.
-    * @param options The navigation options.
-    */
+     * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
+     * by [[Router.navigate]].
+     *
+     * @param route The name of the route to use when generating the navigation location.
+     * @param params The route parameters to be used when populating the route pattern.
+     * @param options The navigation options.
+     */
     Router.prototype.navigateToRoute = function (route, params, options) {
         var path = this.generate(route, params);
         return this.navigate(path, options);
     };
     /**
-    * Navigates back to the most recent location in history.
-    */
+     * Navigates back to the most recent location in history.
+     */
     Router.prototype.navigateBack = function () {
         this.isExplicitNavigationBack = true;
         this.history.navigateBack();
@@ -1192,13 +687,13 @@ var Router = /** @class */ (function () {
         return childRouter;
     };
     /**
-    * Generates a URL fragment matching the specified route pattern.
-    *
-    * @param name The name of the route whose pattern should be used to generate the fragment.
-    * @param params The route params to be used to populate the route pattern.
-    * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
-    * @returns {string} A string containing the generated URL fragment.
-    */
+     * Generates a URL fragment matching the specified route pattern.
+     *
+     * @param name The name of the route whose pattern should be used to generate the fragment.
+     * @param params The route params to be used to populate the route pattern.
+     * @param options If options.absolute = true, then absolute url will be generated; otherwise, it will be relative url.
+     * @returns {string} A string containing the generated URL fragment.
+     */
     Router.prototype.generate = function (nameOrRoute, params, options) {
         if (params === void 0) { params = {}; }
         if (options === void 0) { options = {}; }
@@ -1218,10 +713,10 @@ var Router = /** @class */ (function () {
         return options.absolute ? "" + this.history.getAbsoluteRoot() + rootedPath : rootedPath;
     };
     /**
-    * Creates a [[NavModel]] for the specified route config.
-    *
-    * @param config The route config.
-    */
+     * Creates a [[NavModel]] for the specified route config.
+     *
+     * @param config The route config.
+     */
     Router.prototype.createNavModel = function (config) {
         var navModel = new NavModel(this, 'href' in config
             ? config.href
@@ -1235,11 +730,11 @@ var Router = /** @class */ (function () {
         return navModel;
     };
     /**
-    * Registers a new route with the router.
-    *
-    * @param config The [[RouteConfig]].
-    * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
-    */
+     * Registers a new route with the router.
+     *
+     * @param config The [[RouteConfig]].
+     * @param navModel The [[NavModel]] to use for the route. May be omitted for single-pattern routes.
+     */
     Router.prototype.addRoute = function (config, navModel) {
         if (Array.isArray(config.route)) {
             var routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
@@ -1307,26 +802,26 @@ var Router = /** @class */ (function () {
         }
     };
     /**
-    * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
-    *
-    * @param name The name of the route to check.
-    */
+     * Gets a value indicating whether or not this [[Router]] or one of its ancestors has a route registered with the specified name.
+     *
+     * @param name The name of the route to check.
+     */
     Router.prototype.hasRoute = function (name) {
         return !!(this._recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
     };
     /**
-    * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
-    *
-    * @param name The name of the route to check.
-    */
+     * Gets a value indicating whether or not this [[Router]] has a route registered with the specified name.
+     *
+     * @param name The name of the route to check.
+     */
     Router.prototype.hasOwnRoute = function (name) {
         return this._recognizer.hasRoute(name);
     };
     /**
-    * Register a handler to use when the incoming URL fragment doesn't match any registered routes.
-    *
-    * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
-    */
+     * Register a handler to use when the incoming URL fragment doesn't match any registered routes.
+     *
+     * @param config The moduleId, or a function that selects the moduleId, or a [[RouteConfig]].
+     */
     Router.prototype.handleUnknownRoutes = function (config) {
         var _this = this;
         if (!config) {
@@ -1342,8 +837,8 @@ var Router = /** @class */ (function () {
         };
     };
     /**
-    * Updates the document title using the current navigation instruction.
-    */
+     * Updates the document title using the current navigation instruction.
+     */
     Router.prototype.updateTitle = function () {
         var parentRouter = this.parent;
         if (parentRouter) {
@@ -1356,9 +851,9 @@ var Router = /** @class */ (function () {
         return undefined;
     };
     /**
-    * Updates the navigation routes with hrefs relative to the current location.
-    * Note: This method will likely move to a plugin in a future release.
-    */
+     * Updates the navigation routes with hrefs relative to the current location.
+     * Note: This method will likely move to a plugin in a future release.
+     */
     Router.prototype.refreshNavigation = function () {
         var nav = this.navigation;
         for (var i = 0, length_1 = nav.length; i < length_1; i++) {
@@ -1536,7 +1031,9 @@ var validateRouteConfig = function (config) {
 };
 /* @internal exported for unit testing */
 var evaluateNavigationStrategy = function (instruction, evaluator, context) {
-    return Promise.resolve(evaluator.call(context, instruction)).then(function () {
+    return Promise
+        .resolve(evaluator.call(context, instruction))
+        .then(function () {
         if (!('viewPorts' in instruction.config)) {
             instruction.config.viewPorts = {
                 'default': {
@@ -1582,21 +1079,21 @@ var createCompletionHandler = function (next, status) {
 };
 
 /**
-* The class responsible for managing and processing the navigation pipeline.
-*/
+ * The class responsible for managing and processing the navigation pipeline.
+ */
 var Pipeline = /** @class */ (function () {
     function Pipeline() {
         /**
-        * The pipeline steps. And steps added via addStep will be converted to a function
-        * The actualy running functions with correct step contexts of this pipeline
-        */
+         * The pipeline steps. And steps added via addStep will be converted to a function
+         * The actualy running functions with correct step contexts of this pipeline
+         */
         this.steps = [];
     }
     /**
-    * Adds a step to the pipeline.
-    *
-    * @param step The pipeline step.
-    */
+     * Adds a step to the pipeline.
+     *
+     * @param step The pipeline step.
+     */
     Pipeline.prototype.addStep = function (step) {
         var run;
         if (typeof step === 'function') {
@@ -1618,10 +1115,10 @@ var Pipeline = /** @class */ (function () {
         return this;
     };
     /**
-    * Runs the pipeline.
-    *
-    * @param instruction The navigation instruction to process.
-    */
+     * Runs the pipeline.
+     *
+     * @param instruction The navigation instruction to process.
+     */
     Pipeline.prototype.run = function (instruction) {
         var nextFn = createNextFn(instruction, this.steps);
         return nextFn();
@@ -1630,81 +1127,354 @@ var Pipeline = /** @class */ (function () {
 }());
 
 /**
- * Abstract class that is responsible for loading view / view model from a route config
- * The default implementation can be found in `aurelia-templating-router`
- */
-var RouteLoader = /** @class */ (function () {
-    function RouteLoader() {
+* Determines if the provided object is a navigation command.
+* A navigation command is anything with a navigate method.
+*
+* @param obj The object to check.
+*/
+function isNavigationCommand(obj) {
+    return obj && typeof obj.navigate === 'function';
+}
+/**
+* Used during the activation lifecycle to cause a redirect.
+*/
+var Redirect = /** @class */ (function () {
+    /**
+     * @param url The URL fragment to use as the navigation destination.
+     * @param options The navigation options.
+     */
+    function Redirect(url, options) {
+        if (options === void 0) { options = {}; }
+        this.url = url;
+        this.options = Object.assign({ trigger: true, replace: true }, options);
+        this.shouldContinueProcessing = false;
     }
     /**
-     * Load a route config based on its viewmodel / view configuration
+     * Called by the activation system to set the child router.
+     *
+     * @param router The router.
      */
-    // return typing: return typings used to be never
-    // as it was a throw. Changing it to Promise<any> should not cause any issues
-    RouteLoader.prototype.loadRoute = function (router, config, navigationInstruction) {
-        throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
+    Redirect.prototype.setRouter = function (router) {
+        this.router = router;
     };
-    return RouteLoader;
+    /**
+     * Called by the navigation pipeline to navigate.
+     *
+     * @param appRouter The router to be redirected.
+     */
+    Redirect.prototype.navigate = function (appRouter) {
+        var navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
+        navigatingRouter.navigate(this.url, this.options);
+    };
+    return Redirect;
 }());
 /**
- * A pipeline step responsible for loading a route config of a navigation instruction
+ * Used during the activation lifecycle to cause a redirect to a named route.
  */
-var LoadRouteStep = /** @class */ (function () {
-    function LoadRouteStep(routeLoader) {
-        this.routeLoader = routeLoader;
-    }
-    /**@internal */
-    LoadRouteStep.inject = function () { return [RouteLoader]; };
+var RedirectToRoute = /** @class */ (function () {
     /**
-     * Run the internal to load route config of a navigation instruction to prepare for next steps in the pipeline
+     * @param route The name of the route.
+     * @param params The parameters to be sent to the activation method.
+     * @param options The options to use for navigation.
      */
-    LoadRouteStep.prototype.run = function (navigationInstruction, next) {
-        return loadNewRoute(this.routeLoader, navigationInstruction)
-            .then(next, next.cancel);
+    function RedirectToRoute(route, params, options) {
+        if (params === void 0) { params = {}; }
+        if (options === void 0) { options = {}; }
+        this.route = route;
+        this.params = params;
+        this.options = Object.assign({ trigger: true, replace: true }, options);
+        this.shouldContinueProcessing = false;
+    }
+    /**
+     * Called by the activation system to set the child router.
+     *
+     * @param router The router.
+     */
+    RedirectToRoute.prototype.setRouter = function (router) {
+        this.router = router;
     };
-    return LoadRouteStep;
+    /**
+     * Called by the navigation pipeline to navigate.
+     *
+     * @param appRouter The router to be redirected.
+     */
+    RedirectToRoute.prototype.navigate = function (appRouter) {
+        var navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
+        navigatingRouter.navigateToRoute(this.route, this.params, this.options);
+    };
+    return RedirectToRoute;
 }());
+
+/**
+ * @internal exported for unit testing
+ */
+function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
+    var config = instruction.config;
+    if ('redirect' in config) {
+        return buildRedirectPlan(instruction);
+    }
+    var prevInstruction = instruction.previousInstruction;
+    var defaultViewPortConfigs = instruction.router.viewPortDefaults;
+    if (prevInstruction) {
+        return buildTransitionPlans(instruction, prevInstruction, defaultViewPortConfigs, forceLifecycleMinimum);
+    }
+    // first navigation, only need to prepare a few information for each viewport plan
+    var viewPortPlans = {};
+    var viewPortConfigs = config.viewPorts;
+    for (var viewPortName in viewPortConfigs) {
+        var viewPortConfig = viewPortConfigs[viewPortName];
+        if (viewPortConfig.moduleId === null && viewPortName in defaultViewPortConfigs) {
+            viewPortConfig = defaultViewPortConfigs[viewPortName];
+        }
+        viewPortPlans[viewPortName] = {
+            name: viewPortName,
+            strategy: "replace" /* Replace */,
+            config: viewPortConfig
+        };
+    }
+    return Promise.resolve(viewPortPlans);
+}
+/**
+ * Build redirect plan based on config of a navigation instruction
+ * @internal exported for unit testing
+ */
+var buildRedirectPlan = function (instruction) {
+    var config = instruction.config;
+    var router = instruction.router;
+    return router
+        ._createNavigationInstruction(config.redirect)
+        .then(function (redirectInstruction) {
+        var params = {};
+        var originalInstructionParams = instruction.params;
+        var redirectInstructionParams = redirectInstruction.params;
+        for (var key in redirectInstructionParams) {
+            // If the param on the redirect points to another param, e.g. { route: first/:this, redirect: second/:this }
+            var val = redirectInstructionParams[key];
+            if (typeof val === 'string' && val[0] === ':') {
+                val = val.slice(1);
+                // And if that param is found on the original instruction then use it
+                if (val in originalInstructionParams) {
+                    params[key] = originalInstructionParams[val];
+                }
+            }
+            else {
+                params[key] = redirectInstructionParams[key];
+            }
+        }
+        var redirectLocation = router.generate(redirectInstruction.config, params, instruction.options);
+        // Special handling for child routes
+        for (var key in originalInstructionParams) {
+            redirectLocation = redirectLocation.replace(":" + key, originalInstructionParams[key]);
+        }
+        var queryString = instruction.queryString;
+        if (queryString) {
+            redirectLocation += '?' + queryString;
+        }
+        return Promise.resolve(new Redirect(redirectLocation));
+    });
+};
+/**
+ * @param viewPortPlans the Plan record that holds information about built plans
+ * @internal exported for unit testing
+ */
+var buildTransitionPlans = function (currentInstruction, previousInstruction, defaultViewPortConfigs, forceLifecycleMinimum) {
+    var viewPortPlans = {};
+    var newInstructionConfig = currentInstruction.config;
+    var hasNewParams = hasDifferentParameterValues(previousInstruction, currentInstruction);
+    var pending = [];
+    var previousViewPortInstructions = previousInstruction.viewPortInstructions;
+    var _loop_1 = function (viewPortName) {
+        var prevViewPortInstruction = previousViewPortInstructions[viewPortName];
+        var prevViewPortComponent = prevViewPortInstruction.component;
+        var newInstructionViewPortConfigs = newInstructionConfig.viewPorts;
+        // if this is invoked on a viewport without any changes, based on new url,
+        // newViewPortConfig will be the existing viewport instruction
+        var nextViewPortConfig = viewPortName in newInstructionViewPortConfigs
+            ? newInstructionViewPortConfigs[viewPortName]
+            : prevViewPortInstruction;
+        if (nextViewPortConfig.moduleId === null && viewPortName in defaultViewPortConfigs) {
+            nextViewPortConfig = defaultViewPortConfigs[viewPortName];
+        }
+        var viewPortActivationStrategy = determineActivationStrategy(currentInstruction, prevViewPortInstruction, nextViewPortConfig, hasNewParams, forceLifecycleMinimum);
+        var viewPortPlan = viewPortPlans[viewPortName] = {
+            name: viewPortName,
+            // ViewPortInstruction can quack like a RouteConfig
+            config: nextViewPortConfig,
+            prevComponent: prevViewPortComponent,
+            prevModuleId: prevViewPortInstruction.moduleId,
+            strategy: viewPortActivationStrategy
+        };
+        // recursively build nav plans for all existing child routers/viewports of this viewport
+        // this is possible because existing child viewports and routers already have necessary information
+        // to process the wildcard path from parent instruction
+        if (viewPortActivationStrategy !== "replace" /* Replace */ && prevViewPortInstruction.childRouter) {
+            var path = currentInstruction.getWildcardPath();
+            var task = prevViewPortInstruction
+                .childRouter
+                ._createNavigationInstruction(path, currentInstruction)
+                .then(function (childInstruction) {
+                viewPortPlan.childNavigationInstruction = childInstruction;
+                return _buildNavigationPlan(childInstruction, 
+                // is it safe to assume viewPortPlan has not been changed from previous assignment?
+                // if so, can just use local variable viewPortPlanStrategy
+                // there could be user code modifying viewport plan during _createNavigationInstruction?
+                viewPortPlan.strategy === "invoke-lifecycle" /* InvokeLifecycle */)
+                    .then(function (childPlan) {
+                    if (childPlan instanceof Redirect) {
+                        return Promise.reject(childPlan);
+                    }
+                    childInstruction.plan = childPlan;
+                    // for bluebird ?
+                    return null;
+                });
+            });
+            pending.push(task);
+        }
+    };
+    for (var viewPortName in previousViewPortInstructions) {
+        _loop_1(viewPortName);
+    }
+    return Promise.all(pending).then(function () { return viewPortPlans; });
+};
+/**
+ * @param newViewPortConfig if this is invoked on a viewport without any changes, based on new url, newViewPortConfig will be the existing viewport instruction
+ * @internal exported for unit testing
+ */
+var determineActivationStrategy = function (currentNavInstruction, prevViewPortInstruction, newViewPortConfig, 
+// indicates whether there is difference between old and new url params
+hasNewParams, forceLifecycleMinimum) {
+    var newInstructionConfig = currentNavInstruction.config;
+    var prevViewPortViewModel = prevViewPortInstruction.component.viewModel;
+    var viewPortPlanStrategy;
+    if (prevViewPortInstruction.moduleId !== newViewPortConfig.moduleId) {
+        viewPortPlanStrategy = "replace" /* Replace */;
+    }
+    else if ('determineActivationStrategy' in prevViewPortViewModel) {
+        viewPortPlanStrategy = prevViewPortViewModel.determineActivationStrategy.apply(prevViewPortViewModel, currentNavInstruction.lifecycleArgs);
+    }
+    else if (newInstructionConfig.activationStrategy) {
+        viewPortPlanStrategy = newInstructionConfig.activationStrategy;
+    }
+    else if (hasNewParams || forceLifecycleMinimum) {
+        viewPortPlanStrategy = "invoke-lifecycle" /* InvokeLifecycle */;
+    }
+    else {
+        viewPortPlanStrategy = "no-change" /* NoChange */;
+    }
+    return viewPortPlanStrategy;
+};
+/**@internal exported for unit testing */
+var hasDifferentParameterValues = function (prev, next) {
+    var prevParams = prev.params;
+    var nextParams = next.params;
+    var nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
+    for (var key in nextParams) {
+        if (key === nextWildCardName) {
+            continue;
+        }
+        if (prevParams[key] !== nextParams[key]) {
+            return true;
+        }
+    }
+    for (var key in prevParams) {
+        if (key === nextWildCardName) {
+            continue;
+        }
+        if (prevParams[key] !== nextParams[key]) {
+            return true;
+        }
+    }
+    if (!next.options.compareQueryParams) {
+        return false;
+    }
+    var prevQueryParams = prev.queryParams;
+    var nextQueryParams = next.queryParams;
+    for (var key in nextQueryParams) {
+        if (prevQueryParams[key] !== nextQueryParams[key]) {
+            return true;
+        }
+    }
+    for (var key in prevQueryParams) {
+        if (prevQueryParams[key] !== nextQueryParams[key]) {
+            return true;
+        }
+    }
+    return false;
+};
+
+/**
+ * Transform a navigation instruction into viewport plan record object,
+ * or a redirect request if user viewmodel demands
+ */
+var BuildNavigationPlanStep = /** @class */ (function () {
+    function BuildNavigationPlanStep() {
+    }
+    BuildNavigationPlanStep.prototype.run = function (navigationInstruction, next) {
+        return _buildNavigationPlan(navigationInstruction)
+            .then(function (plan) {
+            if (plan instanceof Redirect) {
+                return next.cancel(plan);
+            }
+            navigationInstruction.plan = plan;
+            return next();
+        })
+            .catch(next.cancel);
+    };
+    return BuildNavigationPlanStep;
+}());
+
 /**
  * @internal Exported for unit testing
  */
 var loadNewRoute = function (routeLoader, navigationInstruction) {
-    var toLoad = determineWhatToLoad(navigationInstruction);
-    var loadPromises = toLoad.map(function (loadingPlan) { return loadRoute(routeLoader, loadingPlan.navigationInstruction, loadingPlan.viewPortPlan); });
+    var loadingPlans = determineLoadingPlans(navigationInstruction);
+    var loadPromises = loadingPlans.map(function (loadingPlan) { return loadRoute(routeLoader, loadingPlan.navigationInstruction, loadingPlan.viewPortPlan); });
     return Promise.all(loadPromises);
 };
 /**
  * @internal Exported for unit testing
  */
-var determineWhatToLoad = function (navigationInstruction, toLoad) {
-    if (toLoad === void 0) { toLoad = []; }
-    var plan = navigationInstruction.plan;
-    for (var viewPortName in plan) {
-        var viewPortPlan = plan[viewPortName];
-        var child_nav_instruction = viewPortPlan.childNavigationInstruction;
-        if (viewPortPlan.strategy === activationStrategy.replace) {
-            toLoad.push({ viewPortPlan: viewPortPlan, navigationInstruction: navigationInstruction });
-            if (child_nav_instruction) {
-                determineWhatToLoad(child_nav_instruction, toLoad);
+var determineLoadingPlans = function (navigationInstruction, loadingPlans) {
+    if (loadingPlans === void 0) { loadingPlans = []; }
+    var viewPortPlans = navigationInstruction.plan;
+    for (var viewPortName in viewPortPlans) {
+        var viewPortPlan = viewPortPlans[viewPortName];
+        var childNavInstruction = viewPortPlan.childNavigationInstruction;
+        if (viewPortPlan.strategy === "replace" /* Replace */) {
+            loadingPlans.push({ viewPortPlan: viewPortPlan, navigationInstruction: navigationInstruction });
+            if (childNavInstruction) {
+                determineLoadingPlans(childNavInstruction, loadingPlans);
             }
         }
         else {
-            var viewPortInstruction = navigationInstruction.addViewPortInstruction(viewPortName, viewPortPlan.strategy, viewPortPlan.prevModuleId, viewPortPlan.prevComponent);
-            if (child_nav_instruction) {
-                viewPortInstruction.childNavigationInstruction = child_nav_instruction;
-                determineWhatToLoad(child_nav_instruction, toLoad);
+            var viewPortInstruction = navigationInstruction.addViewPortInstruction({
+                name: viewPortName,
+                strategy: viewPortPlan.strategy,
+                moduleId: viewPortPlan.prevModuleId,
+                component: viewPortPlan.prevComponent
+            });
+            if (childNavInstruction) {
+                viewPortInstruction.childNavigationInstruction = childNavInstruction;
+                determineLoadingPlans(childNavInstruction, loadingPlans);
             }
         }
     }
-    return toLoad;
+    return loadingPlans;
 };
 /**
  * @internal Exported for unit testing
  */
 var loadRoute = function (routeLoader, navigationInstruction, viewPortPlan) {
-    var moduleId = viewPortPlan.config ? viewPortPlan.config.moduleId : null;
-    return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config)
+    var planConfig = viewPortPlan.config;
+    var moduleId = planConfig ? planConfig.moduleId : null;
+    return loadComponent(routeLoader, navigationInstruction, planConfig)
         .then(function (component) {
-        var viewPortInstruction = navigationInstruction.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
+        var viewPortInstruction = navigationInstruction.addViewPortInstruction({
+            name: viewPortPlan.name,
+            strategy: viewPortPlan.strategy,
+            moduleId: moduleId,
+            component: component
+        });
         var childRouter = component.childRouter;
         if (childRouter) {
             var path = navigationInstruction.getWildcardPath();
@@ -1757,6 +1527,354 @@ var loadComponent = function (routeLoader, navigationInstruction, config) {
 };
 
 /**
+ * Abstract class that is responsible for loading view / view model from a route config
+ * The default implementation can be found in `aurelia-templating-router`
+ */
+var RouteLoader = /** @class */ (function () {
+    function RouteLoader() {
+    }
+    /**
+     * Load a route config based on its viewmodel / view configuration
+     */
+    // return typing: return typings used to be never
+    // as it was a throw. Changing it to Promise<any> should not cause any issues
+    RouteLoader.prototype.loadRoute = function (router, config, navigationInstruction) {
+        throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
+    };
+    return RouteLoader;
+}());
+
+/**
+ * A pipeline step responsible for loading a route config of a navigation instruction
+ */
+var LoadRouteStep = /** @class */ (function () {
+    function LoadRouteStep(routeLoader) {
+        this.routeLoader = routeLoader;
+    }
+    /**@internal */
+    LoadRouteStep.inject = function () { return [RouteLoader]; };
+    /**
+     * Run the internal to load route config of a navigation instruction to prepare for next steps in the pipeline
+     */
+    LoadRouteStep.prototype.run = function (navigationInstruction, next) {
+        return loadNewRoute(this.routeLoader, navigationInstruction)
+            .then(next, next.cancel);
+    };
+    return LoadRouteStep;
+}());
+
+/**
+ * A pipeline step for instructing a piepline to commit changes on a navigation instruction
+ */
+var CommitChangesStep = /** @class */ (function () {
+    function CommitChangesStep() {
+    }
+    CommitChangesStep.prototype.run = function (navigationInstruction, next) {
+        return navigationInstruction
+            ._commitChanges(/*wait to swap?*/ true)
+            .then(function () {
+            navigationInstruction._updateTitle();
+            return next();
+        });
+    };
+    return CommitChangesStep;
+}());
+
+/**
+ * An optional interface describing the available activation strategies.
+ * @internal Used internally.
+ */
+var InternalActivationStrategy;
+(function (InternalActivationStrategy) {
+    /**
+     * Reuse the existing view model, without invoking Router lifecycle hooks.
+     */
+    InternalActivationStrategy["NoChange"] = "no-change";
+    /**
+     * Reuse the existing view model, invoking Router lifecycle hooks.
+     */
+    InternalActivationStrategy["InvokeLifecycle"] = "invoke-lifecycle";
+    /**
+     * Replace the existing view model, invoking Router lifecycle hooks.
+     */
+    InternalActivationStrategy["Replace"] = "replace";
+})(InternalActivationStrategy || (InternalActivationStrategy = {}));
+/**
+ * The strategy to use when activating modules during navigation.
+ */
+// kept for compat reason
+var activationStrategy = {
+    noChange: "no-change" /* NoChange */,
+    invokeLifecycle: "invoke-lifecycle" /* InvokeLifecycle */,
+    replace: "replace" /* Replace */
+};
+
+/**
+ * Recursively find list of deactivate-able view models
+ * and invoke the either 'canDeactivate' or 'deactivate' on each
+ * @internal exported for unit testing
+ */
+var processDeactivatable = function (navigationInstruction, callbackName, next, ignoreResult) {
+    var plan = navigationInstruction.plan;
+    var infos = findDeactivatable(plan, callbackName);
+    var i = infos.length; // query from inside out
+    function inspect(val) {
+        if (ignoreResult || shouldContinue(val)) {
+            return iterate();
+        }
+        return next.cancel(val);
+    }
+    function iterate() {
+        if (i--) {
+            try {
+                var viewModel = infos[i];
+                var result = viewModel[callbackName](navigationInstruction);
+                return processPotential(result, inspect, next.cancel);
+            }
+            catch (error) {
+                return next.cancel(error);
+            }
+        }
+        navigationInstruction.router.couldDeactivate = true;
+        return next();
+    }
+    return iterate();
+};
+/**
+ * Recursively find and returns a list of deactivate-able view models
+ * @internal exported for unit testing
+ */
+var findDeactivatable = function (plan, callbackName, list) {
+    if (list === void 0) { list = []; }
+    for (var viewPortName in plan) {
+        var viewPortPlan = plan[viewPortName];
+        var prevComponent = viewPortPlan.prevComponent;
+        if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace)
+            && prevComponent) {
+            var viewModel = prevComponent.viewModel;
+            if (callbackName in viewModel) {
+                list.push(viewModel);
+            }
+        }
+        if (viewPortPlan.strategy === activationStrategy.replace && prevComponent) {
+            addPreviousDeactivatable(prevComponent, callbackName, list);
+        }
+        else if (viewPortPlan.childNavigationInstruction) {
+            findDeactivatable(viewPortPlan.childNavigationInstruction.plan, callbackName, list);
+        }
+    }
+    return list;
+};
+/**
+ * @internal exported for unit testing
+ */
+var addPreviousDeactivatable = function (component, callbackName, list) {
+    var childRouter = component.childRouter;
+    if (childRouter && childRouter.currentInstruction) {
+        var viewPortInstructions = childRouter.currentInstruction.viewPortInstructions;
+        for (var viewPortName in viewPortInstructions) {
+            var viewPortInstruction = viewPortInstructions[viewPortName];
+            var prevComponent = viewPortInstruction.component;
+            var prevViewModel = prevComponent.viewModel;
+            if (callbackName in prevViewModel) {
+                list.push(prevViewModel);
+            }
+            addPreviousDeactivatable(prevComponent, callbackName, list);
+        }
+    }
+};
+/**
+ * @internal exported for unit testing
+ */
+var processActivatable = function (navigationInstruction, callbackName, next, ignoreResult) {
+    var infos = findActivatable(navigationInstruction, callbackName);
+    var length = infos.length;
+    var i = -1; // query from top down
+    function inspect(val, router) {
+        if (ignoreResult || shouldContinue(val, router)) {
+            return iterate();
+        }
+        return next.cancel(val);
+    }
+    function iterate() {
+        var _a;
+        i++;
+        if (i < length) {
+            try {
+                var current_1 = infos[i];
+                var result = (_a = current_1.viewModel)[callbackName].apply(_a, current_1.lifecycleArgs);
+                return processPotential(result, function (val) { return inspect(val, current_1.router); }, next.cancel);
+            }
+            catch (error) {
+                return next.cancel(error);
+            }
+        }
+        return next();
+    }
+    return iterate();
+};
+/**
+ * Find list of activatable view model and add to list (3rd parameter)
+ * @internal exported for unit testing
+ */
+var findActivatable = function (navigationInstruction, callbackName, list, router) {
+    if (list === void 0) { list = []; }
+    var plan = navigationInstruction.plan;
+    Object
+        .keys(plan)
+        .forEach(function (viewPortName) {
+        var viewPortPlan = plan[viewPortName];
+        var viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
+        var viewPortComponent = viewPortInstruction.component;
+        var viewModel = viewPortComponent.viewModel;
+        if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle
+            || viewPortPlan.strategy === activationStrategy.replace)
+            && callbackName in viewModel) {
+            list.push({
+                viewModel: viewModel,
+                lifecycleArgs: viewPortInstruction.lifecycleArgs,
+                router: router
+            });
+        }
+        var childNavInstruction = viewPortPlan.childNavigationInstruction;
+        if (childNavInstruction) {
+            findActivatable(childNavInstruction, callbackName, list, viewPortComponent.childRouter || router);
+        }
+    });
+    return list;
+};
+var shouldContinue = function (output, router) {
+    if (output instanceof Error) {
+        return false;
+    }
+    if (isNavigationCommand(output)) {
+        if (typeof output.setRouter === 'function') {
+            output.setRouter(router);
+        }
+        return !!output.shouldContinueProcessing;
+    }
+    if (output === undefined) {
+        return true;
+    }
+    return output;
+};
+/**
+ * wraps a subscription, allowing unsubscribe calls even if
+ * the first value comes synchronously
+ */
+var SafeSubscription = /** @class */ (function () {
+    function SafeSubscription(subscriptionFunc) {
+        this._subscribed = true;
+        this._subscription = subscriptionFunc(this);
+        if (!this._subscribed) {
+            this.unsubscribe();
+        }
+    }
+    Object.defineProperty(SafeSubscription.prototype, "subscribed", {
+        get: function () {
+            return this._subscribed;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    SafeSubscription.prototype.unsubscribe = function () {
+        if (this._subscribed && this._subscription) {
+            this._subscription.unsubscribe();
+        }
+        this._subscribed = false;
+    };
+    return SafeSubscription;
+}());
+/**
+ * A function to process return value from `activate`/`canActivate` steps
+ * Supports observable/promise
+ *
+ * For observable, resolve at first next() or on complete()
+ */
+var processPotential = function (obj, resolve, reject) {
+    // if promise like
+    if (obj && typeof obj.then === 'function') {
+        return Promise.resolve(obj).then(resolve).catch(reject);
+    }
+    // if observable
+    if (obj && typeof obj.subscribe === 'function') {
+        var obs_1 = obj;
+        return new SafeSubscription(function (sub) { return obs_1.subscribe({
+            next: function () {
+                if (sub.subscribed) {
+                    sub.unsubscribe();
+                    resolve(obj);
+                }
+            },
+            error: function (error) {
+                if (sub.subscribed) {
+                    sub.unsubscribe();
+                    reject(error);
+                }
+            },
+            complete: function () {
+                if (sub.subscribed) {
+                    sub.unsubscribe();
+                    resolve(obj);
+                }
+            }
+        }); });
+    }
+    // else just resolve
+    try {
+        return resolve(obj);
+    }
+    catch (error) {
+        return reject(error);
+    }
+};
+
+/**
+ * A pipeline step responsible for finding and activating method `canDeactivate` on a view model of a route
+ */
+var CanDeactivatePreviousStep = /** @class */ (function () {
+    function CanDeactivatePreviousStep() {
+    }
+    CanDeactivatePreviousStep.prototype.run = function (navigationInstruction, next) {
+        return processDeactivatable(navigationInstruction, 'canDeactivate', next);
+    };
+    return CanDeactivatePreviousStep;
+}());
+/**
+ * A pipeline step responsible for finding and activating method `canActivate` on a view model of a route
+ */
+var CanActivateNextStep = /** @class */ (function () {
+    function CanActivateNextStep() {
+    }
+    CanActivateNextStep.prototype.run = function (navigationInstruction, next) {
+        return processActivatable(navigationInstruction, 'canActivate', next);
+    };
+    return CanActivateNextStep;
+}());
+/**
+ * A pipeline step responsible for finding and activating method `deactivate` on a view model of a route
+ */
+var DeactivatePreviousStep = /** @class */ (function () {
+    function DeactivatePreviousStep() {
+    }
+    DeactivatePreviousStep.prototype.run = function (navigationInstruction, next) {
+        return processDeactivatable(navigationInstruction, 'deactivate', next, true);
+    };
+    return DeactivatePreviousStep;
+}());
+/**
+ * A pipeline step responsible for finding and activating method `activate` on a view model of a route
+ */
+var ActivateNextStep = /** @class */ (function () {
+    function ActivateNextStep() {
+    }
+    ActivateNextStep.prototype.run = function (navigationInstruction, next) {
+        return processActivatable(navigationInstruction, 'activate', next, true);
+    };
+    return ActivateNextStep;
+}());
+
+/**
  * A multi-slots Pipeline Placeholder Step for hooking into a pipeline execution
  */
 var PipelineSlot = /** @class */ (function () {
@@ -1773,8 +1891,8 @@ var PipelineSlot = /** @class */ (function () {
     return PipelineSlot;
 }());
 /**
-* Class responsible for creating the navigation pipeline.
-*/
+ * Class responsible for creating the navigation pipeline.
+ */
 var PipelineProvider = /** @class */ (function () {
     function PipelineProvider(container) {
         this.container = container;
@@ -1782,22 +1900,22 @@ var PipelineProvider = /** @class */ (function () {
             BuildNavigationPlanStep,
             CanDeactivatePreviousStep,
             LoadRouteStep,
-            this._createPipelineSlot("authorize" /* Authorize */),
+            createPipelineSlot(container, "authorize" /* Authorize */),
             CanActivateNextStep,
-            this._createPipelineSlot("preActivate" /* PreActivate */, 'modelbind'),
+            createPipelineSlot(container, "preActivate" /* PreActivate */, 'modelbind'),
             // NOTE: app state changes start below - point of no return
             DeactivatePreviousStep,
             ActivateNextStep,
-            this._createPipelineSlot("preRender" /* PreRender */, 'precommit'),
+            createPipelineSlot(container, "preRender" /* PreRender */, 'precommit'),
             CommitChangesStep,
-            this._createPipelineSlot("postRender" /* PostRender */, 'postcomplete')
+            createPipelineSlot(container, "postRender" /* PostRender */, 'postcomplete')
         ];
     }
     /**@internal */
     PipelineProvider.inject = function () { return [aureliaDependencyInjection.Container]; };
     /**
-    * Create the navigation pipeline.
-    */
+     * Create the navigation pipeline.
+     */
     PipelineProvider.prototype.createPipeline = function (useCanDeactivateStep) {
         var _this = this;
         if (useCanDeactivateStep === void 0) { useCanDeactivateStep = true; }
@@ -1815,14 +1933,15 @@ var PipelineProvider = /** @class */ (function () {
         return this.steps.find(function (x) { return x.slotName === name || x.slotAlias === name; });
     };
     /**
-    * Adds a step into the pipeline at a known slot location.
-    */
+     * Adds a step into the pipeline at a known slot location.
+     */
     PipelineProvider.prototype.addStep = function (name, step) {
         var found = this._findStep(name);
         if (found) {
+            var slotSteps = found.steps;
             // prevent duplicates
-            if (!found.steps.includes(step)) {
-                found.steps.push(step);
+            if (!slotSteps.includes(step)) {
+                slotSteps.push(step);
             }
         }
         else {
@@ -1835,13 +1954,13 @@ var PipelineProvider = /** @class */ (function () {
     PipelineProvider.prototype.removeStep = function (name, step) {
         var slot = this._findStep(name);
         if (slot) {
-            var steps = slot.steps;
-            steps.splice(steps.indexOf(step), 1);
+            var slotSteps = slot.steps;
+            slotSteps.splice(slotSteps.indexOf(step), 1);
         }
     };
     /**
-     * @internal
      * Clears all steps from a slot in the pipeline
+     * @internal
      */
     PipelineProvider.prototype._clearSteps = function (name) {
         if (name === void 0) { name = ''; }
@@ -1854,22 +1973,22 @@ var PipelineProvider = /** @class */ (function () {
      * Resets all pipeline slots
      */
     PipelineProvider.prototype.reset = function () {
-        this._clearSteps('authorize');
-        this._clearSteps('preActivate');
-        this._clearSteps('preRender');
-        this._clearSteps('postRender');
-    };
-    /**@internal */
-    PipelineProvider.prototype._createPipelineSlot = function (name, alias) {
-        return new PipelineSlot(this.container, name, alias);
+        this._clearSteps("authorize" /* Authorize */);
+        this._clearSteps("preActivate" /* PreActivate */);
+        this._clearSteps("preRender" /* PreRender */);
+        this._clearSteps("postRender" /* PostRender */);
     };
     return PipelineProvider;
 }());
+/**@internal */
+var createPipelineSlot = function (container, name, alias) {
+    return new PipelineSlot(container, name, alias);
+};
 
 var logger = LogManager.getLogger('app-router');
 /**
-* The main application router.
-*/
+ * The main application router.
+ */
 var AppRouter = /** @class */ (function (_super) {
     __extends(AppRouter, _super);
     function AppRouter(container, history, pipelineProvider, events) {
@@ -1881,9 +2000,9 @@ var AppRouter = /** @class */ (function (_super) {
     /**@internal */
     AppRouter.inject = function () { return [aureliaDependencyInjection.Container, aureliaHistory.History, PipelineProvider, aureliaEventAggregator.EventAggregator]; };
     /**
-    * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
-    * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
-    */
+     * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
+     * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
+     */
     AppRouter.prototype.reset = function () {
         _super.prototype.reset.call(this);
         this.maxInstructionCount = 10;
@@ -1895,10 +2014,10 @@ var AppRouter = /** @class */ (function (_super) {
         }
     };
     /**
-    * Loads the specified URL.
-    *
-    * @param url The URL fragment to load.
-    */
+     * Loads the specified URL.
+     *
+     * @param url The URL fragment to load.
+     */
     AppRouter.prototype.loadUrl = function (url) {
         var _this = this;
         return this
@@ -1910,11 +2029,11 @@ var AppRouter = /** @class */ (function (_super) {
         });
     };
     /**
-    * Registers a viewPort to be used as a rendering target for activated routes.
-    *
-    * @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
-    * @param name The name of the viewPort. 'default' if unspecified.
-    */
+     * Registers a viewPort to be used as a rendering target for activated routes.
+     *
+     * @param viewPort The viewPort. This is typically a <router-view/> element in Aurelia default impl
+     * @param name The name of the viewPort. 'default' if unspecified.
+     */
     AppRouter.prototype.registerViewPort = function (viewPort, name) {
         var _this = this;
         // having strong typing without changing public API
@@ -1958,10 +2077,10 @@ var AppRouter = /** @class */ (function (_super) {
         return Promise.resolve();
     };
     /**
-    * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
-    *
-    * @params options The set of options to activate the router with.
-    */
+     * Activates the router. This instructs the router to begin listening for history changes and processing instructions.
+     *
+     * @params options The set of options to activate the router with.
+     */
     AppRouter.prototype.activate = function (options) {
         if (this.isActive) {
             return;
@@ -1974,8 +2093,8 @@ var AppRouter = /** @class */ (function (_super) {
         this._dequeueInstruction();
     };
     /**
-    * Deactivates the router.
-    */
+     * Deactivates the router.
+     */
     AppRouter.prototype.deactivate = function () {
         this.isActive = false;
         this.history.deactivate();
@@ -2006,20 +2125,21 @@ var AppRouter = /** @class */ (function (_super) {
             }
             _this.isNavigating = true;
             var navtracker = _this.history.getState('NavigationTracker');
-            if (!navtracker && !_this.currentNavigationTracker) {
+            var currentNavTracker = _this.currentNavigationTracker;
+            if (!navtracker && !currentNavTracker) {
                 _this.isNavigatingFirst = true;
                 _this.isNavigatingNew = true;
             }
             else if (!navtracker) {
                 _this.isNavigatingNew = true;
             }
-            else if (!_this.currentNavigationTracker) {
+            else if (!currentNavTracker) {
                 _this.isNavigatingRefresh = true;
             }
-            else if (_this.currentNavigationTracker < navtracker) {
+            else if (currentNavTracker < navtracker) {
                 _this.isNavigatingForward = true;
             }
-            else if (_this.currentNavigationTracker > navtracker) {
+            else if (currentNavTracker > navtracker) {
                 _this.isNavigatingBack = true;
             }
             if (!navtracker) {
@@ -2028,15 +2148,16 @@ var AppRouter = /** @class */ (function (_super) {
             }
             _this.currentNavigationTracker = navtracker;
             instruction.previousInstruction = _this.currentInstruction;
+            var maxInstructionCount = _this.maxInstructionCount;
             if (!instructionCount) {
                 _this.events.publish("router:navigation:processing" /* Processing */, { instruction: instruction });
             }
-            else if (instructionCount === _this.maxInstructionCount - 1) {
+            else if (instructionCount === maxInstructionCount - 1) {
                 logger.error(instructionCount + 1 + " navigation instructions have been attempted without success. Restoring last known good location.");
                 restorePreviousLocation(_this);
                 return _this._dequeueInstruction(instructionCount + 1);
             }
-            else if (instructionCount > _this.maxInstructionCount) {
+            else if (instructionCount > maxInstructionCount) {
                 throw new Error('Maximum navigation attempts exceeded. Giving up.');
             }
             var pipeline = _this.pipelineProvider.createPipeline(!_this.couldDeactivate);
@@ -2093,6 +2214,7 @@ var processResult = function (instruction, result, instructionCount, router) {
 };
 var resolveInstruction = function (instruction, result, isInnerInstruction, router) {
     instruction.resolve(result);
+    var eventAggregator = router.events;
     var eventArgs = { instruction: instruction, result: result };
     if (!isInnerInstruction) {
         router.isNavigating = false;
@@ -2116,18 +2238,18 @@ var resolveInstruction = function (instruction, result, isInnerInstruction, rout
             router.history.previousLocation = instruction.fragment + queryString;
             eventName = "router:navigation:success" /* Success */;
         }
-        router.events.publish(eventName, eventArgs);
-        router.events.publish("router:navigation:complete" /* Complete */, eventArgs);
+        eventAggregator.publish(eventName, eventArgs);
+        eventAggregator.publish("router:navigation:complete" /* Complete */, eventArgs);
     }
     else {
-        router.events.publish("router:navigation:child:complete" /* ChildComplete */, eventArgs);
+        eventAggregator.publish("router:navigation:child:complete" /* ChildComplete */, eventArgs);
     }
     return result;
 };
 var restorePreviousLocation = function (router) {
     var previousLocation = router.history.previousLocation;
     if (previousLocation) {
-        router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+        router.navigate(previousLocation, { trigger: false, replace: true });
     }
     else if (router.fallbackRoute) {
         router.navigate(router.fallbackRoute, { trigger: true, replace: true });
