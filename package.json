@@ -1,6 +1,6 @@
 {
   "name": "aurelia-router",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "A powerful client-side router.",
   "keywords": [
     "aurelia",
@@ -20,7 +20,8 @@
     "url": "http://github.com/aurelia/router"
   },
   "files": [
-    "dist"
+    "dist",
+    "typings.json"
   ],
   "scripts": {
     "start": "npm run dev -- --format es2015",
