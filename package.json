@@ -20,7 +20,8 @@
     "url": "http://github.com/aurelia/router"
   },
   "files": [
-    "dist"
+    "dist",
+    "typings.json"
   ],
   "scripts": {
     "start": "npm run dev -- --format es2015",
