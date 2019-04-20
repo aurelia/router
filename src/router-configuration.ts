@@ -1,5 +1,5 @@
 import { RouteConfig, PipelineStep, RouteConfigSpecifier } from './interfaces';
-import { _ensureArrayWithSingleRoutePerConfig } from './util';
+import { _ensureArrayWithSingleRoutePerConfig } from './utilities-url';
 import { Router } from './router';
 import { PipelineSlotName } from './pipeline-slot-name';
 import { NavModel } from './nav-model';

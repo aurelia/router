@@ -9,7 +9,7 @@ import {
   _normalizeAbsolutePath,
   _createRootedPath,
   _resolveUrl
-} from './util';
+} from './utilities-url';
 import { RouteConfig, RouteConfigSpecifier, ViewPortInstruction } from './interfaces';
 import { PipelineProvider } from './pipeline-provider';
 
