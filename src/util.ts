@@ -44,13 +44,14 @@ export function _resolveUrl(fragment: string, baseUrl: string, hasPushState?: bo
   return _createRootedPath(fragment, baseUrl, hasPushState);
 }
 
-export function _ensureArrayWithSingleRoutePerConfig(config: RouteConfig) {
-  let routeConfigs = [];
+export function _ensureArrayWithSingleRoutePerConfig(config: RouteConfig): RouteConfig[] {
+  let routeConfigs: RouteConfig[] = [];
+  let route = config.route;
 
-  if (Array.isArray(config.route)) {
-    for (let i = 0, ii = config.route.length; i < ii; ++i) {
+  if (Array.isArray(route)) {
+    for (let i = 0, ii = route.length; i < ii; ++i) {
       let current = Object.assign({}, config);
-      current.route = config.route[i];
+      current.route = route[i];
       routeConfigs.push(current);
     }
   } else {

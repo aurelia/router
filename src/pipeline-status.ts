@@ -1,6 +1,6 @@
 /**
-* The status of a Pipeline.
-*/
+ * The status of a Pipeline.
+ */
 export const enum PipelineStatus {
   Completed = 'completed',
   Canceled = 'canceled',

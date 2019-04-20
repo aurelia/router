@@ -723,10 +723,11 @@ export const evaluateNavigationStrategy = (
   return Promise
     .resolve(evaluator.call(context, instruction))
     .then(() => {
-      if (!('viewPorts' in instruction.config)) {
-        instruction.config.viewPorts = {
+      let config = instruction.config;
+      if (!('viewPorts' in config)) {
+        config.viewPorts = {
           'default': {
-            moduleId: instruction.config.moduleId
+            moduleId: config.moduleId
           }
         };
       }

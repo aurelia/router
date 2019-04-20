@@ -1,5 +1,5 @@
 import { Next } from './interfaces';
-import { Redirect } from './navigation-commands';
+import { Redirect } from './redirect';
 import { NavigationInstruction } from './navigation-instruction';
 import { _buildNavigationPlan } from './navigation-plan';
 
@@ -10,11 +10,11 @@ import { _buildNavigationPlan } from './navigation-plan';
 export class BuildNavigationPlanStep {
   run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
     return _buildNavigationPlan(navigationInstruction)
-      .then(plan => {
-        if (plan instanceof Redirect) {
-          return next.cancel(plan);
+      .then(redirectOrViewPortPlans => {
+        if (redirectOrViewPortPlans instanceof Redirect) {
+          return next.cancel(redirectOrViewPortPlans);
         }
-        navigationInstruction.plan = plan;
+        navigationInstruction.plan = redirectOrViewPortPlans;
         return next();
       })
       .catch(next.cancel);

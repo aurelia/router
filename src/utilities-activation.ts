@@ -1,5 +1,5 @@
 import { Next, ViewPortComponent, ViewPortPlan, ViewPortInstruction, LifecycleArguments } from './interfaces';
-import { isNavigationCommand } from './navigation-commands';
+import { isNavigationCommand } from './utilities-navigation-command';
 import { NavigationInstruction } from './navigation-instruction';
 import { activationStrategy } from './activation-strategy';
 import { Router } from './router';

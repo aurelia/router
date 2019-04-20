@@ -1,8 +1,8 @@
 import { RouteConfig, PipelineStep, RouteConfigSpecifier } from './interfaces';
 import { _ensureArrayWithSingleRoutePerConfig } from './util';
 import { Router } from './router';
-import { NavigationInstruction } from './navigation-instruction';
 import { PipelineSlotName } from './pipeline-slot-name';
+import { NavModel } from './nav-model';
 
 /**
  * Class used to configure a [[Router]] instance.
@@ -131,7 +131,7 @@ export class RouterConfiguration {
     this.instructions.push(router => {
       let routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
 
-      let navModel;
+      let navModel: NavModel;
       for (let i = 0, ii = routeConfigs.length; i < ii; ++i) {
         let routeConfig = routeConfigs[i];
         routeConfig.settings = routeConfig.settings || {};

@@ -1,5 +1,5 @@
 import { ViewPortPlan, ViewPortInstruction, RouteConfig, ViewPort } from './interfaces';
-import { Redirect } from './navigation-commands';
+import { Redirect } from './redirect';
 import { NavigationInstruction } from './navigation-instruction';
 import { InternalActivationStrategy, ActivationStrategyType } from './activation-strategy';
 
@@ -190,13 +190,17 @@ export const determineActivationStrategy = (
 
   if (prevViewPortInstruction.moduleId !== newViewPortConfig.moduleId) {
     viewPortPlanStrategy = InternalActivationStrategy.Replace;
-  } else if ('determineActivationStrategy' in prevViewPortViewModel) {
+  }
+  else if ('determineActivationStrategy' in prevViewPortViewModel) {
     viewPortPlanStrategy = prevViewPortViewModel.determineActivationStrategy(...currentNavInstruction.lifecycleArgs);
-  } else if (newInstructionConfig.activationStrategy) {
+  }
+  else if (newInstructionConfig.activationStrategy) {
     viewPortPlanStrategy = newInstructionConfig.activationStrategy;
-  } else if (hasNewParams || forceLifecycleMinimum) {
+  }
+  else if (hasNewParams || forceLifecycleMinimum) {
     viewPortPlanStrategy = InternalActivationStrategy.InvokeLifecycle;
-  } else {
+  }
+  else {
     viewPortPlanStrategy = InternalActivationStrategy.NoChange;
   }
   return viewPortPlanStrategy;

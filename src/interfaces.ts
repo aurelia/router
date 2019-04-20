@@ -3,7 +3,7 @@ import { NavigationInstruction } from './navigation-instruction';
 import { Router } from './router';
 import { NavModel } from './nav-model';
 import { RouterConfiguration } from './router-configuration';
-import { NavigationCommand } from './navigation-commands';
+import { NavigationCommand } from './utilities-navigation-command';
 import { IObservable } from './utilities-activation';
 import { PipelineStatus } from './pipeline-status';
 import { ActivationStrategyType } from './activation-strategy';

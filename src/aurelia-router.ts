@@ -23,9 +23,14 @@ export {
   IObservable,
   IObservableConfig
 } from './utilities-activation';
+
 export { AppRouter } from './app-router';
 export { NavModel } from './nav-model';
-export { Redirect, RedirectToRoute, NavigationCommand, isNavigationCommand } from './navigation-commands';
+
+export {
+  NavigationCommand,
+  isNavigationCommand
+} from './utilities-navigation-command';
 
 export {
   NavigationInstruction,
@@ -59,6 +64,14 @@ export {
 export {
   PipelineSlotName
 } from './pipeline-slot-name';
+
+export {
+  Redirect
+} from './redirect';
+
+export {
+  RedirectToRoute
+} from './redirect-to-route';
 
 export { PipelineProvider } from './pipeline-provider';
 export { Pipeline } from './pipeline';
