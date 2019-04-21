@@ -35,7 +35,8 @@ export class Redirect implements NavigationCommand {
    * @param appRouter The router to be redirected.
    */
   navigate(appRouter: Router): void {
-    let navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
-    navigatingRouter.navigate(this.url, this.options);
+    let options = this.options;
+    let navigatingRouter = options.useAppRouter ? appRouter : (this.router || appRouter);
+    navigatingRouter.navigate(this.url, options);
   }
 }

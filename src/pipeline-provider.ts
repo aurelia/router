@@ -19,12 +19,13 @@ class PipelineSlot implements IPipelineSlot {
   /**@internal */
   slotAlias?: string;
 
-  steps: (Function | PipelineStep)[] = [];
+  steps: (Function | PipelineStep)[];
 
   constructor(container: Container, name: string, alias?: string) {
     this.container = container;
     this.slotName = name;
     this.slotAlias = alias;
+    this.steps = [];
   }
 
   getSteps(): (StepRunnerFunction | IPipelineSlot | PipelineStep)[] {

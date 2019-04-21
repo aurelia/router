@@ -19,12 +19,17 @@ export {
    * ViewPortComponent
    */
 } from './interfaces';
+
 export {
   IObservable,
   IObservableConfig
 } from './utilities-activation';
 
-export { AppRouter } from './app-router';
+export {
+  AppRouter,
+  AppRouterResetOptions
+} from './app-router';
+
 export { NavModel } from './nav-model';
 
 export {
@@ -45,7 +50,9 @@ export {
 } from './step-activation';
 
 export { CommitChangesStep } from './step-commit-changes';
+
 export { BuildNavigationPlanStep } from './step-build-navigation-plan';
+
 export { LoadRouteStep } from './step-load-route';
 
 export {

@@ -19,6 +19,16 @@ declare module 'aurelia-dependency-injection' {
 const logger = LogManager.getLogger('app-router');
 
 /**
+ * A reset config object for application router
+ */
+export interface AppRouterResetOptions {
+  /**
+   * Instruct the router to also reset the pipeline provider
+   */
+  clearPipeline?: boolean;
+}
+
+/**
  * The main application router.
  */
 export class AppRouter extends Router {
@@ -44,13 +54,17 @@ export class AppRouter extends Router {
    * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
    * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
    */
-  reset(): void {
+  reset(resetOptions: AppRouterResetOptions = {}): void {
     super.reset();
     this.maxInstructionCount = 10;
-    if (!this._queue) {
+    let queue = this._queue;
+    if (!queue) {
       this._queue = [];
     } else {
-      this._queue.length = 0;
+      queue.length = 0;
+    }
+    if (resetOptions.clearPipeline) {
+      this.pipelineProvider.reset();
     }
   }
 
