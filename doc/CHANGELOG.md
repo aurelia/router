@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.1](https://github.com/aurelia/router/compare/1.7.0...1.7.1) (2019-05-03)
+
+
+### Bug Fixes
+
+* **router:** await viewModel configureRouter ([aed5f53](https://github.com/aurelia/router/commit/aed5f53))
+
+
+
 ## [1.6.4](https://github.com/aurelia/router/compare/1.6.3...1.6.4) (2019-04-17)
 
 
