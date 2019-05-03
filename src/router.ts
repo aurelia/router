@@ -592,21 +592,25 @@ export class Router {
     let result: Promise<NavigationInstruction>;
 
     if (urlRecognizationResults && urlRecognizationResults.length) {
-      let first = urlRecognizationResults[0];
+      let firstRecognition = urlRecognizationResults[0];
+      let routeHandler = firstRecognition.handler;
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
-        params: first.params,
-        queryParams: first.queryParams || urlRecognizationResults.queryParams,
-        config: first.config || first.handler
+        params: firstRecognition.params,
+        queryParams: firstRecognition.queryParams || urlRecognizationResults.queryParams,
+        config: firstRecognition.config || routeHandler
       }));
 
-      if (typeof first.handler === 'function') {
-        result = evaluateNavigationStrategy(instruction, first.handler, first);
-      } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
-        result = evaluateNavigationStrategy(instruction, first.handler.navigationStrategy, first.handler);
-      } else {
+      if (typeof routeHandler === 'function') {
+        result = evaluateNavigationStrategy(instruction, routeHandler, firstRecognition);
+      }
+      else if (routeHandler && typeof routeHandler.navigationStrategy === 'function') {
+        result = evaluateNavigationStrategy(instruction, routeHandler.navigationStrategy, routeHandler);
+      }
+      else {
         result = Promise.resolve(instruction);
       }
-    } else if (this.catchAllHandler) {
+    }
+    else if (this.catchAllHandler) {
       let instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
         queryParams: urlRecognizationResults ? urlRecognizationResults.queryParams : {},
@@ -614,7 +618,8 @@ export class Router {
       }));
 
       result = evaluateNavigationStrategy(instruction, this.catchAllHandler);
-    } else if (this.parent) {
+    }
+    else if (this.parent) {
       let router = this._parentCatchAllHandler(this.parent);
 
       if (router) {

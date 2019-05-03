@@ -1,4 +1,5 @@
 const path = require('path');
+const { AureliaPlugin } = require('aurelia-webpack-plugin');
 
 module.exports = function(config) {
   const browsers = config.browsers;
@@ -18,7 +19,8 @@ module.exports = function(config) {
         modules: ["node_modules"],
         alias: {
           src: path.resolve(__dirname, 'src'),
-          test: path.resolve(__dirname, 'test')
+          test: path.resolve(__dirname, 'test'),
+          'aurelia-router': path.resolve(__dirname, 'src/aurelia-router.ts')
         }
       },
       devtool: browsers.includes('ChromeDebugging') ? 'eval-source-map' : 'inline-source-map',
@@ -28,9 +30,25 @@ module.exports = function(config) {
             test: /\.ts$/,
             loader: "ts-loader",
             exclude: /node_modules/
+          },
+          {
+            test: /\.html$/i,
+            loader: 'html-loader'
           }
         ]
-      }
+      },
+      plugins: [
+        new AureliaPlugin({
+          aureliaApp: undefined,
+          dist: 'es2015',
+          features: { 
+            ie: false,
+            svg: false,
+            unparser: false,
+            polyfills: "esnext"
+          }
+        })
+      ]
     },
     mime: {
       "text/x-typescript": ["ts"]
@@ -50,6 +68,9 @@ module.exports = function(config) {
     mochaReporter: {
       ignoreSkipped: true
     },
-    singleRun: false
+    singleRun: false,
+    webpackMiddleware: {
+      logLevel: 'silent'
+    },
   });
 };
