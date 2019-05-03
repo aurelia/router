@@ -96,10 +96,7 @@ export class AppRouter extends Router {
           const resolveConfiguredPromise = this._resolveConfiguredPromise;
           this._resolveConfiguredPromise = () => {/**/};
           return this
-            .configure(config => {
-              viewModel.configureRouter(config, this);
-              return config;
-            })
+            .configure(config => viewModel.configureRouter(config, this))
             .then(() => {
               this.activate();
               resolveConfiguredPromise();
