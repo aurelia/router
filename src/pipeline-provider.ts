@@ -124,10 +124,7 @@ export class PipelineProvider {
    * Resets all pipeline slots
    */
   reset(): void {
-    this._clearSteps(PipelineSlotName.Authorize);
-    this._clearSteps(PipelineSlotName.PreActivate);
-    this._clearSteps(PipelineSlotName.PreRender);
-    this._clearSteps(PipelineSlotName.PostRender);
+    [PipelineSlotName.Authorize, PipelineSlotName.PreActivate, PipelineSlotName.PreRender, PipelineSlotName.PostRender].forEach(this._clearSteps, this);
   }
 }
 

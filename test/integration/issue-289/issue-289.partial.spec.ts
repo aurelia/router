@@ -5,7 +5,7 @@ import { MockHistory } from '../../shared';
 
 let absoluteRoot = 'http://aurelia.io/docs/';
 
-fdescribe('the router', () => {
+xdescribe('the router', () => {
   let container: Container;
   let router: Router;
   let history: History;
@@ -33,12 +33,10 @@ fdescribe('the router', () => {
         Object.assign(instruction.config, {
           moduleId: 'hello'
         });
-        debugger;
       }});
       const instruction = await child._createNavigationInstruction('/child');
       console.log(instruction);
       expect(callCount).toBe(1, 'callCount');
-      debugger;
       expect(instruction.config.viewPorts.default.moduleId || instruction.config.moduleId).toBeDefined();
     });
   });

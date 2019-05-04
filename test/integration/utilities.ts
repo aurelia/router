@@ -1,6 +1,11 @@
 import { Aurelia, PLATFORM, Controller } from 'aurelia-framework';
 import { AppRouter } from '../../src/app-router';
 
+/**
+ * A bootstrapper utility to bootstrap an aurelia application for integration testing
+ *
+ * Handles all preparation and disposing steps for tests
+ */
 export const bootstrapAurelia = async (root: string | Function) => {
   const baseMeta = document.createElement('base');
   baseMeta.href = location.pathname;

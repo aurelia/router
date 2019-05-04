@@ -2,7 +2,7 @@ import '../../setup';
 import { PLATFORM } from 'aurelia-pal';
 import { bootstrapAurelia } from '../utilities';
 
-describe('issue-289.spec.ts', () => {
+xdescribe('issue-289.spec.ts', () => {
 
   beforeEach(() => {
     // location.replace('#/');
