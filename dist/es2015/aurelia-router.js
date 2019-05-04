@@ -1947,10 +1947,11 @@ class AppRouter extends Router {
                     const resolveConfiguredPromise = this._resolveConfiguredPromise;
                     this._resolveConfiguredPromise = () => { };
                     return this
-                        .configure(config => {
-                        viewModel.configureRouter(config, this);
-                        return config;
-                    })
+                        .configure(config => Promise
+                        .resolve(viewModel.configureRouter(config, this))
+                        // an issue with configure interface. Should be fixed there
+                        // todo: fix this via configure interface in router
+                        .then(() => config))
                         .then(() => {
                         this.activate();
                         resolveConfiguredPromise();

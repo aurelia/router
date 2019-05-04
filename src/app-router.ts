@@ -8,6 +8,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import { NavigationInstruction } from './navigation-instruction';
 import { ViewPort, ConfiguresRouter, PipelineResult } from './interfaces';
 import { RouterEvent } from './router-event';
+import { RouterConfiguration } from './router-configuration';
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {
@@ -110,10 +111,13 @@ export class AppRouter extends Router {
           const resolveConfiguredPromise = this._resolveConfiguredPromise;
           this._resolveConfiguredPromise = () => {/**/};
           return this
-            .configure(config => {
-              viewModel.configureRouter(config, this);
-              return config;
-            })
+            .configure(config =>
+              Promise
+                .resolve(viewModel.configureRouter(config, this))
+                // an issue with configure interface. Should be fixed there
+                // todo: fix this via configure interface in router
+                .then(() => config) as any
+            )
             .then(() => {
               this.activate();
               resolveConfiguredPromise();
