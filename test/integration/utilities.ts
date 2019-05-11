@@ -43,3 +43,10 @@ export const bootstrapAurelia = async (root: string | Function) => {
     }
   };
 };
+
+export const setDocumentBaseUrl = (url: string) => {
+  // remove all existing base tag
+  document.head.querySelectorAll('base').forEach(b => b.remove());
+  // add new base tag
+  document.head.appendChild(document.createElement('base')).href = url;
+};
