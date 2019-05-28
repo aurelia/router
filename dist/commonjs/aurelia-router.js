@@ -2056,8 +2056,11 @@ var AppRouter = /** @class */ (function (_super) {
                     this._resolveConfiguredPromise = function () { };
                     return this
                         .configure(function (config) {
-                        viewModel_1.configureRouter(config, _this);
-                        return config;
+                        return Promise
+                            .resolve(viewModel_1.configureRouter(config, _this))
+                            // an issue with configure interface. Should be fixed there
+                            // todo: fix this via configure interface in router
+                            .then(function () { return config; });
                     })
                         .then(function () {
                         _this.activate();

@@ -3,7 +3,7 @@ import { Container } from 'aurelia-dependency-injection';
 import { History, NavigationOptions } from 'aurelia-history';
 import { Router } from './router';
 import { PipelineProvider } from './pipeline-provider';
-import { isNavigationCommand } from './navigation-commands';
+import { isNavigationCommand } from './utilities-navigation-command';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { NavigationInstruction } from './navigation-instruction';
 import { ViewPort, ConfiguresRouter, PipelineResult } from './interfaces';
@@ -18,6 +18,16 @@ declare module 'aurelia-dependency-injection' {
 }
 
 const logger = LogManager.getLogger('app-router');
+
+/**
+ * A reset config object for application router
+ */
+export interface AppRouterResetOptions {
+  /**
+   * Instruct the router to also reset the pipeline provider
+   */
+  clearPipeline?: boolean;
+}
 
 /**
  * The main application router.
@@ -45,13 +55,17 @@ export class AppRouter extends Router {
    * Fully resets the router's internal state. Primarily used internally by the framework when multiple calls to setRoot are made.
    * Use with caution (actually, avoid using this). Do not use this to simply change your navigation model.
    */
-  reset(): void {
+  reset(resetOptions: AppRouterResetOptions = {}): void {
     super.reset();
     this.maxInstructionCount = 10;
-    if (!this._queue) {
+    let queue = this._queue;
+    if (!queue) {
       this._queue = [];
     } else {
-      this._queue.length = 0;
+      queue.length = 0;
+    }
+    if (resetOptions.clearPipeline) {
+      this.pipelineProvider.reset();
     }
   }
 
@@ -157,7 +171,10 @@ export class AppRouter extends Router {
     });
   }
 
-  /**@internal */
+  /**
+   * @param instructionCount constant. Indicates how many times router has attempted to process its instruction queue
+   * @internal
+   */
   _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | void> {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
@@ -175,23 +192,30 @@ export class AppRouter extends Router {
 
       this.isNavigating = true;
 
-      let navtracker: number = this.history.getState('NavigationTracker');
+      let $history = this.history;
+      let navtracker: number = $history.getState('NavigationTracker');
       let currentNavTracker = this.currentNavigationTracker;
 
       if (!navtracker && !currentNavTracker) {
         this.isNavigatingFirst = true;
         this.isNavigatingNew = true;
-      } else if (!navtracker) {
+      }
+      else if (!navtracker) {
         this.isNavigatingNew = true;
-      } else if (!currentNavTracker) {
+      }
+      else if (!currentNavTracker) {
         this.isNavigatingRefresh = true;
-      } else if (currentNavTracker < navtracker) {
+      }
+      else if (currentNavTracker < navtracker) {
         this.isNavigatingForward = true;
-      } else if (currentNavTracker > navtracker) {
+      }
+      else if (currentNavTracker > navtracker) {
         this.isNavigatingBack = true;
-      } if (!navtracker) {
+      }
+
+      if (!navtracker) {
         navtracker = Date.now();
-        this.history.setState('NavigationTracker', navtracker);
+        $history.setState('NavigationTracker', navtracker);
       }
       this.currentNavigationTracker = navtracker;
 
@@ -199,13 +223,16 @@ export class AppRouter extends Router {
 
       let maxInstructionCount = this.maxInstructionCount;
 
+      // only publish processing event once at the start of a queue
       if (!instructionCount) {
         this.events.publish(RouterEvent.Processing, { instruction });
-      } else if (instructionCount === maxInstructionCount - 1) {
+      }
+      else if (instructionCount === maxInstructionCount - 1) {
         logger.error(`${instructionCount + 1} navigation instructions have been attempted without success. Restoring last known good location.`);
         restorePreviousLocation(this);
         return this._dequeueInstruction(instructionCount + 1);
-      } else if (instructionCount > maxInstructionCount) {
+      }
+      else if (instructionCount > maxInstructionCount) {
         throw new Error('Maximum navigation attempts exceeded. Giving up.');
       }
 
@@ -223,20 +250,22 @@ export class AppRouter extends Router {
 
   /**@internal */
   _findViewModel(viewPort: ViewPort): ConfiguresRouter | undefined {
-    if (this.container.viewModel) {
-      return this.container.viewModel;
+    let routerContainer = this.container;
+    let routerContainerViewModel = routerContainer.viewModel;
+    if (routerContainerViewModel) {
+      return routerContainerViewModel;
     }
 
-    if (viewPort.container) {
-      let container = viewPort.container;
-
-      while (container) {
-        if (container.viewModel) {
-          this.container.viewModel = container.viewModel;
-          return container.viewModel;
+    let viewPortContainer = viewPort.container;
+    if (viewPortContainer) {
+      while (viewPortContainer) {
+        let viewModel = viewPortContainer.viewModel;
+        if (viewModel) {
+          routerContainer.viewModel = viewModel;
+          return viewModel;
         }
 
-        container = container.parent;
+        viewPortContainer = viewPortContainer.parent;
       }
     }
 
@@ -257,14 +286,15 @@ const processResult = (
 
   let finalResult: PipelineResult = null;
   let navigationCommandResult = null;
-  if (isNavigationCommand(result.output)) {
-    navigationCommandResult = result.output.navigate(router);
+  let output = result.output;
+  if (isNavigationCommand(output)) {
+    navigationCommandResult = output.navigate(router);
   } else {
     finalResult = result;
 
     if (!result.completed) {
-      if (result.output instanceof Error) {
-        logger.error(result.output.toString());
+      if (output instanceof Error) {
+        logger.error(output.toString());
       }
 
       restorePreviousLocation(router);

@@ -152,15 +152,16 @@ export class NavigationInstruction {
     let viewPortName = typeof nameOrInitOptions === 'string' ? nameOrInitOptions : nameOrInitOptions.name;
     const lifecycleArgs = this.lifecycleArgs;
     const config: RouteConfig = Object.assign({}, lifecycleArgs[1], { currentViewPort: viewPortName });
+    const newLifecycleArgs = [lifecycleArgs[0], config, lifecycleArgs[2]] as LifecycleArguments;
 
     if (typeof nameOrInitOptions === 'string') {
       viewPortInstruction = {
-        name: nameOrInitOptions,
+        name: viewPortName,
         strategy: strategy,
         moduleId: moduleId,
         component: component,
         childRouter: component.childRouter,
-        lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]] as LifecycleArguments
+        lifecycleArgs: newLifecycleArgs
       };
     } else {
       viewPortInstruction = {
@@ -169,7 +170,7 @@ export class NavigationInstruction {
         component: nameOrInitOptions.component,
         moduleId: nameOrInitOptions.moduleId,
         childRouter: nameOrInitOptions.component.childRouter,
-        lifecycleArgs: [lifecycleArgs[0], config, lifecycleArgs[2]] as LifecycleArguments
+        lifecycleArgs: newLifecycleArgs
       };
     }
 

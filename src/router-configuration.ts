@@ -1,8 +1,17 @@
 import { RouteConfig, PipelineStep, RouteConfigSpecifier } from './interfaces';
-import { _ensureArrayWithSingleRoutePerConfig } from './util';
+import { _ensureArrayWithSingleRoutePerConfig } from './utilities-url';
 import { Router } from './router';
-import { NavigationInstruction } from './navigation-instruction';
 import { PipelineSlotName } from './pipeline-slot-name';
+import { NavModel } from './nav-model';
+
+export interface RouterConfiguationOptions {
+  compareQueryParams?: boolean;
+  root?: string;
+  pushState?: boolean;
+  hashChange?: boolean;
+  silent?: boolean;
+  [key: string]: any;
+}
 
 /**
  * Class used to configure a [[Router]] instance.
@@ -10,17 +19,19 @@ import { PipelineSlotName } from './pipeline-slot-name';
  * @constructor
  */
 export class RouterConfiguration {
+  /**
+   * A list of instructions for a router built based on route configs added
+   */
   instructions: Array<(router: Router) => void> = [];
-  options: {
-    [key: string]: any;
-    compareQueryParams?: boolean;
-    root?: string;
-    pushState?: boolean;
-    hashChange?: boolean;
-    silent?: boolean;
-  } = {};
+  /**
+   * Options to export to a router to alter it behavior
+   */
+  options: RouterConfiguationOptions = {};
   pipelineSteps: Array<{ name: string, step: Function | PipelineStep }> = [];
   title: string;
+  /**
+   * Title separate string used when building title
+   */
   titleSeparator: string;
   unknownRouteConfig: RouteConfigSpecifier;
   viewPortDefaults: Record<string, any>;
@@ -131,7 +142,7 @@ export class RouterConfiguration {
     this.instructions.push(router => {
       let routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
 
-      let navModel;
+      let navModel: NavModel;
       for (let i = 0, ii = routeConfigs.length; i < ii; ++i) {
         let routeConfig = routeConfigs[i];
         routeConfig.settings = routeConfig.settings || {};

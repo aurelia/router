@@ -1,5 +1,5 @@
 import { RouteConfig, ViewPortComponent, ViewPortPlan, ViewPortInstruction } from './interfaces';
-import { Redirect } from './navigation-commands';
+import { Redirect } from './redirect';
 import { NavigationInstruction } from './navigation-instruction';
 import { _buildNavigationPlan } from './navigation-plan';
 import { InternalActivationStrategy } from './activation-strategy';
@@ -49,7 +49,8 @@ export const determineLoadingPlans = (
       if (childNavInstruction) {
         determineLoadingPlans(childNavInstruction, loadingPlans);
       }
-    } else {
+    }
+    else {
       let viewPortInstruction = navigationInstruction.addViewPortInstruction({
         name: viewPortName,
         strategy: viewPortPlan.strategy,
