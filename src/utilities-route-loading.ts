@@ -49,7 +49,8 @@ export const determineLoadingPlans = (
       if (childNavInstruction) {
         determineLoadingPlans(childNavInstruction, loadingPlans);
       }
-    } else {
+    }
+    else {
       let viewPortInstruction = navigationInstruction.addViewPortInstruction({
         name: viewPortName,
         strategy: viewPortPlan.strategy,

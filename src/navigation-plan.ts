@@ -67,7 +67,8 @@ export const buildRedirectPlan = (instruction: NavigationInstruction) => {
           if (val in originalInstructionParams) {
             params[key] = originalInstructionParams[val];
           }
-        } else {
+        }
+        else {
           params[key] = redirectInstructionParams[key];
         }
       }

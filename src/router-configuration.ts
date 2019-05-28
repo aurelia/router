@@ -4,23 +4,34 @@ import { Router } from './router';
 import { PipelineSlotName } from './pipeline-slot-name';
 import { NavModel } from './nav-model';
 
+export interface RouterConfiguationOptions {
+  compareQueryParams?: boolean;
+  root?: string;
+  pushState?: boolean;
+  hashChange?: boolean;
+  silent?: boolean;
+  [key: string]: any;
+}
+
 /**
  * Class used to configure a [[Router]] instance.
  *
  * @constructor
  */
 export class RouterConfiguration {
+  /**
+   * A list of instructions for a router built based on route configs added
+   */
   instructions: Array<(router: Router) => void> = [];
-  options: {
-    [key: string]: any;
-    compareQueryParams?: boolean;
-    root?: string;
-    pushState?: boolean;
-    hashChange?: boolean;
-    silent?: boolean;
-  } = {};
+  /**
+   * Options to export to a router to alter it behavior
+   */
+  options: RouterConfiguationOptions = {};
   pipelineSteps: Array<{ name: string, step: Function | PipelineStep }> = [];
   title: string;
+  /**
+   * Title separate string used when building title
+   */
   titleSeparator: string;
   unknownRouteConfig: RouteConfigSpecifier;
   viewPortDefaults: Record<string, any>;
