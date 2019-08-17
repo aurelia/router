@@ -288,7 +288,7 @@ export declare class Router {
 	 * @param fragment The URL fragment to use as the navigation destination.
 	 * @param options The navigation options.
 	 */
-	navigate(fragment: string, options?: NavigationOptions): boolean;
+	navigate(fragment: string, options?: NavigationOptions): NavigationResult;
 	/**
 	 * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
 	 * by [[Router.navigate]].
@@ -297,7 +297,7 @@ export declare class Router {
 	 * @param params The route parameters to be used when populating the route pattern.
 	 * @param options The navigation options.
 	 */
-	navigateToRoute(route: string, params?: any, options?: NavigationOptions): boolean;
+	navigateToRoute(route: string, params?: any, options?: NavigationOptions): NavigationResult;
 	/**
 	 * Navigates back to the most recent location in history.
 	 */

@@ -148,6 +148,8 @@ describe('the router', () => {
   });
 
   describe('navigate', () => {
+    const delay = (milliseconds: number) => new Promise(res => setTimeout(res, milliseconds));
+
     it('should navigate to absolute paths', (done) => {
       const options = {};
       spyOn(history, 'navigate');
@@ -227,6 +229,40 @@ describe('the router', () => {
         .then(() => {
           router.navigateToRoute('test', { id: 123 }, options);
           expect(history.navigate).toHaveBeenCalledWith('#/test/123', options);
+          done();
+        });
+    });
+
+    it('should return to caller immediately if not awaited', (done) => {
+      const options = {};
+      let navigationPending = false;
+      spyOn(history, 'navigate').and.callFake(async () => {
+        navigationPending = true;
+        await delay(10);
+        navigationPending = false;
+        done();
+      });
+
+      router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(() => {
+          router.navigateToRoute('test', { id: 123 }, options);
+          expect(navigationPending).toBe(true);
+        });
+    });
+
+    it('should return to caller after routing complete if awaited', (done) => {
+      const options = {};
+      let navigationPending = false;
+      spyOn(history, 'navigate').and.callFake(async () => {
+        navigationPending = true;
+        await delay(10);
+        navigationPending = false;
+      });
+
+      router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
+        .then(async () => {
+          await router.navigateToRoute('test', { id: 123 }, options);
+          expect(navigationPending).toBe(false);
           done();
         });
     });
