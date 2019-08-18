@@ -81,6 +81,14 @@ export const buildRedirectPlan = (instruction: NavigationInstruction) => {
       let queryString = instruction.queryString;
       if (queryString) {
         redirectLocation += '?' + queryString;
+      }      
+      let redirectQueryString = redirectInstruction.queryString;
+      if (redirectQueryString) {
+        if (queryString) {
+          redirectLocation += '&' + redirectQueryString;
+        } else {
+          redirectLocation += '?' + redirectQueryString;
+        }
       }
 
       return Promise.resolve(new Redirect(redirectLocation));
