@@ -1,6 +1,6 @@
 import { RouteRecognizer, RouteHandler, ConfigurableRoute, State, RecognizedRoute } from 'aurelia-route-recognizer';
 import { Container } from 'aurelia-dependency-injection';
-import { History, NavigationOptions } from 'aurelia-history';
+import { History, NavigationOptions, NavigationResult } from 'aurelia-history';
 import { NavigationInstruction, NavigationInstructionInit } from './navigation-instruction';
 import { NavModel } from './nav-model';
 import { RouterConfiguration } from './router-configuration';
@@ -288,12 +288,13 @@ export class Router {
   }
 
   /**
-   * Navigates to a new location.
-   *
-   * @param fragment The URL fragment to use as the navigation destination.
-   * @param options The navigation options.
-   */
-  navigate(fragment: string, options?: NavigationOptions): boolean {
+  * Navigates to a new location.
+  *
+  * @param fragment The URL fragment to use as the navigation destination.
+  * @param options The navigation options.
+  * @returns A promise for the navigation result.
+  */
+  navigate(fragment: string, options?: NavigationOptions): Promise<NavigationResult> {
     if (!this.isConfigured && this.parent) {
       return this.parent.navigate(fragment, options);
     }
@@ -303,14 +304,15 @@ export class Router {
   }
 
   /**
-   * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
-   * by [[Router.navigate]].
-   *
-   * @param route The name of the route to use when generating the navigation location.
-   * @param params The route parameters to be used when populating the route pattern.
-   * @param options The navigation options.
-   */
-  navigateToRoute(route: string, params?: any, options?: NavigationOptions): boolean {
+  * Navigates to a new location corresponding to the route and params specified. Equivallent to [[Router.generate]] followed
+  * by [[Router.navigate]].
+  *
+  * @param route The name of the route to use when generating the navigation location.
+  * @param params The route parameters to be used when populating the route pattern.
+  * @param options The navigation options.
+  * @returns A promise for the navigation result.
+  */
+  navigateToRoute(route: string, params?: any, options?: NavigationOptions): Promise<NavigationResult> {
     let path = this.generate(route, params);
     return this.navigate(path, options);
   }

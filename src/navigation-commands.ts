@@ -1,4 +1,4 @@
-import { NavigationOptions } from 'aurelia-history';
+import { NavigationOptions, NavigationResult } from 'aurelia-history';
 import { Router } from './router';
 
 /**@internal */
@@ -14,7 +14,7 @@ declare module 'aurelia-history' {
 * command so it can determine the correct action.
 */
 export interface NavigationCommand {
-  navigate: (router: Router) => void;
+  navigate: (router: Router) => Promise<NavigationResult>;
   /**@internal */
   shouldContinueProcessing?: boolean;
   /**@internal */
@@ -68,9 +68,9 @@ export class Redirect implements NavigationCommand {
    *
    * @param appRouter The router to be redirected.
    */
-  navigate(appRouter: Router): void {
+  navigate(appRouter: Router): Promise<NavigationResult> {
     let navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
-    navigatingRouter.navigate(this.url, this.options);
+    return navigatingRouter.navigate(this.url, this.options);
   }
 }
 
@@ -116,8 +116,8 @@ export class RedirectToRoute implements NavigationCommand {
    *
    * @param appRouter The router to be redirected.
    */
-  navigate(appRouter: Router): void {
+  navigate(appRouter: Router): Promise<NavigationResult> {
     let navigatingRouter = this.options.useAppRouter ? appRouter : (this.router || appRouter);
-    navigatingRouter.navigateToRoute(this.route, this.params, this.options);
+    return navigatingRouter.navigateToRoute(this.route, this.params, this.options);
   }
 }

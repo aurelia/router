@@ -1,4 +1,5 @@
 import { Container } from 'aurelia-dependency-injection';
+import { NavigationResult } from 'aurelia-history';
 import { NavigationInstruction } from './navigation-instruction';
 import { Router } from './router';
 import { NavModel } from './nav-model';
@@ -256,7 +257,7 @@ export interface IPipelineSlot {
 /**
  * The result of a pipeline run.
  */
-export interface PipelineResult {
+export interface PipelineResult extends NavigationResult {
   status: string;
   instruction: NavigationInstruction;
   output: any;
@@ -320,7 +321,6 @@ export interface ViewPortInstruction {
   prevComponent?: ViewPortComponent;
 }
 
-export type NavigationResult = boolean | Promise<PipelineResult | boolean>;
 
 export type LifecycleArguments = [Record<string, string>, RouteConfig, NavigationInstruction];
 

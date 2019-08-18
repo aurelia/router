@@ -237,7 +237,7 @@ describe('app-router', () => {
       router.history.previousLocation = 'prev';
       router.loadUrl('next')
         .then(result => {
-          expect(result).toBeFalsy();
+          expect(result.completed).toBeFalsy();
           expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
         })
         .catch(() => expect(true).toBeFalsy('should have succeeded'))
@@ -251,7 +251,7 @@ describe('app-router', () => {
       router.fallbackRoute = 'fallback';
       router.loadUrl('next')
         .then(result => {
-          expect(result).toBeFalsy();
+          expect(result.completed).toBeFalsy();
           expect(history.navigate).toHaveBeenCalledWith('#/fallback', { trigger: true, replace: true });
         })
         .catch(result => expect(true).toBeFalsy('should have succeeded'))
@@ -272,7 +272,7 @@ describe('app-router', () => {
 
       router.loadUrl('next')
         .then(result => {
-          expect(result).toBeFalsy();
+          expect(result.completed).toBeFalsy();
           expect(history.navigate).toHaveBeenCalledWith('#/prev', { trigger: false, replace: true });
         })
         .catch(() => expect(true).toBeFalsy('should have succeeded'))

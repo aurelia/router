@@ -1,6 +1,6 @@
 import * as LogManager from 'aurelia-logging';
 import { Container } from 'aurelia-dependency-injection';
-import { History, NavigationOptions } from 'aurelia-history';
+import { History, NavigationOptions, NavigationResult } from 'aurelia-history';
 import { Router } from './router';
 import { PipelineProvider } from './pipeline-provider';
 import { isNavigationCommand } from './navigation-commands';
@@ -60,13 +60,14 @@ export class AppRouter extends Router {
    *
    * @param url The URL fragment to load.
    */
-  loadUrl(url: string): Promise<NavigationInstruction> {
+  loadUrl(url: string): Promise<NavigationResult> {
     return this
       ._createNavigationInstruction(url)
       .then(instruction => this._queueInstruction(instruction))
       .catch(error => {
         logger.error(error);
         restorePreviousLocation(this);
+        return { completed: false };
       });
   }
 
@@ -149,7 +150,7 @@ export class AppRouter extends Router {
   }
 
   /**@internal */
-  _queueInstruction(instruction: NavigationInstruction): Promise<any> {
+  _queueInstruction(instruction: NavigationInstruction): Promise<PipelineResult> {
     return new Promise((resolve) => {
       instruction.resolve = resolve;
       this._queue.unshift(instruction);
@@ -244,12 +245,12 @@ export class AppRouter extends Router {
   }
 }
 
-const processResult = (
+function processResult(
   instruction: NavigationInstruction,
   result: PipelineResult,
   instructionCount: number,
   router: AppRouter
-): Promise<PipelineResult> => {
+): Promise<PipelineResult> {
   if (!(result && 'completed' in result && 'output' in result)) {
     result = result || {} as PipelineResult;
     result.output = new Error(`Expected router pipeline to return a navigation result, but got [${JSON.stringify(result)}] instead.`);
@@ -272,16 +273,16 @@ const processResult = (
   }
 
   return Promise.resolve(navigationCommandResult)
-    .then(_ => router._dequeueInstruction(instructionCount + 1))
+    .then(_ => router._dequeueInstruction(instructionCount - 1))
     .then(innerResult => finalResult || innerResult || result);
 };
 
-const resolveInstruction = (
+function resolveInstruction(
   instruction: NavigationInstruction,
   result: PipelineResult,
   isInnerInstruction: boolean,
   router: AppRouter
-): PipelineResult => {
+): PipelineResult {
   instruction.resolve(result);
 
   let eventAggregator = router.events;
@@ -318,7 +319,7 @@ const resolveInstruction = (
   return result;
 };
 
-const restorePreviousLocation = (router: AppRouter): void => {
+function restorePreviousLocation(router: AppRouter): void {
   let previousLocation = router.history.previousLocation;
   if (previousLocation) {
     router.navigate(previousLocation, { trigger: false, replace: true });

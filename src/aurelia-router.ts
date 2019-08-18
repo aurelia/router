@@ -6,7 +6,6 @@ export {
   RoutableComponentDetermineActivationStrategy,
   ConfiguresRouter,
   RouteConfig,
-  NavigationResult,
   Next,
   PipelineResult,
   PipelineStep
@@ -65,3 +64,4 @@ export { Pipeline } from './pipeline';
 export { RouteLoader } from './route-loader';
 export { RouterConfiguration } from './router-configuration';
 export { Router } from './router';
+export { NavigationResult } from 'aurelia-history';
