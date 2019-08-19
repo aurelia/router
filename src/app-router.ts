@@ -60,7 +60,7 @@ export class AppRouter extends Router {
    *
    * @param url The URL fragment to load.
    */
-  loadUrl(url: string): Promise<NavigationInstruction> {
+  loadUrl(url: string): Promise<PipelineResult | void> {
     return this
       ._createNavigationInstruction(url)
       .then(instruction => this._queueInstruction(instruction))
@@ -149,7 +149,7 @@ export class AppRouter extends Router {
   }
 
   /**@internal */
-  _queueInstruction(instruction: NavigationInstruction): Promise<any> {
+  _queueInstruction(instruction: NavigationInstruction): Promise<PipelineResult> {
     return new Promise((resolve) => {
       instruction.resolve = resolve;
       this._queue.unshift(instruction);
