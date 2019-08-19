@@ -60,14 +60,13 @@ export class AppRouter extends Router {
    *
    * @param url The URL fragment to load.
    */
-  loadUrl(url: string): Promise<NavigationResult> {
+  loadUrl(url: string): Promise<PipelineResult | void> {
     return this
       ._createNavigationInstruction(url)
       .then(instruction => this._queueInstruction(instruction))
       .catch(error => {
         logger.error(error);
         restorePreviousLocation(this);
-        return { completed: false };
       });
   }
 
@@ -273,7 +272,7 @@ function processResult(
   }
 
   return Promise.resolve(navigationCommandResult)
-    .then(_ => router._dequeueInstruction(instructionCount - 1))
+    .then(_ => router._dequeueInstruction(instructionCount + 1))
     .then(innerResult => finalResult || innerResult || result);
 };
 
