@@ -86,7 +86,7 @@
     "rimraf": "^2.6.2",
     "rollup": "^1.7.4",
     "rollup-plugin-typescript2": "^0.20.1",
-    "standard-version": "^5.0.2",
+    "standard-version": "^8.0.1",
     "ts-loader": "^4.4.2",
     "tslib": "^1.9.3",
     "tslint": "^5.14.0",
