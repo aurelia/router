@@ -34,9 +34,9 @@
     "test:watch": "karma start",
     "test:debugger": "karma start --browsers ChromeDebugging",
     "lint": "eslint .",
-    "typedoc": "typedoc src/aurelia-templating-router.ts --json doc/api.json",
+    "typedoc": "typedoc src/aurelia-router.ts --json doc/api.json",
     "posttypedoc": "node doc/cleanup.js",
-    "changelog": "standard-version -t \"\" -i doc/CHANGELOG.md",
+    "changelog": "standard-version -t \"\" -i doc/CHANGELOG.md --skip.commit --skip.tag",
     "precut-release": "npm run lint && npm run test && npm run build",
     "cut-release": "npm run changelog",
     "postcut-release": "npm run typedoc"
