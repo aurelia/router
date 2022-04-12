@@ -1,4 +1,4 @@
-import { _createRootedPath, _normalizeAbsolutePath, _resolveUrl, _ensureArrayWithSingleRoutePerConfig } from '../src/util';
+import { _createRootedPath, _normalizeAbsolutePath, _resolveUrl } from '../src/util';
 
 describe('utilities', function Utilities__Tests() {
 

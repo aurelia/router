@@ -7,15 +7,12 @@ import {
   CanDeactivatePreviousStep,
   CanActivateNextStep,
   ActivateNextStep,
-  NavigationInstructionInit
 } from '../src/aurelia-router';
 import {
-  ViewPortComponent,
   ViewPortInstruction,
-  ViewPort,
   ViewPortPlan
 } from '../src/interfaces';
-import { ValueOf, createPipelineState, MockPipelineState, MockInstruction } from './shared';
+import { ValueOf, createPipelineState, MockPipelineState } from './shared';
 
 describe('activation', () => {
   describe('CanDeactivatePreviousStep', () => {
@@ -161,7 +158,7 @@ describe('activation', () => {
     });
 
     describe('with a childNavigationInstruction', () => {
-      let viewPort = viewPortFactory(() => (true));
+      // let viewPort = viewPortFactory(() => (true));
       // let instruction: NavigationInstruction = { plan: { first: viewPort } } as any;
 
       describe('when navigating on the parent', () => {
@@ -277,6 +274,7 @@ describe('activation', () => {
       } as any);
 
       const viewModel = {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         activate(params: Record<string, any>, config: RouteConfig, instruction: NavigationInstruction) {
           expect(config.currentViewPort).toBe('my-view-port');
           done();

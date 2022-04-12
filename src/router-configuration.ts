@@ -1,7 +1,6 @@
 import { RouteConfig, PipelineStep, RouteConfigSpecifier } from './interfaces';
 import { _ensureArrayWithSingleRoutePerConfig } from './util';
 import { Router } from './router';
-import { NavigationInstruction } from './navigation-instruction';
 import { PipelineSlotName } from './pipeline-slot-name';
 
 /**

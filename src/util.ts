@@ -1,6 +1,6 @@
 import { RouteConfig } from './interfaces';
 
-export function _normalizeAbsolutePath(path: string, hasPushState: boolean, absolute: boolean = false) {
+export function _normalizeAbsolutePath(path: string, hasPushState: boolean, absolute = false) {
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
   }

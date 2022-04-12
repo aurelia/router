@@ -12,6 +12,7 @@ export class RouteLoader {
    */
   // return typing: return typings used to be never
   // as it was a throw. Changing it to Promise<any> should not cause any issues
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   loadRoute(router: Router, config: RouteConfig, navigationInstruction: NavigationInstruction): Promise</*ViewPortInstruction*/any> {
     throw new Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
   }

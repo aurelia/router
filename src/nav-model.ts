@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { Router } from './router';
 import { RouteConfig } from './interfaces';
 

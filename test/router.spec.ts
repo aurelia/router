@@ -1,4 +1,4 @@
-import { MockHistory, MockInstruction } from './shared';
+import { MockHistory } from './shared';
 import { History } from 'aurelia-history';
 import { Container } from 'aurelia-dependency-injection';
 import {
@@ -235,7 +235,7 @@ describe('the router', () => {
   describe('_createNavigationInstruction', () => {
     it('should reject when router not configured', (done) => {
       router._createNavigationInstruction()
-        .then(x => expect(true).toBeFalsy('should have rejected'))
+        .then(() => expect(true).withContext('should have rejected').toBeFalsy())
         .catch(reason => expect(reason).toBeTruthy())
         .then(done);
     });
@@ -243,7 +243,7 @@ describe('the router', () => {
     it('should reject when route not found', (done) => {
       router.configure(config => config.map({ name: 'test', route: 'test/:id', moduleId: './test' }))
         .then(() => router._createNavigationInstruction('test'))
-        .then(() => expect(true).toBeFalsy('should have rejected'))
+        .then(() => expect(true).withContext('should have rejected').toBeFalsy())
         .catch(reason => expect(reason).toBeTruthy())
         .then(done);
     });
@@ -297,6 +297,7 @@ describe('the router', () => {
             expect(i.config.name).toEqual('b');
           })
           .then(() => childRouter._createNavigationInstruction('child/c?foo=456'))
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .then(i => {
             // This failing test needs to be implemented.
             // expect(i.fragment).toEqual('child/c');
@@ -382,6 +383,7 @@ describe('the router', () => {
       it('should use function handler', (done) => {
         router
           .configure(config => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             config.unknownRouteConfig = instruction => ({ moduleId: 'test' } as RouteConfig) as any;
             return config;
           })
@@ -394,6 +396,7 @@ describe('the router', () => {
       it('should use async function handler', (done) => {
         router
           .configure(config => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             config.unknownRouteConfig = instruction => Promise.resolve({ moduleId: 'test' } as RouteConfig) as any;
             return config;
           })
@@ -430,6 +433,7 @@ describe('the router', () => {
       it('should reject invalid configs', (done) => {
         router
           .configure(config => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             config.unknownRouteConfig = instruction => null;
             return config;
           })
@@ -475,6 +479,7 @@ describe('the router', () => {
       router.configure(config => {
         // This conflicts with type definition so much
         // what should be fixed ???
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         return promise.then(x => {
           config.map({ route: '', moduleId: './test' });
         }) as any;

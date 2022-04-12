@@ -1,4 +1,4 @@
-import { PipelineStep, PipelineResult, Next, StepRunnerFunction, IPipelineSlot } from './interfaces';
+import { PipelineStep, PipelineResult, StepRunnerFunction, IPipelineSlot } from './interfaces';
 import { NavigationInstruction } from './navigation-instruction';
 import { createNextFn } from './next';
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Router, Next, NavigationInstruction } from '../src/aurelia-router';
 import { NavigationOptions, History } from 'aurelia-history';
 
@@ -35,6 +36,7 @@ export class MockHistory extends History {
   setTitle() { }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface MockInstruction extends NavigationInstruction { }
 
 export class MockInstruction {

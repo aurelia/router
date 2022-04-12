@@ -562,7 +562,7 @@ export class Router {
   }
 
   /**@internal */
-  _createNavigationInstruction(url: string = '', parentInstruction: NavigationInstruction = null): Promise<NavigationInstruction> {
+  _createNavigationInstruction(url = '', parentInstruction: NavigationInstruction = null): Promise<NavigationInstruction> {
     let fragment = url;
     let queryString = '';
 

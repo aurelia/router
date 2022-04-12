@@ -11,7 +11,7 @@ describe('Pipeline', function() {
 
   describe('addStep', function() {
     it('adds function', () => {
-      const runnerFn = function(...args: any[]) {/**/} as StepRunnerFunction;
+      const runnerFn = function() {/**/} as StepRunnerFunction;
       pipeline.addStep(runnerFn);
       expect(pipeline.steps[0]).toBe(runnerFn);
       pipeline.addStep(runnerFn);
@@ -22,7 +22,8 @@ describe('Pipeline', function() {
       let stepRunContext: any = {};
       const stepResult: any = {};
       const step: PipelineStep = {
-        run(...args: any[]) {
+        run() {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
           stepRunContext = this;
           return Promise.resolve(stepResult);
         }
@@ -125,7 +126,7 @@ describe('Pipeline', function() {
             }
           },
           {
-            run(nav: NavigationInstruction, next: Next) {
+            run() {
               secondCalled = 1;
               throw new Error('Invalid run.');
             }

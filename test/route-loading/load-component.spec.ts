@@ -1,17 +1,13 @@
 import '../setup';
-import { Container } from 'aurelia-dependency-injection';
-import { NavigationInstruction, RouteConfig, Router, RouterConfiguration } from '../../src/aurelia-router';
+import { NavigationInstruction, RouteConfig, Router } from '../../src/aurelia-router';
 import { loadComponent } from '../../src/utilities-route-loading';
 import { RouteLoader } from '../../src/route-loader';
 import {
   ViewPortComponent,
-  ViewPortInstruction,
-  ViewPort,
-  ViewPortPlan
 } from '../../src/interfaces';
 
 describe('RouteLoading -- loadComponent()', function() {
-  let container: Container;
+  // let container: Container;
   let router: Router;
   let routeLoader: RouteLoader;
   let navInstruction: NavigationInstruction;
@@ -20,6 +16,7 @@ describe('RouteLoading -- loadComponent()', function() {
 
   beforeEach(function() {
     routeLoader = {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       loadRoute(router: Router, config: RouteConfig, nav: NavigationInstruction): Promise<ViewPortComponent> {
         return Promise.resolve(vpComponent);
       }
