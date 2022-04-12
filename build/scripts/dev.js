@@ -1,63 +1,62 @@
+// @ts-check
 const args = require('../tasks/args');
 const rollup = require('rollup');
-const typescript = require('rollup-plugin-typescript2');
+/** @type {(options: import('@rollup/plugin-typescript').RollupTypescriptOptions) => import('rollup').Plugin} */
+// @ts-ignore
+const typescript = require('@rollup/plugin-typescript');
 const ChildProcess = require('child_process');
+const pkg = require('../../package.json');
 
 const targetFormats = args.format || ['commonjs']; // by default only run devs for commonjs
 const targetDir = args.target;
 
+const LIB_NAME = pkg.name;
+
 const buildConfigs = {
   es2015: {
     output: {
-      file: 'dist/es2015/index.js',
+      file: `dist/es2015/${LIB_NAME}.js`,
       format: 'es'
     },
     tsConfig: {
-      tsconfigOverride: {
-        compilerOptions: {
-          target: 'es2015'
-        }
-      }
+      target: 'es2015'
+    }
+  },
+  es2017: {
+    output: {
+      file: `dist/es2017/${LIB_NAME}.js`,
+      format: 'es'
+    },
+    tsConfig: {
+      target: 'es2015'
     }
   },
   amd: {
     output: {
-      file: 'dist/amd/index.js',
+      file: `dist/amd/${LIB_NAME}.js`,
       format: 'amd',
-      amd: { id: 'aurelia-router' }
+      amd: { id: LIB_NAME }
     },
     tsConfig: {
-      tsconfigOverride: {
-        compilerOptions: {
-          target: 'es5'
-        }
-      }
+      target: 'es5'
     }
   },
   commonjs: {
     output: {
-      file: 'dist/commonjs/index.js',
+      file: `dist/commonjs/${LIB_NAME}.js`,
       format: 'cjs'
     },
     tsConfig: {
-      tsconfigOverride: {
-        compilerOptions: {
-          target: 'es5'
-        }
-      }
+      target: 'es5'
     }
   },
   'native-modules': {
     output: {
-      file: 'dist/commonjs/index.js',
+      file: `dist/commonjs/${LIB_NAME}.js`,
       format: 'es'
     },
     tsConfig: {
-      tsconfigOverride: {
-        compilerOptions: {
-          target: 'es5'
-        }
-      }
+      target: 'es5'
     }
   }
 };
@@ -69,8 +68,11 @@ console.log('Running dev with targets:', targetFormats);
  */
 async function roll(format) {
   const inputOptions = {
-    input: 'src/index.ts',
+    input: 'src/aurelia-router.ts',
     external: [
+      'aurelia-binding',
+      'aurelia-path',
+      'aurelia-templating',
       'aurelia-dependency-injection',
       'aurelia-event-aggregator',
       'aurelia-logging',
@@ -78,10 +80,10 @@ async function roll(format) {
       'aurelia-route-recognizer'
     ],
     plugins: [
-      typescript(Object.assign(
-        { cacheRoot: '.rollupcache' },
-        buildConfigs[format].tsConfig
-      ))
+      typescript({
+        target: buildConfigs[format].tsConfig.target,
+        removeComments: true
+      })
     ]
   };
   console.log('Starting watcher');

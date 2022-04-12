@@ -1,4 +1,4 @@
-import { ViewPortPlan, ViewPortInstruction, RouteConfig, ViewPort } from './interfaces';
+import { ViewPortPlan, ViewPortInstruction, RouteConfig } from './interfaces';
 import { Redirect } from './navigation-commands';
 import { NavigationInstruction } from './navigation-instruction';
 import { InternalActivationStrategy, ActivationStrategyType } from './activation-strategy';

@@ -8,7 +8,6 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import { NavigationInstruction } from './navigation-instruction';
 import { ViewPort, ConfiguresRouter, PipelineResult } from './interfaces';
 import { RouterEvent } from './router-event';
-import { RouterConfiguration } from './router-configuration';
 
 /**@internal */
 declare module 'aurelia-dependency-injection' {
@@ -158,7 +157,7 @@ export class AppRouter extends Router {
   }
 
   /**@internal */
-  _dequeueInstruction(instructionCount: number = 0): Promise<PipelineResult | void> {
+  _dequeueInstruction(instructionCount = 0): Promise<PipelineResult | void> {
     return Promise.resolve().then(() => {
       if (this.isNavigating && !instructionCount) {
         // ts complains about inconsistent returns without void 0
@@ -272,7 +271,7 @@ const processResult = (
   }
 
   return Promise.resolve(navigationCommandResult)
-    .then(_ => router._dequeueInstruction(instructionCount + 1))
+    .then(() => router._dequeueInstruction(instructionCount + 1))
     .then(innerResult => finalResult || innerResult || result);
 };
 

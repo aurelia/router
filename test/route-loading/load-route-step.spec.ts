@@ -1,6 +1,5 @@
 import '../setup';
 import { Container } from 'aurelia-dependency-injection';
-import { RouteLoader } from '../../src/route-loader';
 import { LoadRouteStep } from '../../src/step-load-route';
 import { NavigationInstruction, Next, PipelineResult, activationStrategy, RouteConfig } from '../../src/aurelia-router';
 import { createNextFn } from '../../src/next';
@@ -11,13 +10,13 @@ describe('RouteLoading -- LoadRouteStep', function() {
   let navInstruction: NavigationInstruction;
   let loadRouteStep: LoadRouteStep;
   let next: Next;
-  let nextResult: PipelineResult;
+  // let nextResult: PipelineResult;
 
   beforeEach(function __setup__() {
     container = new Container();
     loadRouteStep = container.get(LoadRouteStep);
     navInstruction = {
-      addViewPortInstruction(name: string = 'default', config = {}) {
+      addViewPortInstruction(name = 'default', config = {}) {
         return {
           name,
           config

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { Container } from 'aurelia-dependency-injection';
 import { Pipeline } from './pipeline';
 import { BuildNavigationPlanStep } from './step-build-navigation-plan';

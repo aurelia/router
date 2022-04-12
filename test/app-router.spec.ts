@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Container } from 'aurelia-dependency-injection';
 import {
   Router,
@@ -293,7 +294,7 @@ describe('app-router', () => {
       const instructionAfterNav = new MockInstruction('instruction after navigation');
 
       const navigationCommand: NavigationCommand = {
-        navigate: () => new Promise(resolve => {
+        navigate: () => new Promise<void>(resolve => {
           setTimeout(() => {
             router._queue.push(instructionAfterNav);
             pipelineStep = (ctx: any, next: Next) => next.complete({});

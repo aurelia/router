@@ -95,6 +95,7 @@ export class NavigationInstruction {
     this.viewPortInstructions = {};
 
     let ancestorParams = [];
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let current: NavigationInstruction = this;
     do {
       let currentParams = Object.assign({}, current.params);
@@ -305,7 +306,7 @@ export class NavigationInstruction {
   }
 
   /**@internal */
-  _buildTitle(separator: string = ' | '): string {
+  _buildTitle(separator = ' | '): string {
     let title = '';
     let childTitles = [];
     let navModelTitle = this.config.navModel.title;
