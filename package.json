@@ -29,13 +29,17 @@
     "start": "npm run dev -- --format es2015",
     "dev": "node build/scripts/dev",
     "build": "node build/scripts/build",
-    "build:dts": "dts-bundle-generator -o dist/aurelia-router.d.ts src/aurelia-router.ts",
+    "build:dts": "dts-bundle-generator src/aurelia-router.ts -o dist/aurelia-router.d.ts",
     "test": "karma start --single-run",
     "test:watch": "karma start",
     "test:debugger": "karma start --browsers ChromeDebugging",
     "lint": "eslint .",
+    "typedoc": "typedoc src/aurelia-templating-router.ts --json doc/api.json",
+    "posttypedoc": "node doc/cleanup.js",
+    "changelog": "standard-version -t \"\" -i doc/CHANGELOG.md",
     "precut-release": "npm run lint && npm run test && npm run build",
-    "cut-release": "standard-version -t \"\" -i doc/CHANGELOG.md"
+    "cut-release": "npm run changelog",
+    "postcut-release": "npm run typedoc"
   },
   "dependencies": {
     "aurelia-dependency-injection": "^1.0.0",
@@ -70,6 +74,7 @@
     "standard-version": "^9.3.2",
     "ts-loader": "^9.2.8",
     "tslib": "^2.3.1",
+    "typedoc": "^0.22.15",
     "typescript": "^4.6.3",
     "webpack": "^5.72.0",
     "yargs": "^17.4.1"
