@@ -3,7 +3,6 @@
     "target": "es2015",
     "module": "es2015",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": false,
     "moduleResolution": "node",
     "importHelpers": true,
     "stripInternal": true,
@@ -12,9 +11,6 @@
     "noImplicitThis": true,
     "strictFunctionTypes": true,
     "noImplicitReturns": true,
-    "listFiles": true,
-    "declaration": false,
-    "removeComments": false,
     "sourceMap": true,
     "lib": [
       "es2015",

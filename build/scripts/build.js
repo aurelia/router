@@ -66,6 +66,7 @@ function build() {
       plugins: [
         typescript({
           target: 'es2015',
+          removeComments: true,
         }),
       ]
     },
@@ -78,6 +79,7 @@ function build() {
       plugins: [
         typescript({
           target: 'es2017',
+          removeComments: true,
         }),
       ]
     },
@@ -91,7 +93,8 @@ function build() {
       external: externalLibs,
       plugins: [
         typescript({
-          target: 'es5'
+          target: 'es5',
+          removeComments: true,
         }),
       ]
     }
