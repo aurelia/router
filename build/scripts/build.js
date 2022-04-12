@@ -1,10 +1,16 @@
+// @ts-check
 const rollup = require('rollup');
-const typescript = require('rollup-plugin-typescript2');
+/** @type {(options: import('@rollup/plugin-typescript').RollupTypescriptOptions) => import('rollup').Plugin} */
+// @ts-ignore
+const typescript = require('@rollup/plugin-typescript');
 const rimraf = require('rimraf');
 
 const LIB_NAME = 'aurelia-router';
 const cacheRoot = '.rollupcache';
 const externalLibs = [
+  'aurelia-binding',
+  'aurelia-templating',
+  'aurelia-path',
   'aurelia-dependency-injection',
   'aurelia-event-aggregator',
   'aurelia-logging',
@@ -24,7 +30,7 @@ function clean() {
       if (error) {
         throw error;
       }
-      resolve();
+      resolve(void 0);
     });
   });
 }
@@ -48,26 +54,35 @@ function generateDts() {
 
 function build() {
   console.log('\n==============\nBuidling...\n==============');
+  const inputFileName = `src/${LIB_NAME}.ts`;
+
   return Promise.all([
     {
-      input: `src/${LIB_NAME}.ts`,
+      input: inputFileName,
       output: [
         { file: `dist/es2015/${LIB_NAME}.js`, format: 'es', sourcemap: true }
       ],
       external: externalLibs,
       plugins: [
         typescript({
-          tsconfigOverride: {
-            compilerOptions: {
-              target: 'es2015'
-            }
-          },
-          cacheRoot: cacheRoot
+          target: 'es2015',
         }),
       ]
     },
     {
-      input: `src/${LIB_NAME}.ts`,
+      input: inputFileName,
+      output: [
+        { file: `dist/es2017/${LIB_NAME}.js`, format: 'es', sourcemap: true }
+      ],
+      external: externalLibs,
+      plugins: [
+        typescript({
+          target: 'es2017',
+        }),
+      ]
+    },
+    {
+      input: inputFileName,
       output: [
         { file: `dist/commonjs/${LIB_NAME}.js`, format: 'cjs', sourcemap: true },
         { file: `dist/amd/${LIB_NAME}.js`, format: 'amd', amd: { id: LIB_NAME }, sourcemap: true },
@@ -76,13 +91,7 @@ function build() {
       external: externalLibs,
       plugins: [
         typescript({
-          useTsconfigDeclarationDir: true,
-          tsconfigOverride: {
-            compilerOptions: {
-              target: 'es5'
-            }
-          },
-          cacheRoot: cacheRoot
+          target: 'es5'
         }),
       ]
     }
