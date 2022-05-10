@@ -263,7 +263,7 @@ const processResult = (
 
     if (!result.completed) {
       if (result.output instanceof Error) {
-        logger.error(result.output.toString());
+        logger.error(result.output.toString(), result.output);
       }
 
       restorePreviousLocation(router);
